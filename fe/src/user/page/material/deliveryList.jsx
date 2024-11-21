@@ -8,33 +8,31 @@ const { TabPane } = Tabs
 const { Header, Content, Footer } = Layout
 import 'moment/locale/vi'
 import BG from '../../../assets/ItmLogo.png'
+import DeliveryActions from '../../components/actions/material/deliveryActions'
 
-export default function Default({permissions, isMobile}) {
+export default function DeliveryList({permissions, isMobile}) {
     const { t } = useTranslation()
 
     return (
         <Layout className="h-screen  bg-slate-50">
             <Helmet>
-                <title>ITM - {t('Work Page')}</title>
+                <title>ITM - {t('Delivery List')}</title>
             </Helmet>
 
             <div className="h-[calc(100vh-100px)] overflow-auto">
-            <Header className="bg-white shadow-md px-4">
-                <Title level={3} className="text-center">
-                    {t('Work Page Header')}
+            <Header className=" bg-slate-50  px-4 h-auto">
+                <Title level={5} className="mt-2 uppercase">
+                    {t('Delivery List')}
                 </Title>
+                <DeliveryActions/>
             </Header>
 
-            <Content className="flex flex-col  justify-center items-center bg-slate-50 px-4">
-                <div className="text-center">
-                    <img src={BG} className="w-full opacity-45 h-auto mb-10" alt="Background" />
-                </div>
-               
+            <Content className="flex flex-col  h-auto justify-center items-center bg-slate-50 px-4">
                
                
             </Content>
 
-            <Footer className="text-center bg-gray-100">
+            <Footer className="text-center h-auto bg-slate-50">
                 <Text className="text-base">
                     ITM SEMICONDUCTOR CO.,LTD  ©2024
                 </Text>

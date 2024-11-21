@@ -1,6 +1,6 @@
 import { Spin } from 'antd'
 import BG from '../../../assets/ItmLogo.png'
-import { LoadingOutlined } from '@ant-design/icons';
+import { LoadingOutlined } from '@ant-design/icons'
 const Spinner = () => {
   return (
     <div className="grid h-screen place-content-center items-center  justify-center bg-slate-50 ">

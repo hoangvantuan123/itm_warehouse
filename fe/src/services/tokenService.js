@@ -5,22 +5,22 @@ export const accessToken = () => {
 }
 
 export const getEmployeeCode = () => {
-  const userInfo = localStorage.getItem('userInfo');
-  
+  const userInfo = localStorage.getItem('userInfo')
+
   if (userInfo) {
-    const parsedUserInfo = JSON.parse(userInfo);
-    return parsedUserInfo.employee_code || null;
+    const parsedUserInfo = JSON.parse(userInfo)
+    return parsedUserInfo.employee_code || null
   }
-  
-  return null; 
-};
+
+  return null
+}
 export const getId = () => {
-  const userInfo = localStorage.getItem('userInfo');
-  
+  const userInfo = localStorage.getItem('userInfo')
+
   if (userInfo) {
-    const parsedUserInfo = JSON.parse(userInfo);
-    return parsedUserInfo.id || null;
+    const parsedUserInfo = JSON.parse(userInfo)
+    return parsedUserInfo.id || null
   }
-  
-  return null; 
-};
+
+  return null
+}

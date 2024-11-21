@@ -38,7 +38,7 @@ export default function KeyMenu02() {
         onFinish={onFinish}
         autoComplete="off"
         layout="vertical"
-        initialValues={{ email, language, timezone }} 
+        initialValues={{ email, language, timezone }}
       >
         <Title level={5}>
           {t('personal_settings_key_menu_02.notification_method')}

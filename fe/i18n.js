@@ -1,7 +1,5 @@
 import i18n from 'i18next'
-import {
-  initReactI18next
-} from 'react-i18next'
+import { initReactI18next } from 'react-i18next'
 import translationVI from './src/locales/vi.json'
 import translationEN from './src/locales/en.json'
 import translationKO from './src/locales/ko.json'

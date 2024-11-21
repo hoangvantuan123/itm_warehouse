@@ -64,7 +64,7 @@ export default function MenuDrawer({
         sequence: selectedDetails.sequence || '',
         parent_id: selectedDetails.parent_id || null,
         key: selectedDetails.key_name || '',
-        parent_path: selectedDetails.parent_path || ''
+        parent_path: selectedDetails.parent_path || '',
       })
       fetchData()
     }
@@ -77,7 +77,7 @@ export default function MenuDrawer({
       sequence,
       ...(parent_id !== undefined ? { parent_id } : {}),
       key,
-      parent_path
+      parent_path,
     }
 
     try {
@@ -169,14 +169,14 @@ export default function MenuDrawer({
           </Form.Item>
         </div>
         <Form.Item
-            label={t('Parent path')}
-            name="parent_path"
-            style={{ textAlign: 'left' }}
-            className="w-full"
-            rules={[{ required: true, message: t('Vui lòng nhập Parent Path ') }]}
-          >
-            <Input size="large" placeholder={t('Nhập Parent Path')} />
-          </Form.Item>
+          label={t('Parent path')}
+          name="parent_path"
+          style={{ textAlign: 'left' }}
+          className="w-full"
+          rules={[{ required: true, message: t('Vui lòng nhập Parent Path ') }]}
+        >
+          <Input size="large" placeholder={t('Nhập Parent Path')} />
+        </Form.Item>
         <Form.Item
           label="Menu cha"
           name="parent_id"

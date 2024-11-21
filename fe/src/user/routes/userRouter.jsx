@@ -17,7 +17,8 @@ import AddUserSheetDrawer from '../components/add/addUsers'
 import InfoUser from '../page/users/user'
 
 const Users = lazy(() => import('../page/users/users'))
-
+const DeliveryList = lazy(() => import('../page/material/deliveryList'))
+const WaitingIqcStockIn = lazy(() => import('../page/material/waitingIqcStockIn'))
 
 const { Content } = Layout
 
@@ -43,34 +44,36 @@ const UserRouter = () => {
               <Content>
                 <Suspense fallback={<Spinner />}>
                   <Routes>
+                  
                     <Route
-                      path="u/action=gen-info-1-2/from=view"
+                      path="u/material/delivery-list"
                       element={
                         checkActionPermission(userPermissions, '', '') ? (
-                          <Users permissions={userPermissions} isMobile={isMobile} />
+                          <DeliveryList
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
                         ) : (
-                          <Users permissions={userPermissions} isMobile={isMobile} />
+                          <DeliveryList
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
                         )
                       }
                     />
                     <Route
-                      path="u/action=gen-info-1-2/from=add"
+                      path="u/material/waiting-iqc-stock-in"
                       element={
                         checkActionPermission(userPermissions, '', '') ? (
-                          <AddUserSheetDrawer permissions={userPermissions} isMobile={isMobile} />
+                          <WaitingIqcStockIn
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
                         ) : (
-                          <AddUserSheetDrawer permissions={userPermissions} isMobile={isMobile} />
-                        )
-                      }
-                    />
-
-                    <Route
-                      path="u/action=gen-info-1-2/from=detail/user/:id"
-                      element={
-                        checkActionPermission(userPermissions, '', '') ? (
-                          <InfoUser permissions={userPermissions} isMobile={isMobile} />
-                        ) : (
-                          <InfoUser permissions={userPermissions} isMobile={isMobile} />
+                          <WaitingIqcStockIn
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
                         )
                       }
                     />

@@ -1,4 +1,4 @@
-import apiService from '../services/apiService';
+import apiService from '../services/apiService'
 
 export const Delete = (id) => {
   return apiService
@@ -11,12 +11,14 @@ export const Delete = (id) => {
       return {
         success: true,
         message: 'Xóa thành công',
-      };
+      }
     })
     .catch((error) => {
       return {
         success: false,
-        message: error.response ? error.response.data.message || 'Có lỗi xảy ra' : 'Không thể kết nối tới server',
-      };
-    });
-};
+        message: error.response
+          ? error.response.data.message || 'Có lỗi xảy ra'
+          : 'Không thể kết nối tới server',
+      }
+    })
+}

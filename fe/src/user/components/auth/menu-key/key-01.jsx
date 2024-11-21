@@ -7,18 +7,19 @@ import {
   DatePicker,
   Row,
   Col,
-} from 'antd';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import moment from 'moment';
-import DefaultAvatar from '../../../../assets/default-avatar.png';
-import '../static/css/scroll_container.css';
+} from 'antd'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import moment from 'moment'
+import DefaultAvatar from '../../../../assets/default-avatar.png'
+import '../static/css/scroll_container.css'
 
-const { Title } = Typography;
+const { Title } = Typography
 
 export default function KeyMenu01() {
-  const { t } = useTranslation();
-  const userFromLocalStorage = JSON.parse(localStorage.getItem('userInfo')) || {};
+  const { t } = useTranslation()
+  const userFromLocalStorage =
+    JSON.parse(localStorage.getItem('userInfo')) || {}
 
   const [formData, setFormData] = useState({
     firstName: userFromLocalStorage.firstName || '',
@@ -28,15 +29,15 @@ export default function KeyMenu01() {
     birthDate: userFromLocalStorage.birthDate
       ? moment(userFromLocalStorage.birthDate)
       : null,
-  });
+  })
 
   const handleInputChange = (field, value) => {
-    setFormData({ ...formData, [field]: value });
-  };
+    setFormData({ ...formData, [field]: value })
+  }
 
   const onFinish = (values) => {
-    console.log('Submitted:', values);
-  };
+    console.log('Submitted:', values)
+  }
 
   const CustomInput = ({ label, field }) => (
     <Form.Item label={label} name={field}>
@@ -46,11 +47,13 @@ export default function KeyMenu01() {
         onChange={(e) => handleInputChange(field, e.target.value)}
       />
     </Form.Item>
-  );
+  )
 
   return (
     <div className="h-full overflow-auto scrollable-content scroll-container">
-      <Title level={4}>{t('personal_settings_key_menu_01.personal_settings')}</Title>
+      <Title level={4}>
+        {t('personal_settings_key_menu_01.personal_settings')}
+      </Title>
 
       <div className="flex items-center gap-4 mb-4">
         <Avatar
@@ -60,7 +63,9 @@ export default function KeyMenu01() {
         />
         <div>
           <Title level={5}>{userFromLocalStorage.login || 'none'}</Title>
-          <span>{t('personal_settings_key_menu_01.your_personal_account')}</span>
+          <span>
+            {t('personal_settings_key_menu_01.your_personal_account')}
+          </span>
         </div>
       </div>
 
@@ -71,7 +76,9 @@ export default function KeyMenu01() {
         layout="vertical"
       >
         {/* Personal Information Section */}
-        <Title level={5}>{t('personal_settings_key_menu_01.personal_information')}</Title>
+        <Title level={5}>
+          {t('personal_settings_key_menu_01.personal_information')}
+        </Title>
         <Row gutter={16}>
           <Col xs={24} sm={12}>
             <CustomInput
@@ -88,7 +95,9 @@ export default function KeyMenu01() {
         </Row>
 
         {/* Contact Information Section */}
-        <Title level={5}>{t('personal_settings_key_menu_01.contact_information')}</Title>
+        <Title level={5}>
+          {t('personal_settings_key_menu_01.contact_information')}
+        </Title>
         <Row gutter={16}>
           <Col xs={24} sm={12}>
             <CustomInput
@@ -120,9 +129,7 @@ export default function KeyMenu01() {
             </Form.Item>
           </Col>
         </Row>
-
-
       </Form>
     </div>
-  );
+  )
 }

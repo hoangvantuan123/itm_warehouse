@@ -25,7 +25,6 @@ export default function Setting({ userNameLogin }) {
         <Avatar shape="square" icon={<UserOutlined />} />
         <Text className="text-sm font-medium">{userNameLogin}</Text>
       </div>
-  
     </div>
   )
 }

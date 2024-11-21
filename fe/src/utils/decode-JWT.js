@@ -14,8 +14,6 @@ const decodeJWT = (token) => {
 
 export default decodeJWT
 
-
-
 export const encodeBase64Url = (str) => {
-  return str.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-};
+  return str.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}

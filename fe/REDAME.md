@@ -1,38 +1,38 @@
 # Sử dụng phiên bản nhẹ của Node.js
+
 FROM node:20-alpine
 
 # Đặt thư mục làm việc
+
 WORKDIR /app
 
 # Sao chép package.json và yarn.lock trước để tận dụng Docker cache
+
 COPY package.json yarn.lock ./
 
 # Cài đặt dependencies
+
 RUN yarn install --frozen-lockfile && yarn cache clean
 
 # Sao chép toàn bộ mã nguồn
+
 COPY . .
 
 # Cài đặt PM2
+
 RUN yarn global add pm2
 
 # Mở cổng ứng dụng
+
 EXPOSE 3000
 
 # Lệnh khởi chạy ứng dụng bằng PM2
+
 CMD ["pm2-runtime", "start", "npm", "--", "run", "start"]
-
-
-
-
 
 # yarn global add http-server
 
-
 ## pm2 start http-server --name "my-react-app" -- -p 3000 ./dist
-
-
-
 
 ```
 import { useEffect, useRef, useState } from 'react';
@@ -162,7 +162,7 @@ export default function SheetView({ dbData: compressedData }) {
             <button onClick={clearDatabase} style={{ marginTop: '20px' }}>
                 Clear IndexedDB
             </button>
-            
+
             <div ref={hotTableRef}>
                 {isLoading && <p>Loading...</p>}
             </div>
