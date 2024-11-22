@@ -6,18 +6,19 @@ const { Title, Text } = Typography;
 const { Header, Content, Footer } = Layout;
 import 'moment/locale/vi';
 import WaitingIqcStockInActions from '../../components/actions/material/waitingIqcStockInActions';
+import TableTransferWaitingIqcStockIn from '../../components/table/material/tableTransferWaitingIqcStockIn';
 
 // Dữ liệu mẫu (dataTest)
 const dataTest = [
-    { "id": 1, "code": "A001", "quantity": 100, "quantityOut": 0, "quantityRemaining": 100 },
-    { "id": 2, "code": "A002", "quantity": 200, "quantityOut": 0, "quantityRemaining": 200 },
-    { "id": 3, "code": "A003", "quantity": 150, "quantityOut": 0, "quantityRemaining": 150 },
-    { "id": 4, "code": "A004", "quantity": 300, "quantityOut": 0, "quantityRemaining": 300 },
-    { "id": 5, "code": "A005", "quantity": 50, "quantityOut": 0, "quantityRemaining": 50 },
-    { "id": 6, "code": "A006", "quantity": 120, "quantityOut": 0, "quantityRemaining": 120 },
-    { "id": 7, "code": "A007", "quantity": 180, "quantityOut": 0, "quantityRemaining": 180 },
-    { "id": 8, "code": "A008", "quantity": 75, "quantityOut": 0, "quantityRemaining": 75 },
-    { "id": 67, "code": "A067", "quantity": 400, "quantityOut": 0, "quantityRemaining": 400 },
+  { "id": 1, "code": "A001", "quantity": 100, "quantityOut": 0, "quantityRemaining": 100 },
+  { "id": 2, "code": "A002", "quantity": 200, "quantityOut": 0, "quantityRemaining": 200 },
+  { "id": 3, "code": "A003", "quantity": 150, "quantityOut": 0, "quantityRemaining": 150 },
+  { "id": 4, "code": "A004", "quantity": 300, "quantityOut": 0, "quantityRemaining": 300 },
+  { "id": 5, "code": "A005", "quantity": 50, "quantityOut": 0, "quantityRemaining": 50 },
+  { "id": 6, "code": "A006", "quantity": 120, "quantityOut": 0, "quantityRemaining": 120 },
+  { "id": 7, "code": "A007", "quantity": 180, "quantityOut": 0, "quantityRemaining": 180 },
+  { "id": 8, "code": "A008", "quantity": 75, "quantityOut": 0, "quantityRemaining": 75 },
+  { "id": 67, "code": "A067", "quantity": 400, "quantityOut": 0, "quantityRemaining": 400 },
 ];
 
 export default function WaitingIqcStockIn({ permissions, isMobile }) {
@@ -27,15 +28,14 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const workerRef = useRef(null);
   const inputCodeRef = useRef(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [inputCode, setInputCode] = useState(""); 
-  const [inputQuantity, setInputQuantity] = useState(0); 
-  const [oldData, setOldData] = useState([]); 
-  const [processedData, setProcessedData] = useState([]); 
-  const [data, setData] = useState(dataTest); 
+  const [inputCode, setInputCode] = useState("");
+  const [inputQuantity, setInputQuantity] = useState(0);
+  const [oldData, setOldData] = useState([]);
+  const [processedData, setProcessedData] = useState([]);
+  const [data, setData] = useState(dataTest);
 
-  // Khởi tạo Web Worker
   useEffect(() => {
-    workerRef.current = new Worker(new URL('./worker.js', import.meta.url));
+    workerRef.current = new Worker(new URL('../../../workers/workerWatingIqcStockIn.js', import.meta.url));
 
     workerRef.current.onmessage = (event) => {
       const { type, payload } = event.data;
@@ -43,8 +43,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
         if (payload.error) {
           message.error(payload.error);
         } else {
-          // A001/99
-          setData(payload.updatedData); 
+          setData(payload.updatedData);
           setProcessedData((prevData) => [...prevData, payload.processedData]);
           setOldData((prevData) => [
             ...prevData,
@@ -118,59 +117,24 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   return (
     <Layout className="h-screen bg-slate-50">
       <Helmet>
-        <title>ITM - {t('Waiting Iqc Stock In')}</title>
+        <title>ITM - {t('Delivery List')}</title>
       </Helmet>
 
-      <div className="h-[calc(100vh-100px)] overflow-auto">
-        <Header className="bg-slate-50 px-4 h-auto">
+      <div className="flex flex-col h-full ">
+        <Header className="bg-slate-50 px-4 h-auto flex-shrink-0">
           <Title level={5} className="mt-2 uppercase">
             {t('Waiting Iqc Stock In')}
           </Title>
           <WaitingIqcStockInActions />
         </Header>
 
-        <Content className="flex h-auto justify-center items-center bg-slate-50 px-4">
-          <div style={{ marginBottom: 20, width: '100%' }}>
-            <Title level={4}>Nhập mã và số lượng</Title>
-            <Space style={{ display: 'flex', marginBottom: 20 }}>
-              <Input
-                ref={inputCodeRef} 
-                value={inputCode}
-                onChange={handleCodeChange}
-                onKeyDown={handleEnterPress} 
-                placeholder="Nhập mã/số lượng (Ví dụ: A001/50)"
-                style={{ width: '150px' }}
-              />
-            </Space>
-          </div>
-
-          <div style={{ marginTop: 40 }}>
-            <Title level={4}>Dữ liệu gốc</Title>
-            <Table
-              style={{ marginTop: 20 }}
-              columns={[
-                { title: 'Mã', dataIndex: 'code', key: 'code' },
-                { title: 'Số lượng còn lại', dataIndex: 'quantityRemaining', key: 'quantityRemaining' },
-              ]}
-              dataSource={data} 
-              pagination={false}
-            />
-          </div>
-
-          <div style={{ marginTop: 40 }}>
-            <Title level={4}>Dữ liệu mới (Số lượng đã nhập)</Title>
-            <Table
-              style={{ marginTop: 20 }}
-              columns={columnsProcessedData}
-              dataSource={processedData}
-              pagination={false}
-            />
+        <Content className="flex-grow px-4  bg-slate-50">
+          <div className="h-full flex flex-col">
+            <div className="flex-grow">
+              <TableTransferWaitingIqcStockIn />
+            </div>
           </div>
         </Content>
-
-        <Footer className="text-center h-auto bg-slate-50">
-          <Text className="text-base">ITM SEMICONDUCTOR CO.,LTD ©2024</Text>
-        </Footer>
       </div>
     </Layout>
   );

@@ -67,7 +67,24 @@ export const menuSettingItems = [
     label: 'KITTING',
     icon: <InboxOutlined style={{ fontSize: '20px' }} />,
     link: '/u/kitting',
-    type: 'menu',
+    type: 'submenu',
+    subMenu: [
+      {
+        key: 'kitting-1-1',
+        label: 'CONFIRM',
+        link: '/u/kitting/confirm',
+      },
+      {
+        key: 'kitting-1-2',
+        label: 'KITTING OUT',
+        link: '/u/kitting/kitting-out',
+      },
+      {
+        key: 'kitting-1-3',
+        label: '1D TO 2D PRINT',
+        link: '/u/kitting/1d-to-2d-print',
+      },
+    ],
   },
   {
     id: 5,

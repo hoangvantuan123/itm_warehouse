@@ -13,10 +13,7 @@ import Cookies from 'js-cookie'
 import { useTranslation } from 'react-i18next'
 import { checkActionPermission } from '../../permissions'
 import Spinner from '../page/default/load'
-import AddUserSheetDrawer from '../components/add/addUsers'
-import InfoUser from '../page/users/user'
 
-const Users = lazy(() => import('../page/users/users'))
 const DeliveryList = lazy(() => import('../page/material/deliveryList'))
 const WaitingIqcStockIn = lazy(() => import('../page/material/waitingIqcStockIn'))
 
@@ -28,9 +25,6 @@ const UserRouter = () => {
   const location = useLocation()
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userPermissions, setUserPermissions] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [showSpinner, setShowSpinner] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
 
   return (

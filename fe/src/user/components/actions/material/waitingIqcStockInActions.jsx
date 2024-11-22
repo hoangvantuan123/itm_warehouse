@@ -1,96 +1,80 @@
-import { useState, useCallback, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-import { Helmet } from 'react-helmet'
-import { Card, Input, Button, DatePicker, Select, Space, Typography } from 'antd'
-import { SearchOutlined, SaveOutlined } from '@ant-design/icons'
+import { useState } from 'react';
+import { Card, Input, Button, DatePicker, Space, Typography } from 'antd';
+import { SaveOutlined } from '@ant-design/icons';
 
-const { RangePicker } = DatePicker
+const { RangePicker } = DatePicker;
 
-export default function WaitingIqcStockInActions({
-  handleSearch,
-  setDateRange,
-  dateRange,
-  setDeliveryNo,
-  setStockIn,
-}) {
-  const { t } = useTranslation()
-  const navigate = useNavigate()
-  const [deliveryNo, setLocalDeliveryNo] = useState('')
-  const [stockIn, setLocalStockIn] = useState('')
-  const [date1, setDate1] = useState(null)
-  const [date2, setDate2] = useState(null)
-
-  const handleDate1Change = (date, dateString) => {
-    setDate1(date)
-    setDateRange([dateString, date2])
-  }
-
-  const handleDate2Change = (date, dateString) => {
-    setDate2(date)
-    setDateRange([date1, dateString])
-  }
-
-  const handleDeliveryNoChange = (e) => {
-    setLocalDeliveryNo(e.target.value)
-    setDeliveryNo(e.target.value)
-  }
-
-  const handleStockInChange = (value) => {
-    setLocalStockIn(value)
-    setStockIn(value)
-  }
-
-  const handleSearchClick = () => {
-    handleSearch() 
-  }
+export default function WaitingIqcStockInActions() {
+  const [yyww, setYyww] = useState(null);
+  const [yyyymm, setYyyymm] = useState(null);
 
   return (
     <div className="mt-1">
-      <Card
-        bordered={false}
-        className="mb-2"
-        style={{ width: '100%' }}
-        size="small"
-      >
-        <div className="flex gap-4 justify-between">
-
-          <Space direction="vertical" size={12} style={{ width: '100%' }}>
+      {/* Card 1 */}
+      <Card className="mb-2 p-2 shadow-sm" size="small">
+        <div className="flex gap-2">
+          <Space direction="vertical" size={8}>
             <Typography.Text>YYWW</Typography.Text>
             <Input
-              value={deliveryNo}
-              onChange={handleDeliveryNoChange}
-              placeholder="Enter Delivery No"
+              placeholder="Enter YYWW"
+              value={yyww}
+              onChange={(e) => setYyww(e.target.value)}
             />
           </Space>
-          <Space direction="vertical" size={12} style={{ width: '100%' }}>
+          <Space direction="vertical" size={8}>
             <Typography.Text>YYYYMM</Typography.Text>
             <Input
-              value={deliveryNo}
-              onChange={handleDeliveryNoChange}
-              placeholder="Enter Delivery No"
+              placeholder="Enter YYYYMM"
+              value={yyyymm}
+              onChange={(e) => setYyyymm(e.target.value)}
             />
           </Space>
-
         </div>
 
-        <div className="flex gap-4 justify-end mt-4">
-          <Button
-            type="primary"
-            icon={<SaveOutlined />}
-            size="middle"
-          >
-            Search
-          </Button>
-          <Button
-            type="default"
-            icon={<SaveOutlined />}
-            size="middle"
-          >
-            Stock In
-          </Button>
+        <div className="flex gap-2 justify-end mt-3">
+          {['Save', 'Row Delete', 'Reset', 'Excel Upload'].map((label) => (
+            <Button
+              key={label}
+              type={label === 'Save' ? 'primary' : 'default'}
+              icon={<SaveOutlined />}
+              size="middle"
+              className="uppercase"
+            >
+              {label}
+            </Button>
+          ))}
+        </div>
+      </Card>
+      <Card className="mb-2 p-2 shadow-sm" size="small">
+        <div className="flex gap-2">
+          <Space direction="vertical" size={8}>
+            <Typography.Text>DATE</Typography.Text>
+            <DatePicker className="w-full" />
+          </Space>
+          <Space direction="vertical" size={8}>
+            <Typography.Text>PURCHASE TYPE</Typography.Text>
+            <Input className="w-full bg-blue-50" />
+
+          </Space>
+          <Space direction="vertical" size={8}>
+            <Typography.Text>DELIVERY NO</Typography.Text>
+            <Input className="w-full bg-blue-50" />
+          </Space>
+          <Space direction="vertical" size={8}>
+            <Typography.Text className="text-red-500">MAT BARCODE</Typography.Text>
+            <Input className="w-full bg-blue-50" />
+
+          </Space>
+          <Space direction="vertical" size={8}>
+            <Typography.Text>ACC UNIT</Typography.Text>
+            <Input className="w-full bg-blue-50" />
+          </Space>
+          <Space direction="vertical" size={8}>
+            <Typography.Text>WH NAME</Typography.Text>
+            <Input className="w-full bg-blue-50" />
+          </Space>
         </div>
       </Card>
     </div>
-  )
+  );
 }

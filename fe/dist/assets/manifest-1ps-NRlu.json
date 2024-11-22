@@ -1,7 +1,7 @@
 {
-  "name": "ITM MES PDA",
-  "short_name": "ITM MES PDA",
-  "description": "MES WEB APP",
+  "name": "ITM WAREHOUSE",
+  "short_name": "ITM WAREHOUSE",
+  "description": "ITM WAREHOUSE",
   "start_url": "/",
   "display": "fullscreen",
   "background_color": "#f8fafc",

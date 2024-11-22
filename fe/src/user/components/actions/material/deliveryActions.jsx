@@ -42,38 +42,33 @@ export default function DeliveryActions({
   }
 
   const handleSearchClick = () => {
-    handleSearch() 
+    handleSearch()
   }
 
   return (
     <div className="mt-1">
       <Card
-        title="Query Condition"
-        bordered={false}
-        className="mb-2"
-        style={{ width: '100%' }}
+        className="mb-2 shadow-none"
         size="small"
       >
-        <div className="flex gap-4 justify-between">
-          <Space direction="vertical" size={12} style={{ width: '100%' }}>
+        <div className="flex gap-4">
+          <Space direction="vertical" size={12} >
             <Typography.Text>Date 1</Typography.Text>
             <DatePicker
               value={date1}
               onChange={handleDate1Change}
-              style={{ width: '100%' }}
+              className="w-auto"
             />
           </Space>
-
-          <Space direction="vertical" size={12} style={{ width: '100%' }}>
+          <Space direction="vertical" size={12} >
             <Typography.Text>Date 2</Typography.Text>
             <DatePicker
               value={date2}
               onChange={handleDate2Change}
-              style={{ width: '100%' }}
             />
           </Space>
 
-          <Space direction="vertical" size={12} style={{ width: '100%' }}>
+          <Space direction="vertical" size={12} >
             <Typography.Text>Delivery No</Typography.Text>
             <Input
               value={deliveryNo}
@@ -82,35 +77,60 @@ export default function DeliveryActions({
             />
           </Space>
 
-          <Space direction="vertical" size={12} style={{ width: '100%' }}>
+          <Space direction="vertical" size={12} >
             <Typography.Text>Stock In</Typography.Text>
             <Select
+              id="typeSelect"
+              defaultValue="All"
+              style={{
+                width: 200,
+              }}
+              size="middle"
               value={stockIn}
               onChange={handleStockInChange}
-              placeholder="Select Stock"
-              style={{ width: '100%' }}
-            >
-              <Select.Option value="stock1">Stock 1</Select.Option>
-              <Select.Option value="stock2">Stock 2</Select.Option>
-              <Select.Option value="stock3">Stock 3</Select.Option>
-            </Select>
+              options={[
+                {
+                  value: 0,
+                  label: 'All',
+                },
+                {
+                  value: 1,
+                  label: 'ITM SEMI',
+                },
+                {
+                  value: 2,
+                  label: 'ITM PACK',
+                },
+                {
+                  value: 3,
+                  label: 'ITM PSG (F3)',
+                },
+                {
+                  value: 4,
+                  label: 'ITM PSG (F4)',
+                },
+              ]}
+            />
           </Space>
         </div>
 
         <div className="flex gap-4 justify-end mt-4">
-          <Button
-            type="primary"
-            icon={<SaveOutlined />}
-            size="middle"
-          >
-            Search
-          </Button>
+
           <Button
             type="default"
             icon={<SaveOutlined />}
-            size="middle"
+           size="middle"
+            className="uppercase"
           >
-            Stock In
+            Stock In (IQC)
+          </Button>
+          <Button
+            type="primary"
+            icon={<SearchOutlined />}
+           size="middle"
+            className="uppercase"
+          >
+            Search
           </Button>
         </div>
       </Card>
