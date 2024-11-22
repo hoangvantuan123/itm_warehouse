@@ -12,17 +12,19 @@ export default function WaitingIqcStockInQuery() {
   const handleDateChange = (date) => {
     setDate(date);
   };
+
   return (
     <div className="flex items-center gap-2">
       <Form layout="vertical">
         <Row gutter={16}>
           <Col span={4}>
             <Form.Item
-              label={<span className="uppercase">Date</span>}
+              label={<span className="uppercase text-xs">Date</span>}
               required
+              className="mb-0"
             >
               <DatePicker
-                className="w-full"
+                className="w-full text-sm p-2"  // Small size, padding
                 value={date}
                 onChange={handleDateChange}
                 format="YYYY-MM-DD"
@@ -31,68 +33,79 @@ export default function WaitingIqcStockInQuery() {
           </Col>
 
           <Col span={4}>
-            <Form.Item label={<span className="uppercase">Delivery No</span>}>
+            <Form.Item 
+              label={<span className="uppercase text-xs">Delivery No</span>}
+              className="mb-0"
+            >
               <Input
                 placeholder="Input placeholder"
                 value={deliveryNo}
-                size="middle"
+                size="small"  
                 onChange={(e) => setDeliveryNo(e.target.value)}
-                className="bg-red-50"
+                className="bg-red-50 text-sm p-2" 
               />
             </Form.Item>
           </Col>
 
           <Col span={4}>
             <Form.Item
-              label={<span className="uppercase">Acc Unit</span>}
+              label={<span className="uppercase text-xs">Acc Unit</span>}
               required
+              className="mb-0"
             >
               <Input
                 placeholder="Input placeholder"
                 value={accUnit}
-                size="middle"
+                size="small"
                 onChange={(e) => setAccUnit(e.target.value)}
-                className="bg-red-50"
+                className="bg-red-50 text-sm p-2"
               />
             </Form.Item>
           </Col>
 
           <Col span={4}>
-            <Form.Item label={<span className="uppercase">Purchase Type</span>}>
+            <Form.Item 
+              label={<span className="uppercase text-xs">Purchase Type</span>}
+              className="mb-0"
+            >
               <Input
                 placeholder="Input placeholder"
                 value={purchaseType}
-                size="middle"
+                size="small"
                 onChange={(e) => setPurchaseType(e.target.value)}
-                className="bg-red-50"
+                className="bg-red-50 text-sm p-2"
               />
             </Form.Item>
           </Col>
 
           <Col span={4}>
             <Form.Item
-              label={<span className="uppercase">MAT Barcode</span>}
+              label={<span className="uppercase text-xs">MAT Barcode</span>}
               required
               tooltip="Barcode auto"
+              className="mb-0"
             >
               <Input
                 placeholder="Input placeholder"
                 value={matBarcode}
-                size="middle"
+                size="small"
                 onChange={(e) => setMatBarcode(e.target.value)}
-                className="bg-red-50"
+                className="bg-red-50 text-sm p-2"
               />
             </Form.Item>
           </Col>
 
           <Col span={4}>
-            <Form.Item label={<span className="uppercase">WH Name</span>}>
+            <Form.Item 
+              label={<span className="uppercase text-xs">WH Name</span>}
+              className="mb-0"
+            >
               <Input
                 placeholder="Input placeholder"
                 value={whName}
-                size="middle"
+                size="small"
                 onChange={(e) => setWhName(e.target.value)}
-                className="bg-red-50"
+                className="bg-red-50 text-sm p-2"
               />
             </Form.Item>
           </Col>

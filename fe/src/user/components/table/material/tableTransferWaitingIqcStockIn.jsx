@@ -33,7 +33,7 @@ const generateFakeData = (numRows = 20) => {
 
 function TableTransferWaitingIqcStockIn() {
   const navigate = useNavigate()
-  const data = generateFakeData(20)  // Generate 20 rows of fake data
+  const data = generateFakeData(20)
 
   const columnsB = [
     {
@@ -42,13 +42,15 @@ function TableTransferWaitingIqcStockIn() {
       sortable: true,
       filter: 'text',
       resizable: true,
+      width: 200,
     },
     { 
       name: 'deliveryNo', 
       header: 'Delivery No', 
       sortable: true, 
       filter: 'text', 
-      resizable: true 
+      resizable: true ,
+      width: 200,
     },
     {
       name: 'deliveryType',
@@ -56,20 +58,23 @@ function TableTransferWaitingIqcStockIn() {
       sortable: true,
       filter: 'text',
       resizable: true,
+      width: 200,
     },
     { 
       name: 'totalQty', 
       header: 'Total Qty', 
       sortable: true, 
       filter: 'text', 
-      resizable: true 
+      resizable: true ,
+      width: 200,
     },
     { 
       name: 'residID', 
       header: 'ResidID', 
       sortable: true, 
       filter: 'text', 
-      resizable: true 
+      resizable: true ,
+      width: 200,
     },
   ]
 
@@ -172,9 +177,8 @@ function TableTransferWaitingIqcStockIn() {
   TuiGrid.applyTheme('striped')
 
   return (
-    <div className="w-full h-full flex gap-10">
-      {/* Bảng A */}
-      <div className="w-1/2 flex flex-col h-full">
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="w-1/2 flex flex-col h-[500px]">
         <div className="p-2 font-bold text-xl">Bảng A</div>
         <Grid
           data={data}
@@ -189,12 +193,17 @@ function TableTransferWaitingIqcStockIn() {
           heightResizable={true}
           usageStatistics={true}
           hoverable={true}
-          scrollX={true}  // Bật cuộn ngang cho bảng A
+          scrollX={true}  
         />
       </div>
 
-      {/* Bảng B */}
-      <div className="w-1/2 flex flex-col h-full">
+      {/* Icon between the tables */}
+      <div className="px-4 flex flex-col items-center justify-center">
+        <div className="text-3xl">&#8594;</div> 
+       
+      </div>
+
+      <div className="w-1/2  flex flex-col h-[500px]">
         <div className="p-2 font-bold text-xl">Bảng B</div>
         <Grid
           data={data}

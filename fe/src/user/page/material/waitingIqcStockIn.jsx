@@ -167,45 +167,47 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
 
   return (
     <Layout className="h-screen bg-slate-50">
-    <Helmet>
-      <title>ITM - {t('Waiting Iqc Stock In')}</title>
-    </Helmet>
-  
-    <div className="flex flex-col h-full">
-      <Header className="bg-slate-50 px-4 h-auto flex-shrink-0">
-        <div className="flex items-center mb-2 justify-between">
-          <Title level={4} className="mt-2 uppercase opacity-85">
-            Waiting Iqc Stock In
-          </Title>
-          <WaitingIqcStockInActions />
-        </div>
-       
-        <details className="group p-2  [&_summary::-webkit-details-marker]:hidden  bg-white border rounded-lg">
-  <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
-    <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600">
-      <FilterOutlined />
-      {t('Điều kiện truy vấn')}
-    </h2>
-    <span className="relative size-5 shrink-0">
-      <ArrowIcon />
-    </span>
-  </summary>
-  <div className="flex p-2 gap-4">
-  <WaitingIqcStockInQuery />
-  </div>
-</details>
+      <Helmet>
+        <title>ITM - {t('Waiting Iqc Stock In')}</title>
+      </Helmet>
 
-      </Header>
-  
-      <Content className="flex-grow px-4  bg-slate-50 mt-2">
-        <div className="flex flex-col h-full">
-          <div className="flex-grow ">
-            <TableTransferWaitingIqcStockIn />
+      <div className="flex flex-col  h-full">
+        <Header className="bg-slate-50 px-4 h-auto flex-shrink-0">
+          <div className=" flex item-center mb-2 justify-between ">
+            <Title level={4} className="mt-2 uppercase opacity-85 ">
+              waiting Iqc Stock In
+            </Title>
+            <WaitingIqcStockInActions />
           </div>
-        </div>
-      </Content>
-    </div>
-  </Layout>
-  
+          <details
+            className="group p-2  [&_summary::-webkit-details-marker]:hidden  bg-white border rounded-lg"
+            open
+          >
+            <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
+              <h2 className=" text-xs font-medium flex items-center gap-2 text-blue-600">
+                {' '}
+                <FilterOutlined />
+                {t('Điều kiện truy vấn')}
+              </h2>
+              <span className="relative size-5 shrink-0">
+                <ArrowIcon />
+              </span>
+            </summary>
+            <div className="flex p-2  gap-4">
+              <WaitingIqcStockInQuery />
+            </div>
+          </details>
+        </Header>
+
+
+        <Content className="flex-grow px-4  overflow-auto bg-slate-50 mt-2">
+          <div className=" h-ful flex flex-col">
+            <div className="flex-grow">
+              <TableTransferWaitingIqcStockIn />
+            </div>
+          </div>
+        </Content>
+      </div>
+    </Layout>
   )
 }
