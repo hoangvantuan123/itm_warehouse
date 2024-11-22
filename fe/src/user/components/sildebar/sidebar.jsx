@@ -1,125 +1,130 @@
-import { Layout, Menu, Typography , Checkbox, Dropdown, Button} from 'antd';
-import { Link } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import SidebarContent from './styled/toggleSidebar';
-import Logo from '../../../assets/192.png';
-import { useTranslation } from 'react-i18next';
+import { Layout, Menu, Typography, Checkbox, Dropdown, Button } from 'antd'
+import { Link } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import SidebarContent from './styled/toggleSidebar'
+import Logo from '../../../assets/192.png'
+import { useTranslation } from 'react-i18next'
 import {
   SettingOutlined,
   SearchOutlined,
   AppstoreOutlined,
   AppstoreAddOutlined,
   UserOutlined,
-  InboxOutlined,
-  PushpinOutlined, 
-  PlusOutlined,  
-} from '@ant-design/icons';
-import { SettingIcon, FileMenuIcon, LogoutIcon } from './icon';
-import { menuSettingItems, menuItems } from './dataMenu';
+  PlusOutlined,
+} from '@ant-design/icons'
+import { SettingIcon, FileMenuIcon, LogoutIcon } from './icon'
+import { menuSettingItems, menuItems } from './dataMenu'
 
-const { Sider, Footer } = Layout;
-const { SubMenu } = Menu;
-const { Title, Text } = Typography;
-const menuStyle = { borderInlineEnd: 'none' };
-import './static/css/scroll_container.css';
+const { Sider, Footer } = Layout
+const { SubMenu } = Menu
+const { Title, Text } = Typography
+const menuStyle = { borderInlineEnd: 'none' }
+import './static/css/scroll_container.css'
 
 const Sidebar = ({ permissions }) => {
-  const location = useLocation();
-  const userFromLocalStorage = JSON.parse(localStorage.getItem('userInfo'));
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
-  const [selectedItems, setSelectedItems] = useState(() => {
-    const storedSelections = JSON.parse(localStorage.getItem('selectedMenuItems')) || [];
-    return storedSelections;
-  });
-  const userNameLogin = userFromLocalStorage?.login || 'none';
-  const [collapsed, setCollapsed] = useState(() => {
-    const savedState = localStorage.getItem('COLLAPSED_STATE');
-    return savedState ? JSON.parse(savedState) : false;
-  });
-  const [isMobile, setIsMobile] = useState(false);
-  const [menu, setMenu] = useState(() => {
-    const savedMenuState = localStorage.getItem('menu');
-    return savedMenuState ? JSON.parse(savedMenuState) : true; 
-  });
-  const [isMenu, setIsMenu] = useState(localStorage.getItem('isMenu') || null);  
-  const [labelMenu, setLabelMenu] = useState(localStorage.getItem('labelMenu') || null); 
+  const location = useLocation()
+  const userFromLocalStorage = JSON.parse(localStorage.getItem('userInfo'))
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
-  const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState(sessionStorage.getItem('current_action_phone'));
-  const [currentAction, setCurrentAction] = useState(sessionStorage.getItem('current_action'));
+  const [selectedItems, setSelectedItems] = useState(() => {
+    const storedSelections =
+      JSON.parse(localStorage.getItem('selectedMenuItems')) || []
+    return storedSelections
+  })
+  const userNameLogin = userFromLocalStorage?.login || 'none'
+  const [collapsed, setCollapsed] = useState(() => {
+    const savedState = localStorage.getItem('COLLAPSED_STATE')
+    return savedState ? JSON.parse(savedState) : false
+  })
+  const [isMobile, setIsMobile] = useState(false)
+  const [menu, setMenu] = useState(() => {
+    const savedMenuState = localStorage.getItem('menu')
+    return savedMenuState ? JSON.parse(savedMenuState) : true
+  })
+  const [isMenu, setIsMenu] = useState(localStorage.getItem('isMenu') || null)
+  const [labelMenu, setLabelMenu] = useState(
+    localStorage.getItem('labelMenu') || null,
+  )
+
+  const { t } = useTranslation()
+  const [activeTab, setActiveTab] = useState(
+    sessionStorage.getItem('current_action_phone'),
+  )
+  const [currentAction, setCurrentAction] = useState(
+    sessionStorage.getItem('current_action'),
+  )
 
   const toggleSidebar = () => {
     setCollapsed((prevState) => {
-      const newState = !prevState;
-      localStorage.setItem('COLLAPSED_STATE', JSON.stringify(newState));
-      return newState;
-    });
-  };
+      const newState = !prevState
+      localStorage.setItem('COLLAPSED_STATE', JSON.stringify(newState))
+      return newState
+    })
+  }
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
+      setIsMobile(window.innerWidth <= 768)
+    }
 
-    handleResize();
-    window.addEventListener('resize', handleResize);
+    handleResize()
+    window.addEventListener('resize', handleResize)
 
     return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
 
   const handleonclickMenu = (e) => {
-    setIsMenu(e.key);
-    setLabelMenu(e.label);
-    localStorage.setItem('isMenu', e.key);  
-    localStorage.setItem('labelMenu', e.label); 
+    setIsMenu(e.key)
+    setLabelMenu(e.label)
+    localStorage.setItem('isMenu', e.key)
+    localStorage.setItem('labelMenu', e.label)
     setCollapsed(false)
-  };
+  }
 
   if (location.pathname === '/u/login') {
-    return null;
+    return null
   }
 
   const handleOnClickMenuItem = (e) => {
-    sessionStorage.setItem('current_action', e.key);
-    setCurrentAction(e.key);
-  };
+    sessionStorage.setItem('current_action', e.key)
+    setCurrentAction(e.key)
+  }
 
   const handleOnClickMenuItemPhone = (e) => {
-    sessionStorage.setItem('current_action_phone', e);
-    setActiveTab(e);
-  };
+    sessionStorage.setItem('current_action_phone', e)
+    setActiveTab(e)
+  }
 
   const handleOnClickMenu = () => {
-    setMenu(!menu);
-    localStorage.setItem('menu', !menu); 
-  };
+    setMenu(!menu)
+    localStorage.setItem('menu', !menu)
+  }
   const handleCheckboxChange = (e, itemKey) => {
     const newSelectedItems = e.target.checked
-      ? [...selectedItems, itemKey] 
-      : selectedItems.filter((key) => key !== itemKey); 
+      ? [...selectedItems, itemKey]
+      : selectedItems.filter((key) => key !== itemKey)
 
-    setSelectedItems(newSelectedItems);
+    setSelectedItems(newSelectedItems)
 
-    localStorage.setItem('selectedMenuItems', JSON.stringify(newSelectedItems));
-  };
+    localStorage.setItem('selectedMenuItems', JSON.stringify(newSelectedItems))
+  }
   const shortcutMenu = (
     <Menu>
       {menuItems.map((item) => (
         <Menu.Item key={item.key}>
           <Checkbox
-            checked={selectedItems.includes(item.key)} 
+            checked={selectedItems.includes(item.key)}
             onChange={(e) => handleCheckboxChange(e, item.key)}
           >
-            <span className="ml-3">{t(item.label)}</span>
+            <span className="ml-3 uppercase">{t(item.label)}</span>
           </Checkbox>
         </Menu.Item>
       ))}
     </Menu>
-  );
+  )
   return (
     <>
       {!isMobile ? (
@@ -145,27 +150,32 @@ const Sidebar = ({ permissions }) => {
                   </div>
 
                   <ul className="space-y-1 border-t border-gray-100 pt-4">
-                  {menuItems
-              .filter(item => selectedItems.includes(item.key)) 
-              .map((item) => (
-                item.utilities ? (
-                  <li key={item.key} >
-                    <a  onClick={() => handleonclickMenu(item)} className="group relative flex justify-center rounded-lg px-2 py-2 border mb-2 text-gray-500 hover:bg-gray-50 hover:text-gray-700">
-                      {item.icon}
-                    </a>
-                  </li>
-                ) : null
-              ))}
-                     <li >
-                         
-                          <Dropdown overlay={shortcutMenu} trigger={['click']} placement="bottomLeft">
-                          <a className="group relative flex justify-center  rounded-lg px-2 py-2 border mb-2 text-gray-500 hover:bg-gray-50 hover:text-gray-700">
-                           <PlusOutlined style={{ fontSize: '20px' }}/>
-                          </a>
-            </Dropdown>
-                        </li>
+                    {menuItems
+                      .filter((item) => selectedItems.includes(item.key))
+                      .map((item) =>
+                        item.utilities ? (
+                          <li key={item.key}>
+                            <a
+                              onClick={() => handleonclickMenu(item)}
+                              className="group relative flex justify-center rounded-lg px-2 py-2 border mb-2 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                            >
+                              {item.icon}
+                            </a>
+                          </li>
+                        ) : null,
+                      )}
+                    <li>
+                      <Dropdown
+                        overlay={shortcutMenu}
+                        trigger={['click']}
+                        placement="bottomLeft"
+                      >
+                        <a className="group relative flex justify-center  rounded-lg px-2 py-2 border mb-2 text-gray-500 hover:bg-gray-50 hover:text-gray-700">
+                          <PlusOutlined style={{ fontSize: '20px' }} />
+                        </a>
+                      </Dropdown>
+                    </li>
                   </ul>
-
                 </div>
               </div>
             </div>
@@ -211,7 +221,7 @@ const Sidebar = ({ permissions }) => {
                       className="flex items-center justify-start"
                     >
                       {item.icon}
-                      <span className="ml-3">{t(item.label)}</span>
+                      <span className="ml-3 uppercase">{t(item.label)}</span>
                     </Link>
                   </Menu.Item>
                 ))}
@@ -220,24 +230,25 @@ const Sidebar = ({ permissions }) => {
           )}
           {isMenu !== null && (
             <Sider
-            width={290} 
+              width={290}
               theme="light"
               collapsed={collapsed}
-              collapsedWidth={0}  
+              collapsedWidth={0}
               onCollapse={toggleSidebar}
               className={`${
                 collapsed ? 'p-0 border-none' : 'p-1 border-r'
-              } h-screen overflow-auto scroll-container transition-all duration-300 ease-in-out`}  
-               /*  className="p-1 border-r h-screen overflow-auto scroll-container" */
+              } h-screen overflow-auto scroll-container transition-all duration-300 ease-in-out`}
             >
               <SidebarContent
                 collapsed={collapsed}
                 toggleSidebar={toggleSidebar}
               />
               <div className="mb-5"></div>
-              {!collapsed && <Text className="text-sm font-medium opacity-60">
-                {labelMenu}
-              </Text>}
+              {!collapsed && (
+                <Text className="text-sm font-medium opacity-60">
+                  {labelMenu}
+                </Text>
+              )}
 
               <Menu
                 style={menuStyle}
@@ -270,7 +281,7 @@ const Sidebar = ({ permissions }) => {
                             </Menu.Item>
                           ))}
                         </Menu.SubMenu>
-                      );
+                      )
                     }
 
                     if (item.type === 'menu') {
@@ -284,10 +295,10 @@ const Sidebar = ({ permissions }) => {
                             <span className="ml-3">{t(item.label)}</span>
                           </Link>
                         </Menu.Item>
-                      );
+                      )
                     }
                   }
-                  return null;
+                  return null
                 })}
               </Menu>
             </Sider>
@@ -346,7 +357,7 @@ const Sidebar = ({ permissions }) => {
         </Footer>
       )}
     </>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar

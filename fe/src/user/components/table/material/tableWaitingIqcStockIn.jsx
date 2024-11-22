@@ -1,6 +1,6 @@
 import 'tui-grid/dist/tui-grid.css'
 import Grid from '@toast-ui/react-grid'
-import TuiGrid from 'tui-grid';
+import TuiGrid from 'tui-grid'
 import { useNavigate } from 'react-router-dom'
 import '../../../../static/css/customTabe.css'
 import moment from 'moment'
@@ -9,8 +9,18 @@ function TableWaitingIqcStockIn({ data }) {
   const navigate = useNavigate()
 
   const columns = [
-    { name: 'Delivery Seq', header: 'Delivery Seq', sortable: true, filter: 'text' },
-    { name: 'Delivery No', header: 'Delivery No', sortable: true, filter: 'text' },
+    {
+      name: 'Delivery Seq',
+      header: 'Delivery Seq',
+      sortable: true,
+      filter: 'text',
+    },
+    {
+      name: 'Delivery No',
+      header: 'Delivery No',
+      sortable: true,
+      filter: 'text',
+    },
     {
       name: 'Delivery Type',
       header: 'Delivery Type',
@@ -48,8 +58,18 @@ function TableWaitingIqcStockIn({ data }) {
       sortable: true,
       filter: 'text',
     },
-    { name: 'Purchase Type', header: 'Purchase Type', sortable: true, filter: 'text' },
-    { name: 'Biz Unit Name', header: 'Biz Unit Name', sortable: true, filter: 'text' },
+    {
+      name: 'Purchase Type',
+      header: 'Purchase Type',
+      sortable: true,
+      filter: 'text',
+    },
+    {
+      name: 'Biz Unit Name',
+      header: 'Biz Unit Name',
+      sortable: true,
+      filter: 'text',
+    },
   ]
 
   const handleRowDoubleClick = (e) => {
@@ -57,7 +77,7 @@ function TableWaitingIqcStockIn({ data }) {
     const clickedRowData = e.instance.getRow(rowKey)
     console.log('Double click - Dữ liệu hàng:', clickedRowData)
   }
-  TuiGrid.applyTheme('clean');
+  TuiGrid.applyTheme('clean')
   return (
     <div className="w-full min-h-full shadow">
       <Grid

@@ -1,5 +1,4 @@
-
-import { ChevronsLeftIcon } from "../icon"
+import { ChevronsLeftIcon } from '../icon'
 const SidebarContent = ({ collapsed, toggleSidebar }) => {
   return (
     <>
@@ -7,11 +6,15 @@ const SidebarContent = ({ collapsed, toggleSidebar }) => {
         className=" flex items-end justify-end cursor-pointer "
         onClick={toggleSidebar}
       >
-        {collapsed ? <div className="p-1 hover:bg-slate-100 rounded-lg hover:opacity-85 opacity-60 ">
-          <ChevronsLeftIcon />
-        </div> : <div className="p-1 hover:bg-slate-100 rounded-lg hover:opacity-85 opacity-60 ">
-          <ChevronsLeftIcon />
-        </div>}
+        {collapsed ? (
+          <div className="p-1 hover:bg-slate-100 rounded-lg hover:opacity-85 opacity-60 ">
+            <ChevronsLeftIcon />
+          </div>
+        ) : (
+          <div className="p-1 hover:bg-slate-100 rounded-lg hover:opacity-85 opacity-60 ">
+            <ChevronsLeftIcon />
+          </div>
+        )}
       </div>
     </>
   )
