@@ -26,7 +26,7 @@ const generateFakeData = (numRows = 20) => {
   return fakeData
 }
 
-function TableWaitingIqcStockIn() {
+function TableDeliveryList() {
   const navigate = useNavigate()
 
   const columns = [
@@ -77,4 +77,4 @@ function TableWaitingIqcStockIn() {
   )
 }
 
-export default TableWaitingIqcStockIn
+export default TableDeliveryList
