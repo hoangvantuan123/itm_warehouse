@@ -1,6 +1,11 @@
 import { useState } from 'react'
 import { Button } from 'antd'
-import { SaveOutlined, DeleteOutlined, UploadOutlined, SearchOutlined } from '@ant-design/icons'
+import {
+  SaveOutlined,
+  DeleteOutlined,
+  UploadOutlined,
+  SearchOutlined,
+} from '@ant-design/icons'
 
 export default function DeliveryActions() {
   return (
@@ -11,7 +16,8 @@ export default function DeliveryActions() {
         icon={<SaveOutlined />}
         size="middle"
         className="uppercase"
-        color="default" variant="filled"
+        color="default"
+        variant="filled"
         style={{ backgroundColor: '#f0f0f0', borderColor: '#d9d9d9' }}
       >
         STOCK IN (IQC)
@@ -25,13 +31,6 @@ export default function DeliveryActions() {
       >
         SEARCH
       </Button>
-
-
-
-
-
-
-
     </div>
   )
 }

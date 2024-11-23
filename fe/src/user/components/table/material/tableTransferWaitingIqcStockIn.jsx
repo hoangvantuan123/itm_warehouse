@@ -4,9 +4,9 @@ import TuiGrid from 'tui-grid'
 import { useNavigate } from 'react-router-dom'
 import '../../../../static/css/customTabe.css'
 import moment from 'moment'
+import { ArrowLeftIcon } from '../../icons'
 
-// Generate fake data for the tables
-const generateFakeData = (numRows = 20) => {
+const generateFakeData = (numRows) => {
   const fakeData = []
   for (let i = 0; i < numRows; i++) {
     fakeData.push({
@@ -19,8 +19,12 @@ const generateFakeData = (numRows = 20) => {
       itemNo: `ITEM-${String(i + 1).padStart(3, '0')}`,
       lotNumber: `LOT-${String(i + 1).padStart(3, '0')}`,
       itemQty: Math.floor(Math.random() * 100) + 10,
-      productionDate: moment().subtract(i % 5, 'days').format('YYYY-MM-DD'),
-      warehouseDate: moment().subtract(i % 10, 'days').format('YYYY-MM-DD'),
+      productionDate: moment()
+        .subtract(i % 5, 'days')
+        .format('YYYY-MM-DD'),
+      warehouseDate: moment()
+        .subtract(i % 10, 'days')
+        .format('YYYY-MM-DD'),
       yyww: moment().format('YYWW'),
       yymm: moment().format('YYMM'),
       yymmdd: moment().format('YYMMDD'),
@@ -30,55 +34,88 @@ const generateFakeData = (numRows = 20) => {
   }
   return fakeData
 }
+const generateFakeDataA = (numRows) => {
+  const fakeData = []
+  for (let i = 0; i < numRows; i++) {
+    const itemSeq = String(i + 1).padStart(3, '0')
+    const itemNo = `ITEM-${itemSeq}`
+    const lotCode = `LOT-${itemSeq}`
+    const qty = Math.floor(Math.random() * 500) + 1
+    const dateCode = `D${new Date()
+      .toISOString()
+      .slice(2, 10)
+      .replace(/-/g, '')}`
+    const reel = String(Math.floor(Math.random() * 9999)).padStart(4, '0')
 
+    const barcode = `${itemNo}/${lotCode}/${qty}/${dateCode}/${reel}`
+
+    fakeData.push({
+      itemSeq: itemSeq,
+      itemNo: itemNo,
+      totalQty: qty,
+      remainQty: Math.floor(qty * Math.random()),
+      barcode: barcode,
+    })
+  }
+  return fakeData
+}
 function TableTransferWaitingIqcStockIn() {
   const navigate = useNavigate()
-  const data = generateFakeData(20)
+  const data = generateFakeData(100)
+  const tableA = generateFakeDataA(10)
 
-  const columnsB = [
+  const columnsA = [
     {
-      name: 'deliverySeq',
-      header: 'Delivery Seq',
+      name: 'itemSeq',
+      header: 'Item Seq',
       sortable: true,
       filter: 'text',
       resizable: true,
       width: 200,
     },
-    { 
-      name: 'deliveryNo', 
-      header: 'Delivery No', 
-      sortable: true, 
-      filter: 'text', 
-      resizable: true ,
-      width: 200,
-    },
     {
-      name: 'deliveryType',
-      header: 'Delivery Type',
+      name: 'itemNo',
+      header: 'Item No.',
       sortable: true,
       filter: 'text',
       resizable: true,
       width: 200,
     },
-    { 
-      name: 'totalQty', 
-      header: 'Total Qty', 
-      sortable: true, 
-      filter: 'text', 
-      resizable: true ,
+    {
+      name: 'totalQty',
+      header: 'Total Qty',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
       width: 200,
     },
-    { 
-      name: 'residID', 
-      header: 'ResidID', 
-      sortable: true, 
-      filter: 'text', 
-      resizable: true ,
+    {
+      name: 'okQty',
+      header: 'Ok Qty',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
       width: 200,
+    },
+    {
+      name: 'remainQty',
+      header: 'Remain Qty',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 200,
+    },
+    {
+      name: 'barcode',
+      header: 'Barcode',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 250,
     },
   ]
 
-  const columnsA = [
+  const columnsB = [
     {
       name: 'warehouseName',
       header: 'Warehouse Name',
@@ -87,13 +124,13 @@ function TableTransferWaitingIqcStockIn() {
       width: 200,
       resizable: true,
     },
-    { 
-      name: 'itemNo', 
-      header: 'Item No.', 
-      sortable: true, 
-      filter: 'text', 
-      resizable: true, 
-      width: 200 
+    {
+      name: 'itemNo',
+      header: 'Item No.',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 200,
     },
     {
       name: 'lotNumber',
@@ -103,13 +140,13 @@ function TableTransferWaitingIqcStockIn() {
       resizable: true,
       width: 200,
     },
-    { 
-      name: 'itemQty', 
-      header: 'Item Qty', 
-      sortable: true, 
-      filter: 'text', 
-      resizable: true, 
-      width: 200 
+    {
+      name: 'itemQty',
+      header: 'Item Qty',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 200,
     },
     {
       name: 'productionDate',
@@ -150,21 +187,21 @@ function TableTransferWaitingIqcStockIn() {
       resizable: true,
       width: 200,
     },
-    { 
-      name: 'dc', 
-      header: 'DC', 
-      sortable: true, 
-      filter: 'text', 
-      resizable: true, 
-      width: 200 
+    {
+      name: 'dc',
+      header: 'DC',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 200,
     },
-    { 
-      name: 'barcode', 
-      header: 'Barcode', 
-      sortable: true, 
-      filter: 'text', 
-      resizable: true, 
-      width: 200 
+    {
+      name: 'barcode',
+      header: 'Barcode',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 200,
     },
   ]
 
@@ -177,38 +214,36 @@ function TableTransferWaitingIqcStockIn() {
   TuiGrid.applyTheme('striped')
 
   return (
-    <div className="w-full h-full flex items-center justify-center">
-      <div className="w-1/2 flex flex-col h-[500px]">
-        <div className="p-2 font-bold text-xl">Bảng A</div>
-        <Grid
-          data={data}
-          columns={columnsA}
-          rowHeight={20}
-          bodyHeight="fitToParent"
-          onDblclick={handleRowDoubleClick}
-          rowHeaders={['rowNum', 'checkbox']}
-          pagination={{
-            perPage: 100,
-          }}
-          heightResizable={true}
-          usageStatistics={true}
-          hoverable={true}
-          scrollX={true}  
-        />
-      </div>
-
-      {/* Icon between the tables */}
-      <div className="px-4 flex flex-col items-center justify-center">
-        <div className="text-3xl">&#8594;</div> 
-       
-      </div>
-
-      <div className="w-1/2  flex flex-col h-[500px]">
-        <div className="p-2 font-bold text-xl">Bảng B</div>
+    <div className="w-full gap-1 h-full flex items-center justify-center">
+      <div className="w-1/2 h-full flex flex-col border bg-white p-3 rounded-lg overflow-hidden">
+        <div className=" font-medium text-xs">THÔNG TIN BAROCODE</div>
         <Grid
           data={data}
           columns={columnsB}
-          rowHeight={20}
+          rowHeight={5}
+          bodyHeight="fitToParent"
+          rowHeaders={['rowNum', 'checkbox']}
+          pagination={{
+            perPage: 100,
+          }}
+          heightResizable={true}
+          usageStatistics={true}
+          hoverable={true}
+          scrollX={true}
+          className="w-full h-full overflow-hidden"
+        />
+      </div>
+
+      <div className="px-4 flex flex-col p-3  bg-[#eee] rounded-lg items-center justify-center">
+        <ArrowLeftIcon />
+      </div>
+
+      <div className="w-1/2 h-full flex flex-col border bg-white p-3 rounded-lg overflow-hidden">
+        <div className=" font-medium text-xs">THÔNG ĐƠN HÀNG</div>
+        <Grid
+          data={tableA}
+          columns={columnsA}
+          rowHeight={5}
           bodyHeight="fitToParent"
           onDblclick={handleRowDoubleClick}
           rowHeaders={['rowNum', 'checkbox']}
@@ -218,7 +253,8 @@ function TableTransferWaitingIqcStockIn() {
           heightResizable={true}
           usageStatistics={true}
           hoverable={true}
-          scrollX={true}  // Bật cuộn ngang cho bảng B
+          scrollX={true}
+          className="w-full h-full overflow-hidden "
         />
       </div>
     </div>

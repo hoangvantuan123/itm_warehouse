@@ -1,6 +1,11 @@
 import { useState } from 'react'
 import { Button } from 'antd'
-import { SaveOutlined, DeleteOutlined, UploadOutlined, SearchOutlined } from '@ant-design/icons'
+import {
+  SaveOutlined,
+  DeleteOutlined,
+  UploadOutlined,
+  SearchOutlined,
+} from '@ant-design/icons'
 
 export default function Default() {
   return (
@@ -33,7 +38,8 @@ export default function Default() {
         icon={<SaveOutlined />}
         size="middle"
         className="uppercase"
-        color="default" variant="filled"
+        color="default"
+        variant="filled"
         style={{ backgroundColor: '#f0f0f0', borderColor: '#d9d9d9' }}
       >
         Reset
@@ -45,13 +51,12 @@ export default function Default() {
         icon={<UploadOutlined />}
         size="middle"
         className="uppercase"
-        color="default" variant="filled"
+        color="default"
+        variant="filled"
         style={{ backgroundColor: '#ffa500', borderColor: '#ffa500' }}
       >
         Excel Upload
       </Button>
-
-
     </div>
   )
 }

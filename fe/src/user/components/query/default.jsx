@@ -1,4 +1,4 @@
-import { Button, Form, Input, Row, Col } from 'antd';
+import { Button, Form, Input, Row, Col } from 'antd'
 
 export default function WaitingIqcStockInQuery() {
   return (
@@ -53,5 +53,5 @@ export default function WaitingIqcStockInQuery() {
         </Col>
       </Row>
     </Form>
-  );
+  )
 }

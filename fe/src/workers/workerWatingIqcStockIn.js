@@ -1,10 +1,14 @@
 self.onmessage = function (event) {
-  const { type, payload } = event.data
+  const { type, payload, barcode } = event.data
 
   if (type === 'processData') {
     const result = processData(payload.dataTest, payload.code, payload.quantity)
     self.postMessage({ type: 'processedData', payload: result })
   }
+  
+    if (barcode) {
+      self.postMessage(barcode); 
+    }
 }
 
 function processData(dataTest, code, quantity) {

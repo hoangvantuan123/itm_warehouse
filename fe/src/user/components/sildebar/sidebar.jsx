@@ -26,7 +26,6 @@ const Sidebar = ({ permissions }) => {
   const location = useLocation()
   const userFromLocalStorage = JSON.parse(localStorage.getItem('userInfo'))
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-
   const [selectedItems, setSelectedItems] = useState(() => {
     const storedSelections =
       JSON.parse(localStorage.getItem('selectedMenuItems')) || []
@@ -131,12 +130,14 @@ const Sidebar = ({ permissions }) => {
         <div className="flex">
           <div className="flex h-screen w-16 flex-col justify-between border-e bg-white">
             <div>
-              <div className="inline-flex size-16 items-center justify-center">
-                <img
-                  src={Logo}
-                  className=" w-10 cursor-pointer   border rounded-lg h-auto  "
-                />
-              </div>
+              <Link to="/">
+                <div className="inline-flex size-16 items-center justify-center">
+                  <img
+                    src={Logo}
+                    className=" w-10 cursor-pointer   border rounded-lg h-auto  "
+                  />
+                </div>
+              </Link>
 
               <div className="border-t border-gray-100">
                 <div className="px-2">

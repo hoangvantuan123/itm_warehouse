@@ -14,6 +14,8 @@ import { useTranslation } from 'react-i18next'
 import { checkActionPermission } from '../../permissions'
 import BreadcrumbRouter from '../components/sildebar/breadcrumb'
 import Spinner from '../page/default/load'
+import ViewTest from '../page/test/viewTest'
+import Home from '../page/home/home'
 
 const DeliveryList = lazy(() => import('../page/material/deliveryList'))
 const WaitingIqcStockIn = lazy(
@@ -35,11 +37,10 @@ const UserRouter = () => {
       <Route
         path="/*"
         element={
-          <Layout style={{ minHeight: '100vh' }}>
+          <Layout className="h-[calc(100vh-30px)]">
             <Sidebar permissions={userPermissions} />
             <Layout>
-              <Content className='bg-slate-50'>
-
+              <Content className="bg-slate-50">
                 <Suspense fallback={<Spinner />}>
                   <BreadcrumbRouter />
                   <Routes>
@@ -69,6 +70,22 @@ const UserRouter = () => {
                           />
                         ) : (
                           <WaitingIqcStockIn
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
+                        )
+                      }
+                    />
+                    <Route
+                      path=""
+                      element={
+                        checkActionPermission(userPermissions, '', '') ? (
+                          <Home
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
+                        ) : (
+                          <Home
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />
