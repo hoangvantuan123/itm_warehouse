@@ -16,12 +16,13 @@ import { ArrowIcon } from '../../components/icons'
 export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const { t } = useTranslation()
 
-  // Web Worker Setup
   const workerRef = useRef(null);
   const inputCodeRef = useRef(null);
   const [inputCode, setInputCode] = useState(null);
   const [currentBarcode, setCurrentBarcode] = useState(''); 
   const bufferRef = useRef('');
+  const [status, setStatus] = useState(false);
+console.log("status", status)
   useEffect(() => {
     workerRef.current = new Worker(new URL('../../../workers/workerWatingIqcStockIn.js', import.meta.url));
 
@@ -48,9 +49,17 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     };
 
     window.addEventListener('keypress', handleKeyPress);
+    const handleFocus = () => setStatus(true);
+
+    const handleBlur = () => setStatus(false);
+
+  window.addEventListener("focus", handleFocus);
+  window.addEventListener("blur", handleBlur);
 
     return () => {
       window.removeEventListener('keypress', handleKeyPress);
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("blur", handleBlur);
     };
   }, []);
 

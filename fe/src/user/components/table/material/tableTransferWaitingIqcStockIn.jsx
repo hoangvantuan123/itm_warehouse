@@ -6,64 +6,94 @@ import '../../../../static/css/customTabe.css'
 import moment from 'moment'
 import { ArrowLeftIcon } from '../../icons'
 
-const generateFakeData = (numRows) => {
-  const fakeData = []
-  for (let i = 0; i < numRows; i++) {
-    fakeData.push({
-      deliverySeq: String(i + 1).padStart(3, '0'),
-      deliveryNo: `DLV-${moment().format('YYYYMMDD')}-${String(i + 1).padStart(2, '0')}`,
-      deliveryType: i % 2 === 0 ? 'Express' : 'Standard',
-      totalQty: Math.floor(Math.random() * 500) + 100,
-      residID: `RESID-${String(i + 1).padStart(3, '0')}`,
-      warehouseName: `Warehouse ${String(i + 1).padStart(3, '0')}`,
-      itemNo: `ITEM-${String(i + 1).padStart(3, '0')}`,
-      lotNumber: `LOT-${String(i + 1).padStart(3, '0')}`,
-      itemQty: Math.floor(Math.random() * 100) + 10,
-      productionDate: moment()
-        .subtract(i % 5, 'days')
-        .format('YYYY-MM-DD'),
-      warehouseDate: moment()
-        .subtract(i % 10, 'days')
-        .format('YYYY-MM-DD'),
-      yyww: moment().format('YYWW'),
-      yymm: moment().format('YYMM'),
-      yymmdd: moment().format('YYMMDD'),
-      dc: `DC-${String(i + 1).padStart(3, '0')}`,
-      barcode: `BARCODE-${String(i + 1).padStart(3, '0')}`,
-    })
-  }
-  return fakeData
-}
-const generateFakeDataA = (numRows) => {
-  const fakeData = []
-  for (let i = 0; i < numRows; i++) {
-    const itemSeq = String(i + 1).padStart(3, '0')
-    const itemNo = `ITEM-${itemSeq}`
-    const lotCode = `LOT-${itemSeq}`
-    const qty = Math.floor(Math.random() * 500) + 1
-    const dateCode = `D${new Date()
-      .toISOString()
-      .slice(2, 10)
-      .replace(/-/g, '')}`
-    const reel = String(Math.floor(Math.random() * 9999)).padStart(4, '0')
+const sampleTableA = [
+  {
+    itemSeq: '001',
+    itemNo: 'ITEM-001',
+    totalQty: 120,
+    remainQty: 50,
+    barcode: 'ITEM-001/LOT-001/120/D241124/1234',
+  },
+  {
+    itemSeq: '002',
+    itemNo: 'ITEM-002',
+    totalQty: 300,
+    remainQty: 200,
+    barcode: 'ITEM-002/LOT-002/300/D241124/5678',
+  },
+  {
+    itemSeq: '003',
+    itemNo: 'ITEM-003',
+    totalQty: 450,
+    remainQty: 350,
+    barcode: 'ITEM-003/LOT-003/450/D241124/9101',
+  },
+  {
+    itemSeq: '004',
+    itemNo: 'ITEM-004',
+    totalQty: 600,
+    remainQty: 550,
+    barcode: 'ITEM-004/LOT-004/600/D241124/1123',
+  },
+];
+const sampleTableB = [
+  {
+    warehouseName: 'Warehouse 001',
+    itemNo: 'ITEM-001',
+    lotNumber: 'LOT-001',
+    itemQty: 100,
+    productionDate: '2024-11-20',
+    warehouseDate: '2024-11-22',
+    yyww: '2447',
+    yymm: '2411',
+    yymmdd: '241124',
+    dc: 'DC-001',
+    barcode: 'BARCODE-001',
+  },
+  {
+    warehouseName: 'Warehouse 002',
+    itemNo: 'ITEM-002',
+    lotNumber: 'LOT-002',
+    itemQty: 200,
+    productionDate: '2024-11-19',
+    warehouseDate: '2024-11-21',
+    yyww: '2447',
+    yymm: '2411',
+    yymmdd: '241124',
+    dc: 'DC-002',
+    barcode: 'BARCODE-002',
+  },
+  {
+    warehouseName: 'Warehouse 003',
+    itemNo: 'ITEM-003',
+    lotNumber: 'LOT-003',
+    itemQty: 300,
+    productionDate: '2024-11-18',
+    warehouseDate: '2024-11-20',
+    yyww: '2447',
+    yymm: '2411',
+    yymmdd: '241124',
+    dc: 'DC-003',
+    barcode: 'BARCODE-003',
+  },
+  {
+    warehouseName: 'Warehouse 004',
+    itemNo: 'ITEM-004',
+    lotNumber: 'LOT-004',
+    itemQty: 400,
+    productionDate: '2024-11-17',
+    warehouseDate: '2024-11-19',
+    yyww: '2447',
+    yymm: '2411',
+    yymmdd: '241124',
+    dc: 'DC-004',
+    barcode: 'BARCODE-004',
+  },
+];
 
-    const barcode = `${itemNo}/${lotCode}/${qty}/${dateCode}/${reel}`
-
-    fakeData.push({
-      itemSeq: itemSeq,
-      itemNo: itemNo,
-      totalQty: qty,
-      remainQty: Math.floor(qty * Math.random()),
-      barcode: barcode,
-    })
-  }
-  return fakeData
-}
 function TableTransferWaitingIqcStockIn() {
   const navigate = useNavigate()
-  const data = generateFakeData(100)
-  const tableA = generateFakeDataA(100)
-
+ 
   const columnsA = [
     {
       name: 'itemSeq',
@@ -218,7 +248,7 @@ function TableTransferWaitingIqcStockIn() {
       <div className="w-1/2 h-full flex flex-col border bg-white p-3 rounded-lg overflow-hidden pb-10" >
         <div className=" font-medium text-xs">THÔNG TIN BAROCODE</div>
         <Grid
-          data={data}
+          data={sampleTableB}
           columns={columnsB}
           rowHeight={5}
           bodyHeight="fitToParent"
@@ -241,7 +271,7 @@ function TableTransferWaitingIqcStockIn() {
       <div className="w-1/2 h-full flex flex-col border bg-white p-3 rounded-lg overflow-hidden pb-10">
         <div className=" font-medium text-xs">THÔNG ĐƠN HÀNG</div>
         <Grid
-          data={tableA}
+          data={sampleTableA}
           columns={columnsA}
           rowHeight={5}
           bodyHeight="fitToParent"
