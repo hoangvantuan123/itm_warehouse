@@ -62,7 +62,7 @@ const generateFakeDataA = (numRows) => {
 function TableTransferWaitingIqcStockIn() {
   const navigate = useNavigate()
   const data = generateFakeData(100)
-  const tableA = generateFakeDataA(10)
+  const tableA = generateFakeDataA(100)
 
   const columnsA = [
     {
@@ -215,7 +215,7 @@ function TableTransferWaitingIqcStockIn() {
 
   return (
     <div className="w-full gap-1 h-full flex items-center justify-center">
-      <div className="w-1/2 h-full flex flex-col border bg-white p-3 rounded-lg overflow-hidden">
+      <div className="w-1/2 h-full flex flex-col border bg-white p-3 rounded-lg overflow-hidden pb-10" >
         <div className=" font-medium text-xs">THÔNG TIN BAROCODE</div>
         <Grid
           data={data}
@@ -238,7 +238,7 @@ function TableTransferWaitingIqcStockIn() {
         <ArrowLeftIcon />
       </div>
 
-      <div className="w-1/2 h-full flex flex-col border bg-white p-3 rounded-lg overflow-hidden">
+      <div className="w-1/2 h-full flex flex-col border bg-white p-3 rounded-lg overflow-hidden pb-10">
         <div className=" font-medium text-xs">THÔNG ĐƠN HÀNG</div>
         <Grid
           data={tableA}

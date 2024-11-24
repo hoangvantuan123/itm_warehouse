@@ -61,44 +61,46 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
         <title>ITM - {t('Waiting Iqc Stock In')}</title>
       </Helmet>
       
-      <div className="bg-slate-50 p-3  h-screen overflow-auto md:h-full md:overflow-hidden">
-        <div className="flex  flex-col gap-4 md:grid md:grid-cols-4 md:grid-rows-5 md:gap-4 h-full">
-          <div className="col-start-1 col-end-5 row-start-1 row-end-2  w-full h-auto rounded-lg">
-            <div className="flex item-center mb-2 justify-between">
-              <Title level={4} className="mt-2 uppercase opacity-85 ">
-                waiting Iqc Stock In
-              </Title>
-              <WaitingIqcStockInActions />
-            </div>
-            
-            <details
-              className="group p-2  [&_summary::-webkit-details-marker]:hidden  bg-white border rounded-lg"
-              open
-            >
-              <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
-                <h2 className=" text-xs font-medium flex items-center gap-2 text-blue-600">
-                  {' '}
-                  <FilterOutlined />
-                  {t('Điều kiện truy vấn')}
-                </h2>
-                <span className="relative size-5 shrink-0">
-                  <ArrowIcon />
-                </span>
-              </summary>
-              <div className="flex p-2  gap-4">
-                <WaitingIqcStockInQuery
-                  inputCodeRef={inputCodeRef}
-                  inputCode={inputCode}
-                  setInputCode={setInputCode}
-                />
-              </div>
-            </details>
-          </div>
-          <div className="col-start-1 col-end-5 row-start-2 row-end-6 w-full h-auto  rounded-lg">
-            <TableTransferWaitingIqcStockIn />
-          </div>
-        </div>
+      <div className="bg-slate-50 p-3 h-screen overflow-hidden">
+  <div
+    className="flex flex-col gap-4 md:grid md:grid-cols-4 md:grid-rows-[auto_1fr] md:gap-4 h-full"
+  >
+    <div className="col-start-1 col-end-5 row-start-1 w-full rounded-lg bg-white">
+      <div className="flex items-center justify-between mb-2">
+        <Title level={4} className="mt-2 uppercase opacity-85">
+          Waiting Iqc Stock In
+        </Title>
+        <WaitingIqcStockInActions />
       </div>
+      <details
+        className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg"
+        open
+      >
+        <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
+          <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600">
+            <FilterOutlined />
+            {t('Điều kiện truy vấn')}
+          </h2>
+          <span className="relative size-5 shrink-0">
+            <ArrowIcon />
+          </span>
+        </summary>
+        <div className="flex p-2 gap-4">
+          <WaitingIqcStockInQuery
+            inputCodeRef={inputCodeRef}
+            inputCode={inputCode}
+            setInputCode={setInputCode}
+          />
+        </div>
+      </details>
+    </div>
+
+    <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg bg-white overflow-auto">
+      <TableTransferWaitingIqcStockIn />
+    </div>
+  </div>
+</div>
+
     </>
   )
 }
