@@ -5,10 +5,10 @@ self.onmessage = function (event) {
     const result = processData(payload.dataTest, payload.code, payload.quantity)
     self.postMessage({ type: 'processedData', payload: result })
   }
-  
-    if (barcode) {
-      self.postMessage(barcode); 
-    }
+
+  if (barcode) {
+    self.postMessage(barcode)
+  }
 }
 
 function processData(dataTest, code, quantity) {

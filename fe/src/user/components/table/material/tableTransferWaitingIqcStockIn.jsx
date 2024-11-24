@@ -35,7 +35,7 @@ const sampleTableA = [
     remainQty: 550,
     barcode: 'ITEM-004/LOT-004/600/D241124/1123',
   },
-];
+]
 const sampleTableB = [
   {
     warehouseName: 'Warehouse 001',
@@ -89,11 +89,11 @@ const sampleTableB = [
     dc: 'DC-004',
     barcode: 'BARCODE-004',
   },
-];
+]
 
 function TableTransferWaitingIqcStockIn() {
   const navigate = useNavigate()
- 
+
   const columnsA = [
     {
       name: 'itemSeq',
@@ -245,7 +245,7 @@ function TableTransferWaitingIqcStockIn() {
 
   return (
     <div className="w-full gap-1 h-full flex items-center justify-center">
-      <div className="w-1/2 h-full flex flex-col border bg-white p-3 rounded-lg overflow-hidden pb-10" >
+      <div className="w-1/2 h-full flex flex-col border bg-white p-3 rounded-lg overflow-hidden pb-10">
         <div className=" font-medium text-xs">THÔNG TIN BAROCODE</div>
         <Grid
           data={sampleTableB}

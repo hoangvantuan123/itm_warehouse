@@ -1,17 +1,17 @@
-import { useState } from 'react';
-import { Button, Form, Input, Row, Col, DatePicker } from 'antd';
+import { useState } from 'react'
+import { Button, Form, Input, Row, Col, DatePicker } from 'antd'
 
 export default function WaitingIqcStockInQuery() {
   // State variables for each input field
-  const [date, setDate] = useState(null);
-  const [deliveryNo, setDeliveryNo] = useState('');
-  const [accUnit, setAccUnit] = useState('');
-  const [purchaseType, setPurchaseType] = useState('');
-  const [matBarcode, setMatBarcode] = useState('');
-  const [whName, setWhName] = useState('');
+  const [date, setDate] = useState(null)
+  const [deliveryNo, setDeliveryNo] = useState('')
+  const [accUnit, setAccUnit] = useState('')
+  const [purchaseType, setPurchaseType] = useState('')
+  const [matBarcode, setMatBarcode] = useState('')
+  const [whName, setWhName] = useState('')
   const handleDateChange = (date) => {
-    setDate(date);
-  };
+    setDate(date)
+  }
 
   return (
     <div className="flex items-center gap-2">
@@ -24,7 +24,7 @@ export default function WaitingIqcStockInQuery() {
               className="mb-0"
             >
               <DatePicker
-                className="w-full text-sm p-2"  // Small size, padding
+                className="w-full text-sm p-2" // Small size, padding
                 value={date}
                 onChange={handleDateChange}
                 format="YYYY-MM-DD"
@@ -33,16 +33,16 @@ export default function WaitingIqcStockInQuery() {
           </Col>
 
           <Col span={4}>
-            <Form.Item 
+            <Form.Item
               label={<span className="uppercase text-xs">Delivery No</span>}
               className="mb-0"
             >
               <Input
                 placeholder="Input placeholder"
                 value={deliveryNo}
-                size="small"  
+                size="small"
                 onChange={(e) => setDeliveryNo(e.target.value)}
-                className="bg-red-50 text-sm p-2" 
+                className="bg-red-50 text-sm p-2"
               />
             </Form.Item>
           </Col>
@@ -64,7 +64,7 @@ export default function WaitingIqcStockInQuery() {
           </Col>
 
           <Col span={4}>
-            <Form.Item 
+            <Form.Item
               label={<span className="uppercase text-xs">Purchase Type</span>}
               className="mb-0"
             >
@@ -96,7 +96,7 @@ export default function WaitingIqcStockInQuery() {
           </Col>
 
           <Col span={4}>
-            <Form.Item 
+            <Form.Item
               label={<span className="uppercase text-xs">WH Name</span>}
               className="mb-0"
             >
@@ -112,5 +112,5 @@ export default function WaitingIqcStockInQuery() {
         </Row>
       </Form>
     </div>
-  );
+  )
 }
