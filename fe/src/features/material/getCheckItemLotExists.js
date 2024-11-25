@@ -10,6 +10,7 @@ export const GetCheckItemLotExist = async (itemNo, lotno) => {
     try {
         const url = `${HOST_API_SERVER_1}/mssql/stock-in/check-item-lot-exists`;
 
+        // Gửi yêu cầu GET tới API
         const response = await axios.get(url, {
             params: {
                 itemNo: `'${itemNo}'`,
@@ -21,14 +22,21 @@ export const GetCheckItemLotExist = async (itemNo, lotno) => {
         });
 
         if (response.status === 200) {
-            return {
-                success: true,
-                data: response.data.data,
-            };
+            if (response.data && response.data.data) {
+                return {
+                    success: true,
+                    data: response.data.data,
+                };
+            } else {
+                return {
+                    success: false,
+                    message: ERROR_MESSAGES.DATABASE_ERROR, // Dữ liệu không có
+                };
+            }
         } else {
             return {
                 success: false,
-                message: ERROR_MESSAGES.ERROR,
+                message: ERROR_MESSAGES.ERROR, // Lỗi chung
             };
         }
     } catch (error) {

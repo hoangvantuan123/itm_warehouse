@@ -71,26 +71,32 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
       if (success) {
         if (resultData) {
           const { itemNo, qty, lot, dc, reel, barcode } = resultData;
-          GetCheckItemLotExist(itemNo, lot)
-          GetCheckIQCHold(itemNo, lot)
-          setData((prevData) =>
-            prevData.map((item) =>
-              item.itemNo === itemNo
-                ? {
-                  ...item,
-                  okQty: item.okQty + qty,
-                  remainQty: item.remainQty - qty,
-                }
-                : item
-            )
-          );
 
-          const inDate1 = formatToYYYYMMDD(new Date());
-          GetCheckItemLotExist(itemNo, lot)
           try {
-            const result = await GetSConvertDC(itemNo, dc, inDate1);
-            if (result.success) {
-              const { ProductionDate, YYWW, YYMM, YYYYMMDD } = result.data[0];
+            const [itemLotExistSuccess, iqcHoldSuccess, sConvertDCResult] = await Promise.all([
+              GetCheckItemLotExist(itemNo, lot),
+              GetCheckIQCHold(itemNo, lot),
+              GetSConvertDC(itemNo, dc, formatToYYYYMMDD(new Date()))
+            ]);
+            console.log("itemLotExistSuccess", itemLotExistSuccess)
+            console.log("iqcHoldSuccess", iqcHoldSuccess)
+            console.log("sConvertDCResult", sConvertDCResult)
+            
+            if (itemLotExistSuccess.success && iqcHoldSuccess.success && sConvertDCResult.success) {
+              const { ProductionDate, YYWW, YYMM, YYYYMMDD } = sConvertDCResult.data[0];
+
+              setData((prevData) =>
+                prevData.map((item) =>
+                  item.itemNo === itemNo
+                    ? {
+                      ...item,
+                      okQty: item.okQty + qty,
+                      remainQty: item.remainQty - qty,
+                    }
+                    : item
+                )
+              );
+
               setScanHistory((prevHistory) => [
                 ...prevHistory,
                 {
@@ -107,15 +113,16 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
                   barcode: barcode,
                 },
               ]);
+
+              message.success(resultMessage);
             } else {
-              message.error(result.message);
+              message.error("Một trong các API đã thất bại");
             }
           } catch (error) {
-            console.error('Error fetching data from GetSConvertDC:', error);
+            console.error('Error during API calls:', error);
+            message.error("Đã có lỗi xảy ra khi gọi API");
           }
         }
-
-        message.success(resultMessage);
       } else {
         setModal2Open(true);
         setError(resultMessage);
@@ -126,6 +133,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
       workerRef.current.terminate();
     };
   }, []);
+
   const handleCheckBarcode = (barcode) => {
     workerRef.current.postMessage({
       type: 'CHECK_BARCODE',
