@@ -3,95 +3,12 @@ import Grid from '@toast-ui/react-grid'
 import TuiGrid from 'tui-grid'
 import { useNavigate } from 'react-router-dom'
 import '../../../../static/css/customTabe.css'
-import moment from 'moment'
 import { ArrowLeftIcon } from '../../icons'
 
-const sampleTableA = [
-  {
-    itemSeq: '001',
-    itemNo: 'ITEM-001',
-    totalQty: 120,
-    remainQty: 50,
-    barcode: 'ITEM-001/LOT-001/120/D241124/1234',
-  },
-  {
-    itemSeq: '002',
-    itemNo: 'ITEM-002',
-    totalQty: 300,
-    remainQty: 200,
-    barcode: 'ITEM-002/LOT-002/300/D241124/5678',
-  },
-  {
-    itemSeq: '003',
-    itemNo: 'ITEM-003',
-    totalQty: 450,
-    remainQty: 350,
-    barcode: 'ITEM-003/LOT-003/450/D241124/9101',
-  },
-  {
-    itemSeq: '004',
-    itemNo: 'ITEM-004',
-    totalQty: 600,
-    remainQty: 550,
-    barcode: 'ITEM-004/LOT-004/600/D241124/1123',
-  },
-]
-const sampleTableB = [
-  {
-    warehouseName: 'Warehouse 001',
-    itemNo: 'ITEM-001',
-    lotNumber: 'LOT-001',
-    itemQty: 100,
-    productionDate: '2024-11-20',
-    warehouseDate: '2024-11-22',
-    yyww: '2447',
-    yymm: '2411',
-    yymmdd: '241124',
-    dc: 'DC-001',
-    barcode: 'BARCODE-001',
-  },
-  {
-    warehouseName: 'Warehouse 002',
-    itemNo: 'ITEM-002',
-    lotNumber: 'LOT-002',
-    itemQty: 200,
-    productionDate: '2024-11-19',
-    warehouseDate: '2024-11-21',
-    yyww: '2447',
-    yymm: '2411',
-    yymmdd: '241124',
-    dc: 'DC-002',
-    barcode: 'BARCODE-002',
-  },
-  {
-    warehouseName: 'Warehouse 003',
-    itemNo: 'ITEM-003',
-    lotNumber: 'LOT-003',
-    itemQty: 300,
-    productionDate: '2024-11-18',
-    warehouseDate: '2024-11-20',
-    yyww: '2447',
-    yymm: '2411',
-    yymmdd: '241124',
-    dc: 'DC-003',
-    barcode: 'BARCODE-003',
-  },
-  {
-    warehouseName: 'Warehouse 004',
-    itemNo: 'ITEM-004',
-    lotNumber: 'LOT-004',
-    itemQty: 400,
-    productionDate: '2024-11-17',
-    warehouseDate: '2024-11-19',
-    yyww: '2447',
-    yymm: '2411',
-    yymmdd: '241124',
-    dc: 'DC-004',
-    barcode: 'BARCODE-004',
-  },
-]
 
-function TableTransferWaitingIqcStockIn() {
+
+
+function TableTransferWaitingIqcStockIn({ sampleTableA, sampleTableB }) {
   const navigate = useNavigate()
 
   const columnsA = [
@@ -101,7 +18,7 @@ function TableTransferWaitingIqcStockIn() {
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 200,
+      width: 150,
     },
     {
       name: 'itemNo',
@@ -109,7 +26,7 @@ function TableTransferWaitingIqcStockIn() {
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 200,
+      width: 150,
     },
     {
       name: 'totalQty',
@@ -117,7 +34,7 @@ function TableTransferWaitingIqcStockIn() {
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 200,
+      width: 150,
     },
     {
       name: 'okQty',
@@ -125,7 +42,7 @@ function TableTransferWaitingIqcStockIn() {
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 200,
+      width: 150,
     },
     {
       name: 'remainQty',
@@ -134,14 +51,6 @@ function TableTransferWaitingIqcStockIn() {
       filter: 'text',
       resizable: true,
       width: 200,
-    },
-    {
-      name: 'barcode',
-      header: 'Barcode',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 250,
     },
   ]
 

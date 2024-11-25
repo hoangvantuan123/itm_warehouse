@@ -5,9 +5,9 @@ import { Connection } from 'typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { HealthController } from './health.controller';
-import {  sqlServerITMV20240117 } from './config/database.config';
+import { sqlServerITMV20240117 } from './config/database.config';
 import { APP_FILTER } from '@nestjs/core';
-import { UsersModule } from './modules/users/module/users.module';
+import { StockInModule } from './modules/material/module/stockIn.module';
 
 
 @Module({
@@ -15,12 +15,12 @@ import { UsersModule } from './modules/users/module/users.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-   /*  TypeOrmModule.forRoot(databaseConfig1), */
+    /*  TypeOrmModule.forRoot(databaseConfig1), */
     TypeOrmModule.forRoot({
       ...sqlServerITMV20240117,
-      name: 'ITMV20240117', 
+      name: 'ITMV20240117',
     }),
-    UsersModule
+    StockInModule
   ],
   providers: [{
     provide: APP_FILTER,
@@ -30,11 +30,11 @@ import { UsersModule } from './modules/users/module/users.module';
 })
 export class AppModule implements OnModuleInit {
   constructor(
-    @InjectConnection('ITMV20240117') private readonly connection2: Connection, 
+    @InjectConnection('ITMV20240117') private readonly connection2: Connection,
   ) { }
 
   async onModuleInit() {
-    
+
 
     if (this.connection2.isConnected) {
       console.log('ITMV20240117 connected');

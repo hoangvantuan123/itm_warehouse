@@ -24,7 +24,7 @@ export default function WaitingIqcStockInQuery() {
               className="mb-0"
             >
               <DatePicker
-                className="w-full text-sm p-2" // Small size, padding
+                className="w-full text-sm p-2"
                 value={date}
                 onChange={handleDateChange}
                 format="YYYY-MM-DD"
@@ -42,7 +42,7 @@ export default function WaitingIqcStockInQuery() {
                 value={deliveryNo}
                 size="small"
                 onChange={(e) => setDeliveryNo(e.target.value)}
-                className="bg-red-50 text-sm p-2"
+                className=" text-sm p-2"
               />
             </Form.Item>
           </Col>
@@ -50,7 +50,6 @@ export default function WaitingIqcStockInQuery() {
           <Col span={4}>
             <Form.Item
               label={<span className="uppercase text-xs">Acc Unit</span>}
-              required
               className="mb-0"
             >
               <Input
@@ -58,7 +57,7 @@ export default function WaitingIqcStockInQuery() {
                 value={accUnit}
                 size="small"
                 onChange={(e) => setAccUnit(e.target.value)}
-                className="bg-red-50 text-sm p-2"
+                className=" text-sm p-2"
               />
             </Form.Item>
           </Col>
@@ -73,7 +72,7 @@ export default function WaitingIqcStockInQuery() {
                 value={purchaseType}
                 size="small"
                 onChange={(e) => setPurchaseType(e.target.value)}
-                className="bg-red-50 text-sm p-2"
+                className=" text-sm p-2"
               />
             </Form.Item>
           </Col>
@@ -81,7 +80,6 @@ export default function WaitingIqcStockInQuery() {
           <Col span={4}>
             <Form.Item
               label={<span className="uppercase text-xs">MAT Barcode</span>}
-              required
               tooltip="Barcode auto"
               className="mb-0"
             >
@@ -90,7 +88,7 @@ export default function WaitingIqcStockInQuery() {
                 value={matBarcode}
                 size="small"
                 onChange={(e) => setMatBarcode(e.target.value)}
-                className="bg-red-50 text-sm p-2"
+                className=" text-sm p-2"
               />
             </Form.Item>
           </Col>
@@ -105,7 +103,7 @@ export default function WaitingIqcStockInQuery() {
                 value={whName}
                 size="small"
                 onChange={(e) => setWhName(e.target.value)}
-                className="bg-red-50 text-sm p-2"
+                className=" text-sm p-2"
               />
             </Form.Item>
           </Col>
