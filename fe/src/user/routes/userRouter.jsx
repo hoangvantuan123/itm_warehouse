@@ -61,7 +61,7 @@ const UserRouter = () => {
                       }
                     />
                     <Route
-                      path="u/warehouse/material/waiting-iqc-stock-in"
+                      path="u/warehouse/material/waiting-iqc-stock-in/:id"
                       element={
                         checkActionPermission(userPermissions, '', '') ? (
                           <WaitingIqcStockIn

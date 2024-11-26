@@ -190,7 +190,8 @@ function TableTransferWaitingIqcStockIn({ sampleTableA, sampleTableB }) {
           usageStatistics={true}
           hoverable={true}
           scrollX={true}
-          className="w-full h-full overflow-hidden "
+          className="w-full h-full overflow-hidden"
+          autoResize={true}
         />
       </div>
     </div>

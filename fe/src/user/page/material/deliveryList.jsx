@@ -6,8 +6,6 @@ const { Title, Text } = Typography
 import { FilterOutlined } from '@ant-design/icons'
 import { ArrowIcon } from '../../components/icons'
 import dayjs from 'dayjs';
-import 'moment/locale/vi'
-import moment from "moment";
 import DeliveryActions from '../../components/actions/material/deliveryActions'
 import TableDeliveryList from '../../components/table/material/tableDeliveryList'
 import { GetCodeHelp } from '../../../features/codeHelp/getCodeHelp'
@@ -29,58 +27,80 @@ export default function DeliveryList({ permissions, isMobile }) {
   const formatDate = (date) => {
     return date.format('YYYYMMDD');
   };
-  const fetchData = async () => {
+  
+  const fetchDeliveryData = async () => {
     try {
-      const [deliveryResponse, codeHelpResponse] = await Promise.all([
-        GetDeliveryList(formatDate(formData),
-          formatDate(toDate), deliveryNo, bizUnit),
-        GetCodeHelp('', 6, 10003, 1, '%', '', '', '', '')
-      ]);
-
+      setLoading(true);
+      const deliveryResponse = await GetDeliveryList(
+        formatDate(formData),
+        formatDate(toDate),
+        deliveryNo,
+        bizUnit
+      );
       setData(deliveryResponse.data);
-      setDataUnit(codeHelpResponse.data);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      setData([])
     } finally {
+      setData([])
       setLoading(false);
     }
   };
-
-
-  const debouncedFetchData = debounce(() => {
-    fetchData();
-  }, 100);
+  
+  const fetchCodeHelpData = async () => {
+    try {
+      setLoading(true);
+      const codeHelpResponse = await GetCodeHelp('', 6, 10003, 1, '%', '', '', '', '');
+      setDataUnit(codeHelpResponse.data);
+    } catch (error) {
+      setDataUnit([])
+    } finally {
+      setDataUnit([])
+      setLoading(false);
+    }
+  };
   
   useEffect(() => {
-    setLoading(true);
-
-    debouncedFetchData();
+    debouncedFetchDeliveryData();
     return () => {
-      debouncedFetchData.cancel();
+      debouncedFetchDeliveryData.cancel();
     };
   }, [formData, toDate, deliveryNo, bizUnit]);
-
+  
+  useEffect(() => {
+    debouncedFetchCodeHelpData();
+    return () => {
+      debouncedFetchCodeHelpData.cancel();
+    };
+  }, []);
+  
+  const debouncedFetchDeliveryData = debounce(() => {
+    fetchDeliveryData();
+  }, 100);
+  
+  const debouncedFetchCodeHelpData = debounce(() => {
+    fetchCodeHelpData();
+  }, 100);
+  
   return (
     <>
       <Helmet>
         <title>ITM - {t('Delivery List')}</title>
       </Helmet>
-
-      <div className="bg-slate-50 p-3  h-screen overflow-auto md:h-full md:overflow-hidden">
-        <div className="flex  flex-col gap-4 md:grid md:grid-cols-4 md:grid-rows-5 md:gap-4 h-full">
-          <div className="col-start-1 col-end-5 row-start-1 row-end-2  w-full min-h-auto rounded-lg">
-            <div className="flex item-center mb-2 justify-between">
-              <Title level={4} className="mt-2 uppercase opacity-85 ">
+      <div className="bg-slate-50 p-3 h-screen overflow-hidden">
+        <div className="flex flex-col gap-4 md:grid md:grid-cols-4 md:grid-rows-[auto_1fr] md:gap-4 h-full">
+          <div className="col-start-1 col-end-5 row-start-1 w-full rounded-lg ">
+            <div className="flex items-center justify-between mb-2">
+            <Title level={4} className="mt-2 uppercase opacity-85 ">
                 {t('Delivery List')}
               </Title>
-              <DeliveryActions fetchData={fetchData} />
+              <DeliveryActions fetchData={fetchDeliveryData} />
             </div>
             <details
-              className="group p-2  [&_summary::-webkit-details-marker]:hidden  bg-white border rounded-lg"
+              className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
               open
             >
               <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
-                <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600">
+              <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600">
                   <FilterOutlined />
                   {t('Điều kiện truy vấn')}
                 </h2>
@@ -89,7 +109,7 @@ export default function DeliveryList({ permissions, isMobile }) {
                 </span>
               </summary>
               <div className="flex p-2 gap-4">
-                <DeliveryListQuery
+              <DeliveryListQuery
                   formData={formData}
                   setFormData={setFormData}
                   setDeliveryNo={setDeliveryNo}
@@ -103,8 +123,9 @@ export default function DeliveryList({ permissions, isMobile }) {
               </div>
             </details>
           </div>
-          <div className="col-start-1 col-end-5 row-start-2 row-end-6 w-full min-h-auto rounded-lg">
-            <TableDeliveryList data={data} />
+
+          <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg  overflow-auto">
+          <TableDeliveryList data={data} loading={loading} />
           </div>
         </div>
       </div>

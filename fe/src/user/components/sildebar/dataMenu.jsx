@@ -84,7 +84,7 @@ export const menuSettingItems = [
       {
         key: 'material-1-2',
         label: 'WAITING IQC STOCK IN',
-        link: '/u/warehouse/material/waiting-iqc-stock-in',
+        link: '/u/warehouse/material/waiting-iqc-stock-in/:id',
       },
       {
         key: 'material-1-3',

@@ -1,13 +1,62 @@
+import  { useState } from 'react';
 import 'tui-grid/dist/tui-grid.css'
 import Grid from '@toast-ui/react-grid'
 import TuiGrid from 'tui-grid'
 import { useNavigate } from 'react-router-dom'
 import '../../../../static/css/customTabe.css'
-import moment from 'moment'
+import { encodeBase64Url } from '../../../../utils/decode-JWT';
+import CryptoJS from "crypto-js";
 
-function TableDeliveryList({ data }) {
+const data= [
+  {
+    "DelvNo": "19559",
+    "DelvMngNo": "WEB11",
+    "ImpType": "8008004",
+    "TotalQty": 7000.00000,
+    "OkQty": 0.00000,
+    "RemainQty": 7000.00000,
+    "DelvDate": "2024-11-21",
+    "CustSeq": "244",
+    "CustNm": "ITM Semiconductor Co., LTD",
+    "DomOrImp": "4",
+    "PurchaseType": "Purchase Import",
+    "BizUnitName": "ITM PSG (F3)",
+    "BizUnit": "4",
+    "EmpSeq": "1295",
+    "EmpName": "NGUYỄN NGỌC TUẤN",
+    "DeptSeq": "307",
+    "DeptName": "IT",
+    "CurrSeq": "2",
+    "CurrName": "USD",
+    "ExRate": 1.000000
+  },
+  {
+    "DelvNo": "19560",
+    "DelvMngNo": "WEB1234",
+    "ImpType": "8008004",
+    "TotalQty": 7.00000,
+    "OkQty": 0.00000,
+    "RemainQty": 7.00000,
+    "DelvDate": "2024-11-21",
+    "CustSeq": "244",
+    "CustNm": "ITM Semiconductor Co., LTD",
+    "DomOrImp": "4",
+    "PurchaseType": "Purchase Import",
+    "BizUnitName": "ITM PSG (F3)",
+    "BizUnit": "4",
+    "EmpSeq": "1295",
+    "EmpName": "NGUYỄN NGỌC TUẤN",
+    "DeptSeq": "307",
+    "DeptName": "IT",
+    "CurrSeq": "2",
+    "CurrName": "USD",
+    "ExRate": 1.000000
+  }
+]
+
+function TableDeliveryList({  loading}) {
   const navigate = useNavigate()
-
+  const [checkedRowKey, setCheckedRowKey] = useState(null); 
   const columns = [
     {
       name: 'DelvNo',
@@ -97,6 +146,14 @@ function TableDeliveryList({ data }) {
       width: 200,
     },
     {
+      name: 'BizUnitName',
+      header: 'BizUnitName',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 200,
+    },
+    {
       name: 'BizUnit',
       header: 'BizUnit',
       sortable: true,
@@ -105,27 +162,104 @@ function TableDeliveryList({ data }) {
       width: 100,
     },
     {
-      name: 'BizUnitName',
-      header: 'BizUnitName',
+      name: 'EmpSeq',
+      header: 'Employee Seq',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 140,
+    },
+    {
+      name: 'EmpName',
+      header: 'Employee Name',
       sortable: true,
       filter: 'text',
       resizable: true,
       width: 200,
     },
-  ]
-
+    {
+      name: 'DeptSeq',
+      header: 'Department Seq',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 140,
+    },
+    {
+      name: 'DeptName',
+      header: 'Department Name',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 200,
+    },
+    {
+      name: 'CurrSeq',
+      header: 'Currency Seq',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 140,
+    },
+    {
+      name: 'CurrName',
+      header: 'Currency Name',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 200,
+    },
+    {
+      name: 'ExRate',
+      header: 'Exchange Rate',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 140,
+    },
+  ];
+  
   const handleRowDoubleClick = (e) => {
     const { rowKey } = e
     const clickedRowData = e.instance.getRow(rowKey)
-    console.log('Double click - Dữ liệu hàng:', clickedRowData)
-    navigate(`/details/${clickedRowData.deliveryno}`)
+    const filteredData = {
+      DelvNo: clickedRowData?.DelvNo,
+      DelvMngNo: clickedRowData?.DelvMngNo,
+      ImpType: clickedRowData?.ImpType,
+      TotalQty: clickedRowData?.TotalQty,
+      OkQty: clickedRowData?.OkQty,
+      RemainQty: clickedRowData?.RemainQty,
+      DelvDate: clickedRowData?.DelvDate,
+      CustSeq: clickedRowData?.CustSeq,
+      CustNm: clickedRowData?.CustNm,
+      DomOrImp: clickedRowData?.DomOrImp,
+      PurchaseType: clickedRowData?.PurchaseType,
+      BizUnitName: clickedRowData?.BizUnitName,
+      BizUnit: clickedRowData?.BizUnit,
+      EmpSeq: clickedRowData?.EmpSeq,
+      EmpName: clickedRowData?.EmpName,
+      DeptSeq: clickedRowData?.DeptSeq,
+      DeptName: clickedRowData?.DeptName,
+      CurrSeq: clickedRowData?.CurrSeq,
+      CurrName: clickedRowData?.CurrName,
+      ExRate: clickedRowData?.ExRate,
+    };
+
+    const secretKey = "TEST_ACCESS_KEY";
+    const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(filteredData), secretKey).toString();
+    const encryptedToken = encodeBase64Url(encryptedData);
+
+    navigate(`/u/warehouse/material/waiting-iqc-stock-in/${encryptedToken}`);
   }
+
   TuiGrid.applyTheme('striped')
 
   
-
+ 
   return (
-    <Grid
+    <div className="w-full gap-1 h-full flex items-center justify-center">
+      <div className="w-full h-full flex flex-col border bg-white p-3 rounded-lg overflow-hidden pb-5" >
+      <Grid
       data={data}
       columns={columns}
       rowHeight={40}
@@ -137,7 +271,11 @@ function TableDeliveryList({ data }) {
       heightResizable={true}
       usageStatistics={true}
       hoverable={true}
-    />
+      autoResize={true}
+      />
+      </div>
+      </div>
+   
   )
 }
 

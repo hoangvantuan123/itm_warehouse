@@ -88,9 +88,9 @@ export default function DeliveryListQuery({
                   width: 190,
                 }}
                 onChange={handleChange}
-                options={dataUnit.map((item) => ({
-                  label: item.AccUnitName,
-                  value: item.BizUnit
+                options={dataUnit?.map((item) => ({
+                  label: item?.AccUnitName,
+                  value: item?.BizUnit
                 }))}
               />
             </Form.Item>

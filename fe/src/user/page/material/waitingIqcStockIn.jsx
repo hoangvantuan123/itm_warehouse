@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next'
 import { Helmet } from 'react-helmet'
 import { Typography, message, Modal } from 'antd'
@@ -9,12 +10,14 @@ import TableTransferWaitingIqcStockIn from '../../components/table/material/tabl
 import { FilterOutlined } from '@ant-design/icons'
 import WaitingIqcStockInQuery from '../../components/query/material/waitingIqcStockInQuery'
 import { ArrowIcon } from '../../components/icons'
-
+import CryptoJS from "crypto-js";
 import ModalWaitingIqcStockIn from '../../components/modal/material/modalWaitingIqcStockIn'
 import { GetSConvertDC } from '../../../features/material/getSConvertDC'
 import { GetCheckItemLotExist } from '../../../features/material/getCheckItemLotExists'
 import { GetCheckIQCHold } from '../../../features/material/getCheckIQCHold'
 import { SMaterialQRCheckWeb } from '../../../features/material/postSMaterialQRCheck'
+
+
 
 function formatToYYYYMMDD(date) {
   const d = new Date(date)
@@ -46,6 +49,7 @@ const sampleTableA = [
 
 export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const { t } = useTranslation()
+  const { id } = useParams();
   const workerRef = useRef(null)
   const inputCodeRef = useRef(null)
   const [inputCode, setInputCode] = useState(null)
@@ -57,6 +61,34 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const [scanHistory, setScanHistory] = useState([])
   const newDate = new Date()
   const [status, setStatus] = useState(false)
+  const [filteredData, setFilteredData] = useState(null);
+  console.log("filteredData" , filteredData)
+  const secretKey = "TEST_ACCESS_KEY";
+
+  const decodeBase64Url = (base64Url) => {
+    let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const padding = base64.length % 4 === 0 ? '' : '='.repeat(4 - (base64.length % 4));
+    base64 += padding;
+    return base64;
+  };
+  
+  const decryptData = (encryptedToken) => {
+    try {
+      const base64Data = decodeBase64Url(encryptedToken);
+      const bytes = CryptoJS.AES.decrypt(base64Data, secretKey);
+      const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
+      return JSON.parse(decryptedData);
+    } catch (error) {
+      console.log("Route path has not been selected yet");
+      return null;
+    }
+  };
+  useEffect(() => {
+    if (id) {
+      const data = decryptData(id);
+      setFilteredData(data);
+    } 
+  }, [id])
   useEffect(() => {
     dataRef.current = data
   }, [data])
