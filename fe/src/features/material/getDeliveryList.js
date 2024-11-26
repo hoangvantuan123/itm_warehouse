@@ -2,15 +2,21 @@ import axios from 'axios'
 import { HOST_API_SERVER_1 } from '../../services'
 import { ERROR_MESSAGES } from '../../utils/constants'
 
-export const GetSConvertDC = async (itemNo, prodDate1, inDate1) => {
+export const GetDeliveryList = async (
+  fromDate,
+  toDate,
+  deliveryNo,
+  delivbizUniteryNo,
+) => {
   try {
-    const url = `${HOST_API_SERVER_1}/mssql/stock-in/convert-dc`
+    const url = `${HOST_API_SERVER_1}/mssql/deliverry-list/itm-sug-get-active-delivery-web`
 
     const response = await axios.get(url, {
       params: {
-        itemNo: `'${itemNo}'`,
-        prodDate1: `'${prodDate1}'`,
-        inDate1: `'${inDate1}'`,
+        fromDate,
+        toDate,
+        deliveryNo,
+        delivbizUniteryNo,
       },
       headers: {
         'Content-Type': 'application/json',

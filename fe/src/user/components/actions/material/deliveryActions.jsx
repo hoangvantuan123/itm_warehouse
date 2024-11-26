@@ -7,7 +7,7 @@ import {
   SearchOutlined,
 } from '@ant-design/icons'
 
-export default function DeliveryActions() {
+export default function DeliveryActions({ fetchData }) {
   return (
     <div className="flex items-center gap-2">
       <Button
@@ -28,6 +28,7 @@ export default function DeliveryActions() {
         icon={<SearchOutlined />}
         size="middle"
         className="uppercase"
+        onClick={fetchData}
       >
         SEARCH
       </Button>

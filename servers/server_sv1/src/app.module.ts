@@ -8,6 +8,7 @@ import { HealthController } from './health.controller';
 import { sqlServerITMV20240117 } from './config/database.config';
 import { APP_FILTER } from '@nestjs/core';
 import { StockInModule } from './modules/material/module/stockIn.module';
+import { CodeHelpComboQueryModule } from './modules/codeHelp/module/codeHelpComboQuery.module';
 
 
 @Module({
@@ -20,7 +21,8 @@ import { StockInModule } from './modules/material/module/stockIn.module';
       ...sqlServerITMV20240117,
       name: 'ITMV20240117',
     }),
-    StockInModule
+    StockInModule,
+    CodeHelpComboQueryModule
   ],
   providers: [{
     provide: APP_FILTER,

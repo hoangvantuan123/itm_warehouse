@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { Button, Form, Input, Row, Col, DatePicker } from 'antd'
 
-export default function WaitingIqcStockInQuery() {
-  // State variables for each input field
+export default function WaitingIqcStockInQuery({}) {
   const [date, setDate] = useState(null)
   const [deliveryNo, setDeliveryNo] = useState('')
   const [accUnit, setAccUnit] = useState('')
   const [purchaseType, setPurchaseType] = useState('')
   const [matBarcode, setMatBarcode] = useState('')
   const [whName, setWhName] = useState('')
+
   const handleDateChange = (date) => {
     setDate(date)
   }
@@ -16,8 +16,8 @@ export default function WaitingIqcStockInQuery() {
   return (
     <div className="flex items-center gap-2">
       <Form layout="vertical">
-        <Row gutter={16}>
-          <Col span={4}>
+        <Row className="gap-4 flex items-center ">
+          <Col>
             <Form.Item
               label={<span className="uppercase text-xs">Date</span>}
               required
@@ -32,7 +32,7 @@ export default function WaitingIqcStockInQuery() {
             </Form.Item>
           </Col>
 
-          <Col span={4}>
+          <Col>
             <Form.Item
               label={<span className="uppercase text-xs">Delivery No</span>}
               className="mb-0"
@@ -47,7 +47,7 @@ export default function WaitingIqcStockInQuery() {
             </Form.Item>
           </Col>
 
-          <Col span={4}>
+          <Col>
             <Form.Item
               label={<span className="uppercase text-xs">Acc Unit</span>}
               className="mb-0"
@@ -62,7 +62,7 @@ export default function WaitingIqcStockInQuery() {
             </Form.Item>
           </Col>
 
-          <Col span={4}>
+          <Col>
             <Form.Item
               label={<span className="uppercase text-xs">Purchase Type</span>}
               className="mb-0"
@@ -77,7 +77,7 @@ export default function WaitingIqcStockInQuery() {
             </Form.Item>
           </Col>
 
-          <Col span={4}>
+          <Col>
             <Form.Item
               label={<span className="uppercase text-xs">MAT Barcode</span>}
               tooltip="Barcode auto"
@@ -93,7 +93,7 @@ export default function WaitingIqcStockInQuery() {
             </Form.Item>
           </Col>
 
-          <Col span={4}>
+          <Col>
             <Form.Item
               label={<span className="uppercase text-xs">WH Name</span>}
               className="mb-0"

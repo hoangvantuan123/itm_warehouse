@@ -2,15 +2,31 @@ import axios from 'axios'
 import { HOST_API_SERVER_1 } from '../../services'
 import { ERROR_MESSAGES } from '../../utils/constants'
 
-export const GetSConvertDC = async (itemNo, prodDate1, inDate1) => {
+export const GetCodeHelp = async (
+  workingTag,
+  languageSeq,
+  codeHelpSeq,
+  companySeq,
+  keyword,
+  param1,
+  param2,
+  param3,
+  param4,
+) => {
   try {
-    const url = `${HOST_API_SERVER_1}/mssql/stock-in/convert-dc`
+    const url = `${HOST_API_SERVER_1}/mssql/code-help-combo-query`
 
     const response = await axios.get(url, {
       params: {
-        itemNo: `'${itemNo}'`,
-        prodDate1: `'${prodDate1}'`,
-        inDate1: `'${inDate1}'`,
+        workingTag,
+        languageSeq,
+        codeHelpSeq,
+        companySeq,
+        keyword,
+        param1,
+        param2,
+        param3,
+        param4,
       },
       headers: {
         'Content-Type': 'application/json',

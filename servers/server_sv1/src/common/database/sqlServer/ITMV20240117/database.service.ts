@@ -26,11 +26,14 @@ export class DatabaseService {
 
   async executeQuery(query: string): Promise<any> {
     try {
-      return await this.queryRunner.query(query);
+      const result = await this.queryRunner.query(query);
+      return result;
     } catch (error) {
       throw error;
     }
   }
+
+
 
   async executeQueryTest(query: string): Promise<any> {
     try {

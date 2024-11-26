@@ -32,9 +32,10 @@ export class StockInService {
     try {
       const result = await this.databaseService.executeQuery(query);
       if (result.length === 0) {
-        return { success: false, message: ERROR_MESSAGES.WARNING_BARCODE_DATABASE };
-      } else {
         return { success: true, data: result };
+
+      } else {
+        return { success: false, message: ERROR_MESSAGES.WARNING_BARCODE_DATABASE };
       }
     } catch (error) {
       return { success: false, message: ERROR_MESSAGES.DATABASE_ERROR };
@@ -47,14 +48,41 @@ export class StockInService {
         @ItemNo = ${itemNo},
         @Lotno = ${lotno};
     `;
-
     try {
       const result = await this.databaseService.executeQuery(query);
       if (result.length === 0) {
-        return { success: false, message: ERROR_MESSAGES.WARNING_HOLD_BARCODE };
-      } else {
         return { success: true, data: result };
+      } else {
+        return { success: false, message: ERROR_MESSAGES.WARNING_HOLD_BARCODE };
       }
+    } catch (error) {
+      return { success: false, message: ERROR_MESSAGES.DATABASE_ERROR };
+    }
+  }
+
+
+  async _SMaterialQRCheck_WEB(xmlDocument: string, xmlFlags: number, serviceSeq: number, workingTag: string, companySeq: number, languageSeq: number, userSeq: number, pgmSeq: number): Promise<SimpleQueryResult> {
+    const escapedXmlDocument = xmlDocument.replace(/'/g, "''");
+    const query = `
+      EXEC _SMaterialQRCheck_WEB 
+        @xmlDocument = N'<ROOT> ${escapedXmlDocument} </ROOT>',
+        @xmlFlags = ${xmlFlags},
+        @ServiceSeq = ${serviceSeq},
+        @WorkingTag = N'${workingTag}',
+        @CompanySeq = ${companySeq},
+        @LanguageSeq = ${languageSeq},
+        @UserSeq = ${userSeq},
+        @PgmSeq = ${pgmSeq};
+    `;
+    try {
+      const result = await this.databaseService.executeQuery(query);
+
+      const hasInvalidEmpSeq = result.some((item: any) => item.Status !== 0);
+
+      if (hasInvalidEmpSeq) {
+        return { success: false, message: "ERROR TRA" };
+      }
+      return { success: true, data: result };
     } catch (error) {
       return { success: false, message: ERROR_MESSAGES.DATABASE_ERROR };
     }

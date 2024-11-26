@@ -14,24 +14,24 @@ import ModalWaitingIqcStockIn from '../../components/modal/material/modalWaiting
 import { GetSConvertDC } from '../../../features/material/getSConvertDC'
 import { GetCheckItemLotExist } from '../../../features/material/getCheckItemLotExists'
 import { GetCheckIQCHold } from '../../../features/material/getCheckIQCHold'
-
+import { SMaterialQRCheckWeb } from '../../../features/material/postSMaterialQRCheck'
 
 function formatToYYYYMMDD(date) {
-  const d = new Date(date);
-  if (isNaN(d.getTime())) throw new Error('Invalid date');
+  const d = new Date(date)
+  if (isNaN(d.getTime())) throw new Error('Invalid date')
 
-  const year = d.getFullYear();
-  const month = (d.getMonth() + 1).toString().padStart(2, '0');
-  const day = d.getDate().toString().padStart(2, '0');
+  const year = d.getFullYear()
+  const month = (d.getMonth() + 1).toString().padStart(2, '0')
+  const day = d.getDate().toString().padStart(2, '0')
 
-  return `${year}${month}${day}`;
+  return `${year}${month}${day}`
 }
 
 const sampleTableA = [
   {
-    itemSeq: '001',
-    itemNo: 'IC0224',
-    totalQty: 16000,
+    itemSeq: '58569',
+    itemNo: 'NIK0998',
+    totalQty: 160000,
     okQty: 0,
     remainQty: 160000,
   },
@@ -41,7 +41,7 @@ const sampleTableA = [
     totalQty: 50000,
     okQty: 0,
     remainQty: 50000,
-  }
+  },
 ]
 
 export default function WaitingIqcStockIn({ permissions, isMobile }) {
@@ -52,38 +52,40 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const [data, setData] = useState(sampleTableA)
   const bufferRef = useRef('')
   const dataRef = useRef(sampleTableA)
-  const [modal2Open, setModal2Open] = useState(false);
-  const [error, setError] = useState(null);
-  const [scanHistory, setScanHistory] = useState([]);
-  const newDate = new Date();
+  const [modal2Open, setModal2Open] = useState(false)
+  const [error, setError] = useState(null)
+  const [scanHistory, setScanHistory] = useState([])
+  const newDate = new Date()
+  const [status, setStatus] = useState(false)
   useEffect(() => {
-    dataRef.current = data;
-  }, [data]);
+    dataRef.current = data
+  }, [data])
 
   useEffect(() => {
     workerRef.current = new Worker(
       new URL('../../../workers/workerWatingIqcStockIn.js', import.meta.url),
-    );
+    )
 
     workerRef.current.onmessage = async (event) => {
-      const { success, message: resultMessage, data: resultData } = event.data;
-
+      const { success, message: resultMessage, data: resultData } = event.data
       if (success) {
         if (resultData) {
-          const { itemNo, qty, lot, dc, reel, barcode } = resultData;
-
+          const { itemNo, qty, lot, dc, reel, barcode } = resultData
           try {
-            const [itemLotExistSuccess, iqcHoldSuccess, sConvertDCResult] = await Promise.all([
-              GetCheckItemLotExist(itemNo, lot),
-              GetCheckIQCHold(itemNo, lot),
-              GetSConvertDC(itemNo, dc, formatToYYYYMMDD(new Date()))
-            ]);
-            console.log("itemLotExistSuccess", itemLotExistSuccess)
-            console.log("iqcHoldSuccess", iqcHoldSuccess)
-            console.log("sConvertDCResult", sConvertDCResult)
-            
-            if (itemLotExistSuccess.success && iqcHoldSuccess.success && sConvertDCResult.success) {
-              const { ProductionDate, YYWW, YYMM, YYYYMMDD } = sConvertDCResult.data[0];
+            const [itemLotExistSuccess, iqcHoldSuccess, sConvertDCResult] =
+              await Promise.all([
+                GetCheckItemLotExist(itemNo, lot),
+                GetCheckIQCHold(itemNo, lot),
+                GetSConvertDC(itemNo, dc, formatToYYYYMMDD(new Date())),
+              ])
+
+            if (
+              itemLotExistSuccess.success &&
+              iqcHoldSuccess.success &&
+              sConvertDCResult.success
+            ) {
+              const { ProductionDate, YYWW, YYMM, YYYYMMDD } =
+                sConvertDCResult.data[0]
 
               setData((prevData) =>
                 prevData.map((item) =>
@@ -93,9 +95,9 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
                       okQty: item.okQty + qty,
                       remainQty: item.remainQty - qty,
                     }
-                    : item
-                )
-              );
+                    : item,
+                ),
+              )
 
               setScanHistory((prevHistory) => [
                 ...prevHistory,
@@ -112,53 +114,61 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
                   dc: dc,
                   barcode: barcode,
                 },
-              ]);
+              ])
 
-              message.success(resultMessage);
+              message.success(resultMessage)
             } else {
-              message.error("Một trong các API đã thất bại");
+              message.error('Một trong các API đã thất bại')
             }
           } catch (error) {
-            console.error('Error during API calls:', error);
-            message.error("Đã có lỗi xảy ra khi gọi API");
+            console.error('Error during API calls:', error)
+            message.error('Đã có lỗi xảy ra khi gọi API')
           }
         }
       } else {
-        setModal2Open(true);
-        setError(resultMessage);
+        setModal2Open(true)
+        setError(resultMessage)
       }
-    };
+    }
 
     return () => {
-      workerRef.current.terminate();
-    };
-  }, []);
+      workerRef.current.terminate()
+    }
+  }, [])
 
   const handleCheckBarcode = (barcode) => {
     workerRef.current.postMessage({
       type: 'CHECK_BARCODE',
       barcode,
       tableData: dataRef.current,
-    });
-  };
+    })
+  }
 
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (e.key === 'Enter' && bufferRef.current.trim()) {
-        const barcode = bufferRef.current.trim();
-        handleCheckBarcode(barcode);
+        const barcode = bufferRef.current.trim()
+        handleCheckBarcode(barcode)
         setInputCode(barcode)
-        bufferRef.current = '';
+        bufferRef.current = ''
       } else if (e.key.length === 1) {
-        bufferRef.current += e.key;
+        bufferRef.current += e.key
       }
-    };
+    }
 
-    window.addEventListener('keypress', handleKeyPress);
+    window.addEventListener('keypress', handleKeyPress)
+    const handleFocus = () => setStatus(true)
+
+    const handleBlur = () => setStatus(false)
+
+    window.addEventListener('focus', handleFocus)
+    window.addEventListener('blur', handleBlur)
     return () => {
-      window.removeEventListener('keypress', handleKeyPress);
-    };
-  }, []);
+      window.removeEventListener('keypress', handleKeyPress)
+      window.removeEventListener('focus', handleFocus)
+      window.removeEventListener('blur', handleBlur)
+    }
+  }, [])
 
   return (
     <>
@@ -173,7 +183,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
               <Title level={4} className="mt-2 uppercase opacity-85">
                 Waiting Iqc Stock In
               </Title>
-              <WaitingIqcStockInActions />
+              <WaitingIqcStockInActions status={status} />
             </div>
             <details
               className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
@@ -189,19 +199,24 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
                 </span>
               </summary>
               <div className="flex p-2 gap-4">
-                <WaitingIqcStockInQuery
-                />
+                <WaitingIqcStockInQuery />
               </div>
             </details>
           </div>
 
           <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg  overflow-auto">
-            <TableTransferWaitingIqcStockIn sampleTableA={data} sampleTableB={scanHistory} />
+            <TableTransferWaitingIqcStockIn
+              sampleTableA={data}
+              sampleTableB={scanHistory}
+            />
           </div>
         </div>
       </div>
-      <ModalWaitingIqcStockIn modal2Open={modal2Open} setModal2Open={setModal2Open} error={error} />
-
+      <ModalWaitingIqcStockIn
+        modal2Open={modal2Open}
+        setModal2Open={setModal2Open}
+        error={error}
+      />
     </>
-  );
+  )
 }

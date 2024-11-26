@@ -5,9 +5,6 @@ import { useNavigate } from 'react-router-dom'
 import '../../../../static/css/customTabe.css'
 import { ArrowLeftIcon } from '../../icons'
 
-
-
-
 function TableTransferWaitingIqcStockIn({ sampleTableA, sampleTableB }) {
   const navigate = useNavigate()
 

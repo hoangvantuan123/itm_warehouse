@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Body, Post } from '@nestjs/common';
 import { StockInService } from '../service/stockIn.service';
 import { SimpleQueryResult } from 'src/common/interfaces/simple-query-result.interface';
 
@@ -32,4 +32,33 @@ export class EmployeeController {
         const result = await this.stockInService.ITM_CheckIQCHold(itemNo, lotno);
         return result;
     }
+
+
+    @Post('smaterial-qr-check-web')
+    async processSMaterialQRCheckWeb(@Body() body: any): Promise<SimpleQueryResult> {
+        const {
+            xmlDocument,
+            xmlFlags,
+            serviceSeq,
+            workingTag,
+            companySeq,
+            languageSeq,
+            userSeq,
+            pgmSeq,
+        } = body;
+        return this.stockInService._SMaterialQRCheck_WEB(
+            xmlDocument,
+            xmlFlags,
+            serviceSeq,
+            workingTag,
+            companySeq,
+            languageSeq,
+            userSeq,
+            pgmSeq,
+        );
+    }
+
+
+
+
 }

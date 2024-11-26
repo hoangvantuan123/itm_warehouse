@@ -6,8 +6,9 @@ import {
   UploadOutlined,
   SearchOutlined,
 } from '@ant-design/icons'
+import { LiveIcon, OffIcon } from '../../icons'
 
-export default function WaitingIqcStockInActions() {
+export default function WaitingIqcStockInActions({ status }) {
   return (
     <div className="flex items-center gap-2">
       <Button
@@ -57,6 +58,23 @@ export default function WaitingIqcStockInActions() {
       >
         Excel Upload
       </Button>
+
+      {status ? (
+        <>
+          <span className="inline-flex items-center justify-center rounded-lg w-20 bg-emerald-100 px-5 py-[6px] text-emerald-700">
+            <LiveIcon />
+
+            <p className="whitespace-nowrap text-sm">LIVE</p>
+          </span>
+        </>
+      ) : (
+        <>
+          <span className="inline-flex items-center justify-center rounded-lg w-20 bg-red-100 px-5 py-[6px] text-red-700">
+            <OffIcon />
+            <p className="whitespace-nowrap text-sm">OFF</p>
+          </span>
+        </>
+      )}
     </div>
   )
 }

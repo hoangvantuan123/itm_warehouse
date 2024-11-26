@@ -5,14 +5,60 @@ import { Input, Space, Table, Typography, message, Tabs, Layout } from 'antd'
 const { Title, Text } = Typography
 import { FilterOutlined } from '@ant-design/icons'
 import { ArrowIcon } from '../../components/icons'
-const { Header, Content, Footer } = Layout
+import dayjs from 'dayjs';
 import 'moment/locale/vi'
-import BG from '../../../assets/ItmLogo.png'
+import moment from "moment";
 import DeliveryActions from '../../components/actions/material/deliveryActions'
 import TableDeliveryList from '../../components/table/material/tableDeliveryList'
+import { GetCodeHelp } from '../../../features/codeHelp/getCodeHelp'
+import { GetDeliveryList } from '../../../features/material/getDeliveryList'
+import DeliveryListQuery from '../../components/query/material/deliveryListQuery'
+import { debounce } from 'lodash';
 
 export default function DeliveryList({ permissions, isMobile }) {
   const { t } = useTranslation()
+  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState([])
+  const [dataUnit, setDataUnit] = useState([])
+  const [formData, setFormData] = useState(dayjs().startOf('month'));
+  const [toDate, setToDate] = useState(dayjs());
+  const [deliveryNo, setDeliveryNo] = useState('')
+  const [bizUnit, setBizUnit] = useState(4)
+
+
+  const formatDate = (date) => {
+    return date.format('YYYYMMDD');
+  };
+  const fetchData = async () => {
+    try {
+      const [deliveryResponse, codeHelpResponse] = await Promise.all([
+        GetDeliveryList(formatDate(formData),
+          formatDate(toDate), deliveryNo, bizUnit),
+        GetCodeHelp('', 6, 10003, 1, '%', '', '', '', '')
+      ]);
+
+      setData(deliveryResponse.data);
+      setDataUnit(codeHelpResponse.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  const debouncedFetchData = debounce(() => {
+    fetchData();
+  }, 100);
+  
+  useEffect(() => {
+    setLoading(true);
+
+    debouncedFetchData();
+    return () => {
+      debouncedFetchData.cancel();
+    };
+  }, [formData, toDate, deliveryNo, bizUnit]);
 
   return (
     <>
@@ -27,23 +73,38 @@ export default function DeliveryList({ permissions, isMobile }) {
               <Title level={4} className="mt-2 uppercase opacity-85 ">
                 {t('Delivery List')}
               </Title>
-              <DeliveryActions />
+              <DeliveryActions fetchData={fetchData} />
             </div>
-            <details className="group p-2  [&_summary::-webkit-details-marker]:hidden  bg-white border rounded-lg">
+            <details
+              className="group p-2  [&_summary::-webkit-details-marker]:hidden  bg-white border rounded-lg"
+              open
+            >
               <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
                 <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600">
                   <FilterOutlined />
                   {t('Điều kiện truy vấn')}
                 </h2>
                 <span className="relative size-5 shrink-0">
-                  <ArrowIcon />
+                  <ArrowIcon  />
                 </span>
               </summary>
-              <div className="flex p-2 gap-4"></div>
+              <div className="flex p-2 gap-4">
+                <DeliveryListQuery
+                  formData={formData}
+                  setFormData={setFormData}
+                  setDeliveryNo={setDeliveryNo}
+                  setToDate={setToDate}
+                  toDate={toDate}
+                  deliveryNo={deliveryNo}
+                  bizUnit={bizUnit}
+                  setBizUnit={setBizUnit}
+                  dataUnit={dataUnit}
+                />
+              </div>
             </details>
           </div>
           <div className="col-start-1 col-end-5 row-start-2 row-end-6 w-full min-h-auto rounded-lg">
-            <TableDeliveryList />
+            <TableDeliveryList data={data} />
           </div>
         </div>
       </div>

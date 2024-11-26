@@ -5,98 +5,75 @@ import { useNavigate } from 'react-router-dom'
 import '../../../../static/css/customTabe.css'
 import moment from 'moment'
 
-const generateFakeData = (numRows = 20) => {
-  const fakeData = []
-  for (let i = 0; i < numRows; i++) {
-    fakeData.push({
-      deliveryseq: String(i + 1).padStart(3, '0'),
-      deliveryno: `DLV-${moment().format('YYYYMMDD')}-${String(i + 1).padStart(2, '0')}`,
-      deliverytype: i % 2 === 0 ? 'Express' : 'Standard',
-      totalqty: Math.floor(Math.random() * 500) + 100,
-      okqty: Math.floor(Math.random() * 500) + 50,
-      remainqty: Math.floor(Math.random() * 100) + 10,
-      deliverdate: moment()
-        .subtract(i % 5, 'days')
-        .format('YYYY-MM-DD'),
-      customercode: `CUST${String(i + 1).padStart(3, '0')}`,
-      customername: `Customer ${String(i + 1).padStart(3, '0')}`,
-      purchasetypeseq: `PT${String(i + 1).padStart(3, '0')}`,
-      purchasetype: i % 2 === 0 ? 'Online' : 'Retail',
-      bizunitname: `Biz Unit ${String(i + 1).padStart(3, '0')}`,
-    })
-  }
-  return fakeData
-}
-
-function TableDeliveryList() {
+function TableDeliveryList({ data }) {
   const navigate = useNavigate()
 
   const columns = [
     {
-      name: 'deliveryseq',
-      header: 'Delivery Seq',
+      name: 'DelvNo',
+      header: 'DelvNo',
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 200,
+      width: 140,
     },
     {
-      name: 'deliveryno',
-      header: 'Delivery No',
+      name: 'DelvMngNo',
+      header: 'DelvMngNo',
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 200,
+      width: 140,
     },
     {
-      name: 'deliverytype',
-      header: 'Delivery Type',
+      name: 'ImpType',
+      header: 'ImpType',
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 200,
+      width: 140,
     },
     {
-      name: 'totalqty',
-      header: 'Total Qty',
+      name: 'TotalQty',
+      header: 'TotalQty',
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 200,
+      width: 140,
     },
     {
-      name: 'okqty',
-      header: 'OK Qty',
+      name: 'OkQty',
+      header: 'OkQty',
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 200,
+      width: 140,
     },
     {
-      name: 'remainqty',
-      header: 'Remain Qty',
+      name: 'RemainQty',
+      header: 'RemainQty',
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 200,
+      width: 140,
     },
     {
-      name: 'deliverdate',
-      header: 'Deliver Date',
+      name: 'DelvDate',
+      header: 'DelvDate',
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 200,
+      width: 140,
     },
     {
-      name: 'customercode',
+      name: 'CustSeq',
       header: 'Customer Code',
       sortable: true,
       resizable: true,
-      width: 200,
+      width: 140,
     },
     {
-      name: 'customername',
+      name: 'CustNm',
       header: 'Customer Name',
       sortable: true,
       filter: 'text',
@@ -104,7 +81,7 @@ function TableDeliveryList() {
       width: 200,
     },
     {
-      name: 'purchasetypeseq',
+      name: 'DomOrImp',
       header: 'Purchase Type Seq',
       sortable: true,
       filter: 'text',
@@ -112,7 +89,7 @@ function TableDeliveryList() {
       width: 200,
     },
     {
-      name: 'purchasetype',
+      name: 'PurchaseType',
       header: 'Purchase Type',
       sortable: true,
       filter: 'text',
@@ -120,16 +97,22 @@ function TableDeliveryList() {
       width: 200,
     },
     {
-      name: 'bizunitname',
-      header: 'Biz Unit Name',
+      name: 'BizUnit',
+      header: 'BizUnit',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 100,
+    },
+    {
+      name: 'BizUnitName',
+      header: 'BizUnitName',
       sortable: true,
       filter: 'text',
       resizable: true,
       width: 200,
     },
   ]
-
-  const data = generateFakeData(10000)
 
   const handleRowDoubleClick = (e) => {
     const { rowKey } = e
@@ -138,6 +121,8 @@ function TableDeliveryList() {
     navigate(`/details/${clickedRowData.deliveryno}`)
   }
   TuiGrid.applyTheme('striped')
+
+  
 
   return (
     <Grid
