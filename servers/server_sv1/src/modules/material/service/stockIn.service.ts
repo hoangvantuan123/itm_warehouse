@@ -141,6 +141,68 @@ export class StockInService {
   }
 
 
+  async _SSLImpDelvMasterCheck_WEB(xmlDocument: string, xmlFlags: number, serviceSeq: number, workingTag: string, companySeq: number, languageSeq: number, userSeq: number, pgmSeq: number): Promise<SimpleQueryResult> {
+    const escapedXmlDocument = xmlDocument.replace(/'/g, "''");
+    const query = `
+      EXEC _SSLImpDelvMasterCheck_WEB 
+        @xmlDocument = N'<ROOT> ${escapedXmlDocument} </ROOT>',
+        @xmlFlags = ${xmlFlags},
+        @ServiceSeq = ${serviceSeq},
+        @WorkingTag = N'${workingTag}',
+        @CompanySeq = ${companySeq},
+        @LanguageSeq = ${languageSeq},
+        @UserSeq = ${userSeq},
+        @PgmSeq = ${pgmSeq};
+    `;
+    try {
+      const result = await this.databaseService.executeQuery(query);
+
+      const invalidStatuses = result.some((item: any) => item.Status !== 0);
+      if (invalidStatuses) {
+        const errorMessage = result
+          .map((item: any) => `${item.Result}`)
+          .join('; ');
+        return { success: false, message: errorMessage };
+      }
+      return { success: true, data: result };
+    } catch (error) {
+      return { success: false, message: ERROR_MESSAGES.DATABASE_ERROR };
+    }
+  }
+  async _SSLImpDelvSheetCheck_WEB(xmlDocument: string, xmlFlags: number, serviceSeq: number, workingTag: string, companySeq: number, languageSeq: number, userSeq: number, pgmSeq: number): Promise<SimpleQueryResult> {
+    const escapedXmlDocument = xmlDocument.replace(/'/g, "''");
+    const query = `
+      EXEC _SSLImpDelvSheetCheck_WEB 
+        @xmlDocument = N'<ROOT> ${escapedXmlDocument} </ROOT>',
+        @xmlFlags = ${xmlFlags},
+        @ServiceSeq = ${serviceSeq},
+        @WorkingTag = N'${workingTag}',
+        @CompanySeq = ${companySeq},
+        @LanguageSeq = ${languageSeq},
+        @UserSeq = ${userSeq},
+        @PgmSeq = ${pgmSeq};
+    `;
+    try {
+      const result = await this.databaseService.executeQuery(query);
+
+      const invalidStatuses = result.some((item: any) => item.Status !== 0);
+      if (invalidStatuses) {
+        const errorMessage = result
+          .map((item: any) => `${item.Result}`)
+          .join('; ');
+        return { success: false, message: errorMessage };
+      }
+      return { success: true, data: result };
+    } catch (error) {
+      return { success: false, message: ERROR_MESSAGES.DATABASE_ERROR };
+    }
+  }
+/* SAVE */
+
+
+
+
+
 
 
 }

@@ -99,6 +99,52 @@ export class EmployeeController {
             pgmSeq,
         );
     }
+    @Post('ssl-imp-delv-master-check-web')
+    async processSSLImpDelvMasterCheckWEB(@Body() body: any): Promise<SimpleQueryResult> {
+        const {
+            xmlDocument,
+            xmlFlags,
+            serviceSeq,
+            workingTag,
+            companySeq,
+            languageSeq,
+            userSeq,
+            pgmSeq,
+        } = body;
+        return this.stockInService._SSLImpDelvMasterCheck_WEB(
+            xmlDocument,
+            xmlFlags,
+            serviceSeq,
+            workingTag,
+            companySeq,
+            languageSeq,
+            userSeq,
+            pgmSeq,
+        );
+    }
+    @Post('ssl-imp-delv-sheet-check-web')
+    async processSSLImpDelvSheetCheckWEB(@Body() body: any): Promise<SimpleQueryResult> {
+        const {
+            xmlDocument,
+            xmlFlags,
+            serviceSeq,
+            workingTag,
+            companySeq,
+            languageSeq,
+            userSeq,
+            pgmSeq,
+        } = body;
+        return this.stockInService._SSLImpDelvSheetCheck_WEB(
+            xmlDocument,
+            xmlFlags,
+            serviceSeq,
+            workingTag,
+            companySeq,
+            languageSeq,
+            userSeq,
+            pgmSeq,
+        );
+    }
 
 
 

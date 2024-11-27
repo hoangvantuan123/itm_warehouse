@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef , useMemo} from 'react'
 import { useTranslation } from 'react-i18next'
 import { Helmet } from 'react-helmet'
 import { Input, Space, Table, Typography, message, Tabs, Layout } from 'antd'
@@ -17,132 +17,123 @@ import { encodeBase64Url } from '../../../utils/decode-JWT'
 import CryptoJS from 'crypto-js'
 
 export default function DeliveryList({ permissions, isMobile }) {
-  const { t } = useTranslation()
-  const gridRef = useRef(null)
-  const navigate = useNavigate()
-  const [loading, setLoading] = useState(true)
-  const [data, setData] = useState([])
-  const [dataUnit, setDataUnit] = useState([])
-  const [formData, setFormData] = useState(dayjs().startOf('month'))
-  const [toDate, setToDate] = useState(dayjs())
-  const [deliveryNo, setDeliveryNo] = useState('')
-  const [bizUnit, setBizUnit] = useState(4)
-  const [checkedRowKey, setCheckedRowKey] = useState(null)
-  const [keyPath, setKeyPath] = useState(null)
-  const [checkedPath, setCheckedPath] = useState(false)
+  const { t } = useTranslation();
+  const gridRef = useRef(null);
+  const navigate = useNavigate();
 
-  const handleCheck = (ev) => {
-    const { rowKey } = ev
-    const gridInstance = gridRef.current.getInstance()
-    let checkedRowKey = null
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState([]);
+  const [dataUnit, setDataUnit] = useState([]);
+  const [formData, setFormData] = useState(dayjs().startOf('month'));
+  const [toDate, setToDate] = useState(dayjs());
+  const [deliveryNo, setDeliveryNo] = useState('');
+  const [bizUnit, setBizUnit] = useState(4);
+  const [checkedRowKey, setCheckedRowKey] = useState(null);
+  const [keyPath, setKeyPath] = useState(null);
+  const [checkedPath, setCheckedPath] = useState(false);
 
-    if (checkedRowKey !== null) {
-      gridInstance.uncheck(checkedRowKey)
-    }
+  const formatDate = useCallback((date) => date.format('YYYYMMDD'), []);
 
-    const rowData = data[rowKey]
-    const filteredData = {
-      DelvNo: rowData?.DelvNo,
-      DelvMngNo: rowData?.DelvMngNo,
-      ImpType: rowData?.ImpType,
-      TotalQty: rowData?.TotalQty,
-      OkQty: rowData?.OkQty,
-      RemainQty: rowData?.RemainQty,
-      DelvDate: rowData?.DelvDate,
-      CustSeq: rowData?.CustSeq,
-      CustNm: rowData?.CustNm,
-      DomOrImp: rowData?.DomOrImp,
-      PurchaseType: rowData?.PurchaseType,
-      BizUnitName: rowData?.BizUnitName,
-      BizUnit: rowData?.BizUnit,
-      EmpSeq: rowData?.EmpSeq,
-      EmpName: rowData?.EmpName,
-      DeptSeq: rowData?.DeptSeq,
-      DeptName: rowData?.DeptName,
-      CurrSeq: rowData?.CurrSeq,
-      CurrName: rowData?.CurrName,
-      ExRate: rowData?.ExRate,
-    }
-    const secretKey = 'TEST_ACCESS_KEY'
-    const encryptedData = CryptoJS.AES.encrypt(
-      JSON.stringify(filteredData),
-      secretKey,
-    ).toString()
-    const encryptedToken = encodeBase64Url(encryptedData)
-    setKeyPath(encryptedToken)
-  }
-
-  const nextPageStockIn = () => {
-    if (keyPath && checkedPath === false) {
-      setCheckedPath(true)
-      navigate(`/u/warehouse/material/waiting-iqc-stock-in/${keyPath}`)
-    }
-  }
-
-  const formatDate = (date) => {
-    return date.format('YYYYMMDD')
-  }
-
-  const fetchDeliveryData = async () => {
+  const fetchDeliveryData = useCallback(async () => {
+    setLoading(true);
     try {
-      setLoading(true)
       const deliveryResponse = await GetDeliveryList(
         formatDate(formData),
         formatDate(toDate),
         deliveryNo,
-        bizUnit,
-      )
-      setData(deliveryResponse?.data)
+        bizUnit
+      );
+      setData(deliveryResponse?.data || []);
     } catch (error) {
-      setData([])
+      console.error('Error fetching delivery data:', error);
+      setData([]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  }, [formData, toDate, deliveryNo, bizUnit, formatDate]);
 
-  const fetchCodeHelpData = async () => {
+  const fetchCodeHelpData = useCallback(async () => {
+    setLoading(true);
     try {
-      setLoading(true)
-      const codeHelpResponse = await GetCodeHelp(
-        '',
-        6,
-        10003,
-        1,
-        '%',
-        '',
-        '',
-        '',
-        '',
-      )
-      setDataUnit(codeHelpResponse?.data)
+      const codeHelpResponse = await GetCodeHelp('', 6, 10003, 1, '%', '', '', '', '');
+      setDataUnit(codeHelpResponse?.data || []);
     } catch (error) {
-      setDataUnit([])
+      console.error('Error fetching code help data:', error);
+      setDataUnit([]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
-  const debouncedFetchDeliveryData = debounce(() => {
-    fetchDeliveryData()
-  }, 100)
+  }, []);
 
-  const debouncedFetchCodeHelpData = debounce(() => {
-    fetchCodeHelpData()
-  }, 100)
+  const debouncedFetchDeliveryData = useMemo(() => debounce(fetchDeliveryData, 100), [fetchDeliveryData]);
+  const debouncedFetchCodeHelpData = useMemo(() => debounce(fetchCodeHelpData, 100), [fetchCodeHelpData]);
+
+  const handleCheck = useCallback((ev) => {
+    const { rowKey } = ev;
+    const gridInstance = gridRef.current?.getInstance();
+    const previousCheckedRowKey = checkedRowKey;
+
+    if (previousCheckedRowKey !== null && gridInstance) {
+      gridInstance.uncheck(previousCheckedRowKey);
+    }
+
+    const rowData = data[rowKey];
+    if (!rowData) {
+      console.warn('Invalid row data');
+      return;
+    }
+
+    const filteredData = {
+      DelvNo: rowData.DelvNo,
+      DelvMngNo: rowData.DelvMngNo,
+      ImpType: rowData.ImpType,
+      TotalQty: rowData.TotalQty,
+      OkQty: rowData.OkQty,
+      RemainQty: rowData.RemainQty,
+      DelvDate: rowData.DelvDate,
+      CustSeq: rowData.CustSeq,
+      CustNm: rowData.CustNm,
+      DomOrImp: rowData.DomOrImp,
+      PurchaseType: rowData.PurchaseType,
+      BizUnitName: rowData.BizUnitName,
+      BizUnit: rowData.BizUnit,
+      EmpSeq: rowData.EmpSeq,
+      EmpName: rowData.EmpName,
+      DeptSeq: rowData.DeptSeq,
+      DeptName: rowData.DeptName,
+      CurrSeq: rowData.CurrSeq,
+      CurrName: rowData.CurrName,
+      ExRate: rowData.ExRate,
+    };
+
+    const secretKey = 'TEST_ACCESS_KEY';
+    const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(filteredData), secretKey).toString();
+    const encryptedToken = encodeBase64Url(encryptedData);
+
+    setCheckedRowKey(rowKey);
+    setKeyPath(encryptedToken);
+  }, [checkedRowKey, data]);
+
+  const nextPageStockIn = useCallback(() => {
+    if (keyPath && !checkedPath) {
+      setCheckedPath(true);
+      navigate(`/u/warehouse/material/waiting-iqc-stock-in/${keyPath}`);
+    }
+  }, [keyPath, checkedPath, navigate]);
 
   useEffect(() => {
-    debouncedFetchDeliveryData()
+    debouncedFetchDeliveryData();
     return () => {
-      debouncedFetchDeliveryData.cancel()
-    }
-  }, [formData, toDate, deliveryNo, bizUnit])
+      debouncedFetchDeliveryData.cancel();
+    };
+  }, [debouncedFetchDeliveryData]);
 
   useEffect(() => {
-    debouncedFetchCodeHelpData()
+    debouncedFetchCodeHelpData();
     return () => {
-      debouncedFetchCodeHelpData.cancel()
-    }
-  }, [])
-
+      debouncedFetchCodeHelpData.cancel();
+    };
+  }, [debouncedFetchCodeHelpData]);
   return (
     <>
       <Helmet>
