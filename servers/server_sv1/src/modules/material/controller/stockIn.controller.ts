@@ -16,20 +16,13 @@ export class EmployeeController {
         return result;
     }
 
-    @Get('check-item-lot-exists')
-    async checkItemLotExists(
-        @Query('itemNo') itemNo: string,
-        @Query('lotno') lotno: string,
+
+    @Get('itm-sug-get-active-delivery-item')
+    async processITMSUGGetActiveDeliveryItem(
+        @Query('deliverySeq') deliverySeq: number,
+        @Query('purchaseType') purchaseType: string,
     ): Promise<SimpleQueryResult> {
-        const result = await this.stockInService.ITM_CheckItemLotExists(itemNo, lotno);
-        return result;
-    }
-    @Get('check-iqc-hold')
-    async checkIQCHold(
-        @Query('itemNo') itemNo: string,
-        @Query('lotno') lotno: string,
-    ): Promise<SimpleQueryResult> {
-        const result = await this.stockInService.ITM_CheckIQCHold(itemNo, lotno);
+        const result = await this.stockInService.ITM_SUGGetActiveDeliveryItem(deliverySeq, purchaseType);
         return result;
     }
 
@@ -47,6 +40,55 @@ export class EmployeeController {
             pgmSeq,
         } = body;
         return this.stockInService._SMaterialQRCheck_WEB(
+            xmlDocument,
+            xmlFlags,
+            serviceSeq,
+            workingTag,
+            companySeq,
+            languageSeq,
+            userSeq,
+            pgmSeq,
+        );
+    }
+
+
+    @Post('scom-close-check-web')
+    async processSCOMCloseCheckWEB(@Body() body: any): Promise<SimpleQueryResult> {
+        const {
+            xmlDocument,
+            xmlFlags,
+            serviceSeq,
+            workingTag,
+            companySeq,
+            languageSeq,
+            userSeq,
+            pgmSeq,
+        } = body;
+        return this.stockInService._SCOMCloseCheck_WEB(
+            xmlDocument,
+            xmlFlags,
+            serviceSeq,
+            workingTag,
+            companySeq,
+            languageSeq,
+            userSeq,
+            pgmSeq,
+        );
+    }
+
+    @Post('scom-close-item-check-web')
+    async processSCOMCloseItemCheckWEB(@Body() body: any): Promise<SimpleQueryResult> {
+        const {
+            xmlDocument,
+            xmlFlags,
+            serviceSeq,
+            workingTag,
+            companySeq,
+            languageSeq,
+            userSeq,
+            pgmSeq,
+        } = body;
+        return this.stockInService._SCOMCloseItemCheck_WEB(
             xmlDocument,
             xmlFlags,
             serviceSeq,

@@ -1,13 +1,21 @@
 import { useState } from 'react'
-import { Button, Form, Input, Row, Col, DatePicker, Segmented, Select } from 'antd'
-import moment from "moment";
-import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
+import {
+  Button,
+  Form,
+  Input,
+  Row,
+  Col,
+  DatePicker,
+  Segmented,
+  Select,
+} from 'antd'
+import moment from 'moment'
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
 
-
-const dateFormat = 'YYYY/MM/DD';
-const weekFormat = 'MM/DD';
-const monthFormat = 'YYYY/MM';
+const dateFormat = 'YYYY/MM/DD'
+const weekFormat = 'MM/DD'
+const monthFormat = 'YYYY/MM'
 
 export default function DeliveryListQuery({
   formData,
@@ -18,9 +26,8 @@ export default function DeliveryListQuery({
   deliveryNo,
   bizUnit,
   setBizUnit,
-  dataUnit
+  dataUnit,
 }) {
-
   const handleFormDate = (date) => {
     setFormData(date)
   }
@@ -90,7 +97,7 @@ export default function DeliveryListQuery({
                 onChange={handleChange}
                 options={dataUnit?.map((item) => ({
                   label: item?.AccUnitName,
-                  value: item?.BizUnit
+                  value: item?.BizUnit,
                 }))}
               />
             </Form.Item>

@@ -49,49 +49,34 @@ docker pull gvenzl/oracle-xe:11
 docker run -d -p 1521:1521 --name ora11gFull -e ORACLE_PASSWORD=SysPassword1 -v oracle-volume:/opt/oracle/XEORA11GFull/oradata gvenzl/oracle-xe:11
 
 
-<!--  Kết nối DB 2  -->
 
+  EXEC _SMaterialQRCheck_WEB
+        @xmlDocument = N'<ROOT>
+    <ROOT>
+        <DataBlock1>
+            <WorkingTag>A</WorkingTag>
+            <IDX_NO>1</IDX_NO>
+            <Status>0</Status>
+            <DataSeq>1</DataSeq>
+            <Selected>1</Selected>
+            <TABLE_NAME>DataBlock1</TABLE_NAME>
 
-```
-
-@Injectable()
-export class SecondDatabaseService {
-  // Inject kết nối với tên cụ thể 'secondConnection'
-  constructor(@InjectConnection('secondConnection') private readonly connection: Connection) {}
-
-  async executeQuery(query: string, parameters: any[] = []) {
-    try {
-      return await this.connection.query(query, parameters);
-    } catch (error) {
-      console.error(ERROR_MESSAGES.EXECUTING_QUERY, error);
-      throw error;
-    }
-  }
-
-  async executeMultipleQueries(queries: string[], parameters: any[][]) {
-    try {
-      const promises = queries.map((query, index) =>
-        this.executeQuery(query, parameters[index])
-      );
-      return await Promise.all(promises);
-    } catch (error) {
-      console.error(ERROR_MESSAGES.MULTIPLE_QUERIES, error);
-      throw error;
-    }
-  }
-}
-
-```
-
-{
-    "PLANT": "ITMVPSG",
-    "MATERIAL_LOT": "FPC0113/D403200800/849/2442/1P4NBN",
-    "PCB_BARCODE": "DK3244138704039640B1000",
-    "TRANS_TIME": "20241101083640",
-    "USER_ID": "VM1305",
-    "LOT_NUMBER": "U444OS",
-    "XOUT_QTY": null
-}
-
-
-ITMVPSGTEST
+            <BizUnit></BizUnit>
+            <BizUnitName></BizUnitName>
+                <SMImpKind>8008004</SMImpKind>
+            <SMImpKindName></SMImpKindName>
+            <ItemNo>undefined</ItemNo>
+            <LotNo>JY2408230040102</LotNo>
+            <Qty>7000</Qty>
+            <DateCode>2439</DateCode>
+            <ReelNo>0736</ReelNo>
+            <Barcode>NIK0998/JY2408230040102/7000/2439/0736</Barcode>
+        </DataBlock1>
+    </ROOT> </ROOT>',
+        @xmlFlags = 2,
+        @ServiceSeq = 1613,
+        @WorkingTag = N'A',
+        @CompanySeq = 1,
+        @LanguageSeq = 6,
+        @UserSeq = 18770,
+        @PgmSeq = 1791;

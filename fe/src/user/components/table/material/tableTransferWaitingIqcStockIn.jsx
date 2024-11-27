@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react'
 import 'tui-grid/dist/tui-grid.css'
 import Grid from '@toast-ui/react-grid'
 import TuiGrid from 'tui-grid'
@@ -7,10 +8,35 @@ import { ArrowLeftIcon } from '../../icons'
 
 function TableTransferWaitingIqcStockIn({ sampleTableA, sampleTableB }) {
   const navigate = useNavigate()
-
+  const gridRef = useRef(null)
+  const [checkedRowKey, setCheckedRowKey] = useState(null)
   const columnsA = [
     {
-      name: 'itemSeq',
+      name: 'PermitType',
+      header: 'PermitType',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 150,
+    },
+    {
+      name: 'PermitSeq',
+      header: 'PermitSeq',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 150,
+    },
+    {
+      name: 'PermitSerl',
+      header: 'PermitSerl',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 150,
+    },
+    {
+      name: 'ItemSeq',
       header: 'Item Seq',
       sortable: true,
       filter: 'text',
@@ -18,7 +44,7 @@ function TableTransferWaitingIqcStockIn({ sampleTableA, sampleTableB }) {
       width: 150,
     },
     {
-      name: 'itemNo',
+      name: 'ItemNo',
       header: 'Item No.',
       sortable: true,
       filter: 'text',
@@ -26,7 +52,7 @@ function TableTransferWaitingIqcStockIn({ sampleTableA, sampleTableB }) {
       width: 150,
     },
     {
-      name: 'totalQty',
+      name: 'TotalQty',
       header: 'Total Qty',
       sortable: true,
       filter: 'text',
@@ -34,7 +60,7 @@ function TableTransferWaitingIqcStockIn({ sampleTableA, sampleTableB }) {
       width: 150,
     },
     {
-      name: 'okQty',
+      name: 'OkQty',
       header: 'Ok Qty',
       sortable: true,
       filter: 'text',
@@ -42,7 +68,7 @@ function TableTransferWaitingIqcStockIn({ sampleTableA, sampleTableB }) {
       width: 150,
     },
     {
-      name: 'remainQty',
+      name: 'RemainQty',
       header: 'Remain Qty',
       sortable: true,
       filter: 'text',
@@ -53,101 +79,177 @@ function TableTransferWaitingIqcStockIn({ sampleTableA, sampleTableB }) {
 
   const columnsB = [
     {
-      name: 'warehouseName',
-      header: 'Warehouse Name',
+      name: 'PermitSeq',
+      header: 'PermitSeq',
       sortable: true,
       filter: 'text',
-      width: 200,
+      width: 150,
       resizable: true,
     },
     {
-      name: 'itemNo',
-      header: 'Item No.',
+      name: 'PermitSerl',
+      header: 'PermitSerl',
+      sortable: true,
+      filter: 'text',
+      width: 150,
+      resizable: true,
+    },
+    {
+      name: 'SMImpKind',
+      header: 'SMImpKind',
+      sortable: true,
+      filter: 'text',
+      width: 150,
+      resizable: true,
+    },
+    {
+      name: 'ItemNo',
+      header: 'ItemNo',
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 200,
+      width: 150,
     },
     {
-      name: 'lotNumber',
-      header: 'Lot Number',
+      name: 'LotNo',
+      header: 'LotNo',
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 200,
+      width: 150,
     },
     {
-      name: 'itemQty',
-      header: 'Item Qty',
+      name: 'Qty',
+      header: 'Qty',
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 200,
+      width: 150,
     },
     {
-      name: 'productionDate',
-      header: 'Production Date',
+      name: 'DateCode',
+      header: 'DateCode',
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 200,
+      width: 150,
     },
     {
-      name: 'warehouseDate',
-      header: 'Warehouse Date',
+      name: 'ReelNo',
+      header: 'ReelNo',
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 200,
+      width: 150,
     },
     {
-      name: 'yyww',
+      name: 'Barcode',
+      header: 'Barcode',
+      sortable: true,
+      resizable: true,
+      width: 150,
+    },
+    {
+      name: 'ItemSeq',
+      header: 'ItemSeq',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 150,
+    },
+    {
+      name: 'WHSeq',
+      header: 'WHSeq',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 150,
+    },
+    {
+      name: 'WHName',
+      header: 'WHName',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 150,
+    },
+    {
+      name: 'CreateDate',
+      header: 'CreateDate',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 150,
+    },
+    {
+      name: 'RegDate',
+      header: 'RegDate',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 150,
+    },
+    {
+      name: 'YYWW',
       header: 'YYWW',
       sortable: true,
+      filter: 'text',
       resizable: true,
-      width: 200,
+      width: 150,
     },
     {
-      name: 'yymm',
+      name: 'YYMM',
       header: 'YYMM',
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 200,
+      width: 150,
     },
     {
-      name: 'yymmdd',
+      name: 'YYMMDD',
       header: 'YYMMDD',
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 200,
+      width: 150,
     },
     {
-      name: 'dc',
-      header: 'DC',
+      name: 'InvoiceNo',
+      header: 'InvoiceNo',
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 200,
+      width: 150,
     },
     {
-      name: 'barcode',
-      header: 'Barcode',
+      name: 'BizUnit',
+      header: 'BizUnit',
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 200,
+      width: 150,
+    },
+    {
+      name: 'DateIn',
+      header: 'DateIn',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 150,
     },
   ]
 
-  const handleRowDoubleClick = (e) => {
-    const { rowKey } = e
-    const clickedRowData = e.instance.getRow(rowKey)
-    console.log('Double click - Dữ liệu hàng:', clickedRowData)
-  }
-
   TuiGrid.applyTheme('striped')
+
+  const handleCheck = (ev) => {
+    const { rowKey } = ev
+    const gridInstance = gridRef.current.getInstance()
+    if (checkedRowKey !== null && checkedRowKey !== rowKey) {
+      gridInstance.uncheck(checkedRowKey)
+    }
+    setCheckedRowKey(rowKey)
+    const rowData = sampleTableA[rowKey]
+  }
 
   return (
     <div className="w-full gap-1 h-full flex items-center justify-center">
@@ -158,7 +260,7 @@ function TableTransferWaitingIqcStockIn({ sampleTableA, sampleTableB }) {
           columns={columnsB}
           rowHeight={5}
           bodyHeight="fitToParent"
-          rowHeaders={['rowNum', 'checkbox']}
+          rowHeaders={['rowNum']}
           pagination={{
             perPage: 100,
           }}
@@ -177,11 +279,11 @@ function TableTransferWaitingIqcStockIn({ sampleTableA, sampleTableB }) {
       <div className="w-1/2 h-full flex flex-col border bg-white p-3 rounded-lg overflow-hidden pb-10">
         <div className=" font-medium text-xs">THÔNG ĐƠN HÀNG</div>
         <Grid
+          ref={gridRef}
           data={sampleTableA}
           columns={columnsA}
           rowHeight={5}
           bodyHeight="fitToParent"
-          onDblclick={handleRowDoubleClick}
           rowHeaders={['rowNum', 'checkbox']}
           pagination={{
             perPage: 100,
@@ -190,8 +292,8 @@ function TableTransferWaitingIqcStockIn({ sampleTableA, sampleTableB }) {
           usageStatistics={true}
           hoverable={true}
           scrollX={true}
-          className="w-full h-full overflow-hidden"
           autoResize={true}
+          onCheck={handleCheck}
         />
       </div>
     </div>

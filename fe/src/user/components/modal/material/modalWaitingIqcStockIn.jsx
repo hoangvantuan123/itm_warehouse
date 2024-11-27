@@ -15,7 +15,7 @@ export default function ModalWaitingIqcStockIn({
     >
       <div className="items-center justify-center flex flex-col">
         <ExclamationCircleOutlined className=" text-4xl mb-2 text-red-500" />
-        <p>{error}</p>
+        <p className="mt-10 text-lg">{error}</p>
       </div>
     </Modal>
   )

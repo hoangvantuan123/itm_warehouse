@@ -10,27 +10,20 @@ const generateXml = (data) => {
             <DataSeq>${data.dataSeq}</DataSeq>
             <Selected>${data.selected}</Selected>
             <TABLE_NAME>DataBlock1</TABLE_NAME>
-            
-            <PermitSeq>${data.permitSeq}</PermitSeq>
-            <PermitSerl>${data.permitSerl}</PermitSerl>
-    
+            <IsChangedMst>${data.isChangedMst}</IsChangedMst>
             <BizUnit>${data.bizUnit}</BizUnit>
-            <BizUnitName>${data.bizUnitName}</BizUnitName>
-            <SMImpKind>${data.sMImpKind}</SMImpKind>
-            <SMImpKindName>${data.sMImpKindName}</SMImpKindName>
-            <ItemNo>${data.itemNo}</ItemNo>
-            <LotNo>${data.lotNo}</LotNo>
-            <Qty>${data.qty}</Qty>
-            <DateCode>${data.dateCode}</DateCode>
-            <ReelNo>${data.reelNo}</ReelNo>
-            <Barcode>${data.barcode}</Barcode>
+            <Date>${data.date}</Date>
+            <DeptSeq>${data.deptSeq}</DeptSeq>
+            <ServiceSeq>${data.serviceSeq2}</ServiceSeq>
+            <MethodSeq>${data.methodSeq}</MethodSeq>
+            <DtlUnitSeq>${data.dtlUnitSeq}</DtlUnitSeq>
         </DataBlock1>
     `
 }
 
 const DEFAULTS = {
   xmlFlags: 2,
-  serviceSeq: 60010001,
+  serviceSeq: 2639,
   workingTag: '',
   companySeq: 1,
   languageSeq: 6,
@@ -38,7 +31,7 @@ const DEFAULTS = {
   pgmSeq: 1036085,
 }
 
-export const SMaterialQRCheckWeb = (requestData) => {
+export const SCOMCloseCheckWEB = (requestData) => {
   const requestParams = {
     ...DEFAULTS,
     ...requestData,
@@ -57,7 +50,7 @@ export const SMaterialQRCheckWeb = (requestData) => {
 
   return axios
     .post(
-      `${HOST_API_SERVER_1}/mssql/stock-in/smaterial-qr-check-web`,
+      `${HOST_API_SERVER_1}/mssql/stock-in/scom-close-check-web`,
       dataToSend,
       {
         headers: {

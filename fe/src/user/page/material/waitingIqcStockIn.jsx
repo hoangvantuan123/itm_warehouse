@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
-import { useParams } from 'react-router-dom';
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Helmet } from 'react-helmet'
 import { Typography, message, Modal } from 'antd'
@@ -10,88 +10,84 @@ import TableTransferWaitingIqcStockIn from '../../components/table/material/tabl
 import { FilterOutlined } from '@ant-design/icons'
 import WaitingIqcStockInQuery from '../../components/query/material/waitingIqcStockInQuery'
 import { ArrowIcon } from '../../components/icons'
-import CryptoJS from "crypto-js";
+import CryptoJS from 'crypto-js'
 import ModalWaitingIqcStockIn from '../../components/modal/material/modalWaitingIqcStockIn'
-import { GetSConvertDC } from '../../../features/material/getSConvertDC'
-import { GetCheckItemLotExist } from '../../../features/material/getCheckItemLotExists'
-import { GetCheckIQCHold } from '../../../features/material/getCheckIQCHold'
 import { SMaterialQRCheckWeb } from '../../../features/material/postSMaterialQRCheck'
-
-
-
-function formatToYYYYMMDD(date) {
-  const d = new Date(date)
-  if (isNaN(d.getTime())) throw new Error('Invalid date')
-
-  const year = d.getFullYear()
-  const month = (d.getMonth() + 1).toString().padStart(2, '0')
-  const day = d.getDate().toString().padStart(2, '0')
-
-  return `${year}${month}${day}`
-}
-
-const sampleTableA = [
-  {
-    itemSeq: '58569',
-    itemNo: 'NIK0998',
-    totalQty: 160000,
-    okQty: 0,
-    remainQty: 160000,
-  },
-  {
-    itemSeq: '002',
-    itemNo: 'DIO0032',
-    totalQty: 50000,
-    okQty: 0,
-    remainQty: 50000,
-  },
-]
+import ErrorPage from '../../components/modal/default/errorPage'
+import { GetSUGGetActiveDeliveryItem } from '../../../features/material/getSUGGetActiveDeliveryItem'
+import { SCOMCloseCheckWEB } from '../../../features/material/postScomCloseCheck'
+import { SCOMCloseItemCheckWEB } from '../../../features/material/postScomCloseItemCheck'
+import { debounce } from 'lodash'
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../../utils/constants'
 
 export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const { t } = useTranslation()
-  const { id } = useParams();
+  const { id } = useParams()
   const workerRef = useRef(null)
   const inputCodeRef = useRef(null)
+  const [loading, setLoading] = useState(true)
   const [inputCode, setInputCode] = useState(null)
-  const [data, setData] = useState(sampleTableA)
+  const [data, setData] = useState([])
   const bufferRef = useRef('')
-  const dataRef = useRef(sampleTableA)
+  const dataRef = useRef(data)
   const [modal2Open, setModal2Open] = useState(false)
+  const [modal3Open, setModal3Open] = useState(false)
   const [error, setError] = useState(null)
   const [scanHistory, setScanHistory] = useState([])
-  const newDate = new Date()
+  const dataRefSacenHistory = useRef(scanHistory)
   const [status, setStatus] = useState(false)
-  const [filteredData, setFilteredData] = useState(null);
-  console.log("filteredData" , filteredData)
-  const secretKey = "TEST_ACCESS_KEY";
+  const [filteredData, setFilteredData] = useState(null)
+  const secretKey = 'TEST_ACCESS_KEY'
+
+  const fetchDeliveryData = async (delvNo, purchaseType) => {
+    try {
+      setLoading(true)
+      const response = await GetSUGGetActiveDeliveryItem(delvNo, purchaseType)
+      setData(response?.data || [])
+    } catch (error) {
+      setData([])
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const decodeBase64Url = (base64Url) => {
-    let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const padding = base64.length % 4 === 0 ? '' : '='.repeat(4 - (base64.length % 4));
-    base64 += padding;
-    return base64;
-  };
-  
+    try {
+      let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+      const padding =
+        base64.length % 4 === 0 ? '' : '='.repeat(4 - (base64.length % 4))
+      return base64 + padding
+    } catch (error) {
+      throw new Error('Invalid Base64 URL')
+    }
+  }
+
   const decryptData = (encryptedToken) => {
     try {
-      const base64Data = decodeBase64Url(encryptedToken);
-      const bytes = CryptoJS.AES.decrypt(base64Data, secretKey);
-      const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
-      return JSON.parse(decryptedData);
+      const base64Data = decodeBase64Url(encryptedToken)
+      const bytes = CryptoJS.AES.decrypt(base64Data, secretKey)
+      const decryptedData = bytes.toString(CryptoJS.enc.Utf8)
+      return JSON.parse(decryptedData)
     } catch (error) {
-      console.log("Route path has not been selected yet");
-      return null;
+      setModal3Open(true)
+      return null
     }
-  };
+  }
+
   useEffect(() => {
     if (id) {
-      const data = decryptData(id);
-      setFilteredData(data);
-    } 
+      const data = decryptData(id)
+      if (data) {
+        setFilteredData(data)
+        fetchDeliveryData(data?.DelvNo, data?.PurchaseType)
+      }
+    }
   }, [id])
+
   useEffect(() => {
     dataRef.current = data
-  }, [data])
+    dataRefSacenHistory.current = scanHistory
+  }, [data, scanHistory])
 
   useEffect(() => {
     workerRef.current = new Worker(
@@ -102,59 +98,95 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
       const { success, message: resultMessage, data: resultData } = event.data
       if (success) {
         if (resultData) {
-          const { itemNo, qty, lot, dc, reel, barcode } = resultData
-          try {
-            const [itemLotExistSuccess, iqcHoldSuccess, sConvertDCResult] =
-              await Promise.all([
-                GetCheckItemLotExist(itemNo, lot),
-                GetCheckIQCHold(itemNo, lot),
-                GetSConvertDC(itemNo, dc, formatToYYYYMMDD(new Date())),
-              ])
+          const { itemNo, qty, lot, dc, reel, barcode, permitSerl, permitSeq } =
+            resultData
 
-            if (
-              itemLotExistSuccess.success &&
-              iqcHoldSuccess.success &&
-              sConvertDCResult.success
-            ) {
-              const { ProductionDate, YYWW, YYMM, YYYYMMDD } =
-                sConvertDCResult.data[0]
+          const formData = {
+            workingTag: 'A',
+            idx_no: '1',
+            status: '0',
+            dataSeq: '1',
+            selected: '1',
+            permitSeq: permitSeq,
+            permitSerl: permitSerl,
+            bizUnit: filteredData?.BizUnit,
+            bizUnitName: filteredData?.BizUnitName,
+            sMImpKind: filteredData?.ImpType,
+            sMImpKindName: filteredData?.PurchaseType,
+            itemNo: itemNo,
+            lotNo: lot,
+            qty: qty,
+            dateCode: dc,
+            reelNo: reel,
+            barcode: barcode,
+          }
+          const resSuccess = await SMaterialQRCheckWeb(formData)
+          if (resSuccess.success) {
+            const dataResSuccess = resSuccess.data[0]
+            message.success(resultMessage)
+            setData((prevData) =>
+              prevData.map((item) =>
+                item.ItemNo === itemNo
+                  ? {
+                    ...item,
+                    OkQty: item.OkQty + qty,
+                    RemainQty: item.RemainQty - qty,
+                  }
+                  : item,
+              ),
+            )
 
-              setData((prevData) =>
-                prevData.map((item) =>
-                  item.itemNo === itemNo
-                    ? {
-                      ...item,
-                      okQty: item.okQty + qty,
-                      remainQty: item.remainQty - qty,
-                    }
-                    : item,
-                ),
-              )
-
-              setScanHistory((prevHistory) => [
-                ...prevHistory,
-                {
-                  warehouseName: 'Warehouse 004',
-                  itemNo: itemNo,
-                  lotNumber: lot,
-                  itemQty: qty,
-                  productionDate: ProductionDate,
-                  warehouseDate: '',
-                  yyww: YYWW,
-                  yymm: YYMM,
-                  yymmdd: YYYYMMDD,
-                  dc: dc,
-                  barcode: barcode,
-                },
-              ])
-
-              message.success(resultMessage)
-            } else {
-              message.error('Một trong các API đã thất bại')
-            }
-          } catch (error) {
-            console.error('Error during API calls:', error)
-            message.error('Đã có lỗi xảy ra khi gọi API')
+            setScanHistory((prevHistory) => [
+              ...prevHistory,
+              {
+                SMImpKind: dataResSuccess?.SMImpKind,
+                ItemNo: dataResSuccess?.ItemNo,
+                LotNo: dataResSuccess?.LotNo,
+                Qty: dataResSuccess?.Qty,
+                DateCode: dataResSuccess?.DateCode,
+                ReelNo: dataResSuccess?.ReelNo,
+                Barcode: dataResSuccess?.Barcode,
+                ItemSeq: dataResSuccess?.ItemSeq,
+                WHSeq: dataResSuccess?.WHSeq,
+                WHName: dataResSuccess?.WHName,
+                CreateDate: dataResSuccess?.CreateDate,
+                RegDate: dataResSuccess?.RegDate,
+                YYWW: dataResSuccess?.YYWW,
+                YYMM: dataResSuccess?.YYMM,
+                YYMMDD: dataResSuccess?.YYMMDD,
+                InvoiceNo: dataResSuccess?.InvoiceNo,
+                PermitSerl: dataResSuccess?.PermitSerl,
+                PermitSeq: dataResSuccess?.PermitSeq,
+                EmpSeq: dataResSuccess?.EmpSeq,
+                EmpName: dataResSuccess?.EmpName,
+                DeptSeq: dataResSuccess?.DeptSeq,
+                DeptName: dataResSuccess?.DeptName,
+                CurrSeq: dataResSuccess?.CurrSeq,
+                CurrName: dataResSuccess?.CurrName,
+                ExRate: dataResSuccess?.ExRate,
+                Price: dataResSuccess?.Price,
+                CurAmt: dataResSuccess?.CurAmt,
+                DomPrice: dataResSuccess?.DomPrice,
+                DomAmt: dataResSuccess?.DomAmt,
+                LotNoFull: dataResSuccess?.LotNoFull,
+                StdUnitSeq: dataResSuccess?.StdUnitSeq,
+                STDUnitName: dataResSuccess?.STDUnitName,
+                UnitSeq: dataResSuccess?.UnitSeq,
+                UnitName: dataResSuccess?.UnitName,
+                CustSeq: dataResSuccess?.CustSeq,
+                CustName: dataResSuccess?.CustName,
+                ItemName: dataResSuccess?.ItemName,
+                Spec: dataResSuccess?.Spec,
+                DateIn: dataResSuccess?.DateIn,
+                StdQty: dataResSuccess?.StdQty,
+                FromAmt: dataResSuccess?.FromAmt,
+                FromVAT: dataResSuccess?.FromVAT,
+                BizUnit: dataResSuccess?.BizUnit,
+              },
+            ])
+          } else {
+            setModal2Open(true)
+            setError(resSuccess?.message)
           }
         }
       } else {
@@ -166,13 +198,14 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     return () => {
       workerRef.current.terminate()
     }
-  }, [])
+  }, [filteredData])
 
   const handleCheckBarcode = (barcode) => {
     workerRef.current.postMessage({
       type: 'CHECK_BARCODE',
       barcode,
       tableData: dataRef.current,
+      tableScanHistory: dataRefSacenHistory.current,
     })
   }
 
@@ -202,6 +235,74 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     }
   }, [])
 
+  /* SAVE */
+
+  const handelSubmitSheet = useCallback(
+    debounce(() => {
+      if (scanHistory.length === 0) {
+        message.warning('Không có dữ liệu nào')
+        return
+      }
+
+      const xmlData = scanHistory
+        .map((row, index) => {
+          return `
+        <DataBlock2>
+          <WorkingTag>A</WorkingTag>
+          <IDX_NO>${index + 1}</IDX_NO>
+          <DataSeq>${index + 1}</DataSeq>
+          <Status>0</Status>
+          <Selected>0</Selected>
+          <TABLE_NAME>DataBlock2</TABLE_NAME>
+          <ServiceSeq>4492</ServiceSeq> 
+          <MethodSeq>2</MethodSeq>
+          <BizUnit>${row?.BizUnit}</BizUnit> 
+          <Date>${row?.DateIn}</Date>
+          <DeptSeq>${row?.DeptSeq}</DeptSeq> 
+          <BizUnitOld>${row?.BizUnit}</BizUnitOld>
+          <DateOld>${row?.DateIn}</DateOld> 
+          <DeptSeqOld>${row?.DeptSeq}</DeptSeqOld> 
+        </DataBlock2>
+      `
+        })
+        .join('\n')
+
+
+      SCOMCloseItemCheckWEB(xmlData)
+        .then((req) => {
+          if (req.success === true) {
+            message.success(SUCCESS_MESSAGES.DELETE_DATA)
+          } else {
+            message.error(req.message)
+          }
+        })
+        .catch((err) => {
+          message.error(ERROR_MESSAGES.ERROR_FE)
+        })
+    }, 300),
+
+    [scanHistory],
+  )
+  const handleSubmit = () => {
+    const formData = {
+      workingTag: 'A',
+      idx_no: '1',
+      status: '0',
+      dataSeq: '1',
+      selected: '1',
+      isChangedMst: '1',
+      bizUnit: filteredData?.BizUnit,
+      date: '20241126',
+      deptSeq: filteredData?.DeptSeq,
+      serviceSeq2: '4492',
+      methodSeq: '2',
+      dtlUnitSeq: '1',
+    }
+
+    SCOMCloseCheckWEB(formData)
+    handelSubmitSheet()
+  }
+
   return (
     <>
       <Helmet>
@@ -215,7 +316,10 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
               <Title level={4} className="mt-2 uppercase opacity-85">
                 Waiting Iqc Stock In
               </Title>
-              <WaitingIqcStockInActions status={status} />
+              <WaitingIqcStockInActions
+                status={status}
+                handleSubmit={handleSubmit}
+              />
             </div>
             <details
               className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
@@ -249,6 +353,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
         setModal2Open={setModal2Open}
         error={error}
       />
+      <ErrorPage modal3Open={modal3Open} setModal3Open={setModal3Open} />
     </>
   )
 }

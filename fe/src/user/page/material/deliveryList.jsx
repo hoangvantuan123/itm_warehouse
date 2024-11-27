@@ -1,86 +1,148 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Helmet } from 'react-helmet'
 import { Input, Space, Table, Typography, message, Tabs, Layout } from 'antd'
 const { Title, Text } = Typography
 import { FilterOutlined } from '@ant-design/icons'
 import { ArrowIcon } from '../../components/icons'
-import dayjs from 'dayjs';
+import dayjs from 'dayjs'
 import DeliveryActions from '../../components/actions/material/deliveryActions'
 import TableDeliveryList from '../../components/table/material/tableDeliveryList'
 import { GetCodeHelp } from '../../../features/codeHelp/getCodeHelp'
 import { GetDeliveryList } from '../../../features/material/getDeliveryList'
 import DeliveryListQuery from '../../components/query/material/deliveryListQuery'
-import { debounce } from 'lodash';
+import { debounce } from 'lodash'
+import { useNavigate } from 'react-router-dom'
+import { encodeBase64Url } from '../../../utils/decode-JWT'
+import CryptoJS from 'crypto-js'
 
 export default function DeliveryList({ permissions, isMobile }) {
   const { t } = useTranslation()
+  const gridRef = useRef(null)
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState([])
   const [dataUnit, setDataUnit] = useState([])
-  const [formData, setFormData] = useState(dayjs().startOf('month'));
-  const [toDate, setToDate] = useState(dayjs());
+  const [formData, setFormData] = useState(dayjs().startOf('month'))
+  const [toDate, setToDate] = useState(dayjs())
   const [deliveryNo, setDeliveryNo] = useState('')
   const [bizUnit, setBizUnit] = useState(4)
+  const [checkedRowKey, setCheckedRowKey] = useState(null)
+  const [keyPath, setKeyPath] = useState(null)
+  const [checkedPath, setCheckedPath] = useState(false)
 
+  const handleCheck = (ev) => {
+    const { rowKey } = ev
+    const gridInstance = gridRef.current.getInstance()
+    let checkedRowKey = null
+
+    if (checkedRowKey !== null) {
+      gridInstance.uncheck(checkedRowKey)
+    }
+
+    const rowData = data[rowKey]
+    const filteredData = {
+      DelvNo: rowData?.DelvNo,
+      DelvMngNo: rowData?.DelvMngNo,
+      ImpType: rowData?.ImpType,
+      TotalQty: rowData?.TotalQty,
+      OkQty: rowData?.OkQty,
+      RemainQty: rowData?.RemainQty,
+      DelvDate: rowData?.DelvDate,
+      CustSeq: rowData?.CustSeq,
+      CustNm: rowData?.CustNm,
+      DomOrImp: rowData?.DomOrImp,
+      PurchaseType: rowData?.PurchaseType,
+      BizUnitName: rowData?.BizUnitName,
+      BizUnit: rowData?.BizUnit,
+      EmpSeq: rowData?.EmpSeq,
+      EmpName: rowData?.EmpName,
+      DeptSeq: rowData?.DeptSeq,
+      DeptName: rowData?.DeptName,
+      CurrSeq: rowData?.CurrSeq,
+      CurrName: rowData?.CurrName,
+      ExRate: rowData?.ExRate,
+    }
+    const secretKey = 'TEST_ACCESS_KEY'
+    const encryptedData = CryptoJS.AES.encrypt(
+      JSON.stringify(filteredData),
+      secretKey,
+    ).toString()
+    const encryptedToken = encodeBase64Url(encryptedData)
+    setKeyPath(encryptedToken)
+  }
+
+  const nextPageStockIn = () => {
+    if (keyPath && checkedPath === false) {
+      setCheckedPath(true)
+      navigate(`/u/warehouse/material/waiting-iqc-stock-in/${keyPath}`)
+    }
+  }
 
   const formatDate = (date) => {
-    return date.format('YYYYMMDD');
-  };
-  
+    return date.format('YYYYMMDD')
+  }
+
   const fetchDeliveryData = async () => {
     try {
-      setLoading(true);
+      setLoading(true)
       const deliveryResponse = await GetDeliveryList(
         formatDate(formData),
         formatDate(toDate),
         deliveryNo,
-        bizUnit
-      );
-      setData(deliveryResponse.data);
+        bizUnit,
+      )
+      setData(deliveryResponse?.data)
     } catch (error) {
       setData([])
     } finally {
-      setData([])
-      setLoading(false);
+      setLoading(false)
     }
-  };
-  
+  }
+
   const fetchCodeHelpData = async () => {
     try {
-      setLoading(true);
-      const codeHelpResponse = await GetCodeHelp('', 6, 10003, 1, '%', '', '', '', '');
-      setDataUnit(codeHelpResponse.data);
+      setLoading(true)
+      const codeHelpResponse = await GetCodeHelp(
+        '',
+        6,
+        10003,
+        1,
+        '%',
+        '',
+        '',
+        '',
+        '',
+      )
+      setDataUnit(codeHelpResponse?.data)
     } catch (error) {
       setDataUnit([])
     } finally {
-      setDataUnit([])
-      setLoading(false);
+      setLoading(false)
     }
-  };
-  
-  useEffect(() => {
-    debouncedFetchDeliveryData();
-    return () => {
-      debouncedFetchDeliveryData.cancel();
-    };
-  }, [formData, toDate, deliveryNo, bizUnit]);
-  
-  useEffect(() => {
-    debouncedFetchCodeHelpData();
-    return () => {
-      debouncedFetchCodeHelpData.cancel();
-    };
-  }, []);
-  
+  }
   const debouncedFetchDeliveryData = debounce(() => {
-    fetchDeliveryData();
-  }, 100);
-  
+    fetchDeliveryData()
+  }, 100)
+
   const debouncedFetchCodeHelpData = debounce(() => {
-    fetchCodeHelpData();
-  }, 100);
-  
+    fetchCodeHelpData()
+  }, 100)
+
+  useEffect(() => {
+    debouncedFetchDeliveryData()
+    return () => {
+      debouncedFetchDeliveryData.cancel()
+    }
+  }, [formData, toDate, deliveryNo, bizUnit])
+
+  useEffect(() => {
+    debouncedFetchCodeHelpData()
+    return () => {
+      debouncedFetchCodeHelpData.cancel()
+    }
+  }, [])
+
   return (
     <>
       <Helmet>
@@ -90,26 +152,29 @@ export default function DeliveryList({ permissions, isMobile }) {
         <div className="flex flex-col gap-4 md:grid md:grid-cols-4 md:grid-rows-[auto_1fr] md:gap-4 h-full">
           <div className="col-start-1 col-end-5 row-start-1 w-full rounded-lg ">
             <div className="flex items-center justify-between mb-2">
-            <Title level={4} className="mt-2 uppercase opacity-85 ">
+              <Title level={4} className="mt-2 uppercase opacity-85 ">
                 {t('Delivery List')}
               </Title>
-              <DeliveryActions fetchData={fetchDeliveryData} />
+              <DeliveryActions
+                fetchData={fetchDeliveryData}
+                nextPageStockIn={nextPageStockIn}
+              />
             </div>
             <details
               className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
               open
             >
               <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
-              <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600">
+                <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600">
                   <FilterOutlined />
                   {t('Điều kiện truy vấn')}
                 </h2>
                 <span className="relative size-5 shrink-0">
-                  <ArrowIcon  />
+                  <ArrowIcon />
                 </span>
               </summary>
               <div className="flex p-2 gap-4">
-              <DeliveryListQuery
+                <DeliveryListQuery
                   formData={formData}
                   setFormData={setFormData}
                   setDeliveryNo={setDeliveryNo}
@@ -125,7 +190,15 @@ export default function DeliveryList({ permissions, isMobile }) {
           </div>
 
           <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg  overflow-auto">
-          <TableDeliveryList data={data} loading={loading} />
+            <TableDeliveryList
+              data={data}
+              setCheckedPath={setCheckedPath}
+              checkedPath={checkedPath}
+              setKeyPath={setKeyPath}
+              loading={loading}
+              handleCheck={handleCheck}
+              gridRef={gridRef}
+            />
           </div>
         </div>
       </div>

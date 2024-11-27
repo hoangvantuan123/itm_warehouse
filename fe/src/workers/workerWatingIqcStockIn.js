@@ -1,4 +1,4 @@
-function checkBarcode(barcode, tableData) {
+function checkBarcode(barcode, tableData, tableScanHistory) {
   if (!barcode || !Array.isArray(tableData)) {
     return {
       success: false,
@@ -7,12 +7,6 @@ function checkBarcode(barcode, tableData) {
   }
 
   const parts = barcode.split('/')
-  if (parts.length < 5) {
-    return {
-      success: false,
-      message: 'Barcode không đúng định dạng',
-    }
-  }
 
   const code = parts[0]
   const lot = parts[1] // Lot
@@ -20,46 +14,54 @@ function checkBarcode(barcode, tableData) {
   const dc = parts[3] // Date Code
   const reel = parts[4] // Reel
 
-  if (isNaN(qty)) {
+  const item = tableData.find((item) => item.ItemNo === code)
+  const existingBarcode = tableScanHistory.find(
+    (item) => item.Barcode === barcode,
+  )
+  if (existingBarcode) {
     return {
       success: false,
-      message: 'Số lượng (qty) trong barcode không hợp lệ',
+      message: 'Barcode đã được quét trước đó',
     }
   }
-  const item = tableData.find((row) => row.itemNo === code)
-  if (item) {
-    if (item.remainQty < qty) {
-      return {
-        success: false,
-        message: `Số lượng quét (${qty}) vượt quá số lượng còn lại (${item.remainQty}) của ItemNo: ${item.itemNo}.`,
-      }
+  if (!item) {
+    return {
+      success: false,
+      message: `Không tìm thấy ItemNo: ${code} trong dữ liệu`,
     }
+  }
 
-    if (item.remainQty > qty)
-      return {
-        success: true,
-        message: `Barcode "${barcode}" khớp với ItemNo: ${item.itemNo}, Số lượng quét: ${qty}.`,
-        data: {
-          itemNo: code,
-          qty,
-          lot,
-          dc,
-          reel,
-          barcode,
-        },
-      }
+  if (item.RemainQty < qty) {
+    return {
+      success: false,
+      message: `Số lượng quét (${qty}) vượt quá số lượng còn lại (${item.RemainQty}) của ItemNo: ${item.ItemNo}.`,
+    }
+  }
+
+  return {
+    success: true,
+    message: `Barcode "${barcode}" khớp với ItemNo: ${item.ItemNo}, Số lượng quét: ${qty}.`,
+    data: {
+      itemNo: item.ItemNo,
+      qty,
+      lot,
+      dc,
+      reel,
+      barcode,
+      permitSerl: item.PermitSerl,
+      permitSeq: item.PermitSeq,
+    },
   }
 }
 
 self.onmessage = function (event) {
-  const { type, barcode, tableData } = event.data
+  const { type, barcode, tableData, tableScanHistory } = event.data
   let result
 
   switch (type) {
     case 'CHECK_BARCODE':
-      result = checkBarcode(barcode, tableData)
+      result = checkBarcode(barcode, tableData, tableScanHistory)
       break
-
     default:
       result = {
         success: false,

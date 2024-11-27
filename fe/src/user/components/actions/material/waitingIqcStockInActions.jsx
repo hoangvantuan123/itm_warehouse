@@ -8,7 +8,7 @@ import {
 } from '@ant-design/icons'
 import { LiveIcon, OffIcon } from '../../icons'
 
-export default function WaitingIqcStockInActions({ status }) {
+export default function WaitingIqcStockInActions({ status, handleSubmit }) {
   return (
     <div className="flex items-center gap-2">
       <Button
@@ -17,6 +17,7 @@ export default function WaitingIqcStockInActions({ status }) {
         icon={<SaveOutlined />}
         size="middle"
         className="uppercase"
+        onClick={handleSubmit}
         style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
       >
         Save

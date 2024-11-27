@@ -22,35 +22,19 @@ export class StockInService {
       return { success: false, message: ERROR_MESSAGES.DATABASE_ERROR };
     }
   }
-  async ITM_CheckItemLotExists(itemNo: string, lotno: string): Promise<SimpleQueryResult> {
+
+
+
+  async ITM_SUGGetActiveDeliveryItem(deliverySeq: number, purchaseType: string): Promise<SimpleQueryResult> {
     const query = `
-      EXEC ITM_CheckItemLotExists 
-        @ItemNo = ${itemNo},
-        @Lotno = ${lotno};
-    `;
-
-    try {
-      const result = await this.databaseService.executeQuery(query);
-      if (result.length === 0) {
-        return { success: true, data: result };
-
-      } else {
-        return { success: false, message: ERROR_MESSAGES.WARNING_BARCODE_DATABASE };
-      }
-    } catch (error) {
-      return { success: false, message: ERROR_MESSAGES.DATABASE_ERROR };
-    }
-  }
-
-  async ITM_CheckIQCHold(itemNo: string, lotno: string): Promise<SimpleQueryResult> {
-    const query = `
-      EXEC ITM_CheckIQCHold 
-        @ItemNo = ${itemNo},
-        @Lotno = ${lotno};
+      EXEC ITM_SUGGetActiveDeliveryItem_WEB 
+        @pDeliverySeq = ${deliverySeq},
+        @pPurchaseType = '${purchaseType}';
     `;
     try {
       const result = await this.databaseService.executeQuery(query);
-      if (result.length === 0) {
+      console.log(result);
+      if (result.length !== 0) {
         return { success: true, data: result };
       } else {
         return { success: false, message: ERROR_MESSAGES.WARNING_HOLD_BARCODE };
@@ -77,10 +61,78 @@ export class StockInService {
     try {
       const result = await this.databaseService.executeQuery(query);
 
-      const hasInvalidEmpSeq = result.some((item: any) => item.Status !== 0);
+      const invalidStatuses = result.some((item: any) => item.Status !== 0);
+      if (invalidStatuses) {
+        const errorMessage = result
+          .map((item: any) => `${item.Result}`)
+          .join('; ');
+        return { success: false, message: errorMessage };
+      }
+      return { success: true, data: result };
+    } catch (error) {
+      return { success: false, message: ERROR_MESSAGES.DATABASE_ERROR };
+    }
+  }
 
-      if (hasInvalidEmpSeq) {
-        return { success: false, message: "ERROR TRA" };
+
+  /* CHECK SACAN CODE POST */
+
+  
+  async _SCOMCloseCheck_WEB(xmlDocument: string, xmlFlags: number, serviceSeq: number, workingTag: string, companySeq: number, languageSeq: number, userSeq: number, pgmSeq: number): Promise<SimpleQueryResult> {
+    const escapedXmlDocument = xmlDocument.replace(/'/g, "''");
+    const query = `
+      EXEC _SCOMCloseCheck_WEB 
+        @xmlDocument = N'<ROOT> ${escapedXmlDocument} </ROOT>',
+        @xmlFlags = ${xmlFlags},
+        @ServiceSeq = ${serviceSeq},
+        @WorkingTag = N'${workingTag}',
+        @CompanySeq = ${companySeq},
+        @LanguageSeq = ${languageSeq},
+        @UserSeq = ${userSeq},
+        @PgmSeq = ${pgmSeq};
+    `;
+    try {
+      const result = await this.databaseService.executeQuery(query);
+
+      const invalidStatuses = result.some((item: any) => item.Status !== 0);
+      if (invalidStatuses) {
+        const errorMessage = result
+          .map((item: any) => `${item.Result}`)
+          .join('; ');
+        return { success: false, message: errorMessage };
+      }
+      return { success: true, data: result };
+    } catch (error) {
+      return { success: false, message: ERROR_MESSAGES.DATABASE_ERROR };
+    }
+  }
+
+
+
+
+  
+  async _SCOMCloseItemCheck_WEB(xmlDocument: string, xmlFlags: number, serviceSeq: number, workingTag: string, companySeq: number, languageSeq: number, userSeq: number, pgmSeq: number): Promise<SimpleQueryResult> {
+    const escapedXmlDocument = xmlDocument.replace(/'/g, "''");
+    const query = `
+      EXEC _SCOMCloseItemCheck_WEB 
+        @xmlDocument = N'<ROOT> ${escapedXmlDocument} </ROOT>',
+        @xmlFlags = ${xmlFlags},
+        @ServiceSeq = ${serviceSeq},
+        @WorkingTag = N'${workingTag}',
+        @CompanySeq = ${companySeq},
+        @LanguageSeq = ${languageSeq},
+        @UserSeq = ${userSeq},
+        @PgmSeq = ${pgmSeq};
+    `;
+    try {
+      const result = await this.databaseService.executeQuery(query);
+
+      const invalidStatuses = result.some((item: any) => item.Status !== 0);
+      if (invalidStatuses) {
+        const errorMessage = result
+          .map((item: any) => `${item.Result}`)
+          .join('; ');
+        return { success: false, message: errorMessage };
       }
       return { success: true, data: result };
     } catch (error) {

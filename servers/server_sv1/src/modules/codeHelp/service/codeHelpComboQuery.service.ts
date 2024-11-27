@@ -35,7 +35,6 @@ export class CodeHelpComboQueryService {
 
         try {
             const result = await this.databaseService.executeQuery(query);
-            console.log('result' , result)
             return { success: true, data: result };
         } catch (error) {
             return { success: false, message: ERROR_MESSAGES.DATABASE_ERROR };

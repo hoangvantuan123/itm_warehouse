@@ -1,62 +1,23 @@
-import  { useState } from 'react';
+import { useRef, useState, useEffect } from 'react'
 import 'tui-grid/dist/tui-grid.css'
 import Grid from '@toast-ui/react-grid'
 import TuiGrid from 'tui-grid'
 import { useNavigate } from 'react-router-dom'
 import '../../../../static/css/customTabe.css'
-import { encodeBase64Url } from '../../../../utils/decode-JWT';
-import CryptoJS from "crypto-js";
+import { encodeBase64Url } from '../../../../utils/decode-JWT'
+import CryptoJS from 'crypto-js'
 
-const data= [
-  {
-    "DelvNo": "19559",
-    "DelvMngNo": "WEB11",
-    "ImpType": "8008004",
-    "TotalQty": 7000.00000,
-    "OkQty": 0.00000,
-    "RemainQty": 7000.00000,
-    "DelvDate": "2024-11-21",
-    "CustSeq": "244",
-    "CustNm": "ITM Semiconductor Co., LTD",
-    "DomOrImp": "4",
-    "PurchaseType": "Purchase Import",
-    "BizUnitName": "ITM PSG (F3)",
-    "BizUnit": "4",
-    "EmpSeq": "1295",
-    "EmpName": "NGUYỄN NGỌC TUẤN",
-    "DeptSeq": "307",
-    "DeptName": "IT",
-    "CurrSeq": "2",
-    "CurrName": "USD",
-    "ExRate": 1.000000
-  },
-  {
-    "DelvNo": "19560",
-    "DelvMngNo": "WEB1234",
-    "ImpType": "8008004",
-    "TotalQty": 7.00000,
-    "OkQty": 0.00000,
-    "RemainQty": 7.00000,
-    "DelvDate": "2024-11-21",
-    "CustSeq": "244",
-    "CustNm": "ITM Semiconductor Co., LTD",
-    "DomOrImp": "4",
-    "PurchaseType": "Purchase Import",
-    "BizUnitName": "ITM PSG (F3)",
-    "BizUnit": "4",
-    "EmpSeq": "1295",
-    "EmpName": "NGUYỄN NGỌC TUẤN",
-    "DeptSeq": "307",
-    "DeptName": "IT",
-    "CurrSeq": "2",
-    "CurrName": "USD",
-    "ExRate": 1.000000
-  }
-]
-
-function TableDeliveryList({  loading}) {
+function TableDeliveryList({
+  data,
+  loading,
+  handleCheck,
+  gridRef,
+  setKeyPath,
+  checkedPath,
+  setCheckedPath,
+}) {
   const navigate = useNavigate()
-  const [checkedRowKey, setCheckedRowKey] = useState(null); 
+
   const columns = [
     {
       name: 'DelvNo',
@@ -217,8 +178,14 @@ function TableDeliveryList({  loading}) {
       resizable: true,
       width: 140,
     },
-  ];
-  
+  ]
+  useEffect(() => {
+    if (checkedPath === true) {
+      setKeyPath(null)
+      setCheckedPath(false)
+    }
+  }, [checkedPath])
+
   const handleRowDoubleClick = (e) => {
     const { rowKey } = e
     const clickedRowData = e.instance.getRow(rowKey)
@@ -243,39 +210,41 @@ function TableDeliveryList({  loading}) {
       CurrSeq: clickedRowData?.CurrSeq,
       CurrName: clickedRowData?.CurrName,
       ExRate: clickedRowData?.ExRate,
-    };
+    }
 
-    const secretKey = "TEST_ACCESS_KEY";
-    const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(filteredData), secretKey).toString();
-    const encryptedToken = encodeBase64Url(encryptedData);
+    const secretKey = 'TEST_ACCESS_KEY'
+    const encryptedData = CryptoJS.AES.encrypt(
+      JSON.stringify(filteredData),
+      secretKey,
+    ).toString()
+    const encryptedToken = encodeBase64Url(encryptedData)
 
-    navigate(`/u/warehouse/material/waiting-iqc-stock-in/${encryptedToken}`);
+    /*  navigate(`/u/warehouse/material/waiting-iqc-stock-in/${encryptedToken}`) */
   }
 
   TuiGrid.applyTheme('striped')
 
-  
- 
   return (
     <div className="w-full gap-1 h-full flex items-center justify-center">
-      <div className="w-full h-full flex flex-col border bg-white p-3 rounded-lg overflow-hidden pb-5" >
-      <Grid
-      data={data}
-      columns={columns}
-      rowHeight={40}
-      bodyHeight="fitToParent"
-      onDblclick={handleRowDoubleClick}
-      rowHeaders={['rowNum', 'checkbox']}
-      pagination={{ perPage: 100 }}
-      scrollX={true}
-      heightResizable={true}
-      usageStatistics={true}
-      hoverable={true}
-      autoResize={true}
-      />
+      <div className="w-full h-full flex flex-col border bg-white p-3 rounded-lg overflow-hidden pb-5">
+        <Grid
+          ref={gridRef}
+          data={data}
+          columns={columns}
+          rowHeight={40}
+          bodyHeight="fitToParent"
+          onDblclick={handleRowDoubleClick}
+          rowHeaders={['rowNum', 'checkbox']}
+          pagination={{ perPage: 100 }}
+          scrollX={true}
+          heightResizable={true}
+          usageStatistics={true}
+          hoverable={true}
+          autoResize={true}
+          onCheck={handleCheck}
+        />
       </div>
-      </div>
-   
+    </div>
   )
 }
 
