@@ -1,13 +1,12 @@
 import { useState } from 'react'
-import { Button, Form, Input, Row, Col, DatePicker } from 'antd'
-
-export default function WaitingIqcStockInQuery({}) {
+import { Button, Form, Input, Row, Col, DatePicker, Typography } from 'antd'
+const { Title } = Typography;
+export default function WaitingIqcStockInQuery({ }) {
   const [date, setDate] = useState(null)
   const [deliveryNo, setDeliveryNo] = useState('')
   const [accUnit, setAccUnit] = useState('')
   const [purchaseType, setPurchaseType] = useState('')
   const [matBarcode, setMatBarcode] = useState('')
-  const [whName, setWhName] = useState('')
 
   const handleDateChange = (date) => {
     setDate(date)
@@ -28,6 +27,7 @@ export default function WaitingIqcStockInQuery({}) {
                 value={date}
                 onChange={handleDateChange}
                 format="YYYY-MM-DD"
+                
               />
             </Form.Item>
           </Col>
@@ -38,7 +38,7 @@ export default function WaitingIqcStockInQuery({}) {
               className="mb-0"
             >
               <Input
-                placeholder="Input placeholder"
+                placeholder="Delivery No"
                 value={deliveryNo}
                 size="small"
                 onChange={(e) => setDeliveryNo(e.target.value)}
@@ -53,7 +53,7 @@ export default function WaitingIqcStockInQuery({}) {
               className="mb-0"
             >
               <Input
-                placeholder="Input placeholder"
+                placeholder="Acc Unit"
                 value={accUnit}
                 size="small"
                 onChange={(e) => setAccUnit(e.target.value)}
@@ -68,7 +68,7 @@ export default function WaitingIqcStockInQuery({}) {
               className="mb-0"
             >
               <Input
-                placeholder="Input placeholder"
+                placeholder="Purchase Type"
                 value={purchaseType}
                 size="small"
                 onChange={(e) => setPurchaseType(e.target.value)}
@@ -80,7 +80,7 @@ export default function WaitingIqcStockInQuery({}) {
           <Col>
             <Form.Item
               label={<span className="uppercase text-xs">MAT Barcode</span>}
-              tooltip="Barcode auto"
+              tooltip="MAT Barcode"
               className="mb-0"
             >
               <Input
@@ -92,21 +92,24 @@ export default function WaitingIqcStockInQuery({}) {
               />
             </Form.Item>
           </Col>
-
           <Col>
             <Form.Item
-              label={<span className="uppercase text-xs">WH Name</span>}
+              label={<span className="uppercase text-xs">YYWW</span>}
               className="mb-0"
             >
-              <Input
-                placeholder="Input placeholder"
-                value={whName}
-                size="small"
-                onChange={(e) => setWhName(e.target.value)}
-                className=" text-sm p-2"
-              />
+              <Title level={3} className="text-gray-800">YYWW</Title>
             </Form.Item>
           </Col>
+          <Col>
+            <Form.Item
+              label={<span className="uppercase text-xs">YYYYMM</span>}
+              className="mb-0"
+            >
+              <Title level={3} className="text-gray-800">YYYYMM</Title>
+            </Form.Item>
+          </Col>
+
+
         </Row>
       </Form>
     </div>

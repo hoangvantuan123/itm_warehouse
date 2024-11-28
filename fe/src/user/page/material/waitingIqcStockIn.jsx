@@ -15,20 +15,19 @@ import ModalWaitingIqcStockIn from '../../components/modal/material/modalWaiting
 import { SMaterialQRCheckWeb } from '../../../features/material/postSMaterialQRCheck'
 import ErrorPage from '../../components/modal/default/errorPage'
 import { GetSUGGetActiveDeliveryItem } from '../../../features/material/getSUGGetActiveDeliveryItem'
-import { SCOMCloseCheckWEB } from '../../../features/material/postScomCloseCheck'
-import { SCOMCloseItemCheckWEB } from '../../../features/material/postScomCloseItemCheck'
 import { debounce } from 'lodash'
 import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../../utils/constants'
-import { SSLImpDelvMasterCheckWEB } from '../../../features/material/postSSLImpDelvMasterCheckWEB'
-import { SSLImpDelvSheetCheck } from '../../../features/material/postSSLImpDelvSheetCheck'
-
+import { CheckAllProceduresStockIn } from '../../../features/material/postCheckAllProceduresStockIn'
 export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const { t } = useTranslation()
   const { id } = useParams()
   const workerRef = useRef(null)
   const inputCodeRef = useRef(null)
   const [loading, setLoading] = useState(true)
+
   const [inputCode, setInputCode] = useState(null)
+  const [result, setResult] = useState(null);
+  const [loadingSave, setLoadingSave] = useState(false)
   const [data, setData] = useState([])
   const bufferRef = useRef('')
   const dataRef = useRef(data)
@@ -40,6 +39,16 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const [status, setStatus] = useState(false)
   const [filteredData, setFilteredData] = useState(null)
   const secretKey = 'TEST_ACCESS_KEY'
+
+  const Format = useCallback((date) => {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}${month}${day}`;
+  }, []);
+
+  const DateIn = Format(new Date())
 
   const fetchDeliveryData = async (delvNo, purchaseType) => {
     try {
@@ -184,6 +193,8 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
                 FromAmt: dataResSuccess?.FromAmt,
                 FromVAT: dataResSuccess?.FromVAT,
                 BizUnit: dataResSuccess?.BizUnit,
+                SMImpKindName: dataResSuccess?.SMImpKindName,
+                PermitNo: dataResSuccess?.PermitNo
               },
             ])
           } else {
@@ -238,6 +249,59 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   }, [])
 
   /* SAVE */
+  const createXmlDataCloseCheck = (data) => {
+    return `
+          <DataBlock1>
+              <WorkingTag>A</WorkingTag>
+              <IDX_NO>1</IDX_NO>
+              <Status>0</Status>
+              <DataSeq>1</DataSeq>
+              <Selected>1</Selected>
+              <TABLE_NAME>DataBlock1</TABLE_NAME>
+              <IsChangedMst>1</IsChangedMst>
+              <BizUnit>${data.BizUnit}</BizUnit>
+              <Date>${DateIn}</Date>
+              <DeptSeq>${data.DeptSeq}</DeptSeq>
+              <ServiceSeq>4492</ServiceSeq> 
+              <MethodSeq>2</MethodSeq>
+              <DtlUnitSeq>1</DtlUnitSeq>
+          </DataBlock1>
+      `
+  }
+  const createXmlDataMasterCheck = (data) => {
+    return `
+          <DataBlock1>
+    <WorkingTag>A</WorkingTag>
+    <IDX_NO>1</IDX_NO>
+    <Status>0</Status>
+    <DataSeq>1</DataSeq>
+    <Selected>1</Selected>
+    <TABLE_NAME>DataBlock1</TABLE_NAME>
+    <IsChangedMst>1</IsChangedMst>
+    <DelvNo /> 
+    <BLNo /> 
+    <BizUnit>${data[0].BizUnit}</BizUnit> 
+    <BizUnitName>${data[0].BizUnitName}</BizUnitName>
+    <SMImpKind>${data[0].SMImpKind}</SMImpKind>
+    <SMImpKindName>${data[0].SMImpKindName}</SMImpKindName> 
+    <CustSeq>${data[0].CustSeq}</CustSeq> 
+    <CustName>${data[0].CustName}</CustName> 
+    <PermitNo>${data[0].PermitNo}</PermitNo>
+    <DelvSeq>0</DelvSeq> 
+    <DelvDate>${data[0].DateIn}</DelvDate>
+    <EmpSeq>${data[0].EmpSeq}</EmpSeq>
+    <EmpName>${data[0].EmpName}</EmpName>
+    <DeptSeq>${data[0].DeptSeq}</DeptSeq>
+    <DeptName>${data[0].DeptName}</DeptName>
+    <CurrSeq>${data[0].CurrSeq}</CurrSeq>
+    <CurrName>${data[0].CurrName}</CurrName>
+    <ExRate>${data[0].ExRate}</ExRate>
+    <Remark>${data[0].InvoiceNo}</Remark>
+    <IsPJT>0</IsPJT>
+  </DataBlock1>
+      `
+  }
+
 
   const createXmlDataBlock = (row, index) => `
   <DataBlock2>
@@ -257,16 +321,17 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     <DeptSeqOld>${row?.DeptSeq}</DeptSeqOld> 
   </DataBlock2>
 `;
-const createXmlDataBlock2 = (row, index) => `
-<DataBlock2>
+
+
+  const createXmlDataBlock2 = (row, index) => `
+    <DataBlock2>
     <WorkingTag>A</WorkingTag>
-    <IDX_NO>1</IDX_NO>
-    <DataSeq>1</DataSeq>
+    <IDX_NO>${index + 1}</IDX_NO>
+    <DataSeq>${index + 1}</DataSeq>
     <Status>0</Status>
     <Selected>0</Selected>
     <PJTSeq>0</PJTSeq>
     <WBSSeq>0</WBSSeq>
-
     <ItemName>${row?.ItemName}</ItemName>
     <ItemNo>${row?.ItemNo}</ItemNo>
     <Spec>${row?.Spec}</Spec>
@@ -283,11 +348,11 @@ const createXmlDataBlock2 = (row, index) => `
     <ToSerlNo />
     <ProdDate />
     <STDUnitName>${row?.STDUnitName}</STDUnitName>
-    <STDQty>${row?.STDQty}</STDQty>
+    <STDQty>${row?.StdQty}</STDQty>
     <DelvSerl />
     <ItemSeq>${row?.ItemSeq}</ItemSeq>
     <UnitSeq>${row?.UnitSeq}</UnitSeq>
-    <STDUnitSeq>${row?.STDUnitSeq}</STDUnitSeq>
+    <STDUnitSeq>${row?.StdUnitSeq}</STDUnitSeq>
     <AccName />
     <OppAccName />
     <WHSeq>${row?.WHSeq}</WHSeq>
@@ -303,123 +368,100 @@ const createXmlDataBlock2 = (row, index) => `
     <Memo8>0</Memo8>
     <TABLE_NAME>DataBlock2</TABLE_NAME>
     <BizUnit>${row?.BizUnit}</BizUnit>
-    <DelvDate>${row?.DelvDate}</DelvDate>
-    <DelvSeq>${row?.DelvSeq}</DelvSeq>
+    <DelvDate>${row?.DateIn}</DelvDate>
+    <DelvSeq></DelvSeq>
   </DataBlock2>
+
 `;
-const callHandelSubmitSheet = useCallback(
-  debounce(() => {
-    if (scanHistory.length === 0) {
-      message.warning('Không có dữ liệu nào');
-      return;
-    }
+  const createXmlDataBlock3 = (row, index) => `
+   <DataBlock1>
+    <WorkingTag>A</WorkingTag>
+    <IDX_NO>${index + 1}</IDX_NO>
+    <DataSeq>${index + 1}</DataSeq>
+    <Status>0</Status>
+    <Selected>0</Selected> 
+    <Spec>${row?.Spec}</Spec>
+    <CustSeq>${row?.CustSeq}</CustSeq>
+    <Qty>${row?.Qty}</Qty>
+    <LotNo>${row?.LotNoFull}</LotNo>
+    <CreateDate>${row?.CreateDate}</CreateDate>
+    <ItemSeq>${row?.ItemSeq}</ItemSeq>
+    <UnitSeq>${row?.UnitSeq}</UnitSeq>
+    <ItemSeqOld>0</ItemSeqOld>
+    <LotNoOLD/>
+    <TABLE_NAME>DataBlock1</TABLE_NAME> 
+    <RegDate>${row?.RegDate}</RegDate>
+    <InNo>${row?.InvoiceNo}</InNo>
+    <SupplyCustSeq>${row?.CustSeq} </SupplyCustSeq>
+  </DataBlock1>
+`;
 
-    const xmlData = scanHistory.map(createXmlDataBlock).join('\n');  
 
-    return SCOMCloseItemCheckWEB(xmlData)  
-      .then((req) => {
-        if (req.success) {
-          message.success(SUCCESS_MESSAGES.DELETE_DATA);
-        } else {
-          message.error(req.message);
-        }
-      })
-      .catch(() => {
-        message.error(ERROR_MESSAGES.ERROR_FE);
+  /* const handleSubmit = useCallback(async (e) => {
+    e.preventDefault();
+    setLoadingSave(true);
+    setResult(null);
+
+    const xmlForCloseCheck = createXmlDataCloseCheck(filteredData);
+    const xmlForCloseItemCheck = scanHistory.map(createXmlDataBlock).join('\n');
+    const xmlForMasterCheck = createXmlDataMasterCheck(scanHistory);
+    const xmlForSheetCheck = scanHistory.map(createXmlDataBlock2).join('\n');
+    const xmlForLotNoMasterCheck = scanHistory.map(createXmlDataBlock3).join('\n');
+
+    try {
+      const response = await CheckAllProceduresStockIn(scanHistory, {
+        closeCheckXML: xmlForCloseCheck,
+        closeItemCheckXML: xmlForCloseItemCheck,
+        masterCheckXML: xmlForMasterCheck,
+        sheetCheckXML: xmlForSheetCheck,
+        sheetLotNoMasterCheckXML: xmlForLotNoMasterCheck,
       });
-  }, 300),
-  [scanHistory]
-);
-const callSSLImpDelvSheetCheck = useCallback(
-  debounce(() => {
-    if (scanHistory.length === 0) {
-      message.warning('Không có dữ liệu nào');
-      return;
+      console.log("response", response)
+      setResult(response);
+    } catch (error) {
+      setResult({ error: error.message });
+    } finally {
+      setLoadingSave(false);
     }
+  }, [filteredData, scanHistory]); */
 
-    const xmlData = scanHistory.map(createXmlDataBlock2).join('\n');  
 
-    return SSLImpDelvSheetCheck(xmlData)  
-      .then((req) => {
-        if (req.success) {
-          message.success(SUCCESS_MESSAGES.DELETE_DATA);
-        } else {
-          message.error(req.message);
-        }
-      })
-      .catch(() => {
-        message.error(ERROR_MESSAGES.ERROR_FE);
+  const handleSubmit = useCallback(async (e) => {
+    e.preventDefault();
+    setLoadingSave(true);
+    setResult(null);
+
+    const xmlForCloseCheck = createXmlDataCloseCheck(filteredData);
+    const xmlForCloseItemCheck = scanHistory.map(createXmlDataBlock).join('\n');
+    const xmlForMasterCheck = createXmlDataMasterCheck(scanHistory);
+    const xmlForSheetCheck = scanHistory.map(createXmlDataBlock2).join('\n');
+    const xmlForLotNoMasterCheck = scanHistory.map(createXmlDataBlock3).join('\n');
+
+    try {
+      const response = await CheckAllProceduresStockIn(scanHistory, {
+        closeCheckXML: xmlForCloseCheck,
+        closeItemCheckXML: xmlForCloseItemCheck,
+        masterCheckXML: xmlForMasterCheck,
+        sheetCheckXML: xmlForSheetCheck,
+        sheetLotNoMasterCheckXML: xmlForLotNoMasterCheck,
       });
-  }, 300),
-  [scanHistory]
-);
 
-
-const callSCOMCloseCheckWEB = useCallback(() => {
-  const formData = {
-    workingTag: 'A',
-    idx_no: '1',
-    status: '0',
-    dataSeq: '1',
-    selected: '1',
-    isChangedMst: '1',
-    bizUnit: filteredData?.BizUnit,
-    date: '20241126',
-    deptSeq: filteredData?.DeptSeq,
-    serviceSeq2: '4492',
-    methodSeq: '2',
-    dtlUnitSeq: '1',
-  };
-
-  return SCOMCloseCheckWEB(formData)  
-    .then((response) => {
+      setResult(response);
       if (response.success) {
-        message.success('SCOMCloseCheckWEB: Thành công!');
+        message.success('Tất cả các quy trình đã được thực thi thành công!');
+        setScanHistory([])
       } else {
-        throw new Error(`SCOMCloseCheckWEB: ${response.message}`);
+        message.error(`Lỗi: ${response.message}`);
       }
-    })
-    .catch((error) => {
-      throw error; 
-    });
-}, [filteredData]);
+    } catch (error) {
+      setResult({ error: error.message });
 
-const callSSLImpDelvMasterCheckWEB = useCallback(() => {
-  const formData = {
-    workingTag: 'A',
-    idx_no: '1',
-    status: '0',
-    dataSeq: '1',
-    selected: '1',
-    isChangedMst: '1',
-    
-  };
+      message.error(`Lỗi: ${error.message}`);
+    } finally {
+      setLoadingSave(false);
+    }
+  }, [filteredData, scanHistory]);
 
-  return SSLImpDelvMasterCheckWEB(formData)  
-    .then((response) => {
-      if (response.success) {
-        message.success('SSLImpDelvMasterCheckWEB: Thành công!');
-      } else {
-        throw new Error(`SSLImpDelvMasterCheckWEB: ${response.message}`);
-      }
-    })
-    .catch((error) => {
-      throw error; 
-    });
-}, [filteredData]);
-
-
-
-const handleSubmit = () => {
-  Promise.all([callSCOMCloseCheckWEB(), callHandelSubmitSheet(), callSSLImpDelvMasterCheckWEB(), callSSLImpDelvSheetCheck()])  
-    .then(() => {
-      message.success('Cả hai API đã được xử lý thành công!');
-    })
-    .catch((error) => {
-      console.error('Lỗi khi xử lý các tác vụ song song:', error);
-      message.error('Đã xảy ra lỗi trong quá trình xử lý các tác vụ.');
-    });
-};
 
 
   return (

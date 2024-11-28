@@ -31,9 +31,7 @@ export default function DeliveryList({ permissions, isMobile }) {
   const [checkedRowKey, setCheckedRowKey] = useState(null);
   const [keyPath, setKeyPath] = useState(null);
   const [checkedPath, setCheckedPath] = useState(false);
-
   const formatDate = useCallback((date) => date.format('YYYYMMDD'), []);
-
   const fetchDeliveryData = useCallback(async () => {
     setLoading(true);
     try {

@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Body, Post } from '@nestjs/common';
+import { Controller, Get, Query, Body, Post, HttpException, HttpStatus } from '@nestjs/common';
 import { StockInService } from '../service/stockIn.service';
 import { SimpleQueryResult } from 'src/common/interfaces/simple-query-result.interface';
 
@@ -145,6 +145,40 @@ export class EmployeeController {
             pgmSeq,
         );
     }
+
+    /* CHECK ALL STOCKIN */
+
+    @Post('check-all-procedures-stock-in')
+    async checkAllProceduresStockIn(@Body() body: any) {
+        try {
+            const { dataSave, xmlDocument, ...otherParams } = body;
+            const procedureData = [
+                { name: '_SCOMCloseCheck_WEB', xmlDocument: xmlDocument.xmlForCloseCheck, serviceSeq: 2639 },
+                { name: '_SCOMCloseItemCheck_WEB', xmlDocument: xmlDocument.xmlForCloseItemCheck, serviceSeq: 2639 },
+                { name: '_SSLImpDelvMasterCheck_WEB', xmlDocument: xmlDocument.xmlForMasterCheck, serviceSeq: 4493 },
+                { name: '_SSLImpDelvSheetCheck_WEB', xmlDocument: xmlDocument.xmlForSheetCheck, serviceSeq: 4493 },
+                { name: '_SLGLotNoMasterCheck_WEB', xmlDocument: xmlDocument.xmlForLotNoMasterCheck, serviceSeq: 4422 }
+            ];
+
+            const result = await this.stockInService.checkAllProceduresStockIn(
+                procedureData,
+                otherParams.xmlFlags,
+                otherParams.workingTag,
+                otherParams.companySeq,
+                otherParams.languageSeq,
+                otherParams.userSeq,
+                otherParams.pgmSeq, 
+                dataSave
+            );
+            return result;
+        } catch (error) {
+            throw new HttpException(
+                { message: error.message || 'Internal Server Error' },
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
 
 
 

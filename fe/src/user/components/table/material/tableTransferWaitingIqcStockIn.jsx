@@ -12,30 +12,6 @@ function TableTransferWaitingIqcStockIn({ sampleTableA, sampleTableB }) {
   const [checkedRowKey, setCheckedRowKey] = useState(null)
   const columnsA = [
     {
-      name: 'PermitType',
-      header: 'PermitType',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 150,
-    },
-    {
-      name: 'PermitSeq',
-      header: 'PermitSeq',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 150,
-    },
-    {
-      name: 'PermitSerl',
-      header: 'PermitSerl',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 150,
-    },
-    {
       name: 'ItemSeq',
       header: 'Item Seq',
       sortable: true,
@@ -79,24 +55,8 @@ function TableTransferWaitingIqcStockIn({ sampleTableA, sampleTableB }) {
 
   const columnsB = [
     {
-      name: 'PermitSeq',
-      header: 'PermitSeq',
-      sortable: true,
-      filter: 'text',
-      width: 150,
-      resizable: true,
-    },
-    {
-      name: 'PermitSerl',
-      header: 'PermitSerl',
-      sortable: true,
-      filter: 'text',
-      width: 150,
-      resizable: true,
-    },
-    {
-      name: 'SMImpKind',
-      header: 'SMImpKind',
+      name: 'WHName',
+      header: 'WHName',
       sortable: true,
       filter: 'text',
       width: 150,
@@ -146,30 +106,6 @@ function TableTransferWaitingIqcStockIn({ sampleTableA, sampleTableB }) {
       name: 'Barcode',
       header: 'Barcode',
       sortable: true,
-      resizable: true,
-      width: 150,
-    },
-    {
-      name: 'ItemSeq',
-      header: 'ItemSeq',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 150,
-    },
-    {
-      name: 'WHSeq',
-      header: 'WHSeq',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 150,
-    },
-    {
-      name: 'WHName',
-      header: 'WHName',
-      sortable: true,
-      filter: 'text',
       resizable: true,
       width: 150,
     },

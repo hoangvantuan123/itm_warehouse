@@ -1,0 +1,66 @@
+
+
+reslut 2
+      EXEC _SSLImpDelvSheetSave_WEB
+        @xmlDocument = N'<ROOT>
+    <DataBlock1>
+    <WorkingTag>A</WorkingTag>
+    <IDX_NO>1</IDX_NO>
+    <DataSeq>1</DataSeq>
+    <Selected>1</Selected>
+    <Status>0</Status>
+    <DelvSeq>23023</DelvSeq>
+    <BizUnit>4</BizUnit>
+    <BizUnitName>undefined</BizUnitName>
+    <DelvDate>20241128</DelvDate>
+    <CustSeq>undefined</CustSeq>
+    <CustName>undefined</CustName>
+    <DelvNo>undefined</DelvNo>
+    <PermitNo>null</PermitNo>
+    <BLNo xml:space="preserve">            </BLNo>
+    <EmpName>undefined</EmpName>
+    <EmpSeq>undefined</EmpSeq>
+    <DeptSeq>undefined</DeptSeq>
+    <DeptName>undefined</DeptName>
+    <CurrName>undefined</CurrName>
+    <CurrSeq>undefined</CurrSeq>
+    <ExRate>undefined</ExRate>
+    <Remark>23023</Remark>
+    <SMImpKindName>undefined</SMImpKindName>
+    <SMImpKind>undefined</SMImpKind>
+    <IsPJT>undefined</IsPJT>
+  </DataBlock1>
+    <DataBlock1>
+    <WorkingTag>A</WorkingTag>
+    <IDX_NO>1</IDX_NO>
+    <DataSeq>1</DataSeq>
+    <Selected>1</Selected>
+    <Status>0</Status>
+    <DelvSeq>23023</DelvSeq>
+    <BizUnit>4</BizUnit>
+    <BizUnitName>undefined</BizUnitName>
+    <DelvDate>20241128</DelvDate>
+    <CustSeq>undefined</CustSeq>
+    <CustName>undefined</CustName>
+    <DelvNo>undefined</DelvNo>
+    <PermitNo>null</PermitNo>
+    <BLNo xml:space="preserve">            </BLNo>
+    <EmpName>undefined</EmpName>
+    <EmpSeq>undefined</EmpSeq>
+    <DeptSeq>undefined</DeptSeq>
+    <DeptName>undefined</DeptName>
+    <CurrName>undefined</CurrName>
+    <CurrSeq>undefined</CurrSeq>
+    <ExRate>undefined</ExRate>
+    <Remark>23023</Remark>
+    <SMImpKindName>undefined</SMImpKindName>
+    <SMImpKind>undefined</SMImpKind>
+    <IsPJT>undefined</IsPJT>
+  </DataBlock1></ROOT>',
+        @xmlFlags = 2,
+        @ServiceSeq = 4493,
+        @WorkingTag = N'',
+        @CompanySeq = 1,
+        @LanguageSeq = 6,
+        @UserSeq = 3106,
+        @PgmSeq = 1036085;

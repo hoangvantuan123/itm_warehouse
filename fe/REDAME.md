@@ -34,141 +34,194 @@ CMD ["pm2-runtime", "start", "npm", "--", "run", "start"]
 
 ## pm2 start http-server --name "my-react-app" -- -p 3000 ./dist
 
-```
-import { useEffect, useRef, useState } from 'react';
-import Handsontable from 'handsontable';
-import 'handsontable/dist/handsontable.full.css';
-import pako from 'pako';
 
-const openDatabase = () => {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open('sheetDatabase', 1);
-        request.onerror = () => reject('Failed to open IndexedDB');
-        request.onsuccess = () => resolve(request.result);
-        request.onupgradeneeded = (e) => {
-            const db = e.target.result;
-            if (!db.objectStoreNames.contains('sheetData')) {
-                db.createObjectStore('sheetData', { keyPath: 'id', autoIncrement: true });
-            }
-        };
+
+
+<!-- 
+const createXmlDataBlock = (row, index) => `
+  <DataBlock2>
+    <WorkingTag>A</WorkingTag>
+    <IDX_NO>${index + 1}</IDX_NO>
+    <DataSeq>${index + 1}</DataSeq>
+    <Status>0</Status>
+    <Selected>0</Selected>
+    <TABLE_NAME>DataBlock2</TABLE_NAME>
+    <ServiceSeq>4492</ServiceSeq> 
+    <MethodSeq>2</MethodSeq>
+    <BizUnit>${row?.BizUnit}</BizUnit> 
+    <Date>${row?.DateIn}</Date>
+    <DeptSeq>${row?.DeptSeq}</DeptSeq> 
+    <BizUnitOld>${row?.BizUnit}</BizUnitOld>
+    <DateOld>${row?.DateIn}</DateOld> 
+    <DeptSeqOld>${row?.DeptSeq}</DeptSeqOld> 
+  </DataBlock2>
+`;
+
+const createXmlDataBlock2 = (row, index) => `
+<DataBlock2>
+    <WorkingTag>A</WorkingTag>
+    <IDX_NO>1</IDX_NO>
+    <DataSeq>1</DataSeq>
+    <Status>0</Status>
+    <Selected>0</Selected>
+    <PJTSeq>0</PJTSeq>
+    <WBSSeq>0</WBSSeq>
+    <ItemName>${row?.ItemName}</ItemName>
+    <ItemNo>${row?.ItemNo}</ItemNo>
+    <Spec>${row?.Spec}</Spec>
+    <MakerName />
+    <MakerSeq>0</MakerSeq>
+    <UnitName>${row?.UnitName}</UnitName>
+    <Qty>${row?.Qty}</Qty>
+    <Price>${row?.Price}</Price>
+    <CurAmt>${row?.CurAmt}</CurAmt>
+    <DomAmt>${row?.DomAmt}</DomAmt>
+    <WHName>${row?.WHName}</WHName>
+    <LotNo>${row?.LotNo}</LotNo>
+    <FromSerlNo />
+    <ToSerlNo />
+    <ProdDate />
+    <STDUnitName>${row?.STDUnitName}</STDUnitName>
+    <STDQty>${row?.STDQty}</STDQty>
+    <DelvSerl />
+    <ItemSeq>${row?.ItemSeq}</ItemSeq>
+    <UnitSeq>${row?.UnitSeq}</UnitSeq>
+    <STDUnitSeq>${row?.STDUnitSeq}</STDUnitSeq>
+    <AccName />
+    <OppAccName />
+    <WHSeq>${row?.WHSeq}</WHSeq>
+    <IsQtyChange />
+    <Remark />
+    <Memo1 />
+    <Memo2 />
+    <Memo3 />
+    <Memo4 />
+    <Memo5 />
+    <Memo6 />
+    <Memo7>0</Memo7>
+    <Memo8>0</Memo8>
+    <TABLE_NAME>DataBlock2</TABLE_NAME>
+    <BizUnit>${row?.BizUnit}</BizUnit>
+    <DelvDate>${row?.DelvDate}</DelvDate>
+    <DelvSeq>${row?.DelvSeq}</DelvSeq>
+  </DataBlock2>
+`;
+const callHandelSubmitSheet = useCallback(
+  debounce(() => {
+    if (scanHistory.length === 0) {
+      message.warning('Không có dữ liệu nào');
+      return;
+    }
+
+    const xmlData = scanHistory.map(createXmlDataBlock).join('\n');  
+
+    return SCOMCloseItemCheckWEB(xmlData)  
+      .then((req) => {
+        if (req.success) {
+          message.success(SUCCESS_MESSAGES.DELETE_DATA);
+        } else {
+          message.error(req.message);
+        }
+      })
+      .catch(() => {
+        message.error(ERROR_MESSAGES.ERROR_FE);
+      });
+  }, 300),
+  [scanHistory]
+);
+
+
+const callSSLImpDelvSheetCheck = useCallback(
+  debounce(() => {
+    if (scanHistory.length === 0) {
+      message.warning('Không có dữ liệu nào');
+      return;
+    }
+
+    const xmlData = scanHistory.map(createXmlDataBlock2).join('\n');  
+
+    return SSLImpDelvSheetCheck(xmlData)  
+      .then((req) => {
+        if (req.success) {
+          message.success(SUCCESS_MESSAGES.DELETE_DATA);
+        } else {
+          message.error(req.message);
+        }
+      })
+      .catch(() => {
+        message.error(ERROR_MESSAGES.ERROR_FE);
+      });
+  }, 300),
+  [scanHistory]
+);
+
+
+const callSCOMCloseCheckWEB = useCallback(() => {
+  const formData = {
+    workingTag: 'A',
+    idx_no: '1',
+    status: '0',
+    dataSeq: '1',
+    selected: '1',
+    isChangedMst: '1',
+    bizUnit: filteredData?.BizUnit,
+    date: '20241126',
+    deptSeq: filteredData?.DeptSeq,
+    serviceSeq2: '4492',
+    methodSeq: '2',
+    dtlUnitSeq: '1',
+  };
+
+  return SCOMCloseCheckWEB(formData)  
+    .then((response) => {
+      if (response.success) {
+        message.success('SCOMCloseCheckWEB: Thành công!');
+      } else {
+        throw new Error(`SCOMCloseCheckWEB: ${response.message}`);
+      }
+    })
+    .catch((error) => {
+      throw error; 
+    });
+}, [filteredData]);
+
+const callSSLImpDelvMasterCheckWEB = useCallback(() => {
+  const formData = {
+    workingTag: 'A',
+    idx_no: '1',
+    status: '0',
+    dataSeq: '1',
+    selected: '1',
+    isChangedMst: '1',
+    
+  };
+
+  return SSLImpDelvMasterCheckWEB(formData)  
+    .then((response) => {
+      if (response.success) {
+        message.success('SSLImpDelvMasterCheckWEB: Thành công!');
+      } else {
+        throw new Error(`SSLImpDelvMasterCheckWEB: ${response.message}`);
+      }
+    })
+    .catch((error) => {
+      throw error; 
+    });
+}, [filteredData]);
+
+
+
+const handleSubmit = () => {
+  Promise.all([callSCOMCloseCheckWEB(), callHandelSubmitSheet(), callSSLImpDelvMasterCheckWEB(), callSSLImpDelvSheetCheck()])  
+    .then(() => {
+      message.success('Cả hai API đã được xử lý thành công!');
+    })
+    .catch((error) => {
+      console.error('Lỗi khi xử lý các tác vụ song song:', error);
+      message.error('Đã xảy ra lỗi trong quá trình xử lý các tác vụ.');
     });
 };
 
-const saveDataToDatabase = async (data) => {
-    try {
-        const db = await openDatabase();
-        const transaction = db.transaction('sheetData', 'readwrite');
-        const store = transaction.objectStore('sheetData');
-
-        const request = store.get(1);
-        request.onsuccess = (e) => {
-            const record = e.target.result;
-            if (record) {
-                store.put({ ...record, data: JSON.stringify(data) });
-            } else {
-                store.add({ id: 1, data: JSON.stringify(data) });
-            }
-        };
-
-        request.onerror = () => {
-            console.error('Error while saving data to IndexedDB');
-        };
-    } catch (error) {
-        console.error('Failed to save data to IndexedDB', error);
-    }
-};
-
-const createDefaultData = () => {
-    const numRows = 30;
-    const numCols = 10;
-    const columns = Array.from({ length: numCols }, (_, index) => `Column ${index + 1}`);
-    const rows = Array.from({ length: numRows }, () => Array(numCols).fill(''));
-
-    return [{ columns, data: rows }];
-};
-
-export default function SheetView({ dbData: compressedData }) {
-    const hotTableRef = useRef(null);
-    const [data, setData] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        if (compressedData) {
-            try {
-                const decompressedData = pako.ungzip(compressedData, { to: 'string' });
-                const parsedData = JSON.parse(decompressedData);
-                setData(parsedData);
-                setIsLoading(false);
-            } catch (e) {
-                setIsLoading(false);
-                setData([]);
-            }
-        } else {
-            const defaultData = createDefaultData();
-            setData(defaultData);
-            setIsLoading(false);
-        }
-    }, [compressedData]);
-
-    useEffect(() => {
-        if (hotTableRef.current && data.length > 0) {
-            const sheet = data[0];
-            const columns = sheet.columns || [];
-            const rowData = sheet.data || [];
-            const columnsObject = columns.reduce((obj, column) => {
-                obj[column] = column;
-                return obj;
-            }, {});
-            const tableData = [columnsObject, ...rowData];
-
-            const hot = new Handsontable(hotTableRef.current, {
-                data: tableData,
-                colHeaders: true,
-                rowHeaders: true,
-                height: '100%',
-                licenseKey: 'non-commercial-and-evaluation',
-                stretchH: 'all',
-                contextMenu: true,
-                manualColumnResize: true,
-                manualRowResize: true,
-                afterChange(changes, source) {
-                    if (source !== 'loadData') {
-                        const updatedData = hot.getData();
-                        saveDataToDatabase(updatedData);
-                    }
-                },
-            });
-
-            return () => {
-                hot.destroy();
-            };
-        }
-    }, [data]);
-
-    const clearDatabase = async () => {
-        try {
-            setData([]);
-            const db = await openDatabase();
-            const transaction = db.transaction('sheetData', 'readwrite');
-            const store = transaction.objectStore('sheetData');
-            store.clear();
-        } catch (error) {
-            console.error('Failed to clear IndexedDB', error);
-        }
-    };
-
-    return (
-        <>
-            <button onClick={clearDatabase} style={{ marginTop: '20px' }}>
-                Clear IndexedDB
-            </button>
-
-            <div ref={hotTableRef}>
-                {isLoading && <p>Loading...</p>}
-            </div>
-        </>
-    );
-}
 
 
-```
+ -->
