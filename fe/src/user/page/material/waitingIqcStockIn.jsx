@@ -18,6 +18,78 @@ import { GetSUGGetActiveDeliveryItem } from '../../../features/material/getSUGGe
 import { debounce } from 'lodash'
 import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../../utils/constants'
 import { CheckAllProceduresStockIn } from '../../../features/material/postCheckAllProceduresStockIn'
+
+const dataB = [
+  {
+    WHName: 'Warehouse A',
+    ItemNo: 'A12345',
+    LotNo: 'L001',
+    Qty: 100,
+    DateCode: '202311',
+    ReelNo: 'R001',
+    Barcode: '123456789012',
+    CreateDate: '2023-11-20',
+    RegDate: '2023-11-21',
+    YYWW: '2347',
+    YYMM: '2311',
+    YYMMDD: '231120',
+    InvoiceNo: 'INV001',
+    BizUnit: 'BU001',
+    DateIn: '2023-11-19',
+  },
+  {
+    WHName: 'Warehouse B',
+    ItemNo: 'B67890',
+    LotNo: 'L002',
+    Qty: 200,
+    DateCode: '202312',
+    ReelNo: 'R002',
+    Barcode: '987654321098',
+    CreateDate: '2023-12-01',
+    RegDate: '2023-12-02',
+    YYWW: '2348',
+    YYMM: '2312',
+    YYMMDD: '231201',
+    InvoiceNo: 'INV002',
+    BizUnit: 'BU002',
+    DateIn: '2023-11-30',
+  },
+  {
+    WHName: 'Warehouse C',
+    ItemNo: 'C54321',
+    LotNo: 'L003',
+    Qty: 150,
+    DateCode: '202401',
+    ReelNo: 'R003',
+    Barcode: '111222333444',
+    CreateDate: '2024-01-10',
+    RegDate: '2024-01-11',
+    YYWW: '2402',
+    YYMM: '2401',
+    YYMMDD: '240110',
+    InvoiceNo: 'INV003',
+    BizUnit: 'BU003',
+    DateIn: '2024-01-09',
+  },
+  {
+    WHName: 'Warehouse D',
+    ItemNo: 'D11223',
+    LotNo: 'L004',
+    Qty: 300,
+    DateCode: '202402',
+    ReelNo: 'R004',
+    Barcode: '555666777888',
+    CreateDate: '2024-02-15',
+    RegDate: '2024-02-16',
+    YYWW: '2407',
+    YYMM: '2402',
+    YYMMDD: '240215',
+    InvoiceNo: 'INV004',
+    BizUnit: 'BU004',
+    DateIn: '2024-02-14',
+  },
+];
+
 export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const { t } = useTranslation()
   const { id } = useParams()
@@ -25,6 +97,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const inputCodeRef = useRef(null)
   const [loading, setLoading] = useState(true)
 
+  const gridRef = useRef(null)
   const [inputCode, setInputCode] = useState(null)
   const [result, setResult] = useState(null);
   const [loadingSave, setLoadingSave] = useState(false)
@@ -34,10 +107,79 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const [modal2Open, setModal2Open] = useState(false)
   const [modal3Open, setModal3Open] = useState(false)
   const [error, setError] = useState(null)
-  const [scanHistory, setScanHistory] = useState([])
+  const [scanHistory, setScanHistory] = useState([{
+    WHName: 'Warehouse A',
+    ItemNo: 'A12345',
+    LotNo: 'L001',
+    Qty: 100,
+    DateCode: '202311',
+    ReelNo: 'R001',
+    Barcode: '123456789012',
+    CreateDate: '2023-11-20',
+    RegDate: '2023-11-21',
+    YYWW: '2347',
+    YYMM: '2311',
+    YYMMDD: '231120',
+    InvoiceNo: 'INV001',
+    BizUnit: 'BU001',
+    DateIn: '2023-11-19',
+  },
+  {
+    WHName: 'Warehouse B',
+    ItemNo: 'B67890',
+    LotNo: 'L002',
+    Qty: 200,
+    DateCode: '202312',
+    ReelNo: 'R002',
+    Barcode: '987654321098',
+    CreateDate: '2023-12-01',
+    RegDate: '2023-12-02',
+    YYWW: '2348',
+    YYMM: '2312',
+    YYMMDD: '231201',
+    InvoiceNo: 'INV002',
+    BizUnit: 'BU002',
+    DateIn: '2023-11-30',
+  },
+  {
+    WHName: 'Warehouse C',
+    ItemNo: 'C54321',
+    LotNo: 'L003',
+    Qty: 150,
+    DateCode: '202401',
+    ReelNo: 'R003',
+    Barcode: '111222333444',
+    CreateDate: '2024-01-10',
+    RegDate: '2024-01-11',
+    YYWW: '2402',
+    YYMM: '2401',
+    YYMMDD: '240110',
+    InvoiceNo: 'INV003',
+    BizUnit: 'BU003',
+    DateIn: '2024-01-09',
+  },
+  {
+    WHName: 'Warehouse D',
+    ItemNo: 'D11223',
+    LotNo: 'L004',
+    Qty: 300,
+    DateCode: '202402',
+    ReelNo: 'R004',
+    Barcode: '555666777888',
+    CreateDate: '2024-02-15',
+    RegDate: '2024-02-16',
+    YYWW: '2407',
+    YYMM: '2402',
+    YYMMDD: '240215',
+    InvoiceNo: 'INV004',
+    BizUnit: 'BU004',
+    DateIn: '2024-02-14',
+  },])
   const dataRefSacenHistory = useRef(scanHistory)
   const [status, setStatus] = useState(false)
   const [filteredData, setFilteredData] = useState(null)
+  const [YYWW, setYYWW] = useState(null)
+  const [YYYYMM, setYYYYMM] = useState(null)
   const secretKey = 'TEST_ACCESS_KEY'
 
   const Format = useCallback((date) => {
@@ -135,6 +277,8 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
           if (resSuccess.success) {
             const dataResSuccess = resSuccess.data[0]
             message.success(resultMessage)
+            setYYWW(dataResSuccess?.YYWW)
+            setYYYYMM(dataResSuccess?.YYMM)
             setData((prevData) =>
               prevData.map((item) =>
                 item.ItemNo === itemNo
@@ -225,28 +369,34 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (e.key === 'Enter' && bufferRef.current.trim()) {
-        const barcode = bufferRef.current.trim()
-        handleCheckBarcode(barcode)
-        setInputCode(barcode)
-        bufferRef.current = ''
+        const barcode = bufferRef.current.trim();
+        handleCheckBarcode(barcode);
+        setInputCode(barcode);
+        bufferRef.current = '';
       } else if (e.key.length === 1) {
-        bufferRef.current += e.key
+        bufferRef.current += e.key;
       }
-    }
-
-    window.addEventListener('keypress', handleKeyPress)
-    const handleFocus = () => setStatus(true)
-
-    const handleBlur = () => setStatus(false)
-
-    window.addEventListener('focus', handleFocus)
-    window.addEventListener('blur', handleBlur)
+    };
+  
+    const handleFocus = () => setStatus(true);
+  
+    const handleBlur = () => setStatus(false);
+  
+    const handleClick = () => setStatus(true);
+  
+    window.addEventListener('keypress', handleKeyPress);
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('blur', handleBlur);
+    document.addEventListener('click', handleClick);
+  
     return () => {
-      window.removeEventListener('keypress', handleKeyPress)
-      window.removeEventListener('focus', handleFocus)
-      window.removeEventListener('blur', handleBlur)
-    }
-  }, [])
+      window.removeEventListener('keypress', handleKeyPress);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('blur', handleBlur);
+      document.removeEventListener('click', handleClick);
+    };
+  }, []);
+  
 
   /* SAVE */
   const createXmlDataCloseCheck = (data) => {
@@ -430,7 +580,11 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     e.preventDefault();
     setLoadingSave(true);
     setResult(null);
-
+    if (scanHistory.length === 0) {
+      setModal2Open(true); 
+      setError("Chưa có dữ liệu để gửi. Vui lòng quét dữ liệu trước khi gửi."); 
+      return; 
+    }
     const xmlForCloseCheck = createXmlDataCloseCheck(filteredData);
     const xmlForCloseItemCheck = scanHistory.map(createXmlDataBlock).join('\n');
     const xmlForMasterCheck = createXmlDataMasterCheck(scanHistory);
@@ -455,15 +609,39 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
       }
     } catch (error) {
       setResult({ error: error.message });
-
-      message.error(`Lỗi: ${error.message}`);
+      setModal2Open(true)
+      setError(error.message)
     } finally {
       setLoadingSave(false);
     }
   }, [filteredData, scanHistory]);
 
-
-
+  const handleDelete = () => {
+    if (gridRef.current) {
+      const gridInstance = gridRef.current.getInstance(); 
+      const selectedRows = gridInstance.getCheckedRows(); 
+      const remainingRows = scanHistory.filter(
+        (row) => !selectedRows.find((selectedRow) => selectedRow.Barcode === row.Barcode)
+      );
+      setScanHistory(remainingRows);
+    }
+  };
+  const handleRestFrom = () => {
+    if (scanHistory.length === 0) {
+      setModal2Open(true)
+      setError('Không có dữ liệu để reset! Vui lòng quét dữ liệu trước.')
+      return; 
+    }
+  
+    setScanHistory([]);
+    fetchDeliveryData();
+    message.success('Reset form thành công!');
+  };
+  
+  const handleUploadExcel = () =>{
+    setModal2Open(true)
+    setError('Chức năng đang trong quá trình phát triển?')
+  }
   return (
     <>
       <Helmet>
@@ -480,6 +658,9 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
               <WaitingIqcStockInActions
                 status={status}
                 handleSubmit={handleSubmit}
+                handleDelete={handleDelete}
+                handleRestFrom={handleRestFrom}
+                handleUploadExcel={handleUploadExcel}
               />
             </div>
             <details
@@ -496,7 +677,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
                 </span>
               </summary>
               <div className="flex p-2 gap-4">
-                <WaitingIqcStockInQuery />
+                <WaitingIqcStockInQuery    filteredData={filteredData}  YYWW={YYWW} YYYYMM={YYYYMM}/>
               </div>
             </details>
           </div>
@@ -505,6 +686,8 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
             <TableTransferWaitingIqcStockIn
               sampleTableA={data}
               sampleTableB={scanHistory}
+              handleDelete={handleDelete}
+              gridRefA={gridRef}
             />
           </div>
         </div>

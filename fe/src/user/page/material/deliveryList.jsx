@@ -16,6 +16,74 @@ import { useNavigate } from 'react-router-dom'
 import { encodeBase64Url } from '../../../utils/decode-JWT'
 import CryptoJS from 'crypto-js'
 
+const dataM = [
+  {
+    DelvNo: 'D001',
+    DelvMngNo: 'DM001',
+    ImpType: 'Import',
+    TotalQty: 100,
+    OkQty: 95,
+    RemainQty: 5,
+    DelvDate: '2024-11-28',
+    CustSeq: 'C001',
+    CustNm: 'Customer A',
+    DomOrImp: 'Domestic',
+    PurchaseType: 'Wholesale',
+    BizUnitName: 'Unit A',
+    BizUnit: 'A1',
+    EmpSeq: 'E001',
+    EmpName: 'John Doe',
+    DeptSeq: 'D001',
+    DeptName: 'Sales',
+    CurrSeq: 'USD',
+    CurrName: 'US Dollar',
+    ExRate: 1.0,
+  },
+  {
+    DelvNo: 'D002',
+    DelvMngNo: 'DM002',
+    ImpType: 'Domestic',
+    TotalQty: 200,
+    OkQty: 190,
+    RemainQty: 10,
+    DelvDate: '2024-11-29',
+    CustSeq: 'C002',
+    CustNm: 'Customer B',
+    DomOrImp: 'Import',
+    PurchaseType: 'Retail',
+    BizUnitName: 'Unit B',
+    BizUnit: 'B1',
+    EmpSeq: 'E002',
+    EmpName: 'Jane Smith',
+    DeptSeq: 'D002',
+    DeptName: 'Logistics',
+    CurrSeq: 'EUR',
+    CurrName: 'Euro',
+    ExRate: 0.85,
+  },
+  {
+    DelvNo: 'D003',
+    DelvMngNo: 'DM003',
+    ImpType: 'Export',
+    TotalQty: 150,
+    OkQty: 145,
+    RemainQty: 5,
+    DelvDate: '2024-11-30',
+    CustSeq: 'C003',
+    CustNm: 'Customer C',
+    DomOrImp: 'Export',
+    PurchaseType: 'Online',
+    BizUnitName: 'Unit C',
+    BizUnit: 'C1',
+    EmpSeq: 'E003',
+    EmpName: 'Robert Brown',
+    DeptSeq: 'D003',
+    DeptName: 'Procurement',
+    CurrSeq: 'JPY',
+    CurrName: 'Japanese Yen',
+    ExRate: 150.5,
+  },
+];
 export default function DeliveryList({ permissions, isMobile }) {
   const { t } = useTranslation();
   const gridRef = useRef(null);
@@ -32,6 +100,7 @@ export default function DeliveryList({ permissions, isMobile }) {
   const [keyPath, setKeyPath] = useState(null);
   const [checkedPath, setCheckedPath] = useState(false);
   const formatDate = useCallback((date) => date.format('YYYYMMDD'), []);
+
   const fetchDeliveryData = useCallback(async () => {
     setLoading(true);
     try {
@@ -41,9 +110,8 @@ export default function DeliveryList({ permissions, isMobile }) {
         deliveryNo,
         bizUnit
       );
-      setData(deliveryResponse?.data || []);
+      setData(deliveryResponse?.data || dataM);
     } catch (error) {
-      console.error('Error fetching delivery data:', error);
       setData([]);
     } finally {
       setLoading(false);
@@ -56,7 +124,6 @@ export default function DeliveryList({ permissions, isMobile }) {
       const codeHelpResponse = await GetCodeHelp('', 6, 10003, 1, '%', '', '', '', '');
       setDataUnit(codeHelpResponse?.data || []);
     } catch (error) {
-      console.error('Error fetching code help data:', error);
       setDataUnit([]);
     } finally {
       setLoading(false);
@@ -76,10 +143,7 @@ export default function DeliveryList({ permissions, isMobile }) {
     }
 
     const rowData = data[rowKey];
-    if (!rowData) {
-      console.warn('Invalid row data');
-      return;
-    }
+ 
 
     const filteredData = {
       DelvNo: rowData.DelvNo,
@@ -110,6 +174,7 @@ export default function DeliveryList({ permissions, isMobile }) {
 
     setCheckedRowKey(rowKey);
     setKeyPath(encryptedToken);
+    navigate(`/u/warehouse/material/waiting-iqc-stock-in/${encryptedToken}`);
   }, [checkedRowKey, data]);
 
   const nextPageStockIn = useCallback(() => {
@@ -187,6 +252,7 @@ export default function DeliveryList({ permissions, isMobile }) {
               loading={loading}
               handleCheck={handleCheck}
               gridRef={gridRef}
+              setData={setData}
             />
           </div>
         </div>

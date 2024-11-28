@@ -233,7 +233,7 @@ function TableDeliveryList({
           columns={columns}
           rowHeight={40}
           bodyHeight="fitToParent"
-          onDblclick={handleRowDoubleClick}
+          onDblclick={handleCheck}
           rowHeaders={['rowNum', 'checkbox']}
           pagination={{ perPage: 100 }}
           scrollX={true}
