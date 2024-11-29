@@ -1,17 +1,23 @@
-import { InboxOutlined } from '@ant-design/icons'
-
+import { InboxOutlined , TeamOutlined, SettingOutlined, ContainerOutlined, FolderOpenOutlined} from '@ant-design/icons'
 export const menuItems = [
   {
     key: 'warehouse',
     label: 'Warehouse Management',
-    icon: <InboxOutlined style={{ fontSize: '20px' }} />,
+    icon: <ContainerOutlined style={{ fontSize: '20px' }} />,
     link: '/u/warehouse',
     utilities: true,
   },
   {
-    key: 'add',
-    label: 'ADD',
-    icon: <InboxOutlined style={{ fontSize: '20px' }} />,
+    key: 'users',
+    label: 'USERS',
+    icon: <TeamOutlined style={{ fontSize: '20px' }} />,
+    link: '/u/add',
+    utilities: true,
+  },
+  {
+    key: 'system_settings',
+    label: 'System Settings',
+    icon: <SettingOutlined style={{ fontSize: '20px' }} />,
     link: '/u/add',
     utilities: true,
   },
@@ -22,7 +28,7 @@ export const menuSettingItems = [
     id: 2,
     key: 'warehouse',
     label: 'WAREHOUSING',
-    icon: <InboxOutlined style={{ fontSize: '20px' }} />,
+    icon: <FolderOpenOutlined style={{ fontSize: '20px' }} />,
     link: '/u/warehouse/warehousing',
     type: 'submenu',
     subMenu: [
@@ -47,7 +53,7 @@ export const menuSettingItems = [
     id: 3,
     key: 'warehouse',
     label: 'KITTING',
-    icon: <InboxOutlined style={{ fontSize: '20px' }} />,
+    icon: <FolderOpenOutlined style={{ fontSize: '20px' }} />,
     link: '/u/warehouse/kitting',
     type: 'submenu',
     subMenu: [
@@ -72,7 +78,7 @@ export const menuSettingItems = [
     id: 5,
     key: 'warehouse',
     label: 'MATERIAL',
-    icon: <InboxOutlined style={{ fontSize: '20px' }} />,
+    icon: <FolderOpenOutlined style={{ fontSize: '20px' }} />,
     link: '/u/warehouse/material',
     type: 'submenu',
     subMenu: [
@@ -120,10 +126,47 @@ export const menuSettingItems = [
   },
   {
     id: 4,
-    key: 'add2',
-    label: 'ADD',
-    icon: <InboxOutlined style={{ fontSize: '20px' }} />,
+    key: 'users',
+    label: 'USERS',
+    icon: <FolderOpenOutlined style={{ fontSize: '20px' }} />,
     link: '/u/add',
     type: 'menu',
+  },
+  {
+    id: 6,
+    key: 'system_settings',
+    label: 'Users',
+    icon: <FolderOpenOutlined style={{ fontSize: '20px' }} />,
+    link: '/u/system_settings/users',
+    type: 'submenu',
+    subMenu: [
+      {
+        key: 'user_management-1-1',
+        label: 'User Management',
+        link: '/u/system_settings/users/user-management',
+      },
+      {
+        key: 'user_management-1-2',
+        label: 'Role Management',
+        link: '/u/system_settings/users/role-management',
+      },
+      
+    ],
+  },
+  {
+    id: 7,
+    key: 'system_settings',
+    label: 'Technique',
+    icon: <FolderOpenOutlined style={{ fontSize: '20px' }} />,
+    link: '/u/system_settings/technique',
+    type: 'submenu',
+    subMenu: [
+      {
+        key: 'technique-1-1',
+        label: 'Menu items',
+        link: '/u/system_settings/technique/menu-items',
+      }
+      
+    ],
   },
 ]

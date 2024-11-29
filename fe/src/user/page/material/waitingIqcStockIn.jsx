@@ -181,7 +181,6 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     const currentTableData = dataRef.current;
     const currentScanHistory = dataRefSacenHistory.current;
 
-    // Gửi message tới worker
     workerRef.current.postMessage({
       type: 'CHECK_BARCODE',
       barcode,

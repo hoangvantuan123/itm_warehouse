@@ -1,4 +1,4 @@
-import { Layout, Menu, Typography, Checkbox, Dropdown, Button } from 'antd'
+import { Layout, Menu, Typography, Checkbox, Dropdown, Button, Tooltip } from 'antd'
 import { Link } from 'react-router-dom'
 import { useLocation } from 'react-router-dom'
 import { useState, useEffect } from 'react'
@@ -41,6 +41,8 @@ const Sidebar = ({ permissions }) => {
     const savedMenuState = localStorage.getItem('menu')
     return savedMenuState ? JSON.parse(savedMenuState) : true
   })
+
+
   const [isMenu, setIsMenu] = useState(localStorage.getItem('isMenu') || null)
   const [labelMenu, setLabelMenu] = useState(
     localStorage.getItem('labelMenu') || null,
@@ -80,7 +82,9 @@ const Sidebar = ({ permissions }) => {
     setLabelMenu(e.label)
     localStorage.setItem('isMenu', e.key)
     localStorage.setItem('labelMenu', e.label)
+    localStorage.setItem('menu', false)
     setCollapsed(false)
+    setMenu(!menu)
   }
 
   if (location.pathname === '/u/login') {
@@ -99,13 +103,20 @@ const Sidebar = ({ permissions }) => {
 
   const handleOnClickMenu = () => {
     setMenu(!menu)
-    localStorage.setItem('menu', !menu)
+    localStorage.setItem('menu', false)
+  }
+  const handleOnClickMenuFast = (e) => {
+    setIsMenu(e.key)
+    setLabelMenu(e.label)
+    localStorage.setItem('isMenu', e.key)
+    localStorage.setItem('labelMenu', e.label)
+    setCollapsed(false)
+    localStorage.setItem('COLLAPSED_STATE', false)
   }
   const handleCheckboxChange = (e, itemKey) => {
     const newSelectedItems = e.target.checked
       ? [...selectedItems, itemKey]
       : selectedItems.filter((key) => key !== itemKey)
-
     setSelectedItems(newSelectedItems)
 
     localStorage.setItem('selectedMenuItems', JSON.stringify(newSelectedItems))
@@ -156,12 +167,14 @@ const Sidebar = ({ permissions }) => {
                       .map((item) =>
                         item.utilities ? (
                           <li key={item.key}>
-                            <a
-                              onClick={() => handleonclickMenu(item)}
-                              className="group relative flex justify-center rounded-lg px-2 py-2 border mb-2 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                            >
-                              {item.icon}
-                            </a>
+                              <Tooltip title={item.label} placement="right"> 
+                <a
+                  onClick={() => handleOnClickMenuFast(item)}
+                  className="group relative flex justify-center rounded-lg px-2 py-2 border mb-2 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                >
+                  {item.icon}
+                </a>
+              </Tooltip>
                           </li>
                         ) : null,
                       )}
@@ -237,7 +250,7 @@ const Sidebar = ({ permissions }) => {
               collapsedWidth={0}
               onCollapse={toggleSidebar}
               className={`${
-                collapsed ? 'p-0 border-none' : 'p-1 border-r'
+                collapsed ? 'p-0 border-none' : 'p-2 border-r'
               } h-screen overflow-auto scroll-container transition-all duration-300 ease-in-out`}
             >
               <SidebarContent
@@ -246,7 +259,7 @@ const Sidebar = ({ permissions }) => {
               />
               <div className="mb-5"></div>
               {!collapsed && (
-                <Text className="text-sm font-medium opacity-60">
+                <Text className="text-sm font-medium opacity-60 uppercase">
                   {labelMenu}
                 </Text>
               )}
@@ -267,7 +280,7 @@ const Sidebar = ({ permissions }) => {
                           title={
                             <span className="flex items-center justify-start">
                               {item.icon}
-                              <span className="ml-3">{t(item.label)}</span>
+                              <span className="ml-3 uppercase">{t(item.label)}</span>
                             </span>
                           }
                         >
@@ -277,7 +290,7 @@ const Sidebar = ({ permissions }) => {
                                 to={subItem.link}
                                 className="flex items-center justify-start"
                               >
-                                <span>{t(subItem.label)}</span>
+                                <span className="uppercase">{t(subItem.label)}</span>
                               </Link>
                             </Menu.Item>
                           ))}
@@ -293,7 +306,7 @@ const Sidebar = ({ permissions }) => {
                             className="flex items-center justify-start"
                           >
                             {item.icon}
-                            <span className="ml-3">{t(item.label)}</span>
+                            <span className="ml-3 uppercase">{t(item.label)}</span>
                           </Link>
                         </Menu.Item>
                       )

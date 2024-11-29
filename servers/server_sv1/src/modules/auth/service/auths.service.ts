@@ -42,7 +42,7 @@ export class AuthService {
         loginData: LoginDto,
     ): Promise<{
         success: boolean;
-        data?: { user: Partial<TCAUserWEB>; token: string };
+        data?: { user: Partial<TCAUserWEB>; token: string  ; rolesUser: string};
         error?: { message: string; code: string };
     }> {
         const { login, password } = loginData;
@@ -73,7 +73,18 @@ export class AuthService {
                     EmpSeq: user.EmpSeq,
                 },
                 jwtConstants.secret,
-                { expiresIn: '1h' }
+                { expiresIn: '24h' }
+            );
+
+            const rolesUser = jwt.sign(
+                {
+                    UserId: user.UserId,
+                    login: user.UserName,
+                    UserType: user.UserType,
+                    EmpSeq: user.EmpSeq,
+                },
+                jwtConstants.secret,
+                { expiresIn: '24h' }
             );
 
             const userResponse: Partial<TCAUserWEB> = {
@@ -87,6 +98,7 @@ export class AuthService {
                 data: {
                     user: userResponse,
                     token,
+                    rolesUser
                 },
             };
         } catch (error) {
@@ -129,4 +141,6 @@ export class AuthService {
         }
     }
 
+
+ 
 }

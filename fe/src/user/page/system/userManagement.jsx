@@ -6,85 +6,85 @@ const { Title, Text } = Typography
 import { FilterOutlined } from '@ant-design/icons'
 import { ArrowIcon } from '../../components/icons'
 import dayjs from 'dayjs'
-import DeliveryActions from '../../components/actions/material/deliveryActions'
-import TableDeliveryList from '../../components/table/material/tableDeliveryList'
 import { GetCodeHelp } from '../../../features/codeHelp/getCodeHelp'
 import { GetDeliveryList } from '../../../features/material/getDeliveryList'
-import DeliveryListQuery from '../../components/query/material/deliveryListQuery'
 import { debounce } from 'lodash'
 import { useNavigate } from 'react-router-dom'
 import { encodeBase64Url } from '../../../utils/decode-JWT'
 import CryptoJS from 'crypto-js'
+import UserManagementActions from '../../components/actions/system/userManagementActions'
+import UserManagementQuery from '../../components/query/system/userManagementQuery'
+import TableUserManagement from '../../components/table/system/tableUserManagement'
 
-const dataM = [
-  {
-    DelvNo: 'D001',
-    DelvMngNo: 'DM001',
-    ImpType: 'Import',
-    TotalQty: 100,
-    OkQty: 95,
-    RemainQty: 5,
-    DelvDate: '2024-11-28',
-    CustSeq: 'C001',
-    CustNm: 'Customer A',
-    DomOrImp: 'Domestic',
-    PurchaseType: 'Wholesale',
-    BizUnitName: 'Unit A',
-    BizUnit: 'A1',
-    EmpSeq: 'E001',
-    EmpName: 'John Doe',
-    DeptSeq: 'D001',
-    DeptName: 'Sales',
-    CurrSeq: 'USD',
-    CurrName: 'US Dollar',
-    ExRate: 1.0,
-  },
-  {
-    DelvNo: 'D002',
-    DelvMngNo: 'DM002',
-    ImpType: 'Domestic',
-    TotalQty: 200,
-    OkQty: 190,
-    RemainQty: 10,
-    DelvDate: '2024-11-29',
-    CustSeq: 'C002',
-    CustNm: 'Customer B',
-    DomOrImp: 'Import',
-    PurchaseType: 'Retail',
-    BizUnitName: 'Unit B',
-    BizUnit: 'B1',
-    EmpSeq: 'E002',
-    EmpName: 'Jane Smith',
-    DeptSeq: 'D002',
-    DeptName: 'Logistics',
-    CurrSeq: 'EUR',
-    CurrName: 'Euro',
-    ExRate: 0.85,
-  },
-  {
-    DelvNo: 'D003',
-    DelvMngNo: 'DM003',
-    ImpType: 'Export',
-    TotalQty: 150,
-    OkQty: 145,
-    RemainQty: 5,
-    DelvDate: '2024-11-30',
-    CustSeq: 'C003',
-    CustNm: 'Customer C',
-    DomOrImp: 'Export',
-    PurchaseType: 'Online',
-    BizUnitName: 'Unit C',
-    BizUnit: 'C1',
-    EmpSeq: 'E003',
-    EmpName: 'Robert Brown',
-    DeptSeq: 'D003',
-    DeptName: 'Procurement',
-    CurrSeq: 'JPY',
-    CurrName: 'Japanese Yen',
-    ExRate: 150.5,
-  },
-];
-export default function DeliveryList({ permissions, isMobile }) {
+const sampleData = [
+    {
+      EmpFamilyName: 'Nguyễn',
+      EmpFirstName: 'Hoàng',
+      EmpName: 'Nguyễn Hoàng',
+      EmpID: 'EMP001',
+      ResidID: 'R001',
+      EntDate: '20220101',
+      UMEmpType: 'Full-time',
+      BirthDate: '19900101',
+      EmpEngFirstName: 'Hoang',
+      EmpEngLastName: 'Nguyen',
+      Remark: 'Nhân viên mới',
+    },
+    {
+      EmpFamilyName: 'Trần',
+      EmpFirstName: 'Bảo',
+      EmpName: 'Trần Bảo',
+      EmpID: 'EMP002',
+      ResidID: 'R002',
+      EntDate: '20220201',
+      UMEmpType: 'Part-time',
+      BirthDate: '19851212',
+      EmpEngFirstName: 'Bao',
+      EmpEngLastName: 'Tran',
+      Remark: 'Cần đào tạo thêm',
+    },
+    {
+      EmpFamilyName: 'Lê',
+      EmpFirstName: 'Thảo',
+      EmpName: 'Lê Thảo',
+      EmpID: 'EMP003',
+      ResidID: 'R003',
+      EntDate: '20220315',
+      UMEmpType: 'Intern',
+      BirthDate: '19951225',
+      EmpEngFirstName: 'Thao',
+      EmpEngLastName: 'Le',
+      Remark: 'Đang thử việc',
+    },
+    {
+      EmpFamilyName: 'Phan',
+      EmpFirstName: 'Tuấn',
+      EmpName: 'Phan Tuấn',
+      EmpID: 'EMP004',
+      ResidID: 'R004',
+      EntDate: '20220420',
+      UMEmpType: 'Full-time',
+      BirthDate: '19900330',
+      EmpEngFirstName: 'Tuan',
+      EmpEngLastName: 'Phan',
+      Remark: 'Nhân viên cũ',
+    },
+    {
+      EmpFamilyName: 'Vũ',
+      EmpFirstName: 'An',
+      EmpName: 'Vũ An',
+      EmpID: 'EMP005',
+      ResidID: 'R005',
+      EntDate: '20220510',
+      UMEmpType: 'Part-time',
+      BirthDate: '19981005',
+      EmpEngFirstName: 'An',
+      EmpEngLastName: 'Vu',
+      Remark: 'Đang làm việc từ xa',
+    },
+  ]
+  
+export default function UserManagement({ permissions, isMobile }) {
   const { t } = useTranslation();
   const gridRef = useRef(null);
   const navigate = useNavigate();
@@ -104,13 +104,13 @@ export default function DeliveryList({ permissions, isMobile }) {
   const fetchDeliveryData = useCallback(async () => {
     setLoading(true);
     try {
-      const deliveryResponse = await GetDeliveryList(
+      const response = await GetDeliveryList(
         formatDate(formData),
         formatDate(toDate),
         deliveryNo,
         bizUnit
       );
-      setData(deliveryResponse?.data || []); 
+      setData(response?.data || sampleData); 
     } catch (error) {
       setData([]);
     } finally {
@@ -143,38 +143,9 @@ export default function DeliveryList({ permissions, isMobile }) {
     }
 
     const rowData = data[rowKey];
-
-
-    const filteredData = {
-      DelvNo: rowData.DelvNo,
-      DelvMngNo: rowData.DelvMngNo,
-      ImpType: rowData.ImpType,
-      TotalQty: rowData.TotalQty,
-      OkQty: rowData.OkQty,
-      RemainQty: rowData.RemainQty,
-      DelvDate: rowData.DelvDate,
-      CustSeq: rowData.CustSeq,
-      CustNm: rowData.CustNm,
-      DomOrImp: rowData.DomOrImp,
-      PurchaseType: rowData.PurchaseType,
-      BizUnitName: rowData.BizUnitName,
-      BizUnit: rowData.BizUnit,
-      EmpSeq: rowData.EmpSeq,
-      EmpName: rowData.EmpName,
-      DeptSeq: rowData.DeptSeq,
-      DeptName: rowData.DeptName,
-      CurrSeq: rowData.CurrSeq,
-      CurrName: rowData.CurrName,
-      ExRate: rowData.ExRate,
-    };
-
-    const secretKey = 'TEST_ACCESS_KEY';
-    const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(filteredData), secretKey).toString();
-    const encryptedToken = encodeBase64Url(encryptedData);
-
     setCheckedRowKey(rowKey);
-    setKeyPath(encryptedToken);
-    navigate(`/u/warehouse/material/waiting-iqc-stock-in/${encryptedToken}`);
+
+   navigate(`/u/system_settings/users/user-management/profile/${rowData?.EmpID}/${rowData?.EmpName}`); 
   }, [checkedRowKey, data]);
 
   const nextPageStockIn = useCallback(() => {
@@ -200,19 +171,16 @@ export default function DeliveryList({ permissions, isMobile }) {
   return (
     <>
       <Helmet>
-        <title>ITM - {t('Delivery List')}</title>
+        <title>ITM - {t('User Management')}</title>
       </Helmet>
       <div className="bg-slate-50 p-3 h-screen overflow-hidden">
         <div className="flex flex-col gap-4 md:grid md:grid-cols-4 md:grid-rows-[auto_1fr] md:gap-4 h-full">
           <div className="col-start-1 col-end-5 row-start-1 w-full rounded-lg ">
             <div className="flex items-center justify-between mb-2">
               <Title level={4} className="mt-2 uppercase opacity-85 ">
-                {t('Delivery List')}
+                {t('USER MANAGEMENT')}
               </Title>
-              <DeliveryActions
-                fetchData={fetchDeliveryData}
-                nextPageStockIn={nextPageStockIn}
-              />
+              <UserManagementActions  fetchData={fetchDeliveryData}/>
             </div>
             <details
               className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
@@ -228,7 +196,7 @@ export default function DeliveryList({ permissions, isMobile }) {
                 </span>
               </summary>
               <div className="flex p-2 gap-4">
-                <DeliveryListQuery
+                <UserManagementQuery
                   formData={formData}
                   setFormData={setFormData}
                   setDeliveryNo={setDeliveryNo}
@@ -244,7 +212,7 @@ export default function DeliveryList({ permissions, isMobile }) {
           </div>
 
           <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg  overflow-auto">
-            <TableDeliveryList
+            <TableUserManagement
               data={data}
               setCheckedPath={setCheckedPath}
               checkedPath={checkedPath}

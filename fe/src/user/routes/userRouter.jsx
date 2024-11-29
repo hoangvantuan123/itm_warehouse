@@ -23,6 +23,9 @@ const WaitingIqcStockIn = lazy(
 )
 
 const StockOutRequest = lazy(() => import('../page/material/stockOutRequest'))
+const UserManagement = lazy(() => import('../page/system/userManagement'))
+const RoleManagement = lazy(() => import('../page/system/roleManagement'))
+const ProfileUserId  = lazy(() => import('../page/system/profileUserId'))
 
 const { Content } = Layout
 
@@ -91,6 +94,54 @@ const UserRouter = () => {
                           />
                         ) : (
                           <StockOutRequest
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
+                        )
+                      }
+                    />
+                    <Route
+                      path="u/system_settings/users/user-management"
+                      element={
+                        checkActionPermission(userPermissions, '', '') ? (
+                          <UserManagement
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
+                        ) : (
+                          <UserManagement
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
+                        )
+                      }
+                    />
+                    <Route
+                      path="u/system_settings/users/user-management/profile/:id/:name"
+                      element={
+                        checkActionPermission(userPermissions, '', '') ? (
+                          <ProfileUserId
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
+                        ) : (
+                          <ProfileUserId
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
+                        )
+                      }
+                    />
+                    <Route
+                      path="u/system_settings/users/role-management"
+                      element={
+                        checkActionPermission(userPermissions, '', '') ? (
+                          <RoleManagement
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
+                        ) : (
+                          <RoleManagement
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />
