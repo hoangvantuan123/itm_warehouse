@@ -84,7 +84,7 @@ const dataM = [
     ExRate: 150.5,
   },
 ];
-export default function DeliveryList({ permissions, isMobile }) {
+export default function StockOutRequest({ permissions, isMobile }) {
   const { t } = useTranslation();
   const gridRef = useRef(null);
   const navigate = useNavigate();

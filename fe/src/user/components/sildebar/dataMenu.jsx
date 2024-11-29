@@ -96,6 +96,26 @@ export const menuSettingItems = [
         label: 'STOCK OUT REQUEST',
         link: '/u/warehouse/material/stock-out-request',
       },
+      {
+        key: 'material-1-5',
+        label: 'STOCK OUT (FIFO)',
+        link: '/u/warehouse/material/stock-out-fifo',
+      },
+      {
+        key: 'material-1-6',
+        label: 'MATERIAL STOCK IN',
+        link: '/u/warehouse/material/material-stock-in',
+      },
+      {
+        key: 'material-1-7',
+        label: 'CONVERT YYYYMM',
+        link: '/u/warehouse/material/convert-yyyymm',
+      },
+      {
+        key: 'material-1-8',
+        label: 'MATERIAL STOCK IN (BULKID)',
+        link: '/u/warehouse/material/material-stock-in-bulkid',
+      },
     ],
   },
   {

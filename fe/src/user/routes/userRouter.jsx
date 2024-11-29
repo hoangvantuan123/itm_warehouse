@@ -16,11 +16,13 @@ import BreadcrumbRouter from '../components/sildebar/breadcrumb'
 import Spinner from '../page/default/load'
 import ViewTest from '../page/test/viewTest'
 import Home from '../page/home/home'
-
+import Login from '../auth/login'
 const DeliveryList = lazy(() => import('../page/material/deliveryList'))
 const WaitingIqcStockIn = lazy(
-  () => import('../page/material/waitingIqcStockIn'),
+  () => import('../page/material/waitingIqcStockIn')
 )
+
+const StockOutRequest = lazy(() => import('../page/material/stockOutRequest'))
 
 const { Content } = Layout
 
@@ -34,6 +36,9 @@ const UserRouter = () => {
 
   return (
     <Routes>
+
+
+      <Route path="u/login" element={<Login />} />
       <Route
         path="/*"
         element={
@@ -70,6 +75,22 @@ const UserRouter = () => {
                           />
                         ) : (
                           <WaitingIqcStockIn
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
+                        )
+                      }
+                    />
+                    <Route
+                      path="u/warehouse/material/stock-out-request"
+                      element={
+                        checkActionPermission(userPermissions, '', '') ? (
+                          <StockOutRequest
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
+                        ) : (
+                          <StockOutRequest
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />

@@ -79,6 +79,14 @@ function TableTransferWaitingIqcStockIn({ sampleTableA, sampleTableB , gridRefA}
       width: 150,
     },
     {
+      name: 'LotNoFull',
+      header: 'LotNoFull',
+      sortable: true,
+      filter: 'text',
+      resizable: true,
+      width: 150,
+    },
+    {
       name: 'Qty',
       header: 'Qty',
       sortable: true,
@@ -106,6 +114,7 @@ function TableTransferWaitingIqcStockIn({ sampleTableA, sampleTableB , gridRefA}
       name: 'Barcode',
       header: 'Barcode',
       sortable: true,
+      filter: 'text',
       resizable: true,
       width: 150,
     },
@@ -152,14 +161,6 @@ function TableTransferWaitingIqcStockIn({ sampleTableA, sampleTableB , gridRefA}
     {
       name: 'InvoiceNo',
       header: 'InvoiceNo',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 150,
-    },
-    {
-      name: 'BizUnit',
-      header: 'BizUnit',
       sortable: true,
       filter: 'text',
       resizable: true,

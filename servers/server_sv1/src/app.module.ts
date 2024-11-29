@@ -9,7 +9,7 @@ import { sqlServerITMV20240117 } from './config/database.config';
 import { APP_FILTER } from '@nestjs/core';
 import { StockInModule } from './modules/material/module/stockIn.module';
 import { CodeHelpComboQueryModule } from './modules/codeHelp/module/codeHelpComboQuery.module';
-
+import { AuthsModule } from './modules/auth/module/auths.module';
 
 @Module({
   imports: [
@@ -22,7 +22,8 @@ import { CodeHelpComboQueryModule } from './modules/codeHelp/module/codeHelpComb
       name: 'ITMV20240117',
     }),
     StockInModule,
-    CodeHelpComboQueryModule
+    CodeHelpComboQueryModule,
+    AuthsModule
   ],
   providers: [{
     provide: APP_FILTER,

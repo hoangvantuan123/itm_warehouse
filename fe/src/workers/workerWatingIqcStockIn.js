@@ -14,16 +14,19 @@ function checkBarcode(barcode, tableData, tableScanHistory) {
   const dc = parts[3] // Date Code
   const reel = parts[4] // Reel
 
+
   const item = tableData.find((item) => item.ItemNo === code)
   const existingBarcode = tableScanHistory.find(
     (item) => item.Barcode === barcode,
   )
+
   if (existingBarcode) {
     return {
       success: false,
       message: 'Barcode đã được quét trước đó',
     }
   }
+
   if (!item) {
     return {
       success: false,
@@ -55,7 +58,12 @@ function checkBarcode(barcode, tableData, tableScanHistory) {
 }
 
 self.onmessage = function (event) {
-  const { type, barcode, tableData, tableScanHistory } = event.data
+  const {
+    type,
+    barcode,
+    tableData,
+    tableScanHistory
+  } = event.data
   let result
 
   switch (type) {

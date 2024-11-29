@@ -15,9 +15,12 @@ import ModalWaitingIqcStockIn from '../../components/modal/material/modalWaiting
 import { SMaterialQRCheckWeb } from '../../../features/material/postSMaterialQRCheck'
 import ErrorPage from '../../components/modal/default/errorPage'
 import { GetSUGGetActiveDeliveryItem } from '../../../features/material/getSUGGetActiveDeliveryItem'
-import { debounce } from 'lodash'
+import debounce from 'lodash.debounce';
 import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../../utils/constants'
 import { CheckAllProceduresStockIn } from '../../../features/material/postCheckAllProceduresStockIn'
+import LoadSubmit from '../default/loadSubmit'
+import SuccessSubmit from '../default/successSubmit'
+
 
 const dataB = [
   {
@@ -99,6 +102,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
 
   const gridRef = useRef(null)
   const [inputCode, setInputCode] = useState(null)
+  const [inputBarCode, setInputBarCode] = useState(null)
   const [result, setResult] = useState(null);
   const [loadingSave, setLoadingSave] = useState(false)
   const [data, setData] = useState([])
@@ -106,75 +110,11 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const dataRef = useRef(data)
   const [modal2Open, setModal2Open] = useState(false)
   const [modal3Open, setModal3Open] = useState(false)
+  const [modal4Open, setModal4Open] = useState(false)
+  const [modal5Open, setModal5Open] = useState(false)
   const [error, setError] = useState(null)
-  const [scanHistory, setScanHistory] = useState([{
-    WHName: 'Warehouse A',
-    ItemNo: 'A12345',
-    LotNo: 'L001',
-    Qty: 100,
-    DateCode: '202311',
-    ReelNo: 'R001',
-    Barcode: '123456789012',
-    CreateDate: '2023-11-20',
-    RegDate: '2023-11-21',
-    YYWW: '2347',
-    YYMM: '2311',
-    YYMMDD: '231120',
-    InvoiceNo: 'INV001',
-    BizUnit: 'BU001',
-    DateIn: '2023-11-19',
-  },
-  {
-    WHName: 'Warehouse B',
-    ItemNo: 'B67890',
-    LotNo: 'L002',
-    Qty: 200,
-    DateCode: '202312',
-    ReelNo: 'R002',
-    Barcode: '987654321098',
-    CreateDate: '2023-12-01',
-    RegDate: '2023-12-02',
-    YYWW: '2348',
-    YYMM: '2312',
-    YYMMDD: '231201',
-    InvoiceNo: 'INV002',
-    BizUnit: 'BU002',
-    DateIn: '2023-11-30',
-  },
-  {
-    WHName: 'Warehouse C',
-    ItemNo: 'C54321',
-    LotNo: 'L003',
-    Qty: 150,
-    DateCode: '202401',
-    ReelNo: 'R003',
-    Barcode: '111222333444',
-    CreateDate: '2024-01-10',
-    RegDate: '2024-01-11',
-    YYWW: '2402',
-    YYMM: '2401',
-    YYMMDD: '240110',
-    InvoiceNo: 'INV003',
-    BizUnit: 'BU003',
-    DateIn: '2024-01-09',
-  },
-  {
-    WHName: 'Warehouse D',
-    ItemNo: 'D11223',
-    LotNo: 'L004',
-    Qty: 300,
-    DateCode: '202402',
-    ReelNo: 'R004',
-    Barcode: '555666777888',
-    CreateDate: '2024-02-15',
-    RegDate: '2024-02-16',
-    YYWW: '2407',
-    YYMM: '2402',
-    YYMMDD: '240215',
-    InvoiceNo: 'INV004',
-    BizUnit: 'BU004',
-    DateIn: '2024-02-14',
-  },])
+  const [successMessage, setSuccessMessage] = useState(null)
+  const [scanHistory, setScanHistory] = useState([])
   const dataRefSacenHistory = useRef(scanHistory)
   const [status, setStatus] = useState(false)
   const [filteredData, setFilteredData] = useState(null)
@@ -237,22 +177,144 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     }
   }, [id])
 
-  useEffect(() => {
-    dataRef.current = data
-    dataRefSacenHistory.current = scanHistory
-  }, [data, scanHistory])
+  const handleCheckBarcode = useCallback((barcode) => {
+    const currentTableData = dataRef.current;
+    const currentScanHistory = dataRefSacenHistory.current;
 
+    // Gửi message tới worker
+    workerRef.current.postMessage({
+      type: 'CHECK_BARCODE',
+      barcode,
+      tableData: currentTableData,
+      tableScanHistory: currentScanHistory,
+    });
+  }, []);
+
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.key === 'Enter' && bufferRef.current.trim()) {
+        const barcode = bufferRef.current.trim();
+        handleCheckBarcode(barcode);
+        setInputCode(barcode);
+        bufferRef.current = '';
+      } else if (e.key.length === 1) {
+        bufferRef.current += e.key;
+      }
+    };
+
+    const handleFocus = () => setStatus(true);
+
+    const handleBlur = () => setStatus(false);
+
+    const handleClick = () => setStatus(true);
+
+    window.addEventListener('keypress', handleKeyPress);
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('blur', handleBlur);
+    document.addEventListener('click', handleClick);
+
+    return () => {
+      window.removeEventListener('keypress', handleKeyPress);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('blur', handleBlur);
+      document.removeEventListener('click', handleClick);
+    };
+  }, []);
+
+  const addToScanHistory = useCallback((dataResSuccess) => {
+    setScanHistory((prevHistory) => [
+      ...prevHistory,
+      {
+        SMImpKind: dataResSuccess?.SMImpKind,
+        ItemNo: dataResSuccess?.ItemNo,
+        LotNo: dataResSuccess?.LotNo,
+        Qty: dataResSuccess?.Qty,
+        DateCode: dataResSuccess?.DateCode,
+        ReelNo: dataResSuccess?.ReelNo,
+        Barcode: dataResSuccess?.Barcode,
+        ItemSeq: dataResSuccess?.ItemSeq,
+        WHSeq: dataResSuccess?.WHSeq,
+        WHName: dataResSuccess?.WHName,
+        CreateDate: dataResSuccess?.CreateDate,
+        RegDate: dataResSuccess?.RegDate,
+        YYWW: dataResSuccess?.YYWW,
+        YYMM: dataResSuccess?.YYMM,
+        YYMMDD: dataResSuccess?.YYMMDD,
+        InvoiceNo: dataResSuccess?.InvoiceNo,
+        PermitSerl: dataResSuccess?.PermitSerl,
+        PermitSeq: dataResSuccess?.PermitSeq,
+        EmpSeq: dataResSuccess?.EmpSeq,
+        EmpName: dataResSuccess?.EmpName,
+        DeptSeq: dataResSuccess?.DeptSeq,
+        DeptName: dataResSuccess?.DeptName,
+        CurrSeq: dataResSuccess?.CurrSeq,
+        CurrName: dataResSuccess?.CurrName,
+        ExRate: dataResSuccess?.ExRate,
+        Price: dataResSuccess?.Price,
+        CurAmt: dataResSuccess?.CurAmt,
+        DomPrice: dataResSuccess?.DomPrice,
+        DomAmt: dataResSuccess?.DomAmt,
+        LotNoFull: dataResSuccess?.LotNoFull,
+        StdUnitSeq: dataResSuccess?.StdUnitSeq,
+        STDUnitName: dataResSuccess?.STDUnitName,
+        UnitSeq: dataResSuccess?.UnitSeq,
+        UnitName: dataResSuccess?.UnitName,
+        CustSeq: dataResSuccess?.CustSeq,
+        CustName: dataResSuccess?.CustName,
+        ItemName: dataResSuccess?.ItemName,
+        Spec: dataResSuccess?.Spec,
+        DateIn: dataResSuccess?.DateIn,
+        StdQty: dataResSuccess?.StdQty,
+        FromAmt: dataResSuccess?.FromAmt,
+        FromVAT: dataResSuccess?.FromVAT,
+        BizUnit: dataResSuccess?.BizUnit,
+        SMImpKindName: dataResSuccess?.SMImpKindName,
+        PermitNo: dataResSuccess?.PermitNo,
+      },
+    ]);
+  }, []);
+
+  const debouncedCheckBarcode = useCallback(
+    debounce(async (formData, resultMessage) => {
+      const resSuccess = await SMaterialQRCheckWeb(formData);
+      if (resSuccess.success) {
+        const dataResSuccess = resSuccess.data[0];
+        message.success(resultMessage);
+        setInputBarCode(null);
+        setModal2Open(false);
+        setInputCode(null);
+        setYYWW(dataResSuccess?.YYWW);
+        setYYYYMM(dataResSuccess?.YYMM);
+        setData((prevData) =>
+          prevData.map((item) =>
+            item.ItemNo === formData.itemNo
+              ? {
+                ...item,
+                OkQty: item.OkQty + formData.qty,
+                RemainQty: item.RemainQty - formData.qty,
+              }
+              : item
+          )
+        );
+        addToScanHistory(dataResSuccess);
+      } else {
+        setModal2Open(true);
+        setError(resSuccess?.message);
+      }
+    }, 100),
+    [addToScanHistory]
+  );
+  
   useEffect(() => {
     workerRef.current = new Worker(
-      new URL('../../../workers/workerWatingIqcStockIn.js', import.meta.url),
-    )
+      new URL('../../../workers/workerWatingIqcStockIn.js', import.meta.url)
+    );
 
     workerRef.current.onmessage = async (event) => {
-      const { success, message: resultMessage, data: resultData } = event.data
+      const { success, message: resultMessage, data: resultData } = event.data;
       if (success) {
         if (resultData) {
-          const { itemNo, qty, lot, dc, reel, barcode, permitSerl, permitSeq } =
-            resultData
+          const { itemNo, qty, lot, dc, reel, barcode, permitSerl, permitSeq } = resultData;
 
           const formData = {
             workingTag: 'A',
@@ -272,131 +334,37 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
             dateCode: dc,
             reelNo: reel,
             barcode: barcode,
-          }
-          const resSuccess = await SMaterialQRCheckWeb(formData)
-          if (resSuccess.success) {
-            const dataResSuccess = resSuccess.data[0]
-            message.success(resultMessage)
-            setYYWW(dataResSuccess?.YYWW)
-            setYYYYMM(dataResSuccess?.YYMM)
-            setData((prevData) =>
-              prevData.map((item) =>
-                item.ItemNo === itemNo
-                  ? {
-                    ...item,
-                    OkQty: item.OkQty + qty,
-                    RemainQty: item.RemainQty - qty,
-                  }
-                  : item,
-              ),
-            )
+          };
 
-            setScanHistory((prevHistory) => [
-              ...prevHistory,
-              {
-                SMImpKind: dataResSuccess?.SMImpKind,
-                ItemNo: dataResSuccess?.ItemNo,
-                LotNo: dataResSuccess?.LotNo,
-                Qty: dataResSuccess?.Qty,
-                DateCode: dataResSuccess?.DateCode,
-                ReelNo: dataResSuccess?.ReelNo,
-                Barcode: dataResSuccess?.Barcode,
-                ItemSeq: dataResSuccess?.ItemSeq,
-                WHSeq: dataResSuccess?.WHSeq,
-                WHName: dataResSuccess?.WHName,
-                CreateDate: dataResSuccess?.CreateDate,
-                RegDate: dataResSuccess?.RegDate,
-                YYWW: dataResSuccess?.YYWW,
-                YYMM: dataResSuccess?.YYMM,
-                YYMMDD: dataResSuccess?.YYMMDD,
-                InvoiceNo: dataResSuccess?.InvoiceNo,
-                PermitSerl: dataResSuccess?.PermitSerl,
-                PermitSeq: dataResSuccess?.PermitSeq,
-                EmpSeq: dataResSuccess?.EmpSeq,
-                EmpName: dataResSuccess?.EmpName,
-                DeptSeq: dataResSuccess?.DeptSeq,
-                DeptName: dataResSuccess?.DeptName,
-                CurrSeq: dataResSuccess?.CurrSeq,
-                CurrName: dataResSuccess?.CurrName,
-                ExRate: dataResSuccess?.ExRate,
-                Price: dataResSuccess?.Price,
-                CurAmt: dataResSuccess?.CurAmt,
-                DomPrice: dataResSuccess?.DomPrice,
-                DomAmt: dataResSuccess?.DomAmt,
-                LotNoFull: dataResSuccess?.LotNoFull,
-                StdUnitSeq: dataResSuccess?.StdUnitSeq,
-                STDUnitName: dataResSuccess?.STDUnitName,
-                UnitSeq: dataResSuccess?.UnitSeq,
-                UnitName: dataResSuccess?.UnitName,
-                CustSeq: dataResSuccess?.CustSeq,
-                CustName: dataResSuccess?.CustName,
-                ItemName: dataResSuccess?.ItemName,
-                Spec: dataResSuccess?.Spec,
-                DateIn: dataResSuccess?.DateIn,
-                StdQty: dataResSuccess?.StdQty,
-                FromAmt: dataResSuccess?.FromAmt,
-                FromVAT: dataResSuccess?.FromVAT,
-                BizUnit: dataResSuccess?.BizUnit,
-                SMImpKindName: dataResSuccess?.SMImpKindName,
-                PermitNo: dataResSuccess?.PermitNo
-              },
-            ])
-          } else {
-            setModal2Open(true)
-            setError(resSuccess?.message)
-          }
+          debouncedCheckBarcode(formData, resultMessage);
         }
       } else {
-        setModal2Open(true)
-        setError(resultMessage)
+        setModal2Open(true);
+        setError(resultMessage);
       }
-    }
+    };
 
     return () => {
-      workerRef.current.terminate()
-    }
-  }, [filteredData])
+      workerRef.current.terminate();
+      debouncedCheckBarcode.cancel();
+    };
+  }, [filteredData, debouncedCheckBarcode]);
 
-  const handleCheckBarcode = (barcode) => {
-    workerRef.current.postMessage({
-      type: 'CHECK_BARCODE',
-      barcode,
-      tableData: dataRef.current,
-      tableScanHistory: dataRefSacenHistory.current,
-    })
-  }
+
 
   useEffect(() => {
-    const handleKeyPress = (e) => {
-      if (e.key === 'Enter' && bufferRef.current.trim()) {
-        const barcode = bufferRef.current.trim();
-        handleCheckBarcode(barcode);
-        setInputCode(barcode);
-        bufferRef.current = '';
-      } else if (e.key.length === 1) {
-        bufferRef.current += e.key;
-      }
-    };
-  
-    const handleFocus = () => setStatus(true);
-  
-    const handleBlur = () => setStatus(false);
-  
-    const handleClick = () => setStatus(true);
-  
-    window.addEventListener('keypress', handleKeyPress);
-    window.addEventListener('focus', handleFocus);
-    window.addEventListener('blur', handleBlur);
-    document.addEventListener('click', handleClick);
-  
-    return () => {
-      window.removeEventListener('keypress', handleKeyPress);
-      window.removeEventListener('focus', handleFocus);
-      window.removeEventListener('blur', handleBlur);
-      document.removeEventListener('click', handleClick);
-    };
-  }, []);
-  
+    dataRef.current = data
+    dataRefSacenHistory.current = scanHistory
+  }, [data, scanHistory])
+
+
+
+
+  const handleInputChange = (e) => {
+    bufferRef.current = e.target.value;
+    setInputCode(e.target.value)
+  };
+
 
   /* SAVE */
   const createXmlDataCloseCheck = (data) => {
@@ -546,44 +514,15 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   </DataBlock1>
 `;
 
-
-  /* const handleSubmit = useCallback(async (e) => {
-    e.preventDefault();
-    setLoadingSave(true);
-    setResult(null);
-
-    const xmlForCloseCheck = createXmlDataCloseCheck(filteredData);
-    const xmlForCloseItemCheck = scanHistory.map(createXmlDataBlock).join('\n');
-    const xmlForMasterCheck = createXmlDataMasterCheck(scanHistory);
-    const xmlForSheetCheck = scanHistory.map(createXmlDataBlock2).join('\n');
-    const xmlForLotNoMasterCheck = scanHistory.map(createXmlDataBlock3).join('\n');
-
-    try {
-      const response = await CheckAllProceduresStockIn(scanHistory, {
-        closeCheckXML: xmlForCloseCheck,
-        closeItemCheckXML: xmlForCloseItemCheck,
-        masterCheckXML: xmlForMasterCheck,
-        sheetCheckXML: xmlForSheetCheck,
-        sheetLotNoMasterCheckXML: xmlForLotNoMasterCheck,
-      });
-      console.log("response", response)
-      setResult(response);
-    } catch (error) {
-      setResult({ error: error.message });
-    } finally {
-      setLoadingSave(false);
-    }
-  }, [filteredData, scanHistory]); */
-
-
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     setLoadingSave(true);
     setResult(null);
+    setModal4Open(true);
     if (scanHistory.length === 0) {
-      setModal2Open(true); 
-      setError("Chưa có dữ liệu để gửi. Vui lòng quét dữ liệu trước khi gửi."); 
-      return; 
+      setModal2Open(true);
+      setError("Chưa có dữ liệu để gửi. Vui lòng quét dữ liệu trước khi gửi.");
+      return;
     }
     const xmlForCloseCheck = createXmlDataCloseCheck(filteredData);
     const xmlForCloseItemCheck = scanHistory.map(createXmlDataBlock).join('\n');
@@ -602,12 +541,18 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
 
       setResult(response);
       if (response.success) {
-        message.success('Tất cả các quy trình đã được thực thi thành công!');
-        setScanHistory([])
+        setModal4Open(false);
+        setModal5Open(true);
+        setSuccessMessage('Tất cả các dữ liệu đã được thực thi thành công!');
+        setScanHistory([]);
+        fetchDeliveryData(filteredData?.DelvNo, filteredData?.PurchaseType)
       } else {
-        message.error(`Lỗi: ${response.message}`);
+        setModal4Open(false);
+        setModal2Open(true)
+        setError(response.message)
       }
     } catch (error) {
+      setModal4Open(false);
       setResult({ error: error.message });
       setModal2Open(true)
       setError(error.message)
@@ -616,32 +561,41 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     }
   }, [filteredData, scanHistory]);
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(async (e) => {
+    e.preventDefault();
+    if (scanHistory.length === 0) {
+      setModal2Open(true)
+      setError('Không có dữ liệu nào để xóa.')
+      return;
+    }
     if (gridRef.current) {
-      const gridInstance = gridRef.current.getInstance(); 
-      const selectedRows = gridInstance.getCheckedRows(); 
+      const gridInstance = gridRef.current.getInstance();
+      const selectedRows = gridInstance.getCheckedRows();
       const remainingRows = scanHistory.filter(
         (row) => !selectedRows.find((selectedRow) => selectedRow.Barcode === row.Barcode)
       );
       setScanHistory(remainingRows);
     }
-  };
-  const handleRestFrom = () => {
+  }, [scanHistory]);
+
+
+  const handleRestFrom = useCallback(async (e) => {
+    e.preventDefault();
     if (scanHistory.length === 0) {
       setModal2Open(true)
       setError('Không có dữ liệu để reset! Vui lòng quét dữ liệu trước.')
-      return; 
+      return;
     }
-  
     setScanHistory([]);
-    fetchDeliveryData();
+    fetchDeliveryData(filteredData?.DelvNo, filteredData?.PurchaseType)
     message.success('Reset form thành công!');
-  };
-  
-  const handleUploadExcel = () =>{
+  }, [filteredData, scanHistory]);
+
+  const handleUploadExcel = useCallback(async (e) => {
+    e.preventDefault();
     setModal2Open(true)
     setError('Chức năng đang trong quá trình phát triển?')
-  }
+  }, []);
   return (
     <>
       <Helmet>
@@ -677,7 +631,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
                 </span>
               </summary>
               <div className="flex p-2 gap-4">
-                <WaitingIqcStockInQuery    filteredData={filteredData}  YYWW={YYWW} YYYYMM={YYYYMM}/>
+                <WaitingIqcStockInQuery handleCheckBarcode={handleCheckBarcode} inputBarCode={inputBarCode} setInputBarCode={setInputBarCode} filteredData={filteredData} YYWW={YYWW} YYYYMM={YYYYMM} bufferRef={bufferRef} handleInputChange={handleInputChange} />
               </div>
             </details>
           </div>
@@ -697,6 +651,8 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
         setModal2Open={setModal2Open}
         error={error}
       />
+      <LoadSubmit setModal4Open={setModal4Open} modal4Open={modal4Open} />
+      <SuccessSubmit setModal5Open={setModal5Open} modal5Open={modal5Open} successMessage={successMessage} />
       <ErrorPage modal3Open={modal3Open} setModal3Open={setModal3Open} />
     </>
   )

@@ -156,11 +156,11 @@ export default function Login({ fetchPermissions }) {
         <title>{t('auth.login')}</title>
       </Helmet>
       <div className="min-h-screen flex flex-col lg:flex-row items-center justify-center overflow-hidden">
-        <div className="hidden lg:flex lg:w-1/2 h-screen items-center justify-center">
+        <div className="hidden  lg:flex lg:w-1/2 h-screen items-center justify-center">
           <BgCarousel />
         </div>
 
-        <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-5 pt-36">
+        <div className="w-full  lg:w-1/2 flex flex-col items-center justify-center p-5 pt-36">
           <div className="flex flex-col items-center top-20 absolute">
             <img src={Logo} alt="Company Logo" className="w-60 h-auto mb-4" />
           </div>
