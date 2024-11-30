@@ -27,6 +27,8 @@ import Login from '../auth/login'
 import decodeJWT from '../../utils/decode-JWT'
 import { transformDataMenu } from '../../utils/transformDataMenu'
 import ErrorPage from '../page/default/errorPage'
+import BarcodePrint from '../page/barcodePrint/barcodePrint'
+import BarcodeChange from '../page/barcodePrint/barcodeChange'
 const DeliveryList = lazy(() => import('../page/material/deliveryList'))
 const WaitingIqcStockIn = lazy(
   () => import('../page/material/waitingIqcStockIn'),
@@ -93,7 +95,7 @@ const UserRouter = () => {
     }
   }, [])
 
-  const skippedRoutes = ['/u/login', '/u/home']
+  const skippedRoutes = ['/u/login', '/u/home', '/u/warehouse/warehousing/barcode-change']
 
   const checkLoginStatus = () => {
     const token = Cookies.get('a_a')
@@ -293,6 +295,42 @@ const UserRouter = () => {
                         ) : (
                           <ErrorPage />
                         )
+                      }
+                    />
+
+                    <Route
+                      path="/u/warehouse/warehousing/barcode-print"
+                      element={
+                        checkActionPermission(
+                          userPermissions,
+                          'warehousing-1-1',
+                          'View',
+                        ) ? (
+                          <BarcodePrint
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
+                        ) : (
+                          <ErrorPage />
+                        )
+                      }
+                    />
+
+                    <Route
+                      path="/u/warehouse/warehousing/barcode-change"
+                      element={
+                        // checkActionPermission(
+                        //   userPermissions,
+                        //   'warehousing-1-2',
+                        //   'View',
+                        // ) ? (
+                          <BarcodeChange
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
+                        // ) : (
+                        //   <ErrorPage />
+                        // )
                       }
                     />
                     <Route
