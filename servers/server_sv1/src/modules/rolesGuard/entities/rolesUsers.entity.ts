@@ -1,37 +1,42 @@
 import {
-    Entity,
-    Column,
-    PrimaryGeneratedColumn,
-    OneToMany,
-    Timestamp,
-  } from 'typeorm';
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  Timestamp,
+} from 'typeorm';
 
 @Entity('_TCARolesUsers_WEB')
-export class TCAGroupUsersWEB {
+export class TCARolesUsersWEB {
 
-    @PrimaryGeneratedColumn()
-    Id: number;
-  
-    @Column({ default: false })
-    View: boolean;
-  
-    @Column({ default: false })
-    Edit: boolean;
-  
-    @Column({ default: false })
-    Create: boolean;
-  
-    @Column({ default: false })
-    Delete: boolean;
-    
-    @Column({ nullable: true })
-    MenuId: number;
-  
-    @Column({ nullable: true })
-    GroupId: number;
+  @PrimaryGeneratedColumn()
+  Id: number;
 
-    @Column({ type: 'nvarchar', length: 100, nullable: true })
-    ProjectType: string | null;
+  @Column({ default: false })
+  View: boolean;
+
+  @Column({ default: false })
+  Edit: boolean;
+
+  @Column({ default: false })
+  Create: boolean;
+
+  @Column({ default: false })
+  Delete: boolean;
+
+
+  @Column({ nullable: true })
+  MenuId: number;
+
+  @Column({ nullable: true })
+  GroupId: number;
+
+  @Column({ nullable: true })
+  UserId: string;
+
+
+  @Column({ type: 'nvarchar', length: 100, nullable: true })
+  ProjectType: string | null;
 
 
 }

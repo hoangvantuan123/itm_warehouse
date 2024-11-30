@@ -19,6 +19,6 @@ export class UserAuthService {
             throw new NotFoundException(`User with login ${UserId} not found`);
         }
     }
-    
+
 
 }

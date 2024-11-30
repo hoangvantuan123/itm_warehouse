@@ -15,6 +15,7 @@ import CryptoJS from 'crypto-js'
 import UserManagementQuery from '../../components/query/system/userManagementQuery'
 import RoleManagementActions from '../../components/actions/system/roleManagementActions'
 import TableRoleManagement from '../../components/table/system/tableRoleManagement'
+import DrawerAddUserGroups from '../../components/drawer/system/addUserGroups'
 
 
 export default function RoleManagement({ permissions, isMobile }) {
@@ -32,7 +33,8 @@ export default function RoleManagement({ permissions, isMobile }) {
   const [keyPath, setKeyPath] = useState(null);
   const [checkedPath, setCheckedPath] = useState(false);
   const formatDate = useCallback((date) => date.format('YYYYMMDD'), []);
-
+  const [isModalOpenAddUserGroups, setIsModalOpenAddUserGroups] =
+    useState(false)
   const fetchDeliveryData = useCallback(async () => {
     setLoading(true);
     try {
@@ -42,7 +44,7 @@ export default function RoleManagement({ permissions, isMobile }) {
         deliveryNo,
         bizUnit
       );
-      setData(deliveryResponse?.data || []); 
+      setData(deliveryResponse?.data || []);
     } catch (error) {
       setData([]);
     } finally {
@@ -129,6 +131,15 @@ export default function RoleManagement({ permissions, isMobile }) {
       debouncedFetchCodeHelpData.cancel();
     };
   }, [debouncedFetchCodeHelpData]);
+
+
+  const openModalAddUserGroups = () => {
+    setIsModalOpenAddUserGroups(true)
+  }
+  const closeModalAddUserGroups = () => {
+    setIsModalOpenAddUserGroups(false)
+  }
+
   return (
     <>
       <Helmet>
@@ -141,7 +152,7 @@ export default function RoleManagement({ permissions, isMobile }) {
               <Title level={4} className="mt-2 uppercase opacity-85 ">
                 {t('Role Management')}
               </Title>
-              <RoleManagementActions  fetchData={fetchDeliveryData}/>
+              <RoleManagementActions fetchData={fetchDeliveryData} openModalAddUserGroups={openModalAddUserGroups} />
             </div>
           </div>
 
@@ -158,6 +169,9 @@ export default function RoleManagement({ permissions, isMobile }) {
             />
           </div>
         </div>
+
+        <DrawerAddUserGroups isOpen={isModalOpenAddUserGroups}
+          onClose={closeModalAddUserGroups} />
       </div>
     </>
   )

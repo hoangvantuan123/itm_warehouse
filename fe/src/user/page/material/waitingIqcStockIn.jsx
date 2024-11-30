@@ -177,17 +177,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     }
   }, [id])
 
-  const handleCheckBarcode = useCallback((barcode) => {
-    const currentTableData = dataRef.current;
-    const currentScanHistory = dataRefSacenHistory.current;
 
-    workerRef.current.postMessage({
-      type: 'CHECK_BARCODE',
-      barcode,
-      tableData: currentTableData,
-      tableScanHistory: currentScanHistory,
-    });
-  }, []);
 
   useEffect(() => {
     const handleKeyPress = (e) => {
@@ -221,57 +211,76 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   }, []);
 
   const addToScanHistory = useCallback((dataResSuccess) => {
-    setScanHistory((prevHistory) => [
-      ...prevHistory,
-      {
-        SMImpKind: dataResSuccess?.SMImpKind,
-        ItemNo: dataResSuccess?.ItemNo,
-        LotNo: dataResSuccess?.LotNo,
-        Qty: dataResSuccess?.Qty,
-        DateCode: dataResSuccess?.DateCode,
-        ReelNo: dataResSuccess?.ReelNo,
-        Barcode: dataResSuccess?.Barcode,
-        ItemSeq: dataResSuccess?.ItemSeq,
-        WHSeq: dataResSuccess?.WHSeq,
-        WHName: dataResSuccess?.WHName,
-        CreateDate: dataResSuccess?.CreateDate,
-        RegDate: dataResSuccess?.RegDate,
-        YYWW: dataResSuccess?.YYWW,
-        YYMM: dataResSuccess?.YYMM,
-        YYMMDD: dataResSuccess?.YYMMDD,
-        InvoiceNo: dataResSuccess?.InvoiceNo,
-        PermitSerl: dataResSuccess?.PermitSerl,
-        PermitSeq: dataResSuccess?.PermitSeq,
-        EmpSeq: dataResSuccess?.EmpSeq,
-        EmpName: dataResSuccess?.EmpName,
-        DeptSeq: dataResSuccess?.DeptSeq,
-        DeptName: dataResSuccess?.DeptName,
-        CurrSeq: dataResSuccess?.CurrSeq,
-        CurrName: dataResSuccess?.CurrName,
-        ExRate: dataResSuccess?.ExRate,
-        Price: dataResSuccess?.Price,
-        CurAmt: dataResSuccess?.CurAmt,
-        DomPrice: dataResSuccess?.DomPrice,
-        DomAmt: dataResSuccess?.DomAmt,
-        LotNoFull: dataResSuccess?.LotNoFull,
-        StdUnitSeq: dataResSuccess?.StdUnitSeq,
-        STDUnitName: dataResSuccess?.STDUnitName,
-        UnitSeq: dataResSuccess?.UnitSeq,
-        UnitName: dataResSuccess?.UnitName,
-        CustSeq: dataResSuccess?.CustSeq,
-        CustName: dataResSuccess?.CustName,
-        ItemName: dataResSuccess?.ItemName,
-        Spec: dataResSuccess?.Spec,
-        DateIn: dataResSuccess?.DateIn,
-        StdQty: dataResSuccess?.StdQty,
-        FromAmt: dataResSuccess?.FromAmt,
-        FromVAT: dataResSuccess?.FromVAT,
-        BizUnit: dataResSuccess?.BizUnit,
-        SMImpKindName: dataResSuccess?.SMImpKindName,
-        PermitNo: dataResSuccess?.PermitNo,
-      },
-    ]);
+    const newLotNoFull = dataResSuccess?.LotNoFull?.trim().toLowerCase();
+    const newBarcode = dataResSuccess?.Barcode?.trim().toLowerCase();
+  
+    // Kiểm tra xem dữ liệu đã tồn tại trong scanHistory chưa
+    setScanHistory((prevHistory) => {
+      // Kiểm tra trùng lặp trong prevHistory (là mảng cập nhật từ lần gọi trước)
+      const isExist = prevHistory.some(item =>
+        item.LotNoFull?.trim().toLowerCase() === newLotNoFull &&
+        item.Barcode?.trim().toLowerCase() === newBarcode
+      );
+  
+      // Nếu không trùng lặp, thêm dữ liệu mới vào mảng
+      if (!isExist) {
+        return [
+          ...prevHistory,
+          {
+            SMImpKind: dataResSuccess?.SMImpKind,
+            ItemNo: dataResSuccess?.ItemNo,
+            LotNo: dataResSuccess?.LotNo,
+            Qty: dataResSuccess?.Qty,
+            DateCode: dataResSuccess?.DateCode,
+            ReelNo: dataResSuccess?.ReelNo,
+            Barcode: dataResSuccess?.Barcode,
+            ItemSeq: dataResSuccess?.ItemSeq,
+            WHSeq: dataResSuccess?.WHSeq,
+            WHName: dataResSuccess?.WHName,
+            CreateDate: dataResSuccess?.CreateDate,
+            RegDate: dataResSuccess?.RegDate,
+            YYWW: dataResSuccess?.YYWW,
+            YYMM: dataResSuccess?.YYMM,
+            YYMMDD: dataResSuccess?.YYMMDD,
+            InvoiceNo: dataResSuccess?.InvoiceNo,
+            PermitSerl: dataResSuccess?.PermitSerl,
+            PermitSeq: dataResSuccess?.PermitSeq,
+            EmpSeq: dataResSuccess?.EmpSeq,
+            EmpName: dataResSuccess?.EmpName,
+            DeptSeq: dataResSuccess?.DeptSeq,
+            DeptName: dataResSuccess?.DeptName,
+            CurrSeq: dataResSuccess?.CurrSeq,
+            CurrName: dataResSuccess?.CurrName,
+            ExRate: dataResSuccess?.ExRate,
+            Price: dataResSuccess?.Price,
+            CurAmt: dataResSuccess?.CurAmt,
+            DomPrice: dataResSuccess?.DomPrice,
+            DomAmt: dataResSuccess?.DomAmt,
+            LotNoFull: dataResSuccess?.LotNoFull,
+            StdUnitSeq: dataResSuccess?.StdUnitSeq,
+            STDUnitName: dataResSuccess?.STDUnitName,
+            UnitSeq: dataResSuccess?.UnitSeq,
+            UnitName: dataResSuccess?.UnitName,
+            CustSeq: dataResSuccess?.CustSeq,
+            CustName: dataResSuccess?.CustName,
+            ItemName: dataResSuccess?.ItemName,
+            Spec: dataResSuccess?.Spec,
+            DateIn: dataResSuccess?.DateIn,
+            StdQty: dataResSuccess?.StdQty,
+            FromAmt: dataResSuccess?.FromAmt,
+            FromVAT: dataResSuccess?.FromVAT,
+            BizUnit: dataResSuccess?.BizUnit,
+            SMImpKindName: dataResSuccess?.SMImpKindName,
+            PermitNo: dataResSuccess?.PermitNo,
+          },
+        ];
+      }
+  
+      // Nếu dữ liệu đã tồn tại, không thay đổi gì
+      return prevHistory;
+    });
   }, []);
+  
 
   const debouncedCheckBarcode = useCallback(
     debounce(async (formData, resultMessage) => {
@@ -303,7 +312,17 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     }, 100),
     [addToScanHistory]
   );
-  
+  const handleCheckBarcode = useCallback((barcode) => {
+    const currentTableData = dataRef.current;
+    const currentScanHistory = dataRefSacenHistory.current;
+
+    workerRef.current.postMessage({
+      type: 'CHECK_BARCODE',
+      barcode,
+      tableData: currentTableData,
+      tableScanHistory: currentScanHistory,
+    });
+  }, []);
   useEffect(() => {
     workerRef.current = new Worker(
       new URL('../../../workers/workerWatingIqcStockIn.js', import.meta.url)

@@ -12,7 +12,7 @@ export class TCAGroupsWEB {
     @PrimaryGeneratedColumn()
     Id: number;
   
-    @Column({ nullable: false })
+    @Column({ nullable: true })
     Name: string;
     
     @Column({ type: 'nvarchar', length: 100, nullable: true })

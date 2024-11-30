@@ -7,7 +7,7 @@ import '../../../../static/css/customTabe.css'
 import { encodeBase64Url } from '../../../../utils/decode-JWT'
 import CryptoJS from 'crypto-js'
 
-  
+
 function TableUserManagement({
   data,
   loading,
@@ -19,68 +19,42 @@ function TableUserManagement({
 }) {
   const navigate = useNavigate()
   const columns = [
-    { name: 'EmpFamilyName', header: 'Họ', sortable: true, filter: 'text',    resizable: true,
-        width: 140 },
-    { name: 'EmpFirstName', header: 'Tên', sortable: true, filter: 'text',    resizable: true,
-        width: 140 },
     {
-      name: 'EmpName',
-      header: 'Họ và Tên',
-      width: 220,
+      name: 'UserSeq',
+      header: 'UserSeq',
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 140
-    },
-    { name: 'EmpID', header: 'Mã nhân viên', sortable: true, filter: 'text' ,    resizable: true,
-        width: 140},
-    { name: 'ResidID', header: 'ResidID', sortable: true, filter: 'text',    resizable: true,
-        width: 140 },
-    {
-      name: 'EntDate',
-      header: 'Ngày gia nhập',
-
-      sortable: true,
-      filter: 'text',
-     
-      resizable: true,
-      width: 140
+      width: 240
     },
     {
-      name: 'UMEmpType',
-      header: 'Loại nhân viên',
-
+      name: 'UserName',
+      header: 'UserName',
       sortable: true,
       filter: 'text',
       resizable: true,
-      width: 140
+      width: 240
     },
     {
-      name: 'BirthDate',
-      header: 'Ngày sinh',
-      resizable: true,
-      width: 140,
-      sortable: true
-    
+      name: 'UserId', header: 'UserId', sortable: true, filter: 'text', resizable: true,
+      width: 200
     },
     {
-      name: 'EmpEngFirstName',
-      header: 'Tên Tiếng Anh',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 140
+      name: 'DeptSeq', header: 'DeptSeq', sortable: true, filter: 'text', resizable: true,
+      width: 200
     },
     {
-      name: 'EmpEngLastName',
-      header: 'Họ Tiếng Anh',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 140
+      name: 'Remark', header: 'Remark', sortable: true, filter: 'text', resizable: true,
+      width: 200
     },
-    { name: 'Remark', header: 'Ghi chú', sortable: true, filter: 'text' ,   resizable: true,
-        width: 140},
+    {
+      name: 'LoginDate', header: 'LoginDate', sortable: true, filter: 'text', resizable: true,
+      width: 200
+    },
+    {
+      name: 'LoginStatus', header: 'LoginStatus', sortable: true, filter: 'text', resizable: true,
+      width: 200
+    },
   ]
 
 
@@ -91,7 +65,7 @@ function TableUserManagement({
     }
   }, [checkedPath])
 
- 
+
 
   TuiGrid.applyTheme('striped')
 

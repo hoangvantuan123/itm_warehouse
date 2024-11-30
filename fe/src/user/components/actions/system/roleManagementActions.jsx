@@ -2,15 +2,23 @@ import { useState } from 'react'
 import { Button } from 'antd'
 import {
   SaveOutlined,
-  DeleteOutlined,
-  UploadOutlined,
-  SearchOutlined,
+  PlusOutlined,
 } from '@ant-design/icons'
 
-export default function RoleManagementActions({ fetchData }) {
+export default function RoleManagementActions({ fetchData, openModalAddUserGroups }) {
   return (
     <div className="flex items-center gap-2">
-         <Button
+      <Button
+        key="Save"
+        type="primary"
+        icon={<PlusOutlined />}
+        size="middle"
+        onClick={openModalAddUserGroups}
+        className="w-full  uppercase rounded-lg h-full border-gray-200 bg-indigo-600 text-white shadow-sm text-sm"
+      >
+        ADD
+      </Button>
+      <Button
         key="Save"
         type="primary"
         icon={<SaveOutlined />}
@@ -20,7 +28,7 @@ export default function RoleManagementActions({ fetchData }) {
       >
         Save
       </Button>
-     
+
     </div>
   )
 }

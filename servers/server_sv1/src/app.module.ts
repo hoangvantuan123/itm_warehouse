@@ -10,6 +10,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { StockInModule } from './modules/material/module/stockIn.module';
 import { CodeHelpComboQueryModule } from './modules/codeHelp/module/codeHelpComboQuery.module';
 import { AuthsModule } from './modules/auth/module/auths.module';
+import { RolesUsersModule } from './modules/rolesGuard/module/rolesUsers.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { AuthsModule } from './modules/auth/module/auths.module';
     }),
     StockInModule,
     CodeHelpComboQueryModule,
-    AuthsModule
+    AuthsModule,
+    RolesUsersModule
   ],
   providers: [{
     provide: APP_FILTER,

@@ -13,12 +13,14 @@ import { jwtConstants } from 'src/config/security.config';
 import * as crypto from 'crypto';
 import { LoginDto } from '../dto/login.dto';
 import * as bcrypt from 'bcrypt';
+import { DatabaseService } from 'src/common/database/sqlServer/ITMV20240117/database.service';
 
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly userAuthService: UserAuthService,
+        private readonly databaseService: DatabaseService,
         @InjectRepository(TCAUserWEB)
         private readonly userWEBRepository: Repository<TCAUserWEB>) { }
     private async hashPassword(password: string): Promise<string> {
@@ -38,17 +40,17 @@ export class AuthService {
         return iv.toString('hex') + encrypted;
     }
 
-    async loginUserMes(
+    async loginUserB(
         loginData: LoginDto,
     ): Promise<{
         success: boolean;
-        data?: { user: Partial<TCAUserWEB>; token: string  ; rolesUser: string};
+        data?: { user: Partial<TCAUserWEB>; token: string; rolesUser: string };
         error?: { message: string; code: string };
     }> {
         const { login, password } = loginData;
 
         try {
-            const user = await this.userAuthService.findAuthByEmpID(login);
+            const user = await this.databaseService.findAuthByEmpID(login);
 
             if (!user) {
                 throw new NotFoundException('User not found');
@@ -68,9 +70,12 @@ export class AuthService {
             const token = jwt.sign(
                 {
                     UserId: user.UserId,
-                    login: user.UserName,
-                    UserType: user.UserType,
+                    Login: user.UserName,
+                    UserSeq: user.UserSeq,
                     EmpSeq: user.EmpSeq,
+                    Remark: user.Remark,
+                    CompanySeq: user.CompanySeq
+
                 },
                 jwtConstants.secret,
                 { expiresIn: '24h' }
@@ -79,20 +84,21 @@ export class AuthService {
             const rolesUser = jwt.sign(
                 {
                     UserId: user.UserId,
-                    login: user.UserName,
-                    UserType: user.UserType,
-                    EmpSeq: user.EmpSeq,
+                    Login: user.UserName,
+                    UserSeq: user.UserSeq
                 },
-                jwtConstants.secret,
-                { expiresIn: '24h' }
+                jwtConstants.secret
             );
 
-            const userResponse: Partial<TCAUserWEB> = {
+            const userResponse: Partial<any> = {
                 UserId: user.UserId,
-                EmpSeq: user.EmpSeq,
-                Remark: user.Remark,
+                UserName: user.UserName,
+                CompanySeq: user.CompanySeq,
+                CustSeq: user.CustSeq,
+                DeptSeq: user.DeptSeq,
+                UserType: user.UserType,
+                ProjectType: "B"
             };
-
             return {
                 success: true,
                 data: {
@@ -142,5 +148,5 @@ export class AuthService {
     }
 
 
- 
+
 }

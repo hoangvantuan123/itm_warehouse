@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection, QueryRunner } from 'typeorm';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from 'src/common/utils/constants';
@@ -45,6 +45,24 @@ export class DatabaseService {
 
       return { message: 'Query executed successfully', result: result };
     } catch (error) {
+      throw error;
+    }
+  }
+
+
+  async findAuthByEmpID(UserId: string): Promise<any> {
+    const query = `SELECT * FROM _TCAUser_WEB WHERE UserId = '${UserId}'`;
+
+    try {
+      const result = await this.queryRunner.query(query);
+
+      if (!result || result.length === 0) {
+        throw new NotFoundException(`User with UserId ${UserId} not found`);
+      }
+
+      return result[0];
+    } catch (error) {
+      console.error(`Error executing query for UserId ${UserId}:`, error);
       throw error;
     }
   }

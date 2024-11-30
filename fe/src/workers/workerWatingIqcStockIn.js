@@ -1,3 +1,4 @@
+
 function checkBarcode(barcode, tableData, tableScanHistory) {
   if (!barcode || !Array.isArray(tableData)) {
     return {
