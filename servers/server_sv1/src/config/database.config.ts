@@ -44,3 +44,26 @@ export const sqlServerITMV20240117: TypeOrmModuleOptions = {
   },
   maxQueryExecutionTime: 1000
 }
+
+
+export const mysqlITMBARCODE: TypeOrmModuleOptions = {
+  type: 'mysql',
+  host: '192.168.35.130',
+  port: 3306,
+  username: 'admin',
+  password: 'dreamtech#@1',
+  database: 'ITMBARCODE',
+  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+  synchronize: false,
+  logging: true,
+  cache: true,
+  extra: {
+    trustServerCertificate: true,
+    encrypt: false,
+    connectionTimeout: 5000,
+    max: 100,
+    min: 10,
+    idleTimeoutMillis: 30000,
+  },
+  maxQueryExecutionTime: 1000
+}

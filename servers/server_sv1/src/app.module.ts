@@ -5,9 +5,13 @@ import { Connection } from 'typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { HealthController } from './health.controller';
-import {  sqlServerITMV20240117 } from './config/database.config';
+import { mysqlITMBARCODE, sqlServerITMV20240117 } from './config/database.config';
 import { APP_FILTER } from '@nestjs/core';
 import { UsersModule } from './modules/users/module/users.module';
+import { StockOutRequestModule } from './modules/material_stock_out_req/modules/stockOutRequest.modules';
+import { PrinterModule } from './modules/printer/module/printer.module';
+import { LabelModule } from './modules/label/module/label.module';
+import { PrintBarcodeModule } from './modules/print_barcode/modules/printBarcodeModule';
 
 @Module({
   imports: [
@@ -19,7 +23,15 @@ import { UsersModule } from './modules/users/module/users.module';
       ...sqlServerITMV20240117,
       name: 'ITMV20240117', 
     }),
-    UsersModule
+    TypeOrmModule.forRoot({
+      ...mysqlITMBARCODE,
+      name: 'ITMBARCODE', 
+    }),
+    UsersModule,
+    StockOutRequestModule,
+    PrinterModule,
+    LabelModule,
+    PrintBarcodeModule
   ],
   providers: [{
     provide: APP_FILTER,
@@ -30,14 +42,16 @@ import { UsersModule } from './modules/users/module/users.module';
 export class AppModule implements OnModuleInit {
   constructor(
     @InjectConnection('ITMV20240117') private readonly connection2: Connection, 
+    @InjectConnection('ITMBARCODE') private readonly conITMBARCODE: Connection, 
   ) { }
 
   async onModuleInit() {
     
 
-    if (this.connection2.isConnected) {
-      console.log('ITMV20240117 connected');
-    } else {
+    if ( this.conITMBARCODE.isConnected){
+      console.log('ITMBARCODE connected');
+    } 
+    else {
       console.error('Failed to connect to the second database');
     }
   }

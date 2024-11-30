@@ -13,6 +13,9 @@ import Cookies from 'js-cookie'
 import { useTranslation } from 'react-i18next'
 import { checkActionPermission } from '../../permissions'
 import Spinner from '../page/default/load'
+import StockOutRequest from '../page/material/stockOutRequest'
+import LabelPrint from '../page/label/label'
+import BarcodePrint from '../page/barcodePrint/barcodePrint'
 
 const DeliveryList = lazy(() => import('../page/material/deliveryList'))
 const WaitingIqcStockIn = lazy(() => import('../page/material/waitingIqcStockIn'))
@@ -38,7 +41,7 @@ const UserRouter = () => {
               <Content>
                 <Suspense fallback={<Spinner />}>
                   <Routes>
-                  
+
                     <Route
                       path="u/material/delivery-list"
                       element={
@@ -69,6 +72,72 @@ const UserRouter = () => {
                             isMobile={isMobile}
                           />
                         )
+                      }
+                    />
+
+                    <Route
+                      path="u/material/stock-out-request"
+                      element={
+
+                        <StockOutRequest
+                          permissions={userPermissions}
+                          isMobile={isMobile}
+                        />
+                        // checkActionPermission(userPermissions, '', '') ? (
+                        //   <StockOutRequest
+                        //     permissions={userPermissions}
+                        //     isMobile={isMobile}
+                        //   />
+                        // ) : (
+                        //   <StockOutRequest
+                        //     permissions={userPermissions}
+                        //     isMobile={isMobile}
+                        //   />
+                        // )
+                      }
+                    />
+
+                    <Route
+                      path="u/material/label-design"
+                      element={
+
+                        <LabelPrint
+                          permissions={userPermissions}
+                          isMobile={isMobile}
+                        />
+                        // checkActionPermission(userPermissions, '', '') ? (
+                        //   <StockOutRequest
+                        //     permissions={userPermissions}
+                        //     isMobile={isMobile}
+                        //   />
+                        // ) : (
+                        //   <StockOutRequest
+                        //     permissions={userPermissions}
+                        //     isMobile={isMobile}
+                        //   />
+                        // )
+                      }
+                    />
+
+                    <Route
+                      path="/u/warehouse/barcode-print"
+                      element={
+
+                        <BarcodePrint
+                          permissions={userPermissions}
+                          isMobile={isMobile}
+                        />
+                        // checkActionPermission(userPermissions, '', '') ? (
+                        //   <StockOutRequest
+                        //     permissions={userPermissions}
+                        //     isMobile={isMobile}
+                        //   />
+                        // ) : (
+                        //   <StockOutRequest
+                        //     permissions={userPermissions}
+                        //     isMobile={isMobile}
+                        //   />
+                        // )
                       }
                     />
 

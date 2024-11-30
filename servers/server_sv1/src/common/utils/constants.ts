@@ -28,7 +28,8 @@ export const ERROR_MESSAGES = {
   EXECUTING_QUERY: "Error executing query",
   DATABASE_ERROR: "Error executing database",
   ERROR_ITMV20240117: "Failed to connect to the database ITMV20240117.",
-  ERROR_DUP: "An error occurred, please review the data."
+  ERROR_DUP: "An error occurred, please review the data.",
+  ERROR_ITMBARCODE: "Failed to connect to the database ITMBARCODE.",
 };
 
 
@@ -41,5 +42,7 @@ export const SUCCESS_MESSAGES = {
   RECORD_UPDATED: 'Record updated successfully',
   RECORD_DELETED: 'Record deleted successfully',
   BATCHES_INSERTED: 'Batch inserted successfully',
-  SUCCESS_ITMV20240117: 'Successfully connected to the database ITMV20240117.'
+  SUCCESS_ITMV20240117: 'Successfully connected to the database ITMV20240117.',
+  SUCCESS_ITMBARCODE: 'Successfully connected to the database ITMBARCODE.'
+
 };

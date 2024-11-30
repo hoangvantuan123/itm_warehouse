@@ -47,6 +47,7 @@
     "moment": "^2.30.1",
     "moment-timezone": "^0.5.46",
     "node-cron": "^3.0.3",
+    "node-zpl": "^1.0.5",
     "pako": "^2.1.0",
     "papaparse": "^5.4.1",
     "re-resizable": "^6.9.11",
