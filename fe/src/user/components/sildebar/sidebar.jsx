@@ -1,4 +1,12 @@
-import { Layout, Menu, Typography, Checkbox, Dropdown, Button, Tooltip } from 'antd'
+import {
+  Layout,
+  Menu,
+  Typography,
+  Checkbox,
+  Dropdown,
+  Button,
+  Tooltip,
+} from 'antd'
 import { Link } from 'react-router-dom'
 import { useLocation } from 'react-router-dom'
 import { useState, useEffect } from 'react'
@@ -41,7 +49,6 @@ const Sidebar = ({ permissions }) => {
     const savedMenuState = localStorage.getItem('menu')
     return savedMenuState ? JSON.parse(savedMenuState) : true
   })
-
 
   const [isMenu, setIsMenu] = useState(localStorage.getItem('isMenu') || null)
   const [labelMenu, setLabelMenu] = useState(
@@ -167,14 +174,14 @@ const Sidebar = ({ permissions }) => {
                       .map((item) =>
                         item.utilities ? (
                           <li key={item.key}>
-                              <Tooltip title={item.label} placement="right"> 
-                <a
-                  onClick={() => handleOnClickMenuFast(item)}
-                  className="group relative flex justify-center rounded-lg px-2 py-2 border mb-2 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                >
-                  {item.icon}
-                </a>
-              </Tooltip>
+                            <Tooltip title={item.label} placement="right">
+                              <a
+                                onClick={() => handleOnClickMenuFast(item)}
+                                className="group relative flex justify-center rounded-lg px-2 py-2 border mb-2 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                              >
+                                {item.icon}
+                              </a>
+                            </Tooltip>
                           </li>
                         ) : null,
                       )}
@@ -280,7 +287,9 @@ const Sidebar = ({ permissions }) => {
                           title={
                             <span className="flex items-center justify-start">
                               {item.icon}
-                              <span className="ml-3 uppercase">{t(item.label)}</span>
+                              <span className="ml-3 uppercase">
+                                {t(item.label)}
+                              </span>
                             </span>
                           }
                         >
@@ -290,7 +299,9 @@ const Sidebar = ({ permissions }) => {
                                 to={subItem.link}
                                 className="flex items-center justify-start"
                               >
-                                <span className="uppercase">{t(subItem.label)}</span>
+                                <span className="uppercase">
+                                  {t(subItem.label)}
+                                </span>
                               </Link>
                             </Menu.Item>
                           ))}
@@ -306,7 +317,9 @@ const Sidebar = ({ permissions }) => {
                             className="flex items-center justify-start"
                           >
                             {item.icon}
-                            <span className="ml-3 uppercase">{t(item.label)}</span>
+                            <span className="ml-3 uppercase">
+                              {t(item.label)}
+                            </span>
                           </Link>
                         </Menu.Item>
                       )

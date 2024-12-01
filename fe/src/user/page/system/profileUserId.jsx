@@ -23,43 +23,46 @@ const items = [
   {
     key: '3',
     label: 'Security',
-    children: <SecurityProfileID/>,
-  }
-  
+    children: <SecurityProfileID />,
+  },
 ]
-  
+
 export default function ProfileUserId({ permissions, isMobile }) {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const { id , name} = useParams()
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const { id, name } = useParams()
   const onChange = (key) => {
     console.log(key)
   }
   return (
-<>
-  <Helmet>
-    <title>ITM - {t('User Management')}</title>
-  </Helmet>
-  <div className="bg-slate-50 p-2 h-screen overflow-hidden">
-  <div className="flex flex-col gap-6 md:grid md:grid-cols-4 md:grid-rows-[auto_1fr] md:gap-6 h-full">
-  <div className="col-start-1 col-end-5 row-start-1 w-full rounded-lg ">
-    
-      <div className="left-16 flex gap-4 items-end">
-        <div className="h-32 w-32 rounded-lg bg-slate-500"></div>
-        <div>
-          <Title level={4}>Hoang Van Tuan</Title>
-          <Text>VM3240288</Text>
+    <>
+      <Helmet>
+        <title>ITM - {t('User Management')}</title>
+      </Helmet>
+      <div className="bg-slate-50 p-2 h-screen overflow-hidden">
+        <div className="flex flex-col gap-6 md:grid md:grid-cols-4 md:grid-rows-[auto_1fr] md:gap-6 h-full">
+          <div className="col-start-1 col-end-5 row-start-1 w-full rounded-lg ">
+            <div className="left-16 flex gap-4 items-end">
+              <div className="h-32 w-32 rounded-lg bg-slate-500"></div>
+              <div>
+                <Title level={4}>Hoang Van Tuan</Title>
+                <Text>VM3240288</Text>
+              </div>
+            </div>
+          </div>
+          <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg   overflow-auto">
+            <div className="w-full h-full ">
+              <Tabs
+                defaultActiveKey="1"
+                type="card"
+                size="small"
+                items={items}
+                onChange={onChange}
+              />
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-    <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg   overflow-auto">
-    <div className="w-full h-full ">
-        <Tabs defaultActiveKey="1"   type="card" size="small" items={items} onChange={onChange} />
-      </div>
-      </div>
-  </div>
-</div>
-
-</>
+    </>
   )
 }

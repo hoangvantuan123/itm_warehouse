@@ -34,10 +34,7 @@ CMD ["pm2-runtime", "start", "npm", "--", "run", "start"]
 
 ## pm2 start http-server --name "my-react-app" -- -p 3000 ./dist
 
-
-
-
-<!-- 
+<!--
 const createXmlDataBlock = (row, index) => `
   <DataBlock2>
     <WorkingTag>A</WorkingTag>
@@ -46,14 +43,14 @@ const createXmlDataBlock = (row, index) => `
     <Status>0</Status>
     <Selected>0</Selected>
     <TABLE_NAME>DataBlock2</TABLE_NAME>
-    <ServiceSeq>4492</ServiceSeq> 
+    <ServiceSeq>4492</ServiceSeq>
     <MethodSeq>2</MethodSeq>
-    <BizUnit>${row?.BizUnit}</BizUnit> 
+    <BizUnit>${row?.BizUnit}</BizUnit>
     <Date>${row?.DateIn}</Date>
-    <DeptSeq>${row?.DeptSeq}</DeptSeq> 
+    <DeptSeq>${row?.DeptSeq}</DeptSeq>
     <BizUnitOld>${row?.BizUnit}</BizUnitOld>
-    <DateOld>${row?.DateIn}</DateOld> 
-    <DeptSeqOld>${row?.DeptSeq}</DeptSeqOld> 
+    <DateOld>${row?.DateIn}</DateOld>
+    <DeptSeqOld>${row?.DeptSeq}</DeptSeqOld>
   </DataBlock2>
 `;
 
@@ -113,9 +110,9 @@ const callHandelSubmitSheet = useCallback(
       return;
     }
 
-    const xmlData = scanHistory.map(createXmlDataBlock).join('\n');  
+    const xmlData = scanHistory.map(createXmlDataBlock).join('\n');
 
-    return SCOMCloseItemCheckWEB(xmlData)  
+    return SCOMCloseItemCheckWEB(xmlData)
       .then((req) => {
         if (req.success) {
           message.success(SUCCESS_MESSAGES.DELETE_DATA);
@@ -138,9 +135,9 @@ const callSSLImpDelvSheetCheck = useCallback(
       return;
     }
 
-    const xmlData = scanHistory.map(createXmlDataBlock2).join('\n');  
+    const xmlData = scanHistory.map(createXmlDataBlock2).join('\n');
 
-    return SSLImpDelvSheetCheck(xmlData)  
+    return SSLImpDelvSheetCheck(xmlData)
       .then((req) => {
         if (req.success) {
           message.success(SUCCESS_MESSAGES.DELETE_DATA);
@@ -172,7 +169,7 @@ const callSCOMCloseCheckWEB = useCallback(() => {
     dtlUnitSeq: '1',
   };
 
-  return SCOMCloseCheckWEB(formData)  
+  return SCOMCloseCheckWEB(formData)
     .then((response) => {
       if (response.success) {
         message.success('SCOMCloseCheckWEB: Thành công!');
@@ -181,7 +178,7 @@ const callSCOMCloseCheckWEB = useCallback(() => {
       }
     })
     .catch((error) => {
-      throw error; 
+      throw error;
     });
 }, [filteredData]);
 
@@ -193,10 +190,10 @@ const callSSLImpDelvMasterCheckWEB = useCallback(() => {
     dataSeq: '1',
     selected: '1',
     isChangedMst: '1',
-    
+
   };
 
-  return SSLImpDelvMasterCheckWEB(formData)  
+  return SSLImpDelvMasterCheckWEB(formData)
     .then((response) => {
       if (response.success) {
         message.success('SSLImpDelvMasterCheckWEB: Thành công!');
@@ -205,14 +202,14 @@ const callSSLImpDelvMasterCheckWEB = useCallback(() => {
       }
     })
     .catch((error) => {
-      throw error; 
+      throw error;
     });
 }, [filteredData]);
 
 
 
 const handleSubmit = () => {
-  Promise.all([callSCOMCloseCheckWEB(), callHandelSubmitSheet(), callSSLImpDelvMasterCheckWEB(), callSSLImpDelvSheetCheck()])  
+  Promise.all([callSCOMCloseCheckWEB(), callHandelSubmitSheet(), callSSLImpDelvMasterCheckWEB(), callSSLImpDelvSheetCheck()])
     .then(() => {
       message.success('Cả hai API đã được xử lý thành công!');
     })

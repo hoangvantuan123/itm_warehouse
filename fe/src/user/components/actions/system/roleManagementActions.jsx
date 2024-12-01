@@ -1,11 +1,8 @@
 import { useState } from 'react'
 import { Button } from 'antd'
-import {
-  SaveOutlined,
-  PlusOutlined,
-} from '@ant-design/icons'
+import { SaveOutlined, PlusOutlined } from '@ant-design/icons'
 
-export default function RoleManagementActions({ fetchData, openModalAddUserGroups }) {
+export default function RoleManagementActions({ openModalAddUserGroups }) {
   return (
     <div className="flex items-center gap-2">
       <Button
@@ -16,7 +13,7 @@ export default function RoleManagementActions({ fetchData, openModalAddUserGroup
         onClick={openModalAddUserGroups}
         className="w-full  uppercase rounded-lg h-full border-gray-200 bg-indigo-600 text-white shadow-sm text-sm"
       >
-        ADD
+        ADD GROUP
       </Button>
       <Button
         key="Save"
@@ -28,7 +25,6 @@ export default function RoleManagementActions({ fetchData, openModalAddUserGroup
       >
         Save
       </Button>
-
     </div>
   )
 }

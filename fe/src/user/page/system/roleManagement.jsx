@@ -14,124 +14,52 @@ import { encodeBase64Url } from '../../../utils/decode-JWT'
 import CryptoJS from 'crypto-js'
 import UserManagementQuery from '../../components/query/system/userManagementQuery'
 import RoleManagementActions from '../../components/actions/system/roleManagementActions'
-import TableRoleManagement from '../../components/table/system/tableRoleManagement'
 import DrawerAddUserGroups from '../../components/drawer/system/addUserGroups'
-
+import { GetAllResGroups } from '../../../features/system/getGroups'
+import ViewRoleManagement from '../../components/view/system/viewRoleManagement'
 
 export default function RoleManagement({ permissions, isMobile }) {
-  const { t } = useTranslation();
-  const gridRef = useRef(null);
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState([]);
-  const [dataUnit, setDataUnit] = useState([]);
-  const [formData, setFormData] = useState(dayjs().startOf('month'));
-  const [toDate, setToDate] = useState(dayjs());
-  const [deliveryNo, setDeliveryNo] = useState('');
-  const [bizUnit, setBizUnit] = useState(4);
-  const [checkedRowKey, setCheckedRowKey] = useState(null);
-  const [keyPath, setKeyPath] = useState(null);
-  const [checkedPath, setCheckedPath] = useState(false);
-  const formatDate = useCallback((date) => date.format('YYYYMMDD'), []);
+  const { t } = useTranslation()
+  const gridRef = useRef(null)
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
+  const [data, setData] = useState([])
+  const [dataUnit, setDataUnit] = useState([])
+  const [groups, setGroups] = useState([])
+  const [formData, setFormData] = useState(dayjs().startOf('month'))
+  const [toDate, setToDate] = useState(dayjs())
+  const [deliveryNo, setDeliveryNo] = useState('')
+  const [bizUnit, setBizUnit] = useState(4)
+  const [checkedRowKey, setCheckedRowKey] = useState(null)
+  const [keyPath, setKeyPath] = useState(null)
+  const [checkedPath, setCheckedPath] = useState(false)
+  const formatDate = useCallback((date) => date.format('YYYYMMDD'), [])
   const [isModalOpenAddUserGroups, setIsModalOpenAddUserGroups] =
     useState(false)
-  const fetchDeliveryData = useCallback(async () => {
-    setLoading(true);
+
+  const fetchDataGroups = useCallback(async () => {
+    setLoading(true)
     try {
-      const deliveryResponse = await GetDeliveryList(
-        formatDate(formData),
-        formatDate(toDate),
-        deliveryNo,
-        bizUnit
-      );
-      setData(deliveryResponse?.data || []);
+      const response = await GetAllResGroups()
+      setGroups(response.data.data || [])
     } catch (error) {
-      setData([]);
+      setGroups([])
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [formData, toDate, deliveryNo, bizUnit, formatDate]);
+  }, [])
 
-  const fetchCodeHelpData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const codeHelpResponse = await GetCodeHelp('', 6, 10003, 1, '%', '', '', '', '');
-      setDataUnit(codeHelpResponse?.data || []);
-    } catch (error) {
-      setDataUnit([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const debouncedFetchDeliveryData = useMemo(() => debounce(fetchDeliveryData, 100), [fetchDeliveryData]);
-  const debouncedFetchCodeHelpData = useMemo(() => debounce(fetchCodeHelpData, 100), [fetchCodeHelpData]);
-
-  const handleCheck = useCallback((ev) => {
-    const { rowKey } = ev;
-    const gridInstance = gridRef.current?.getInstance();
-    const previousCheckedRowKey = checkedRowKey;
-
-    if (previousCheckedRowKey !== null && gridInstance) {
-      gridInstance.uncheck(previousCheckedRowKey);
-    }
-
-    const rowData = data[rowKey];
-
-
-    const filteredData = {
-      DelvNo: rowData.DelvNo,
-      DelvMngNo: rowData.DelvMngNo,
-      ImpType: rowData.ImpType,
-      TotalQty: rowData.TotalQty,
-      OkQty: rowData.OkQty,
-      RemainQty: rowData.RemainQty,
-      DelvDate: rowData.DelvDate,
-      CustSeq: rowData.CustSeq,
-      CustNm: rowData.CustNm,
-      DomOrImp: rowData.DomOrImp,
-      PurchaseType: rowData.PurchaseType,
-      BizUnitName: rowData.BizUnitName,
-      BizUnit: rowData.BizUnit,
-      EmpSeq: rowData.EmpSeq,
-      EmpName: rowData.EmpName,
-      DeptSeq: rowData.DeptSeq,
-      DeptName: rowData.DeptName,
-      CurrSeq: rowData.CurrSeq,
-      CurrName: rowData.CurrName,
-      ExRate: rowData.ExRate,
-    };
-
-    const secretKey = 'TEST_ACCESS_KEY';
-    const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(filteredData), secretKey).toString();
-    const encryptedToken = encodeBase64Url(encryptedData);
-
-    setCheckedRowKey(rowKey);
-    setKeyPath(encryptedToken);
-    navigate(`/u/warehouse/material/waiting-iqc-stock-in/${encryptedToken}`);
-  }, [checkedRowKey, data]);
-
-  const nextPageStockIn = useCallback(() => {
-    if (keyPath && !checkedPath) {
-      setCheckedPath(true);
-      navigate(`/u/warehouse/material/waiting-iqc-stock-in/${keyPath}`);
-    }
-  }, [keyPath, checkedPath, navigate]);
+  const debouncedFetchDataGroups = useMemo(
+    () => debounce(fetchDataGroups, 100),
+    [fetchDataGroups],
+  )
 
   useEffect(() => {
-    debouncedFetchDeliveryData();
+    debouncedFetchDataGroups()
     return () => {
-      debouncedFetchDeliveryData.cancel();
-    };
-  }, [debouncedFetchDeliveryData]);
-
-  useEffect(() => {
-    debouncedFetchCodeHelpData();
-    return () => {
-      debouncedFetchCodeHelpData.cancel();
-    };
-  }, [debouncedFetchCodeHelpData]);
-
+      debouncedFetchDataGroups.cancel()
+    }
+  }, [debouncedFetchDataGroups])
 
   const openModalAddUserGroups = () => {
     setIsModalOpenAddUserGroups(true)
@@ -152,26 +80,29 @@ export default function RoleManagement({ permissions, isMobile }) {
               <Title level={4} className="mt-2 uppercase opacity-85 ">
                 {t('Role Management')}
               </Title>
-              <RoleManagementActions fetchData={fetchDeliveryData} openModalAddUserGroups={openModalAddUserGroups} />
+              <RoleManagementActions
+                fetchDataGroups={fetchDataGroups}
+                openModalAddUserGroups={openModalAddUserGroups}
+              />
             </div>
           </div>
 
           <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg  overflow-auto">
-            <TableRoleManagement
+            <ViewRoleManagement
               data={data}
-              setCheckedPath={setCheckedPath}
-              checkedPath={checkedPath}
-              setKeyPath={setKeyPath}
               loading={loading}
-              handleCheck={handleCheck}
               gridRef={gridRef}
               setData={setData}
+              groups={groups}
             />
           </div>
         </div>
 
-        <DrawerAddUserGroups isOpen={isModalOpenAddUserGroups}
-          onClose={closeModalAddUserGroups} />
+        <DrawerAddUserGroups
+          isOpen={isModalOpenAddUserGroups}
+          onClose={closeModalAddUserGroups}
+          fetchDataGroups={fetchDataGroups}
+        />
       </div>
     </>
   )

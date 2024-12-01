@@ -35,7 +35,7 @@ export class TCARolesUsersWEB {
   UserId: string;
 
 
-  @Column({ type: 'nvarchar', length: 100, nullable: true })
+  @Column({  nullable: true })
   ProjectType: string | null;
 
 

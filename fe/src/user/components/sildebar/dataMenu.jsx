@@ -1,4 +1,10 @@
-import { InboxOutlined, TeamOutlined, SettingOutlined, ContainerOutlined, FolderOpenOutlined } from '@ant-design/icons'
+import {
+  InboxOutlined,
+  TeamOutlined,
+  SettingOutlined,
+  ContainerOutlined,
+  FolderOpenOutlined,
+} from '@ant-design/icons'
 export const menuItems = [
   {
     key: 'warehouse',
@@ -78,7 +84,7 @@ export const menuSettingItems = [
         key: 'kitting-1-3',
         label: '1D TO 2D PRINT',
         MenuId: 3,
-        
+
         link: '/u/warehouse/kitting/1d-to-2d-print',
       },
     ],
@@ -137,7 +143,7 @@ export const menuSettingItems = [
       {
         key: 'material-1-8',
         MenuId: 5,
-        
+
         label: 'MATERIAL STOCK IN (BULKID)',
         link: '/u/warehouse/material/material-stock-in-bulkid',
       },
@@ -150,7 +156,6 @@ export const menuSettingItems = [
     icon: <FolderOpenOutlined style={{ fontSize: '20px' }} />,
     link: '/u/add',
     type: 'menu',
-    
     MenuId: null,
   },
   {
@@ -174,7 +179,6 @@ export const menuSettingItems = [
         MenuId: 6,
         link: '/u/system_settings/users/role-management',
       },
-
     ],
   },
   {
@@ -188,11 +192,16 @@ export const menuSettingItems = [
     subMenu: [
       {
         key: 'technique-1-1',
+        label: 'Root Menu',
+        MenuId: 7,
+        link: '/u/system_settings/technique/root-menu',
+      },
+      {
+        key: 'technique-1-2',
         label: 'Menu items',
         MenuId: 7,
         link: '/u/system_settings/technique/menu-items',
-      }
-
+      },
     ],
   },
 ]

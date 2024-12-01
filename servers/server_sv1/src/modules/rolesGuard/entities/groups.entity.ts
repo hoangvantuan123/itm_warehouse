@@ -14,7 +14,9 @@ export class TCAGroupsWEB {
   
     @Column({ nullable: true })
     Name: string;
-    
-    @Column({ type: 'nvarchar', length: 100, nullable: true })
+
+    @Column({ nullable: true })
+    Comment: string;
+    @Column({  nullable: true })
     ProjectType: string | null;
 }

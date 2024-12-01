@@ -23,9 +23,7 @@ import { RolesUsersModule } from './modules/rolesGuard/module/rolesUsers.module'
       name: 'ITMV20240117',
     }),
     StockInModule,
-    CodeHelpComboQueryModule,
-    AuthsModule,
-    RolesUsersModule
+    CodeHelpComboQueryModule
   ],
   providers: [{
     provide: APP_FILTER,

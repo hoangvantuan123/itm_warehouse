@@ -32,7 +32,7 @@ export class TCAMenusWEB {
   Type: string;
 
 
-  @Column({ type: 'nvarchar', length: 100, nullable: true })
+  @Column({  nullable: true })
   ProjectType: string | null;
 
 

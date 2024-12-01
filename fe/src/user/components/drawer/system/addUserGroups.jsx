@@ -1,36 +1,38 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Input,
-  Typography,
-  Form,
-  Select,
-  Button,
-  Drawer,
-  message,
-} from 'antd'
+import { Input, Typography, Form, Select, Button, Drawer, message } from 'antd'
+import { PostResGroups } from '../../../../features/system/postGroups'
 const { Title } = Typography
 const { Option } = Select
 const { TextArea } = Input
-export default function DrawerAddUserGroups({ isOpen, onClose, fetchData }) {
+export default function DrawerAddUserGroups({
+  isOpen,
+  onClose,
+  fetchDataGroups,
+}) {
   const { t } = useTranslation()
   const [form] = Form.useForm()
   const handleFinish = async (values) => {
     const { name, comment } = values
     try {
+      const result = await PostResGroups(name, comment)
 
+      if (result.success) {
+        message.success(t('Tạo nhóm thành công'))
+        fetchDataGroups()
+        form.resetFields()
+        onClose()
+      } else {
+        message.error(result.message || t('Lỗi khi tạo nhóm'))
+      }
     } catch (error) {
-      message.error(t('api_status.error_group'))
+      message.error(t('Lỗi khi tạo nhóm'))
     }
   }
 
   return (
     <Drawer
-      title={
-        <Title level={4}>
-          {t('Thêm nhóm')}
-        </Title>
-      }
+      title={<Title level={4}>{t('Thêm nhóm')}</Title>}
       open={isOpen}
       closable={false}
       width={900}
@@ -54,14 +56,13 @@ export default function DrawerAddUserGroups({ isOpen, onClose, fetchData }) {
         onFinish={handleFinish}
         style={{ textAlign: 'left' }}
       >
-
         <Form.Item
           label={t('Tên nhóm')}
           name="name"
           rules={[{ required: true, message: t('add_page.rules_group') }]}
           style={{ textAlign: 'left' }}
         >
-          <Input size="large"  />
+          <Input size="large" />
         </Form.Item>
         <Form.Item
           label={t('Ghi chú')}

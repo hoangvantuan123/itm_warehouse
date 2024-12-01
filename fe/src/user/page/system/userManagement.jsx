@@ -16,49 +16,51 @@ import UserManagementActions from '../../components/actions/system/userManagemen
 import TableUserManagement from '../../components/table/system/tableUserManagement'
 import UserManagementQuery from '../../components/query/system/userManagementQuery'
 
-
 export default function UserManagement({ permissions, isMobile }) {
-  const { t } = useTranslation();
-  const gridRef = useRef(null);
-  const navigate = useNavigate();
-  const [test, setTest] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [loading2, setLoading2] = useState(false);
-  const [data, setData] = useState([]);
-  const [formData, setFormData] = useState(dayjs().startOf('month'));
-  const [toDate, setToDate] = useState(dayjs());
-  const [userId, setUserId] = useState('');
-  const [userName, setUserName] = useState('');
-  const [userIdSearch, setUserIdSearch] = useState('');
-  const [userNameSearch, setUserNameSearch] = useState('');
-  const [checkedRowKey, setCheckedRowKey] = useState(null);
-  const [keyPath, setKeyPath] = useState(null);
-  const [checkedPath, setCheckedPath] = useState(false);
-  const [searchTriggered, setSearchTriggered] = useState(false);
+  const { t } = useTranslation()
+  const gridRef = useRef(null)
+  const navigate = useNavigate()
+  const [test, setTest] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [loading2, setLoading2] = useState(false)
+  const [data, setData] = useState([])
+  const [formData, setFormData] = useState(dayjs().startOf('month'))
+  const [toDate, setToDate] = useState(dayjs())
+  const [userId, setUserId] = useState('')
+  const [userName, setUserName] = useState('')
+  const [userIdSearch, setUserIdSearch] = useState('')
+  const [userNameSearch, setUserNameSearch] = useState('')
+  const [checkedRowKey, setCheckedRowKey] = useState(null)
+  const [keyPath, setKeyPath] = useState(null)
+  const [checkedPath, setCheckedPath] = useState(false)
+  const [searchTriggered, setSearchTriggered] = useState(false)
 
-  const formatDate = useCallback((date) => date.format('YYYYMMDD'), []);
+  const formatDate = useCallback((date) => date.format('YYYYMMDD'), [])
 
   const fetchSystemUsersData = useCallback(async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const response = await GetSysttemUsersList(userId, userName);
-      setData(response?.data || []);
+      const response = await GetSysttemUsersList(userId, userName)
+      setData(response?.data || [])
     } catch (error) {
-      setData([]);
+      setData([])
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, []);
+  }, [])
 
-  const debouncedFetchDeliveryData = useMemo(() => debounce(fetchSystemUsersData, 100), [fetchSystemUsersData]);
+  const debouncedFetchDeliveryData = useMemo(
+    () => debounce(fetchSystemUsersData, 100),
+    [fetchSystemUsersData],
+  )
   const handleSearch = () => {
-    setSearchTriggered(true);
+    setSearchTriggered(true)
     fetchSystemUsersData()
-  };
+  }
 
-
-  const handleCheck = useCallback((ev) => {
-    /*   const { rowKey } = ev;
+  const handleCheck = useCallback(
+    (ev) => {
+      /*   const { rowKey } = ev;
       const gridInstance = gridRef.current?.getInstance();
       const previousCheckedRowKey = checkedRowKey;
   
@@ -70,9 +72,9 @@ export default function UserManagement({ permissions, isMobile }) {
       setCheckedRowKey(rowKey);
   
       navigate(`/u/system_settings/users/user-management/profile/${rowData?.UserId}/${rowData?.UserName}`); */
-  }, [checkedRowKey, data]);
-
-  
+    },
+    [checkedRowKey, data],
+  )
 
   return (
     <>
@@ -88,7 +90,10 @@ export default function UserManagement({ permissions, isMobile }) {
               </Title>
               <UserManagementActions handleSearch={handleSearch} />
             </div>
-            <details className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white" open>
+            <details
+              className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
+              open
+            >
               <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
                 <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600">
                   <FilterOutlined />
@@ -99,9 +104,13 @@ export default function UserManagement({ permissions, isMobile }) {
                 </span>
               </summary>
 
-
               <div className="flex p-2 gap-4">
-                <UserManagementQuery setUserId={setUserId} userId={userId} setUserName={setUserName} userName={userName} />
+                <UserManagementQuery
+                  setUserId={setUserId}
+                  userId={userId}
+                  setUserName={setUserName}
+                  userName={userName}
+                />
               </div>
             </details>
           </div>
@@ -121,5 +130,5 @@ export default function UserManagement({ permissions, isMobile }) {
         </div>
       </div>
     </>
-  );
+  )
 }

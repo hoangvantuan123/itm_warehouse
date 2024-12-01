@@ -15,19 +15,19 @@ export class TCAGroupUsersWEB {
     @Column({ nullable: false })
     Name: string;
    
-    @Column({ type: 'int', nullable: true })
+    @Column({ nullable: true })
     EmpSeq: number | null;
 
-    @Column({ type: 'int' })
+    @Column({ nullable: true })
     UserSeq: number;
 
-    @Column({ type: 'nvarchar', length: 100, nullable: true })
+    @Column({  nullable: true })
     UserId: string | null;
 
     @Column({ nullable: true })
     GroupId: number;
 
-    @Column({ type: 'nvarchar', length: 100, nullable: true })
+    @Column({ nullable: true })
     ProjectType: string | null;
 
 }

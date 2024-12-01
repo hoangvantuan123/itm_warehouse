@@ -6,7 +6,11 @@ import { useNavigate } from 'react-router-dom'
 import '../../../../static/css/customTabe.css'
 import { ArrowLeftIcon } from '../../icons'
 
-function TableTransferWaitingIqcStockIn({ sampleTableA, sampleTableB , gridRefA}) {
+function TableTransferWaitingIqcStockIn({
+  sampleTableA,
+  sampleTableB,
+  gridRefA,
+}) {
   const navigate = useNavigate()
   const gridRef = useRef(null)
   const [checkedRowKey, setCheckedRowKey] = useState(null)
@@ -193,7 +197,7 @@ function TableTransferWaitingIqcStockIn({ sampleTableA, sampleTableB , gridRefA}
       <div className="w-1/2 h-full flex flex-col border bg-white p-3 rounded-lg overflow-hidden pb-10">
         <div className=" font-medium text-xs">THÔNG TIN BAROCODE</div>
         <Grid
-         ref={gridRefA}
+          ref={gridRefA}
           data={sampleTableB}
           columns={columnsB}
           rowHeight={5}

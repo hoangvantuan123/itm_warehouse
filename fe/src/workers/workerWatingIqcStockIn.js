@@ -1,4 +1,3 @@
-
 function checkBarcode(barcode, tableData, tableScanHistory) {
   if (!barcode || !Array.isArray(tableData)) {
     return {
@@ -14,7 +13,6 @@ function checkBarcode(barcode, tableData, tableScanHistory) {
   const qty = parseInt(parts[2], 10) // Số lượng quét
   const dc = parts[3] // Date Code
   const reel = parts[4] // Reel
-
 
   const item = tableData.find((item) => item.ItemNo === code)
   const existingBarcode = tableScanHistory.find(
@@ -59,12 +57,7 @@ function checkBarcode(barcode, tableData, tableScanHistory) {
 }
 
 self.onmessage = function (event) {
-  const {
-    type,
-    barcode,
-    tableData,
-    tableScanHistory
-  } = event.data
+  const { type, barcode, tableData, tableScanHistory } = event.data
   let result
 
   switch (type) {

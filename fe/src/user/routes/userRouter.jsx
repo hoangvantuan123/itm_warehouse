@@ -19,13 +19,15 @@ import Home from '../page/home/home'
 import Login from '../auth/login'
 const DeliveryList = lazy(() => import('../page/material/deliveryList'))
 const WaitingIqcStockIn = lazy(
-  () => import('../page/material/waitingIqcStockIn')
+  () => import('../page/material/waitingIqcStockIn'),
 )
 
 const StockOutRequest = lazy(() => import('../page/material/stockOutRequest'))
 const UserManagement = lazy(() => import('../page/system/userManagement'))
 const RoleManagement = lazy(() => import('../page/system/roleManagement'))
-const ProfileUserId  = lazy(() => import('../page/system/profileUserId'))
+const ProfileUserId = lazy(() => import('../page/system/profileUserId'))
+const MenuTechnique = lazy(() => import('../page/system/menuTechnique'))
+const RootMenuTechnique = lazy(() => import('../page/system/rootMenuTechnique'))
 
 const { Content } = Layout
 
@@ -39,8 +41,6 @@ const UserRouter = () => {
 
   return (
     <Routes>
-
-
       <Route path="u/login" element={<Login />} />
       <Route
         path="/*"
@@ -142,6 +142,38 @@ const UserRouter = () => {
                           />
                         ) : (
                           <RoleManagement
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
+                        )
+                      }
+                    />
+                    <Route
+                      path="u/system_settings/technique/menu-items"
+                      element={
+                        checkActionPermission(userPermissions, '', '') ? (
+                          <MenuTechnique
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
+                        ) : (
+                          <MenuTechnique
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
+                        )
+                      }
+                    />
+                    <Route
+                      path="u/system_settings/technique/root-menu"
+                      element={
+                        checkActionPermission(userPermissions, '', '') ? (
+                          <RootMenuTechnique
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
+                        ) : (
+                          <RootMenuTechnique
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />

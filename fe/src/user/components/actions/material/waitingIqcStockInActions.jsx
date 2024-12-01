@@ -8,13 +8,18 @@ import {
 } from '@ant-design/icons'
 import { LiveIcon, OffIcon } from '../../icons'
 
-export default function WaitingIqcStockInActions({ status, handleSubmit, handleDelete , handleRestFrom, handleUploadExcel}) {
+export default function WaitingIqcStockInActions({
+  status,
+  handleSubmit,
+  handleDelete,
+  handleRestFrom,
+  handleUploadExcel,
+}) {
   return (
     <div className="flex items-center gap-2">
-       {status ? (
+      {status ? (
         <>
           <span className="inline-flex items-center justify-center rounded-lg w-20 bg-emerald-100 px-5 py-[6px] text-emerald-700">
-
             <p className="whitespace-nowrap text-sm">LIVE</p>
           </span>
         </>
@@ -76,8 +81,6 @@ export default function WaitingIqcStockInActions({ status, handleSubmit, handleD
       >
         Excel Upload
       </Button>
-
-     
     </div>
   )
 }

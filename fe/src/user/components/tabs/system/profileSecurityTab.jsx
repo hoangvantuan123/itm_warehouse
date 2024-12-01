@@ -1,5 +1,15 @@
 import { useState } from 'react'
-import { Input, Button, Table, Typography, message, Space, Row, Col, Modal } from 'antd'
+import {
+  Input,
+  Button,
+  Table,
+  Typography,
+  message,
+  Space,
+  Row,
+  Col,
+  Modal,
+} from 'antd'
 import { useTranslation } from 'react-i18next'
 import { Helmet } from 'react-helmet'
 
@@ -51,22 +61,26 @@ export default function SecurityProfileID() {
       <Row gutter={[16, 16]} className="mb-6">
         <Col span={12}>
           <Text level={5}>{t('Change Password')}</Text>
-          <br/>
-          <Text className="text-xs italic opacity-70">{t('Enter your current password and the new password to change your account password.')}</Text>
+          <br />
+          <Text className="text-xs italic opacity-70">
+            {t(
+              'Enter your current password and the new password to change your account password.',
+            )}
+          </Text>
         </Col>
         <Col span={12}>
           <Space direction="vertical" className="w-full">
-            <Input.Password 
-              placeholder={t('Current Password')} 
-              value={currentPassword} 
-              size="large" 
-              onChange={e => setCurrentPassword(e.target.value)} 
+            <Input.Password
+              placeholder={t('Current Password')}
+              value={currentPassword}
+              size="large"
+              onChange={(e) => setCurrentPassword(e.target.value)}
             />
-            <Input.Password 
-              placeholder={t('New Password')} 
-              value={newPassword} 
-              size="large" 
-              onChange={e => setNewPassword(e.target.value)} 
+            <Input.Password
+              placeholder={t('New Password')}
+              value={newPassword}
+              size="large"
+              onChange={(e) => setNewPassword(e.target.value)}
             />
             <Button type="primary" onClick={handlePasswordChange} block>
               {t('Change Password')}
@@ -78,19 +92,34 @@ export default function SecurityProfileID() {
       <Row gutter={[16, 16]} className="mt-10">
         <Col span={12}>
           <Text level={5}>{t('Login History')}</Text>
-          <br/>
-          <Text className="text-xs italic opacity-70">{t('View the list of devices and times when your account was accessed.')}</Text>
+          <br />
+          <Text className="text-xs italic opacity-70">
+            {t(
+              'View the list of devices and times when your account was accessed.',
+            )}
+          </Text>
         </Col>
         <Col span={12}>
-          <Table columns={loginHistoryColumns} dataSource={loginHistory} pagination={false} rowKey="key" size="small" bordered />
+          <Table
+            columns={loginHistoryColumns}
+            dataSource={loginHistory}
+            pagination={false}
+            rowKey="key"
+            size="small"
+            bordered
+          />
         </Col>
       </Row>
 
       <Row gutter={[16, 16]} className="mt-10">
         <Col span={12}>
           <Text level={5}>{t('Reset Account to Default')}</Text>
-          <br/>
-          <Text className="text-xs italic opacity-70">{t('Reset your account to its default settings, clearing all custom configurations and history.')}</Text>
+          <br />
+          <Text className="text-xs italic opacity-70">
+            {t(
+              'Reset your account to its default settings, clearing all custom configurations and history.',
+            )}
+          </Text>
         </Col>
         <Col span={12}>
           <Button type="default" danger onClick={handleResetAccount} block>

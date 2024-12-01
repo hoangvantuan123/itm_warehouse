@@ -10,7 +10,6 @@ import {
 export default function UserManagementActions({ handleSearch }) {
   return (
     <div className="flex items-center gap-2">
-     
       <Button
         key="Save"
         type="primary"
