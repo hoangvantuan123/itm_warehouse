@@ -8,6 +8,8 @@ import {
     UnauthorizedException,
     Put,
     Patch,
+    Get,
+    Query,
     BadRequestException
 } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
@@ -16,7 +18,7 @@ import { UserAuthService } from '../service/user.service';
 import { AuthService } from '../service/auths.service';
 import { LoginDto } from '../dto/login.dto';
 
-@Controller('acc')
+@Controller('v2/acc')
 export class AuthController {
     constructor(
         private readonly appService: AuthService,
@@ -44,4 +46,13 @@ export class AuthController {
     async loginUserB(@Body() loginDto: LoginDto) {
         return this.appService.loginUserB(loginDto);
     }
+
+
+
+    @Get('check-roles-user-raw')
+    async getDataRolesUserRaw(@Query('userId') userId: string): Promise<any[]> {
+
+        return await this.appService.getDataRolesUserRaw(userId);
+    }
+
 }

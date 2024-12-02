@@ -11,7 +11,7 @@ export default function RootMenuManagementActions({ openModal }) {
         icon={<PlusOutlined />}
         size="middle"
         onClick={openModal}
-        className="w-full  uppercase rounded-lg h-full border-gray-200 bg-indigo-600 text-white shadow-sm text-sm"
+        style={{ backgroundColor: '#4F46E5', borderColor: '#4F46E5' }}
       >
         ADD ROOT MENU
       </Button>

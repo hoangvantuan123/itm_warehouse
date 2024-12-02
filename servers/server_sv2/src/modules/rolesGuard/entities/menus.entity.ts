@@ -12,10 +12,12 @@ export class TCAMenusWEB {
 
   /* Menu Ông */
   @Column({ nullable: true })
-  MenuRootId: string;
+  MenuRootId: number;
+
+
   /* Menu Cha */
   @Column({ nullable: true })
-  MenuSubRootId: string;
+  MenuSubRootId: number;
 
   @Column({ nullable: true })
   Key: string;

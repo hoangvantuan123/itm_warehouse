@@ -4,13 +4,11 @@ import { Helmet } from 'react-helmet'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Button, Form, Input, Typography, notification, message } from 'antd'
 import { LockOutlined, UserOutlined } from '@ant-design/icons'
-import { loginAuth } from '../../features/auth/API/authAPI'
+import { LoginAuth } from '../../features/auth/login'
 import decodeJWT from '../../utils/decode-JWT'
 import Cookies from 'js-cookie'
 import BgCarousel from '../components/carousel/bgCarousel'
 import Logo from '../../assets/ItmLogo.png'
-import { ActivatePasswordLogin } from '../../features/auth/API/activatePassLogin'
-import { ResetPasswordUser } from '../../features/auth/API/restPasswordUser'
 const { Title, Text } = Typography
 const languages = [
   { key: 'vi', label: 'Tiếng Việt' },
@@ -41,13 +39,14 @@ export default function Login({ fetchPermissions }) {
       setLoading(true)
       setError(null)
 
-      const response = await loginAuth({ login, password })
+      const response = await LoginAuth({ login, password })
 
       if (response.success) {
         localStorage.setItem('userInfo', JSON.stringify(response.data.user))
         localStorage.setItem('language', response.data.user.language)
+        localStorage.setItem('roles_menu', response.data.tokenRolesUserMenu)
         Cookies.set('accessToken', response.data.token)
-        navigate('/u/home')
+          navigate('/u/home')
         fetchPermissions()
       } else {
         switch (response.error.code) {
@@ -72,71 +71,6 @@ export default function Login({ fetchPermissions }) {
     }
   }
 
-  const handleChangePassword = async () => {
-    if (!oldPassword || !newPassword || !confirmNewPassword) {
-      setError('Please fill in all required fields!')
-      return
-    }
-
-    if (newPassword !== confirmNewPassword) {
-      setError('New passwords do not match!')
-      return
-    }
-
-    if (newPassword === oldPassword) {
-      setError(
-        'New password cannot be the same as the old password. Please choose a different one!',
-      )
-      return
-    }
-
-    try {
-      const response = await ActivatePasswordLogin(
-        oldPassword,
-        newPassword,
-        employeeId,
-      )
-
-      if (response.success) {
-        message.success(response.message || 'Password changed successfully!')
-
-        setStatus(false)
-        setNewPassword('')
-        setConfirmNewPassword('')
-        setOldPassword('')
-        setCurrentView('login')
-        form.resetFields()
-        setError(null)
-      } else {
-        setError(response.message)
-      }
-    } catch (error) {
-      setError(
-        'An error occurred while changing the password. Please try again later.',
-      )
-    }
-  }
-
-  const handleResetPassword = async () => {
-    try {
-      const response = await ResetPasswordUser(username, employeeId)
-      if (response.data.success) {
-        setError(null)
-
-        message.success(
-          response.data.message || 'Password has been reset successfully.',
-        )
-
-        setCurrentView('login')
-        setUsername(null)
-        setEmployeeId('')
-      } else {
-        setError(response.data.error.message)
-      }
-    } catch (error) {
-      setError('An unexpected error occurred. Please try again later.')
-    }
-  }
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search)
@@ -340,7 +274,6 @@ export default function Login({ fetchPermissions }) {
                     type="button"
                     className="w-full rounded-lg h-full bg-gray-700 text-white mt-4 p-3 text-base hover:bg-gray-700 first-line:relative hover:text-white"
                     size="large"
-                    onClick={handleChangePassword}
                   >
                     Change Password
                   </button>
@@ -446,7 +379,6 @@ export default function Login({ fetchPermissions }) {
                     type="button"
                     className="w-full rounded-lg h-full bg-gray-700 text-white mt-4 p-3 text-base hover:bg-gray-800"
                     size="large"
-                    onClick={handleResetPassword}
                   >
                     Submit
                   </button>

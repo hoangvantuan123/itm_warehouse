@@ -17,6 +17,9 @@ import Spinner from '../page/default/load'
 import ViewTest from '../page/test/viewTest'
 import Home from '../page/home/home'
 import Login from '../auth/login'
+import decodeJWT from '../../utils/decode-JWT'
+
+
 const DeliveryList = lazy(() => import('../page/material/deliveryList'))
 const WaitingIqcStockIn = lazy(
   () => import('../page/material/waitingIqcStockIn'),
@@ -38,6 +41,14 @@ const UserRouter = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userPermissions, setUserPermissions] = useState([])
   const [isMobile, setIsMobile] = useState(false)
+  const [menuSettingItems, setMenuSettingItems] = useState([])
+  const [rootMenu, setRootMenu] = useState([])
+  useEffect(() => {
+    const token = localStorage.getItem('roles_menu');
+    const data = decodeJWT(token);
+    setMenuSettingItems(data.data[0].menu || [])
+    setRootMenu(data.data[1].rootMenu || [])
+  }, []);
 
   return (
     <Routes>
@@ -46,7 +57,7 @@ const UserRouter = () => {
         path="/*"
         element={
           <Layout className="h-[calc(100vh-30px)]">
-            <Sidebar permissions={userPermissions} />
+            <Sidebar permissions={userPermissions} rootMenu={rootMenu} menuSettingItems={menuSettingItems} />
             <Layout>
               <Content className="bg-slate-50">
                 <Suspense fallback={<Spinner />}>

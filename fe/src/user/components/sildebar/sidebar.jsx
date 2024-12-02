@@ -22,7 +22,7 @@ import {
   PlusOutlined,
 } from '@ant-design/icons'
 import { SettingIcon, FileMenuIcon, LogoutIcon } from './icon'
-import { menuSettingItems, menuItems } from './dataMenu'
+import { menuSettingItems, iconMapping } from './dataMenu'
 
 const { Sider, Footer } = Layout
 const { SubMenu } = Menu
@@ -30,7 +30,7 @@ const { Title, Text } = Typography
 const menuStyle = { borderInlineEnd: 'none' }
 import './static/css/scroll_container.css'
 
-const Sidebar = ({ permissions }) => {
+const Sidebar = ({ permissions, rootMenu }) => {
   const location = useLocation()
   const userFromLocalStorage = JSON.parse(localStorage.getItem('userInfo'))
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -85,10 +85,10 @@ const Sidebar = ({ permissions }) => {
   }, [])
 
   const handleonclickMenu = (e) => {
-    setIsMenu(e.key)
-    setLabelMenu(e.label)
-    localStorage.setItem('isMenu', e.key)
-    localStorage.setItem('labelMenu', e.label)
+    setIsMenu(e.RootMenuKey)
+    setLabelMenu(e.RootMenuLabel)
+    localStorage.setItem('isMenu', e.RootMenuKey)
+    localStorage.setItem('labelMenu', e.RootMenuLabel)
     localStorage.setItem('menu', false)
     setCollapsed(false)
     setMenu(!menu)
@@ -113,10 +113,10 @@ const Sidebar = ({ permissions }) => {
     localStorage.setItem('menu', false)
   }
   const handleOnClickMenuFast = (e) => {
-    setIsMenu(e.key)
-    setLabelMenu(e.label)
-    localStorage.setItem('isMenu', e.key)
-    localStorage.setItem('labelMenu', e.label)
+    setIsMenu(e.RootMenuKey)
+    setLabelMenu(e.RootMenuLabel)
+    localStorage.setItem('isMenu', e.RootMenuKey)
+    localStorage.setItem('labelMenu', e.RootMenuLabel)
     setCollapsed(false)
     localStorage.setItem('COLLAPSED_STATE', false)
   }
@@ -130,13 +130,13 @@ const Sidebar = ({ permissions }) => {
   }
   const shortcutMenu = (
     <Menu>
-      {menuItems.map((item) => (
-        <Menu.Item key={item.key}>
+      {rootMenu.map((item) => (
+        <Menu.Item key={item.RootMenuKey}>
           <Checkbox
-            checked={selectedItems.includes(item.key)}
-            onChange={(e) => handleCheckboxChange(e, item.key)}
+            checked={selectedItems.includes(item.RootMenuKey)}
+            onChange={(e) => handleCheckboxChange(e, item.RootMenuKey)}
           >
-            <span className="ml-3 uppercase">{t(item.label)}</span>
+            <span className="ml-3 uppercase">{t(item.RootMenuLabel)}</span>
           </Checkbox>
         </Menu.Item>
       ))}
@@ -169,17 +169,17 @@ const Sidebar = ({ permissions }) => {
                   </div>
 
                   <ul className="space-y-1 border-t border-gray-100 pt-4">
-                    {menuItems
-                      .filter((item) => selectedItems.includes(item.key))
+                    {rootMenu
+                      .filter((item) => selectedItems.includes(item.RootMenuKey))
                       .map((item) =>
-                        item.utilities ? (
-                          <li key={item.key}>
-                            <Tooltip title={item.label} placement="right">
+                        item.RootMenuUtilities ? (
+                          <li key={item.RootMenuKey}>
+                            <Tooltip title={item.RootMenuLabel} placement="right">
                               <a
                                 onClick={() => handleOnClickMenuFast(item)}
                                 className="group relative flex justify-center rounded-lg px-2 py-2 border mb-2 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                               >
-                                {item.icon}
+                                {iconMapping[item.RootMenuIcon]}
                               </a>
                             </Tooltip>
                           </li>
@@ -235,14 +235,14 @@ const Sidebar = ({ permissions }) => {
                 className="border-r-0"
                 onClick={(e) => handleOnClickMenuItem(e)}
               >
-                {menuItems.map((item) => (
-                  <Menu.Item key={item.key}>
+                {rootMenu.map((item) => (
+                  <Menu.Item key={item.RootMenuKey}>
                     <Link
                       onClick={() => handleonclickMenu(item)}
                       className="flex items-center justify-start"
                     >
-                      {item.icon}
-                      <span className="ml-3 uppercase">{t(item.label)}</span>
+                      {iconMapping[item?.RootMenuIcon]}
+                      <span className="ml-3 uppercase">{t(item?.RootMenuLabel)}</span>
                     </Link>
                   </Menu.Item>
                 ))}
@@ -256,9 +256,8 @@ const Sidebar = ({ permissions }) => {
               collapsed={collapsed}
               collapsedWidth={0}
               onCollapse={toggleSidebar}
-              className={`${
-                collapsed ? 'p-0 border-none' : 'p-2 border-r'
-              } h-screen overflow-auto scroll-container transition-all duration-300 ease-in-out`}
+              className={`${collapsed ? 'p-0 border-none' : 'p-2 border-r'
+                } h-screen overflow-auto scroll-container transition-all duration-300 ease-in-out`}
             >
               <SidebarContent
                 collapsed={collapsed}

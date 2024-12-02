@@ -5,6 +5,12 @@ import {
   ContainerOutlined,
   FolderOpenOutlined,
 } from '@ant-design/icons'
+
+export const iconMapping = {
+  ContainerOutlined: <ContainerOutlined style={{ fontSize: '20px' }} />,
+  TeamOutlined: <TeamOutlined style={{ fontSize: '20px' }} />,
+  SettingOutlined: <SettingOutlined style={{ fontSize: '20px' }} />,
+};
 export const menuItems = [
   {
     key: 'warehouse',

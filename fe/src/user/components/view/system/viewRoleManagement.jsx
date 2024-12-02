@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react'
 import { Menu, Button, Input, Table, Space, Checkbox, Layout } from 'antd'
-import { FolderOutlined } from '@ant-design/icons'
+import { FolderOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
 import BG from '../../../../assets/defaultLogo.png'
 import ModalRootMenu from '../../modal/system/modalRootMenu'
 import ModalUsers from '../../modal/system/modalUsers'
 import ModalMenu from '../../modal/system/modalMenu'
-import { getPaginatedRoles } from '../../../../features/system/getPaginatedRoles'
+import { getPaginatedRolesRootMenu } from '../../../../features/system/getPaginatedRolesRootMenu'
+import { getPaginatedRolesMenu } from '../../../../features/system/getPaginatedRolesMenu'
+import { getPaginatedRolesUsers } from '../../../../features/system/getPaginatedRolesUsers'
 const { Header, Content, Footer } = Layout
 
-function ViewRoleManagement({  groups }) {
+function ViewRoleManagement({ groups }) {
   const [selectedGroup, setSelectedGroup] = useState(null)
   const [openView, setOpenView] = useState(false)
   const [userInfo, setUserInfo] = useState({
@@ -16,21 +18,39 @@ function ViewRoleManagement({  groups }) {
     note: '',
   })
   const [loading, setLoading] = useState(true);
+  const [loading3, setLoading3] = useState(true);
   const [error, setError] = useState(null);
   const [page1, setPage1] = useState(1);
+  const [page2, setPage2] = useState(1);
+  const [page3, setPage3] = useState(1);
   const [limit1, setLimit1] = useState(50);
-  const [openModel1 , setOpenModel1] = useState(false)
-  const [openModel2 , setOpenModel2] = useState(false)
-  const [openModel3 , setOpenModel3] = useState(false)
-  const [data1 , setData1] = useState([])
-
+  const [limit2, setLimit2] = useState(50);
+  const [limit3, setLimit3] = useState(50);
+  const [total1, setTotal1] = useState(50);
+  const [total2, setTotal2] = useState(50);
+  const [total3, setTotal3] = useState(50);
+  const [totalPages3, setTotalPages3] = useState(50);
+  const [totalPages2, setTotalPages2] = useState(50);
+  const [totalPages1, setTotalPages1] = useState(50);
+  const [openModel1, setOpenModel1] = useState(false)
+  const [openModel2, setOpenModel2] = useState(false)
+  const [openModel3, setOpenModel3] = useState(false)
+  const [data1, setData1] = useState([])
+  const [updateData1, setUpdateData2] = useState([])
+  const [data2, setData2] = useState([])
+  const [data3, setData3] = useState([])
+  const [selectedRowKeys1, setSelectedRowKeys1] = useState([]);
+  const [selectedRowKeys2, setSelectedRowKeys2] = useState([]);
+  const [selectedRowKeys3, setSelectedRowKeys3] = useState([]);
   const fetchData1 = async () => {
     setLoading(true);
     try {
-        const response = await getPaginatedRoles(selectedGroup, 'rootmenu' , page1,limit1 );
-        if (response.success) {
-          setData1(response.data);
-        } 
+      const response = await getPaginatedRolesRootMenu(selectedGroup, 'rootmenu', page1, limit1);
+      if (response.success) {
+        setData1(response.data);
+        setTotal1(response.data.total)
+        setTotalPages1(response.data.totalPages)
+      }
     } catch (error) {
       setError(error.message || 'Đã xảy ra lỗi');
       setData1([]);
@@ -39,9 +59,56 @@ function ViewRoleManagement({  groups }) {
     }
   };
 
+  const fetchData2 = async () => {
+    setLoading(true);
+    try {
+      const response = await getPaginatedRolesMenu(selectedGroup, 'menu', page2, limit2);
+      if (response.success) {
+        setData2(response.data);
+        setTotal2(response.data.total)
+        setTotalPages2(response.data.totalPages)
+      }
+    } catch (error) {
+      setError(error.message || 'Đã xảy ra lỗi');
+      setData2([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchData3 = async () => {
+    setLoading3(true);
+    try {
+      const response = await getPaginatedRolesUsers(selectedGroup, 'user', page3, limit3);
+      if (response.success) {
+        setData3(response.data);
+        setTotal3(response.total)
+        setTotalPages3(response.totalPages)
+      }
+    } catch (error) {
+      setError(error.message || 'Đã xảy ra lỗi');
+      setData3([]);
+    } finally {
+      setLoading3(false);
+    }
+  };
+
   useEffect(() => {
-    fetchData1();
+    if (selectedGroup !== null) {
+      fetchData1();
+    }
   }, [selectedGroup]);
+  useEffect(() => {
+    if (selectedGroup !== null) {
+      fetchData2();
+    }
+  }, [selectedGroup]);
+  useEffect(() => {
+    if (selectedGroup !== null) {
+      fetchData3();
+    }
+  }, [selectedGroup, page3, limit3]);
+
+
   const handleAddRow1 = () => {
     setOpenModel1(true)
   }
@@ -59,149 +126,11 @@ function ViewRoleManagement({  groups }) {
   }
   const closeModal3 = () => {
     setOpenModel3(false)
+
   }
 
-  const sampleUsers = [
-    {
-      id: 5441,
-      user_id: 17696,
-      login: 'VW12403433',
-      name: 'BÙI QUỲNH HƯƠNG',
-      language: 'vi',
-      active: true,
-    },
-    {
-      id: 5440,
-      user_id: 17695,
-      login: 'VW12403432',
-      name: 'LỮ ĐÌNH ANH',
-      language: 'vi',
-      active: false,
-    },
-    {
-      id: 5439,
-      user_id: 17694,
-      login: 'VW12403431',
-      name: 'NÔNG HOÀNG YẾN',
-      language: 'vi',
-      active: false,
-    },
-    {
-      id: 5438,
-      user_id: 17691,
-      login: 'VW12403428',
-      name: 'LÊ TÙNG DUY',
-      language: 'vi',
-      active: true,
-    },
-    {
-      id: 5437,
-      user_id: 17693,
-      login: 'VW12403430',
-      name: 'TRIỆU THÙY LINH',
-      language: 'vi',
-      active: false,
-    },
-    {
-      id: 5436,
-      user_id: 17692,
-      login: 'VW12403429',
-      name: 'HOÀNG NHƯ TỈNH',
-      language: 'vi',
-      active: false,
-    },
-    {
-      id: 5435,
-      user_id: 17690,
-      login: 'VW12403427',
-      name: 'NGUYỄN TRỌNG LUÂN',
-      language: 'vi',
-      active: false,
-    },
-    {
-      id: 5434,
-      user_id: 17689,
-      login: 'VW12403426',
-      name: 'TRƯƠNG NGỌC VŨ',
-      language: 'vi',
-      active: false,
-    },
-    {
-      id: 5433,
-      user_id: 17688,
-      login: 'VW12403425',
-      name: 'NÔNG VĂN DOÃN',
-      language: 'vi',
-      active: false,
-    },
-    {
-      id: 5432,
-      user_id: 17687,
-      login: 'VW12403424',
-      name: 'PHẠM THU TRANG',
-      language: 'vi',
-      active: false,
-    },
-  ]
 
-  const samplePermissions = [
-    {
-      id: 92,
-      permission: 'Bảng công tổng hợp',
-      view: true,
-      edit: false,
-      create: false,
-      delete: false,
-    },
-    {
-      id: 90,
-      permission: 'Bảng lương cá nhân',
-      view: true,
-      edit: false,
-      create: false,
-      delete: false,
-    },
-    {
-      id: 77,
-      permission: 'Dữ liệu công theo tháng',
-      view: true,
-      edit: false,
-      create: false,
-      delete: false,
-    },
-    {
-      id: 75,
-      permission: 'Công việc',
-      view: true,
-      edit: false,
-      create: false,
-      delete: false,
-    },
-    {
-      id: 74,
-      permission: 'Thông báo',
-      view: false,
-      edit: false,
-      create: false,
-      delete: false,
-    },
-    {
-      id: 76,
-      permission: 'Chấm công',
-      view: true,
-      edit: false,
-      create: false,
-      delete: false,
-    },
-    {
-      id: 73,
-      permission: 'Home',
-      view: true,
-      edit: false,
-      create: false,
-      delete: false,
-    },
-  ]
+
 
   const handleGroupClick = (groupId) => {
     setSelectedGroup(groupId)
@@ -213,33 +142,43 @@ function ViewRoleManagement({  groups }) {
     })
   }
 
-  const handleSaveChanges = () => {
-    console.log('Save changes', userInfo)
-  }
+
+
+  const handlePermissionChange1 = (id, permissionType) => {
+    const newData = [...data1];
+    const recordIndex = newData.findIndex(record => record.Id === id);
+    if (recordIndex !== -1) {
+      newData[recordIndex][permissionType] = !newData[recordIndex][permissionType];
+      setData1(newData);
+    }
+  };
+
+  const handlePermissionChange2 = (id, permissionType) => {
+    const newData = [...data2];
+    const recordIndex = newData.findIndex(record => record.Id === id);
+    if (recordIndex !== -1) {
+      newData[recordIndex][permissionType] = !newData[recordIndex][permissionType];
+      setData2(newData);
+    }
+  };
 
   const handlePermissionChange = (permissionId, field) => {
-    const updatedPermissions = samplePermissions.map((permission) =>
-      permission.id === permissionId
+    const updatedPermissions = data1.map((permission) =>
+      permission.Id === permissionId
         ? { ...permission, [field]: !permission[field] }
         : permission,
     )
   }
 
   const userColumns = [
-    { title: 'Tên Người Dùng', dataIndex: 'name', key: 'name' },
-    { title: 'Login', dataIndex: 'login', key: 'login' },
-    { title: 'Ngôn ngữ', dataIndex: 'language', key: 'language' },
-    { title: 'Ngày Tạo', dataIndex: 'create_date', key: 'create_date' },
-    {
-      title: 'Trạng Thái',
-      dataIndex: 'active',
-      key: 'active',
-      render: (active) => (active ? 'Active' : 'Inactive'),
-    },
+    { title: 'UserId', dataIndex: 'UserId', key: 'UserId' },
+    { title: 'UserName', dataIndex: 'UserName', key: 'UserName' }
+
   ]
 
+
   const permissionColumns1 = [
-    { title: 'Name', dataIndex: 'Name', key: 'Name' },
+    { title: 'Name', dataIndex: 'Label', key: 'Label' },
     {
       title: 'View',
       dataIndex: 'View',
@@ -247,7 +186,7 @@ function ViewRoleManagement({  groups }) {
       render: (view, record) => (
         <Checkbox
           checked={view}
-          onChange={() => handlePermissionChange(record.Id, 'View')}
+          onChange={() => handlePermissionChange1(record.Id, 'View')}
         />
       ),
     },
@@ -258,7 +197,7 @@ function ViewRoleManagement({  groups }) {
       render: (edit, record) => (
         <Checkbox
           checked={edit}
-          onChange={() => handlePermissionChange(record.Id, 'Edit')}
+          onChange={() => handlePermissionChange1(record.Id, 'Edit')}
         />
       ),
     },
@@ -269,7 +208,7 @@ function ViewRoleManagement({  groups }) {
       render: (create, record) => (
         <Checkbox
           checked={create}
-          onChange={() => handlePermissionChange(record.Id, 'Create')}
+          onChange={() => handlePermissionChange1(record.Id, 'Create')}
         />
       ),
     },
@@ -280,12 +219,71 @@ function ViewRoleManagement({  groups }) {
       render: (deletePermission, record) => (
         <Checkbox
           checked={deletePermission}
-          onChange={() => handlePermissionChange(record.Id, 'Delete')}
+          onChange={() => handlePermissionChange1(record.Id, 'Delete')}
         />
       ),
     },
   ]
 
+  const permissionColumns2 = [
+    { title: 'Name', dataIndex: 'Label', key: 'Label' },
+    {
+      title: 'View',
+      dataIndex: 'View',
+      key: 'View',
+      render: (view, record) => (
+        <Checkbox
+          checked={view}
+          onChange={() => handlePermissionChange2(record.Id, 'View')}
+        />
+      ),
+    },
+    {
+      title: 'Edit',
+      dataIndex: 'Edit',
+      key: 'Edit',
+      render: (edit, record) => (
+        <Checkbox
+          checked={edit}
+          onChange={() => handlePermissionChange2(record.Id, 'Edit')}
+        />
+      ),
+    },
+    {
+      title: 'Create',
+      dataIndex: 'Create',
+      key: 'Create',
+      render: (create, record) => (
+        <Checkbox
+          checked={create}
+          onChange={() => handlePermissionChange2(record.Id, 'Create')}
+        />
+      ),
+    },
+    {
+      title: 'Delete',
+      dataIndex: 'Delete',
+      key: 'Delete',
+      render: (deletePermission, record) => (
+        <Checkbox
+          checked={deletePermission}
+          onChange={() => handlePermissionChange2(record.Id, 'Delete')}
+        />
+      ),
+    },
+  ]
+  const handleTableChange3 = (pagination) => {
+    setPage3(pagination.current)
+    setLimit3(pagination.pageSize)
+  }
+  const handleTableChange2 = (pagination) => {
+    setPage2(pagination.current)
+    setLimit2(pagination.pageSize)
+  }
+  const handleTableChange1 = (pagination) => {
+    setPage1(pagination.current)
+    setLimit1(pagination.pageSize)
+  }
   return (
     <div className="w-full gap-3 h-full flex items-center justify-center">
       <div className="w-1/4 h-full flex flex-col bg-white border rounded-lg overflow-hidden pb-10">
@@ -332,12 +330,28 @@ function ViewRoleManagement({  groups }) {
             </div>
             <div className="mb-4">
               <div className="font-medium text-xs mb-2">Quyền Truy Nhóm Menu</div>
+
+
               <Table
                 dataSource={data1}
                 columns={permissionColumns1}
-                pagination={false}
-                rowKey="id"
+                rowKey="Id"
                 size="small"
+                rowSelection={{
+                  selectedRowKeys1,
+                  onChange: setSelectedRowKeys1,
+                  selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT, Table.SELECTION_NONE],
+                }}
+                pagination={{
+                  current: page1,
+                  pageSize: limit1,
+                  total: total1,
+                  showSizeChanger: true,
+                  showTotal: (total) => `Total ${total} Item`,
+                  onChange: (page, pageSize) =>
+                    handleTableChange1({ current: page, pageSize }),
+                }}
+                onChange={(pagination) => handleTableChange1(pagination)}
                 bordered
                 footer={() => (
                   <span
@@ -346,7 +360,7 @@ function ViewRoleManagement({  groups }) {
                     className="mt-2 max-w-md cursor-pointer text-pretty text-base text-indigo-500"
                     size="large"
                   >
-                   Add Row
+                    Add Row
                   </span>
                 )}
               />
@@ -354,12 +368,26 @@ function ViewRoleManagement({  groups }) {
             <div className="mb-4">
               <div className="font-medium text-xs mb-2">Quyền Truy Cập Menu</div>
               <Table
-                dataSource={samplePermissions}
-                columns={permissionColumns1}
-                pagination={false}
-                rowKey="id"
+                dataSource={data2}
+                columns={permissionColumns2}
+                rowKey="Id"
                 size="small"
                 bordered
+                rowSelection={{
+                  selectedRowKeys2,
+                  onChange: setSelectedRowKeys2,
+                  selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT, Table.SELECTION_NONE],
+                }}
+                pagination={{
+                  current: page2,
+                  pageSize: limit2,
+                  total: total2,
+                  showSizeChanger: true,
+                  showTotal: (total) => `Total ${total} Item`,
+                  onChange: (page, pageSize) =>
+                    handleTableChange2({ current: page, pageSize }),
+                }}
+                onChange={(pagination) => handleTableChange2(pagination)}
                 footer={() => (
                   <span
                     type="primary"
@@ -367,7 +395,7 @@ function ViewRoleManagement({  groups }) {
                     size="small"
                     onClick={handleAddRow2}
                   >
-                   Add Row
+                    Add Row
                   </span>
                 )}
               />
@@ -377,14 +405,26 @@ function ViewRoleManagement({  groups }) {
                 Danh Sách Người Dùng
               </div>
               <Table
-                dataSource={sampleUsers.filter(
-                  (user) => user.group === userInfo.groupName,
-                )}
+                dataSource={data3}
                 columns={userColumns}
-                pagination={false}
-                rowKey="id"
+                rowKey="Id"
                 size="small"
                 bordered
+                rowSelection={{
+                  selectedRowKeys3,
+                  onChange: setSelectedRowKeys3,
+                  selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT, Table.SELECTION_NONE],
+                }}
+                pagination={{
+                  current: page3,
+                  pageSize: limit3,
+                  total: total3,
+                  showSizeChanger: true,
+                  showTotal: (total) => `Total ${total} Item`,
+                  onChange: (page, pageSize) =>
+                    handleTableChange3({ current: page, pageSize }),
+                }}
+                onChange={(pagination) => handleTableChange3(pagination)}
                 footer={() => (
                   <span
                     type="primary"
@@ -392,7 +432,7 @@ function ViewRoleManagement({  groups }) {
                     size="large"
                     onClick={handleAddRow3}
                   >
-                   Add Row
+                    Add Row
                   </span>
                 )}
               />
@@ -412,13 +452,13 @@ function ViewRoleManagement({  groups }) {
             </Content>
           </>
         )}
-        <ModalRootMenu  isOpen={openModel1}
-        onClose={closeModal1} groupId={selectedGroup}/>
-         <ModalMenu  isOpen={openModel2}
-        onClose={closeModal2} groupId={selectedGroup}/>
-        <ModalUsers  isOpen={openModel3}
-        onClose={closeModal3}  groupId={selectedGroup} />
-       
+        <ModalRootMenu isOpen={openModel1}
+          onClose={closeModal1} groupId={selectedGroup} fetchData1={fetchData1} />
+        <ModalMenu isOpen={openModel2}
+          onClose={closeModal2} groupId={selectedGroup} fetchData2={fetchData2} />
+        <ModalUsers isOpen={openModel3}
+          onClose={closeModal3} groupId={selectedGroup} fetchData3={fetchData3} />
+
       </div>
     </div>
   )

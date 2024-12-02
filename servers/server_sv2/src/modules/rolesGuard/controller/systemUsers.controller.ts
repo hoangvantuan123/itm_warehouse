@@ -23,6 +23,8 @@ import { TCAGroupsWEB } from '../entities/groups.entity';
 import { TCAMenusWEB } from '../entities/menus.entity';
 import { TCARootMenusWEB } from '../entities/rootMenus.entity';
 import { TCARolesUsersWEB } from '../entities/rolesUsers.entity';
+import { TCAUserWEB } from 'src/modules/auth/entities/auths.entity';
+import { CreateResUsersDto } from '../dto/users.dto';
 
 
 @Controller('v2/mssql/system-users')
@@ -122,45 +124,57 @@ export class SystemUsersController {
 
     @Get('itm-root-menu-all')
     async findAllRootMenu(
-      @Param('userId') userId: string, 
-      @Query() filter: Record<string, any>, 
+        @Param('userId') userId: string,
+        @Query() filter: Record<string, any>,
     ) {
-      return this.systemUsersService.findAllRootMenu(filter); 
+        return this.systemUsersService.findAllRootMenu(filter);
     }
     @Get('itm-menu-all')
     async findAllMenu(
-      @Param('userId') userId: string, 
-      @Query() filter: Record<string, any>, 
+        @Param('userId') userId: string,
+        @Query() filter: Record<string, any>,
     ) {
-      return this.systemUsersService.findAllMenu(filter); 
+        return this.systemUsersService.findAllMenu(filter);
     }
 
     @Get('root-menus-not-in-role')
     async getRootMenusNotInRole(@Query('groupId') groupId: number): Promise<TCARootMenusWEB[]> {
-      if (!groupId) {
-        throw new NotFoundException('GroupId is required');
-      }
-  
-      return await this.systemUsersService.getRootMenusNotInRole(groupId);
+        if (!groupId) {
+            throw new NotFoundException('GroupId is required');
+        }
+
+        return await this.systemUsersService.getRootMenusNotInRole(groupId);
     }
+
+
+
+
     @Get('menus-not-in-role')
     async getMenusNotInRole(@Query('groupId') groupId: number): Promise<TCAMenusWEB[]> {
-      if (!groupId) {
-        throw new NotFoundException('GroupId is required');
-      }
-  
-      return await this.systemUsersService.getMenusNotInRole(groupId);
+        if (!groupId) {
+            throw new NotFoundException('GroupId is required');
+        }
+
+        return await this.systemUsersService.getMenusNotInRole(groupId);
+    }
+    @Get('users-not-in-role')
+    async getUsersNotInRole(@Query('groupId') groupId: number): Promise<CreateResUsersDto[]> {
+        if (!groupId) {
+            throw new NotFoundException('GroupId is required');
+        }
+
+        return await this.systemUsersService.getUsersNotInRole(groupId);
     }
 
 
     @Post('itm-roles-root-menus')
     async createRolesRootMenus(
-        @Body() body: { rootMenuIds: number[] , groupId : number , type: string},
+        @Body() body: { rootMenuIds: number[], groupId: number, type: string },
         @Req() req: Request,
         @Res() res: Response,
     ): Promise<Response> {
         try {
-            const rootMenuIds = body.rootMenuIds; 
+            const rootMenuIds = body.rootMenuIds;
             const groupId = body.groupId;
             const type = body.type;
             const userId = 'VM32402882'
@@ -172,39 +186,173 @@ export class SystemUsersController {
             );
         }
     }
+    @Post('itm-roles-menus')
+    async createRolesMenus(
+        @Body() body: { menuIds: number[], groupId: number, type: string },
+        @Req() req: Request,
+        @Res() res: Response,
+    ): Promise<Response> {
+        try {
+            const menuIds = body.menuIds;
+            const groupId = body.groupId;
+            const type = body.type;
+            const userId = 'VM32402882'
+            const result = await this.systemUsersService.createRolesMenu(userId, menuIds, groupId, type);
+            return res.status(HttpStatus.OK).json(result);
+        } catch (error) {
+            throw new UnauthorizedException(
+                'Request sending failed, please try again!',
+            );
+        }
+    }
+    @Post('itm-roles-users')
+    async createRolesUsers(
+        @Body() body: { userIds: string[], groupId: number, type: string },
+        @Req() req: Request,
+        @Res() res: Response,
+    ): Promise<Response> {
+        try {
+            const userIds = body.userIds;
+            const groupId = body.groupId;
+            const type = body.type;
+            const userId = 'VM32402882'
+            const result = await this.systemUsersService.createRolesUsers(userId, userIds, groupId, type);
+            return res.status(HttpStatus.OK).json(result);
+        } catch (error) {
+            throw new UnauthorizedException(
+                'Request sending failed, please try again!',
+            );
+        }
+    }
 
 
     /* roles-paginated?groupId=3&type=rootmenu&page=1&limit=5 */
-    @Get('roles-paginated')
-  async getPaginatedRoles(
-    @Query('groupId') groupId: number,
-    @Query('type') type: string,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-    @Res() res: Response,
-  ) {
-    try {
-      const result = await this.systemUsersService.getPaginatedRoles(
-        groupId,
-        type,
-        page,
-        limit,
-      );
+    @Get('roles-paginated-root-menu')
+    async getPaginatedRoles(
+        @Query('groupId') groupId: number,
+        @Query('type') type: string,
+        @Query('page') page: number = 1,
+        @Query('limit') limit: number = 10,
+        @Res() res: Response,
+    ) {
+        try {
+            if (!groupId || !type) {
+                return res.status(HttpStatus.OK).json({
+                    success: true,
+                    message: 'No data found due to missing parameters',
+                    data: [],
+                    total: 0,
+                    totalPages: 0,
+                    currentPage: page,
+                });
+            }
 
-      return res.status(HttpStatus.OK).json({
-        success: true,
-        message: 'Data retrieved successfully',
-        data: result.data,
-        total: result.total,
-        totalPages: result.totalPages,
-        currentPage: page,
-      });
-    } catch (error) {
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: error.message || 'Error fetching data',
-      });
+            const result = await this.systemUsersService.getPaginatedRootMenuRolesWithLabelsRaw(
+                groupId,
+                type,
+                page,
+                limit,
+            );
+
+            return res.status(HttpStatus.OK).json({
+                success: true,
+                message: 'Data retrieved successfully',
+                data: result.data,
+                total: result.total,
+                totalPages: result.totalPages,
+                currentPage: page,
+            });
+        } catch (error) {
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+                success: false,
+                message: error.message || 'Error fetching data',
+            });
+        }
     }
-  }
+    @Get('roles-paginated-menu')
+    async getPaginatedMenuRolesWithLabelsRaw(
+        @Query('groupId') groupId: number,
+        @Query('type') type: string,
+        @Query('page') page: number = 1,
+        @Query('limit') limit: number = 10,
+        @Res() res: Response,
+    ) {
+        try {
+            if (!groupId || !type) {
+                return res.status(HttpStatus.OK).json({
+                    success: true,
+                    message: 'No data found due to missing parameters',
+                    data: [],
+                    total: 0,
+                    totalPages: 0,
+                    currentPage: page,
+                });
+            }
+
+            const result = await this.systemUsersService.getPaginatedMenuRolesWithLabelsRaw(
+                groupId,
+                type,
+                page,
+                limit,
+            );
+
+            return res.status(HttpStatus.OK).json({
+                success: true,
+                message: 'Data retrieved successfully',
+                data: result.data,
+                total: result.total,
+                totalPages: result.totalPages,
+                currentPage: page,
+            });
+        } catch (error) {
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+                success: false,
+                message: error.message || 'Error fetching data',
+            });
+        }
+    }
+    @Get('roles-paginated-users')
+    async getPaginatedUserRolesWithLabelsRaw(
+        @Query('groupId') groupId: number,
+        @Query('type') type: string,
+        @Query('page') page: number = 1,
+        @Query('limit') limit: number = 10,
+        @Res() res: Response,
+    ) {
+        try {
+            if (!groupId || !type) {
+                return res.status(HttpStatus.OK).json({
+                    success: true,
+                    message: 'No data found due to missing parameters',
+                    data: [],
+                    total: 0,
+                    totalPages: 0,
+                    currentPage: page,
+                });
+            }
+
+            const result = await this.systemUsersService.getPaginatedUserRolesWithLabelsRaw(
+                groupId,
+                type,
+                page,
+                limit,
+            );
+
+            return res.status(HttpStatus.OK).json({
+                success: true,
+                message: 'Data retrieved successfully',
+                data: result.data,
+                total: result.total,
+                totalPages: result.totalPages,
+                currentPage: page,
+            });
+        } catch (error) {
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+                success: false,
+                message: error.message || 'Error fetching data',
+            });
+        }
+    }
+
 
 }

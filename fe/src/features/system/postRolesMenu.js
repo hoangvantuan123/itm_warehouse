@@ -1,17 +1,27 @@
 import axios from 'axios'
-import { HOST_API_SERVER_1 } from '../../../services'
-import { accessToken } from '../../../services/tokenService'
+import {
+  HOST_API_SERVER_2
+} from '../../services'
+import {
+  ERROR_MESSAGES
+} from '../../utils/constants'
+import {
+  accessToken
+} from '../../services/tokenService'
 
-export const ResetPassword = async (userIds) => {
+export const PostRolesMenu = async (
+  menuIds,
+  groupId,
+  type
+) => {
   try {
-    const token = accessToken() // Get the access token
-
+    const token = accessToken()
     const response = await axios.post(
-      `${HOST_API_SERVER_1}/reset-password`,
-      {
-        userIds,
-      },
-      {
+      `${HOST_API_SERVER_2}/mssql/system-users/itm-roles-menus`, {
+        menuIds,
+        groupId,
+        type
+      }, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -32,12 +42,12 @@ export const ResetPassword = async (userIds) => {
       }
     }
   } catch (error) {
-    // Improved error handling
+    // Xử lý lỗi tốt hơn
     return {
       success: false,
-      message: error.response
-        ? error.response.data.message || 'Có lỗi xảy ra'
-        : 'Không thể kết nối tới server',
+      message: error.response ?
+        error.response.data.message || 'Có lỗi xảy ra' :
+        'Không thể kết nối tới server',
     }
   }
 }

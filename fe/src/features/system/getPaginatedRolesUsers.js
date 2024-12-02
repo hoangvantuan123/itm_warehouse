@@ -1,16 +1,20 @@
 import axios from 'axios'
-import { HOST_API_SERVER_2 } from '../../services'
-import { ERROR_MESSAGES } from '../../utils/constants'
+import {
+  HOST_API_SERVER_2
+} from '../../services'
+import {
+  ERROR_MESSAGES
+} from '../../utils/constants'
 
-export const getPaginatedRoles = async (groupId, type, page, limit) => {
+export const getPaginatedRolesUsers = async (groupId, type, page, limit) => {
   try {
-    const url = `${HOST_API_SERVER_2}/mssql/system-users/roles-paginated`
+    const url = `${HOST_API_SERVER_2}/mssql/system-users/roles-paginated-users`
 
     const response = await axios.get(url, {
       params: {
         groupId,
         type,
-        page, 
+        page,
         limit
       },
       headers: {
@@ -22,6 +26,9 @@ export const getPaginatedRoles = async (groupId, type, page, limit) => {
       return {
         success: true,
         data: response.data.data,
+        total: response.data.total,
+        totalPages: response.data.totalPages
+
       }
     } else {
       return {
@@ -32,9 +39,9 @@ export const getPaginatedRoles = async (groupId, type, page, limit) => {
   } catch (error) {
     return {
       success: false,
-      message: error.response
-        ? error.response.data.message
-        : ERROR_MESSAGES.ERROR,
+      message: error.response ?
+        error.response.data.message :
+        ERROR_MESSAGES.ERROR,
     }
   }
 }

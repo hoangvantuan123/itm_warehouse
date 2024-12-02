@@ -3,6 +3,7 @@ import {
     NotFoundException,
     UnauthorizedException,
     BadRequestException
+    , InternalServerErrorException
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -15,6 +16,10 @@ import { LoginDto } from '../dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import { DatabaseService } from 'src/common/database/sqlServer/ITMV20240117/database.service';
 
+interface RoleMenuData {
+    menu: any[];
+    rootMenu: any[];
+}
 
 @Injectable()
 export class AuthService {
@@ -40,11 +45,128 @@ export class AuthService {
         return iv.toString('hex') + encrypted;
     }
 
+
+    async getDataRolesUserRaw(UserId: string): Promise<any[]> {
+        try {
+            const query = `
+              WITH GroupIDs AS (
+    SELECT DISTINCT GroupId 
+    FROM _TCARolesUsers_WEB 
+    WHERE UserId = N'${UserId}'
+)
+SELECT 
+    r.*,
+    m.[Key] AS MenuKey, 
+    m.Label AS MenuLabel,  
+    m.Link AS MenuLink,
+    m.Type AS MenuType,
+    rm.[Key] AS RootMenuKey,  
+    rm.Label AS RootMenuLabel,  
+    rm.Icon AS RootMenuIcon, 
+    rm.Link AS RootMenuLink, 
+    rm.Utilities AS RootMenuUtilities  
+FROM _TCARolesUsers_WEB r
+LEFT JOIN _TCAMenus_WEB m 
+    ON r.MenuId = m.Id AND r.Type = 'menu'
+LEFT JOIN _TCARootMenus_WEB rm 
+    ON r.RootMenuId = rm.Id AND r.Type = 'rootmenu'
+WHERE r.GroupId IN (SELECT GroupId FROM GroupIDs)
+AND r.Type IN ('rootmenu', 'menu');
+
+            `;
+
+            const datas = await this.databaseService.executeQuery(query);
+            if (datas.length === 0) {
+                console.log("No data found for UserId:", UserId);
+                return [];
+            }
+
+            const datamergePermissions = this.mergePermissions(datas);
+
+            return [
+                { menu: [...datamergePermissions.menu] },
+                { rootMenu: [...datamergePermissions.rootMenu] }
+            ];
+        } catch (error) {
+            throw new InternalServerErrorException('Error fetching datas from database');
+        }
+    }
+
+
+
+    private mergePermissions(data: any[]): { menu: any[], rootMenu: any[] } {
+        const mergedData = data.reduce((acc, item) => {
+            const { Id, View, Edit, Create, Delete, MenuId, GroupId, UserId, RootMenuId, Type, Name
+                , MenuKey, MenuLabel, MenuLink, MenuType, RootMenuKey, RootMenuLabel, RootMenuIcon, RootMenuLink,
+                RootMenuUtilities
+
+            } = item;
+
+            if (Type === "menu") {
+                if (!acc.menu[MenuId]) {
+                    acc.menu[MenuId] = {
+                        Id: Id,
+                        View: View,
+                        Edit: Edit,
+                        Create: Create,
+                        Delete: Delete,
+                        GroupId: GroupId,
+                        UserId: UserId,
+                        MenuId: MenuId,
+                        Type: Type,
+                        Name: Name,
+                        MenuKey: MenuKey,
+                        MenuLabel: MenuLabel,
+                        MenuLink: MenuLink,
+                        MenuType: MenuType
+                    };
+                } else {
+                    acc.menu[MenuId].View = acc.menu[MenuId].View && View;
+                    acc.menu[MenuId].Create = acc.menu[MenuId].Create && Create;
+                    acc.menu[MenuId].Edit = acc.menu[MenuId].Edit && Edit;
+                    acc.menu[MenuId].Delete = acc.menu[MenuId].Delete && Delete;
+                }
+            } else if (Type === "rootmenu") {
+                if (!acc.rootMenu[RootMenuId]) {
+                    acc.rootMenu[RootMenuId] = {
+                        Id: Id,
+                        View: View,
+                        Edit: Edit,
+                        Create: Create,
+                        Delete: Delete,
+                        GroupId: GroupId,
+                        UserId: UserId,
+                        RootMenuId: RootMenuId,
+                        Type: Type,
+                        Name: Name,
+                        RootMenuKey: RootMenuKey,
+                        RootMenuLabel: RootMenuLabel,
+                        RootMenuIcon: RootMenuIcon,
+                        RootMenuLink: RootMenuLink,
+                        RootMenuUtilities: RootMenuUtilities
+                    };
+                } else {
+                    acc.rootMenu[RootMenuId].View = acc.rootMenu[RootMenuId].View && View;
+                    acc.rootMenu[RootMenuId].Create = acc.rootMenu[RootMenuId].Create && Create;
+                    acc.rootMenu[RootMenuId].Edit = acc.rootMenu[RootMenuId].Edit && Edit;
+                    acc.rootMenu[RootMenuId].Delete = acc.rootMenu[RootMenuId].Delete && Delete;
+                }
+            }
+
+            return acc;
+        }, { menu: {}, rootMenu: {} });
+
+        return {
+            menu: Object.values(mergedData.menu),
+            rootMenu: Object.values(mergedData.rootMenu),
+        };
+    }
+
     async loginUserB(
         loginData: LoginDto,
     ): Promise<{
         success: boolean;
-        data?: { user: Partial<TCAUserWEB>; token: string; rolesUser: string };
+        data?: { user: Partial<TCAUserWEB>; token: string; tokenRolesUserMenu: string };
         error?: { message: string; code: string };
     }> {
         const { login, password } = loginData;
@@ -75,20 +197,21 @@ export class AuthService {
                     EmpSeq: user.EmpSeq,
                     Remark: user.Remark,
                     CompanySeq: user.CompanySeq
+                },
+                jwtConstants.secret,
+                { expiresIn: '24h' }
+            );
+
+            const rolesUserMenu = await this.getDataRolesUserRaw(login);
+            const tokenRolesUserMenu = jwt.sign(
+                {
+                    data: rolesUserMenu
 
                 },
                 jwtConstants.secret,
                 { expiresIn: '24h' }
             );
 
-            const rolesUser = jwt.sign(
-                {
-                    UserId: user.UserId,
-                    Login: user.UserName,
-                    UserSeq: user.UserSeq
-                },
-                jwtConstants.secret
-            );
 
             const userResponse: Partial<any> = {
                 UserId: user.UserId,
@@ -104,7 +227,7 @@ export class AuthService {
                 data: {
                     user: userResponse,
                     token,
-                    rolesUser
+                    tokenRolesUserMenu
                 },
             };
         } catch (error) {
@@ -146,6 +269,7 @@ export class AuthService {
             };
         }
     }
+
 
 
 

@@ -211,16 +211,13 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     const newLotNoFull = dataResSuccess?.LotNoFull?.trim().toLowerCase()
     const newBarcode = dataResSuccess?.Barcode?.trim().toLowerCase()
 
-    // Kiểm tra xem dữ liệu đã tồn tại trong scanHistory chưa
     setScanHistory((prevHistory) => {
-      // Kiểm tra trùng lặp trong prevHistory (là mảng cập nhật từ lần gọi trước)
       const isExist = prevHistory.some(
         (item) =>
           item.LotNoFull?.trim().toLowerCase() === newLotNoFull &&
           item.Barcode?.trim().toLowerCase() === newBarcode,
       )
 
-      // Nếu không trùng lặp, thêm dữ liệu mới vào mảng
       if (!isExist) {
         return [
           ...prevHistory,

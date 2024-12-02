@@ -33,6 +33,16 @@ export class DatabaseService {
     }
   }
 
+  async executeQueryParams(query: string, params: any[]): Promise<any> {
+    try {
+      const result = await this.queryRunner.query(query, params);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
 
 
   async executeQueryTest(query: string): Promise<any> {

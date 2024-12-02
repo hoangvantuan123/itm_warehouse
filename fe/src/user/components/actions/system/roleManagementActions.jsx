@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button } from 'antd'
-import { SaveOutlined, PlusOutlined } from '@ant-design/icons'
+import { SaveOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 
 export default function RoleManagementActions({ openModalAddUserGroups }) {
   return (
@@ -11,7 +11,7 @@ export default function RoleManagementActions({ openModalAddUserGroups }) {
         icon={<PlusOutlined />}
         size="middle"
         onClick={openModalAddUserGroups}
-        className="w-full  uppercase rounded-lg h-full border-gray-200 bg-indigo-600 text-white shadow-sm text-sm"
+        style={{ backgroundColor: '#4F46E5', borderColor: '#4F46E5' }}
       >
         ADD GROUP
       </Button>
@@ -24,6 +24,16 @@ export default function RoleManagementActions({ openModalAddUserGroups }) {
         style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
       >
         Save
+      </Button>
+      <Button
+        key="Row Delete"
+        type="primary"
+        icon={<DeleteOutlined />}
+        size="middle"
+        className="uppercase text-white"
+        style={{ backgroundColor: '#ff4d4f', borderColor: '#ff4d4f' }}
+      >
+        Row Delete
       </Button>
     </div>
   )

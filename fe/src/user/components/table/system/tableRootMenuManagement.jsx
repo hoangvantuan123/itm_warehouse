@@ -145,6 +145,7 @@ function TableRootMenuManagement({ data }) {
           getCellsForSelection={true}
           onSearchClose={onSearchClose}
           width="100%"
+          height="100%"
           rowMarkers={('checkbox-visible', 'both')}
           useRef={useRef}
           onColumnResize={onColumnResize}
