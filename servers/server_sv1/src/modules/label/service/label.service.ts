@@ -17,26 +17,23 @@ export class LabelService {
       const templateZpl = `
 
               ^XA
-              ^PW1100                ; Đặt chiều rộng tem (600 dots)
-              ^LL500                ; Đặt chiều cao tem (300 dots)
-              ^CF0,30             ; Đặt kích thước font mặc định
 
-              ^FO0,10^BY2,2,30
-              ^BCN,50,Y,N,N         ; Barcode với chiều cao 50
+              ^FO60,30^BY2,4,20
+              ^BCN,80,Y,N,N         ; Barcode với chiều cao 50
               ^FD {BARCODE_DATA}^FS
 
               ; Cột trái
-              ^FO20,90^A0N,20,20^FDCode: {CODE}^FS  ; Đặt ngay dưới barcode
-              ^FO20,120^A0N,20,20^FDLot: {LOT}^FS
-              ^FO20,150^A0N,20,20^FDReel: {REEL}^FS
+              ^FO60,140^A0N,30,40^FDCode: {CODE}^FS  ; Đặt ngay dưới barcode
+              ^FO60,180^A0N,30,40^FDLot: {LOT}^FS
+              ^FO60,210^A0N,30,40^FDReel: {REEL}^FS
 
               ; Cột phải
-              ^FO300,90^A0N,20,20^FDQTY: {QTY}^FS
-              ^FO300,120^A0N,20,20^FDDC: {DC}^FS
-              ^FO300,150^A0N,20,20^FDUserID: {USER_ID}^FS
+              ^FO460,140^A0N,30,40^FDQTY: {QTY}^FS
+              ^FO460,180^A0N,30,40^FDDC: {DC}^FS
+              ^FO460,210^A0N,30,40^FDUserID: {USER_ID}^FS
 
               ; QR Code
-              ^FO650,0^BQN,2,5     ; QR code nhỏ hơn
+              ^FO1100,0^BQN,8,8     ; QR code nhỏ hơn
               ^FDQA,{QR_DATA}^FS
               ^XZ
 
@@ -51,7 +48,6 @@ export class LabelService {
       console.error('Error generating QR code:', error);
     }
   }
-
 
   async GetData(matID: string, lotNo: string) {
     let query = ` SELECT * FROM EWIPRMTBCI WHERE (1=1) `;

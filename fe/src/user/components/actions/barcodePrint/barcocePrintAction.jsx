@@ -99,7 +99,7 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect }
             };
 
             try {
-                const response = await fetch(`http://api.labelary.com/v1/printers/8dpmm/labels/3.9370100000000003x0.787402/0/`, options);
+                const response = await fetch(`http://api.labelary.com/v1/printers/12dpmm/labels/4.94x0.91/0/`, options);
 
                 if (!response.ok) {
                     throw new Error('Error generating preview');
@@ -107,6 +107,7 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect }
 
                 const blob = await response.blob();
                 const url = URL.createObjectURL(blob);
+
                 imageUrls.push(url);
             } catch (error) {
                 console.error('Error fetching ZPL preview:', error);
@@ -130,12 +131,12 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect }
         const iframe = document.createElement('iframe');
         iframe.style.display = 'none';
         document.body.appendChild(iframe);
-        const doc = iframe.contentDocument || iframe.contentWindow.document ;
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
         doc.open();
         doc.write(`
              <style>
               @page {
-                size: 10cm 2.5cm;
+                size: 3.94in 0.79in;
                 margin: 0;
                 }
                     body {
@@ -152,9 +153,10 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect }
                         max-width: 100%;
                         max-height: 100%;
                         object-fit: contain;
-                        // margin-top: 2;
-                        page-break-after: always;
+                        page-break-before: always;
+                        margin-top:0;
                     }
+
                     </style>
             `);
         objectUrls.forEach((url) => {
@@ -163,6 +165,8 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect }
                     <img src="${url}" alt="Label">
                     
             `);
+
+
         });
 
         console.log(doc);
