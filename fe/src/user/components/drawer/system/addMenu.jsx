@@ -201,8 +201,9 @@ export default function DrawerAddMenu({
                 size="large"
               >
                 {menus.map((item) => (
-                  <Option key={item.Id} value={item.Id} >
-                    {item.Type}  - <span className="uppercase">{item.Label}</span>
+                  <Option key={item.Id} value={item.Id}>
+                    {item.Type} -{' '}
+                    <span className="uppercase">{item.Label}</span>
                   </Option>
                 ))}
               </Select>

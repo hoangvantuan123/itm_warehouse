@@ -10,28 +10,28 @@ export const iconMapping = {
   ContainerOutlined: <ContainerOutlined style={{ fontSize: '20px' }} />,
   TeamOutlined: <TeamOutlined style={{ fontSize: '20px' }} />,
   SettingOutlined: <SettingOutlined style={{ fontSize: '20px' }} />,
-};
+}
 export const menuItems = [
   {
-    key: 'warehouse',
-    label: 'Warehouse Management',
-    icon: <ContainerOutlined style={{ fontSize: '20px' }} />,
-    link: '/u/warehouse',
-    utilities: true,
+    RootMenuKey: 'warehouse',
+    RootMenuLabel: 'Warehouse Management',
+    RootMenuIcon: 'ContainerOutlined',
+    RootMenuLink: '/u/warehouse',
+    RootMenuUtilities: true,
   },
   {
-    key: 'users',
-    label: 'USERS',
-    icon: <TeamOutlined style={{ fontSize: '20px' }} />,
-    link: '/u/add',
-    utilities: true,
+    RootMenuKey: 'users',
+    RootMenuLabel: 'USERS',
+    RootMenuIcon: 'TeamOutlined',
+    RootMenuLink: '/u/add',
+    RootMenuUtilities: true,
   },
   {
-    key: 'system_settings',
-    label: 'System Settings',
-    icon: <SettingOutlined style={{ fontSize: '20px' }} />,
-    link: '/u/add',
-    utilities: true,
+    RootMenuKey: 'system_settings',
+    RootMenuLabel: 'System Settings',
+    RootMenuIcon: 'SettingOutlined',
+    RootMenuLink: '/u/add',
+    RootMenuUtilities: true,
   },
 ]
 

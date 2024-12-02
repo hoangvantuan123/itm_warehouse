@@ -46,7 +46,7 @@ export default function Login({ fetchPermissions }) {
         localStorage.setItem('language', response.data.user.language)
         localStorage.setItem('roles_menu', response.data.tokenRolesUserMenu)
         Cookies.set('accessToken', response.data.token)
-          navigate('/u/home')
+        navigate('/u/home')
         fetchPermissions()
       } else {
         switch (response.error.code) {
@@ -70,7 +70,6 @@ export default function Login({ fetchPermissions }) {
       setLoading(false)
     }
   }
-
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search)

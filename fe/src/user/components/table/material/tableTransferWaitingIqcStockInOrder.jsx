@@ -3,14 +3,13 @@ import { DataEditor, GridCellKind } from '@glideapps/glide-data-grid'
 import { Button } from 'antd'
 import '@glideapps/glide-data-grid/dist/index.css'
 import { useNavigate } from 'react-router-dom'
-import '../../../../static/css/customTabe.css'
 import { CompactSelection } from '@glideapps/glide-data-grid'
 
 const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
 
-function TableMenuManagement({ data }) {
+function TableTransferWaitingIqcStockInOrder({ data }) {
   const [gridData, setGridData] = useState([])
   const [showSearch, setShowSearch] = useState(false)
   const ref = (useRef < data) | (null > null)
@@ -25,15 +24,14 @@ function TableMenuManagement({ data }) {
   })
   const columns = useMemo(
     () => [
-      { title: 'Menu Root ID' },
-      { title: 'Menu Sub Root ID' },
-      { title: 'Key' },
-      { title: 'Label', width: 300 },
-      { title: 'Link', width: 350 },
-      { title: 'Type' },
+      { title: 'ItemNo' },
+      { title: 'TotalQty' },
+      { title: 'OkQty' },
+      { title: 'RemainQty' }
     ],
     [],
   )
+
   const [cols, setCols] = useState(columns)
   const onColumnResize = useCallback(
     (column, newSize) => {
@@ -55,23 +53,19 @@ function TableMenuManagement({ data }) {
     ([col, row]) => {
       const person = gridData[row] || {}
       const {
-        MenuRootId = '',
-        MenuSubRootId = '',
-        Key = '',
-        Label = '',
-        Link = '',
-        Type = '',
+        ItemNo = '',
+        TotalQty = '',
+        OkQty = '',
+        RemainQty = ''
       } = person
 
       const safeString = (value) => (value != null ? String(value) : '')
 
       const columnMap = {
-        0: { kind: GridCellKind.Text, data: safeString(MenuRootId) },
-        1: { kind: GridCellKind.Text, data: safeString(MenuSubRootId) },
-        2: { kind: GridCellKind.Text, data: safeString(Key) },
-        3: { kind: GridCellKind.Text, data: safeString(Label) },
-        4: { kind: GridCellKind.Text, data: safeString(Link) },
-        5: { kind: GridCellKind.Text, data: safeString(Type) },
+        0: { kind: GridCellKind.Text, data: safeString(ItemNo) },
+        1: { kind: GridCellKind.Text, data: safeString(TotalQty) },
+        2: { kind: GridCellKind.Text, data: safeString(OkQty) },
+        3: { kind: GridCellKind.Text, data: safeString(RemainQty) }
       }
 
       if (columnMap.hasOwnProperty(col)) {
@@ -130,9 +124,7 @@ function TableMenuManagement({ data }) {
       console.log('Invalid row index:', rowIndex)
     }
 
-    console.log('Cell clicked:', cell)
-    console.log('Row data:', gridData[rowIndex])
-    console.log('Event:', event)
+   
   }
 
   const onGridSelectionChange = (newSelection) => {
@@ -140,8 +132,7 @@ function TableMenuManagement({ data }) {
   }
 
   return (
-    <div className="w-full gap-1 h-full flex items-center justify-center pb-8">
-      <div className="w-full h-full flex flex-col border bg-white rounded-lg overflow-hidden ">
+      <div className="w-full h-full border-t border-b overflow-hidden scroll-container ">
         <DataEditor
           columns={cols}
           getCellContent={getData}
@@ -157,13 +148,12 @@ function TableMenuManagement({ data }) {
           smoothScrollY={true}
           smoothScrollX={true}
           onCellClicked={onCellClicked}
-          rowSelect="multi"
+          rowSelect="single"
           gridSelection={selection}
           onGridSelectionChange={setSelection}
         />
-      </div>
     </div>
   )
 }
 
-export default TableMenuManagement
+export default TableTransferWaitingIqcStockInOrder

@@ -17,6 +17,8 @@ import RoleManagementActions from '../../components/actions/system/roleManagemen
 import DrawerAddUserGroups from '../../components/drawer/system/addUserGroups'
 import { GetAllResGroups } from '../../../features/system/getGroups'
 import ViewRoleManagement from '../../components/view/system/viewRoleManagement'
+import { PostUpdateRolesUser } from '../../../features/system/postUpdateRolesUser'
+import { DeleteRolesUser } from '../../../features/system/deleteRolesUser'
 
 export default function RoleManagement({ permissions, isMobile }) {
   const { t } = useTranslation()
@@ -33,7 +35,21 @@ export default function RoleManagement({ permissions, isMobile }) {
   const [checkedRowKey, setCheckedRowKey] = useState(null)
   const [keyPath, setKeyPath] = useState(null)
   const [checkedPath, setCheckedPath] = useState(false)
+  const [changedIds, setChangedIds] = useState([]);
   const formatDate = useCallback((date) => date.format('YYYYMMDD'), [])
+  const [selectedRowKeys, setSelectedRowKeys] = useState({
+    table1: [],
+    table2: [],
+    table3: [], 
+  });
+  const getAllSelectedKeys = () => {
+    return [
+      ...selectedRowKeys.table1,
+      ...selectedRowKeys.table2,
+      ...selectedRowKeys.table3,
+    ];
+  };
+
   const [isModalOpenAddUserGroups, setIsModalOpenAddUserGroups] =
     useState(false)
 
@@ -68,6 +84,42 @@ export default function RoleManagement({ permissions, isMobile }) {
     setIsModalOpenAddUserGroups(false)
   }
 
+  const handleSubmitSheet = useCallback(async () => {
+    if (changedIds.length === 0) {
+      console.log('No changes to submit.');
+      return;
+    }
+
+    const response = await PostUpdateRolesUser(changedIds);
+
+    if (response.success) {
+      console.log('Save successful:', response.message);
+      setChangedIds([]); 
+    } else {
+      console.error('Save failed:', response.message);
+    }
+  }, [changedIds]);
+  const handleDeleteDataSheet = useCallback(async () => {
+    const ids = getAllSelectedKeys(); 
+    if (ids.length === 0) {
+      console.log('No rows selected');
+      return;
+    }
+
+    const response = await DeleteRolesUser(ids);
+
+    if (response.success) {
+      console.log('Delete successful:', response.message);
+      setSelectedRowKeys({
+        table1: [],
+        table2: [],
+        table3: [],
+      });
+    } else {
+      console.error('Save failed:', response.message);
+    }
+  }, [selectedRowKeys]);
+
   return (
     <>
       <Helmet>
@@ -83,6 +135,8 @@ export default function RoleManagement({ permissions, isMobile }) {
               <RoleManagementActions
                 fetchDataGroups={fetchDataGroups}
                 openModalAddUserGroups={openModalAddUserGroups}
+                handleSubmitSheet={handleSubmitSheet}
+                handleDeleteDataSheet={handleDeleteDataSheet}
               />
             </div>
           </div>
@@ -94,6 +148,10 @@ export default function RoleManagement({ permissions, isMobile }) {
               gridRef={gridRef}
               setData={setData}
               groups={groups}
+              setChangedIds={setChangedIds}
+              changedIds={changedIds}
+              setSelectedRowKeys={setSelectedRowKeys}
+              selectedRowKeys={selectedRowKeys}
             />
           </div>
         </div>

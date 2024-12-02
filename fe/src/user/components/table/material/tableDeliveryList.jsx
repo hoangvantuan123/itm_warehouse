@@ -1,11 +1,13 @@
-import { useRef, useState, useEffect } from 'react'
-import 'tui-grid/dist/tui-grid.css'
-import Grid from '@toast-ui/react-grid'
-import TuiGrid from 'tui-grid'
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
+import { DataEditor, GridCellKind } from '@glideapps/glide-data-grid'
+import { Button } from 'antd'
+import '@glideapps/glide-data-grid/dist/index.css'
 import { useNavigate } from 'react-router-dom'
-import '../../../../static/css/customTabe.css'
-import { encodeBase64Url } from '../../../../utils/decode-JWT'
-import CryptoJS from 'crypto-js'
+import { CompactSelection } from '@glideapps/glide-data-grid'
+
+const SearchButton = ({ onClick }) => (
+  <Button onClick={onClick}>Show Search</Button>
+)
 
 function TableDeliveryList({
   data,
@@ -15,233 +17,160 @@ function TableDeliveryList({
   setKeyPath,
   checkedPath,
   setCheckedPath,
+  onCellClicked, 
+  gridData, 
+  setGridData
 }) {
-  const navigate = useNavigate()
 
-  const columns = [
-    {
-      name: 'DelvNo',
-      header: 'DelvNo',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 140,
+  const [showSearch, setShowSearch] = useState(false)
+  const ref = (useRef < data) | (null > null)
+  const onSearchClose = useCallback(() => setShowSearch(false), [])
+
+  const [selection, setSelection] = useState({
+    columns: CompactSelection.empty(),
+    rows: CompactSelection.empty(),
+  })
+  const columns = useMemo(
+    () => [
+      { title: 'DelvNo' },
+      { title: 'DelvMngNo' },
+      { title: 'ImpType' },
+      { title: 'TotalQty' },
+      { title: 'OkQty' },
+      { title: 'RemainQty' },
+      { title: 'DelvDate' },
+      { title: 'CustSeq' },
+      { title: 'CustNm' },
+      { title: 'DomOrImp' },
+      { title: 'PurchaseType' },
+      { title: 'BizUnitName' },
+      { title: 'BizUnit' },
+      { title: 'EmpSeq' },
+      { title: 'EmpName' },
+      { title: 'DeptSeq' },
+      { title: 'DeptName' },
+      { title: 'CurrSeq' },
+      { title: 'CurrName' },
+      { title: 'ExRate' },
+    ],
+    [],
+  )
+
+  const [cols, setCols] = useState(columns)
+  const onColumnResize = useCallback(
+    (column, newSize) => {
+      const index = cols.indexOf(column)
+      if (index !== -1) {
+        const newCol = {
+          ...column,
+          width: newSize,
+        }
+        const newCols = [...cols]
+        newCols.splice(index, 1, newCol)
+        setCols(newCols)
+      }
     },
-    {
-      name: 'DelvMngNo',
-      header: 'DelvMngNo',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 140,
+    [cols],
+  )
+
+  const getData = useCallback(
+    ([col, row]) => {
+      const person = gridData[row] || {}
+      const {
+        DelvNo = '',
+        DelvMngNo = '',
+        ImpType = '',
+        TotalQty = '',
+        OkQty = '',
+        RemainQty = '',
+        DelvDate = '',
+        CustSeq = '',
+        CustNm = '',
+        DomOrImp = '',
+        PurchaseType = '',
+        BizUnitName = '',
+        BizUnit = '',
+        EmpSeq = '',
+        EmpName = '',
+        DeptSeq = '',
+        DeptName = '',
+        CurrSeq = '',
+        CurrName = '',
+        ExRate = '',
+      } = person
+
+      const safeString = (value) => (value != null ? String(value) : '')
+
+      const columnMap = {
+        0: { kind: GridCellKind.Text, data: safeString(DelvNo) },
+        1: { kind: GridCellKind.Text, data: safeString(DelvMngNo) },
+        2: { kind: GridCellKind.Text, data: safeString(ImpType) },
+        3: { kind: GridCellKind.Text, data: safeString(TotalQty) },
+        4: { kind: GridCellKind.Text, data: safeString(OkQty) },
+        5: { kind: GridCellKind.Text, data: safeString(RemainQty) },
+        6: { kind: GridCellKind.Text, data: safeString(DelvDate) },
+        7: { kind: GridCellKind.Text, data: safeString(CustSeq) },
+        8: { kind: GridCellKind.Text, data: safeString(CustNm) },
+        9: { kind: GridCellKind.Text, data: safeString(DomOrImp) },
+        10: { kind: GridCellKind.Text, data: safeString(PurchaseType) },
+        11: { kind: GridCellKind.Text, data: safeString(BizUnitName) },
+        12: { kind: GridCellKind.Text, data: safeString(BizUnit) },
+        13: { kind: GridCellKind.Text, data: safeString(EmpSeq) },
+        14: { kind: GridCellKind.Text, data: safeString(EmpName) },
+        15: { kind: GridCellKind.Text, data: safeString(DeptSeq) },
+        16: { kind: GridCellKind.Text, data: safeString(DeptName) },
+        17: { kind: GridCellKind.Text, data: safeString(CurrSeq) },
+        18: { kind: GridCellKind.Text, data: safeString(CurrName) },
+        19: { kind: GridCellKind.Text, data: safeString(ExRate) },
+      }
+
+      if (columnMap.hasOwnProperty(col)) {
+        const { kind, data } = columnMap[col]
+        return { kind, data, displayData: data }
+      }
+
+      return { kind: GridCellKind.Text, data: '', displayData: '' }
     },
-    {
-      name: 'ImpType',
-      header: 'ImpType',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 140,
-    },
-    {
-      name: 'TotalQty',
-      header: 'TotalQty',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 140,
-    },
-    {
-      name: 'OkQty',
-      header: 'OkQty',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 140,
-    },
-    {
-      name: 'RemainQty',
-      header: 'RemainQty',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 140,
-    },
-    {
-      name: 'DelvDate',
-      header: 'DelvDate',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 140,
-    },
-    {
-      name: 'CustSeq',
-      header: 'Customer Code',
-      sortable: true,
-      resizable: true,
-      width: 140,
-    },
-    {
-      name: 'CustNm',
-      header: 'Customer Name',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 200,
-    },
-    {
-      name: 'DomOrImp',
-      header: 'Purchase Type Seq',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 200,
-    },
-    {
-      name: 'PurchaseType',
-      header: 'Purchase Type',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 200,
-    },
-    {
-      name: 'BizUnitName',
-      header: 'BizUnitName',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 200,
-    },
-    {
-      name: 'BizUnit',
-      header: 'BizUnit',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 100,
-    },
-    {
-      name: 'EmpSeq',
-      header: 'Employee Seq',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 140,
-    },
-    {
-      name: 'EmpName',
-      header: 'Employee Name',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 200,
-    },
-    {
-      name: 'DeptSeq',
-      header: 'Department Seq',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 140,
-    },
-    {
-      name: 'DeptName',
-      header: 'Department Name',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 200,
-    },
-    {
-      name: 'CurrSeq',
-      header: 'Currency Seq',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 140,
-    },
-    {
-      name: 'CurrName',
-      header: 'Currency Name',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 200,
-    },
-    {
-      name: 'ExRate',
-      header: 'Exchange Rate',
-      sortable: true,
-      filter: 'text',
-      resizable: true,
-      width: 140,
-    },
-  ]
+    [gridData],
+  )
+
+  const [lastActivated, setLastActivated] = useState(undefined)
+
+  const onCellActivated = useCallback((cell) => {
+    console.log('cell', cell)
+    setLastActivated(cell)
+  }, [])
+
   useEffect(() => {
-    if (checkedPath === true) {
-      setKeyPath(null)
-      setCheckedPath(false)
-    }
-  }, [checkedPath])
+    setGridData(data)
+  }, [data])
 
-  const handleRowDoubleClick = (e) => {
-    const { rowKey } = e
-    const clickedRowData = e.instance.getRow(rowKey)
-    const filteredData = {
-      DelvNo: clickedRowData?.DelvNo,
-      DelvMngNo: clickedRowData?.DelvMngNo,
-      ImpType: clickedRowData?.ImpType,
-      TotalQty: clickedRowData?.TotalQty,
-      OkQty: clickedRowData?.OkQty,
-      RemainQty: clickedRowData?.RemainQty,
-      DelvDate: clickedRowData?.DelvDate,
-      CustSeq: clickedRowData?.CustSeq,
-      CustNm: clickedRowData?.CustNm,
-      DomOrImp: clickedRowData?.DomOrImp,
-      PurchaseType: clickedRowData?.PurchaseType,
-      BizUnitName: clickedRowData?.BizUnitName,
-      BizUnit: clickedRowData?.BizUnit,
-      EmpSeq: clickedRowData?.EmpSeq,
-      EmpName: clickedRowData?.EmpName,
-      DeptSeq: clickedRowData?.DeptSeq,
-      DeptName: clickedRowData?.DeptName,
-      CurrSeq: clickedRowData?.CurrSeq,
-      CurrName: clickedRowData?.CurrName,
-      ExRate: clickedRowData?.ExRate,
-    }
 
-    const secretKey = 'TEST_ACCESS_KEY'
-    const encryptedData = CryptoJS.AES.encrypt(
-      JSON.stringify(filteredData),
-      secretKey,
-    ).toString()
-    const encryptedToken = encodeBase64Url(encryptedData)
-
-    /*  navigate(`/u/warehouse/material/waiting-iqc-stock-in/${encryptedToken}`) */
+  const onGridSelectionChange = (newSelection) => {
+    console.log('Selection aborted', newSelection)
   }
 
-  TuiGrid.applyTheme('striped')
-
   return (
-    <div className="w-full gap-1 h-full flex items-center justify-center">
-      <div className="w-full h-full flex flex-col border bg-white p-3 rounded-lg overflow-hidden pb-5">
-        <Grid
-          ref={gridRef}
-          data={data}
-          columns={columns}
-          rowHeight={40}
-          bodyHeight="fitToParent"
-          onDblclick={handleCheck}
-          rowHeaders={['rowNum', 'checkbox']}
-          pagination={{ perPage: 100 }}
-          scrollX={true}
-          heightResizable={true}
-          usageStatistics={true}
-          hoverable={true}
-          autoResize={true}
-          onCheck={handleCheck}
+    <div className="w-full gap-1 h-full flex items-center justify-center pb-8">
+      <div className="w-full h-full flex flex-col border bg-white rounded-lg overflow-hidden ">
+        <DataEditor
+          columns={cols}
+          getCellContent={getData}
+          rows={gridData.length}
+          showSearch={showSearch}
+          getCellsForSelection={true}
+          onSearchClose={onSearchClose}
+          width="100%"
+          height="100%"
+          rowMarkers={('checkbox-visible', 'both')}
+          useRef={useRef}
+          onColumnResize={onColumnResize}
+          smoothScrollY={true}
+          smoothScrollX={true}
+          onCellClicked={onCellClicked}
+          rowSelect="single"
+          gridSelection={selection}
+          onGridSelectionChange={setSelection}
         />
       </div>
     </div>

@@ -19,7 +19,6 @@ import Home from '../page/home/home'
 import Login from '../auth/login'
 import decodeJWT from '../../utils/decode-JWT'
 
-
 const DeliveryList = lazy(() => import('../page/material/deliveryList'))
 const WaitingIqcStockIn = lazy(
   () => import('../page/material/waitingIqcStockIn'),
@@ -44,11 +43,35 @@ const UserRouter = () => {
   const [menuSettingItems, setMenuSettingItems] = useState([])
   const [rootMenu, setRootMenu] = useState([])
   useEffect(() => {
-    const token = localStorage.getItem('roles_menu');
-    const data = decodeJWT(token);
-    setMenuSettingItems(data.data[0].menu || [])
-    setRootMenu(data.data[1].rootMenu || [])
-  }, []);
+    const token = localStorage.getItem('roles_menu')
+    const data = decodeJWT(token)
+    setMenuSettingItems(data?.data[0].menu || [])
+    setRootMenu(
+      data?.data[1].rootMenu || [
+        {
+          RootMenuKey: 'warehouse',
+          RootMenuLabel: 'Warehouse Management',
+          RootMenuIcon: 'ContainerOutlined',
+          RootMenuLink: '/u/warehouse',
+          RootMenuUtilities: true,
+        },
+        {
+          RootMenuKey: 'users',
+          RootMenuLabel: 'USERS',
+          RootMenuIcon: 'TeamOutlined',
+          RootMenuLink: '/u/add',
+          RootMenuUtilities: true,
+        },
+        {
+          RootMenuKey: 'system_settings',
+          RootMenuLabel: 'System Settings',
+          RootMenuIcon: 'SettingOutlined',
+          RootMenuLink: '/u/add',
+          RootMenuUtilities: true,
+        },
+      ],
+    )
+  }, [])
 
   return (
     <Routes>
@@ -57,7 +80,11 @@ const UserRouter = () => {
         path="/*"
         element={
           <Layout className="h-[calc(100vh-30px)]">
-            <Sidebar permissions={userPermissions} rootMenu={rootMenu} menuSettingItems={menuSettingItems} />
+            <Sidebar
+              permissions={userPermissions}
+              rootMenu={rootMenu}
+              menuSettingItems={menuSettingItems}
+            />
             <Layout>
               <Content className="bg-slate-50">
                 <Suspense fallback={<Spinner />}>

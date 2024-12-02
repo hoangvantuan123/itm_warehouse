@@ -100,7 +100,11 @@ export default function DeliveryList({ permissions, isMobile }) {
   const [keyPath, setKeyPath] = useState(null)
   const [checkedPath, setCheckedPath] = useState(false)
   const formatDate = useCallback((date) => date.format('YYYYMMDD'), [])
-
+  const [isMinusClicked, setIsMinusClicked] = useState(false)
+  const [lastClickedCell, setLastClickedCell] = useState(null)
+  const [clickedRowData, setClickedRowData] = useState(null)
+  const [clickedRowDataList, setClickedRowDataList] = useState([])
+  const [gridData, setGridData] = useState([])
   const fetchDeliveryData = useCallback(async () => {
     setLoading(true)
     try {
@@ -110,7 +114,7 @@ export default function DeliveryList({ permissions, isMobile }) {
         deliveryNo,
         bizUnit,
       )
-      setData(deliveryResponse?.data || [])
+      setData(deliveryResponse?.data || dataM)
     } catch (error) {
       setData([])
     } finally {
@@ -149,17 +153,42 @@ export default function DeliveryList({ permissions, isMobile }) {
     [fetchCodeHelpData],
   )
 
-  const handleCheck = useCallback(
-    (ev) => {
-      const { rowKey } = ev
-      const gridInstance = gridRef.current?.getInstance()
-      const previousCheckedRowKey = checkedRowKey
 
-      if (previousCheckedRowKey !== null && gridInstance) {
-        gridInstance.uncheck(previousCheckedRowKey)
-      }
+  const nextPageStockIn = useCallback(() => {
+    if (keyPath) {
+      navigate(`/u/warehouse/material/waiting-iqc-stock-in/${keyPath}`)
+    }
+  }, [keyPath, navigate])
 
-      const rowData = data[rowKey]
+
+  const onCellClicked = (cell, event) => {
+    let rowIndex
+
+    if (cell[0] !== -1) {
+      return
+    }
+
+    if (cell[0] === -1) {
+      rowIndex = cell[1]
+      setIsMinusClicked(true)
+    } else {
+      rowIndex = cell[0]
+      setIsMinusClicked(false)
+    }
+
+    if (
+      lastClickedCell &&
+      lastClickedCell[0] === cell[0] &&
+      lastClickedCell[1] === cell[1]
+    ) {
+      setKeyPath(null)
+      setLastClickedCell(null)
+      setClickedRowData(null)
+      return
+    }
+
+    if (rowIndex >= 0 && rowIndex < gridData.length) {
+      const rowData = gridData[rowIndex]
 
       const filteredData = {
         DelvNo: rowData.DelvNo,
@@ -183,27 +212,19 @@ export default function DeliveryList({ permissions, isMobile }) {
         CurrName: rowData.CurrName,
         ExRate: rowData.ExRate,
       }
-
       const secretKey = 'TEST_ACCESS_KEY'
       const encryptedData = CryptoJS.AES.encrypt(
         JSON.stringify(filteredData),
         secretKey,
       ).toString()
       const encryptedToken = encodeBase64Url(encryptedData)
-
-      setCheckedRowKey(rowKey)
       setKeyPath(encryptedToken)
-      navigate(`/u/warehouse/material/waiting-iqc-stock-in/${encryptedToken}`)
-    },
-    [checkedRowKey, data],
-  )
+      setClickedRowData(rowData) 
+      setLastClickedCell(cell)
+    } 
 
-  const nextPageStockIn = useCallback(() => {
-    if (keyPath && !checkedPath) {
-      setCheckedPath(true)
-      navigate(`/u/warehouse/material/waiting-iqc-stock-in/${keyPath}`)
-    }
-  }, [keyPath, checkedPath, navigate])
+  }
+
 
   useEffect(() => {
     debouncedFetchDeliveryData()
@@ -271,10 +292,12 @@ export default function DeliveryList({ permissions, isMobile }) {
               checkedPath={checkedPath}
               setKeyPath={setKeyPath}
               loading={loading}
-              handleCheck={handleCheck}
-              gridRef={gridRef}
               setData={setData}
-            />
+              onCellClicked={onCellClicked}
+              setGridData={setGridData}
+              gridData={gridData}
+           />
+
           </div>
         </div>
       </div>

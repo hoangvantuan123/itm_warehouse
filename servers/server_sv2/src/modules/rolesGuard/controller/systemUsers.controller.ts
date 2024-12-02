@@ -25,6 +25,7 @@ import { TCARootMenusWEB } from '../entities/rootMenus.entity';
 import { TCARolesUsersWEB } from '../entities/rolesUsers.entity';
 import { TCAUserWEB } from 'src/modules/auth/entities/auths.entity';
 import { CreateResUsersDto } from '../dto/users.dto';
+import { UpdateRoleDto } from '../dto/updateRole.dto';
 
 
 @Controller('v2/mssql/system-users')
@@ -354,5 +355,16 @@ export class SystemUsersController {
         }
     }
 
+
+    @Post('update/roles-user')
+    async updateRoles(@Body() updateData: UpdateRoleDto[]) {
+        return this.systemUsersService.updateRoles(updateData);
+    }
+
+    @Delete('delete/roles-user')
+    async deleteRoles(@Body() body: { ids: number[] }): Promise<any> {
+        const { ids } = body;
+        return await this.systemUsersService.deleteRolesByIds(ids);
+    }
 
 }

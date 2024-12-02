@@ -11,6 +11,7 @@ import { TCARolesUsersWEB } from '../entities/rolesUsers.entity';
 import { TCAUserWEB } from 'src/modules/auth/entities/auths.entity';
 import { CreateResUsersDto } from '../dto/users.dto';
 import { TCAGroupUsersWEB } from '../entities/groupUsers.entity';
+import { UpdateRoleDto } from '../dto/updateRole.dto';
 
 
 @Injectable()
@@ -461,5 +462,46 @@ export class SystemUsersService {
     }
   }
 
+
+
+  async updateRoles(updateData: UpdateRoleDto[]): Promise<any> {
+    const updatePromises = updateData.map(async (update) => {
+      const { id, column, value } = update;
+
+      await this.resTCARolesUserWEBRepository
+        .createQueryBuilder()
+        .update()
+        .set({ [column]: value })
+        .where('Id = :id', { id })
+        .execute();
+    });
+
+    await Promise.all(updatePromises);
+
+    return { message: 'Roles updated successfully' };
+  }
+
+  async deleteRolesByIds(ids: number[]): Promise<any> {
+    try {
+      const result = await this.resTCARolesUserWEBRepository.delete(ids);
+      if (result.affected > 0) {
+        return {
+          success: true,
+          message: `${result.affected} record(s) deleted successfully`,
+        };
+      } else {
+        return {
+          success: false,
+          message: 'No records found to delete',
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Error while deleting records',
+        error: error.message,
+      };
+    }
+  }
 
 }

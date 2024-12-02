@@ -15,7 +15,27 @@
 
 
 
-
+export const sqlServerITMV20240117: TypeOrmModuleOptions = {
+  type: 'mssql',
+  host: '192.168.35.150',
+  port: 14233,
+  username: 'genuine',
+  password: 'Itmv209#',
+  database: 'ITMV20240117',
+  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+  synchronize: false,
+  logging: true,
+  cache: true,
+  extra: {
+    trustServerCertificate: true,
+    encrypt: false,
+    connectionTimeout: 5000,
+    max: 100,
+    min: 10,
+    idleTimeoutMillis: 30000,
+  },
+  maxQueryExecutionTime: 1000
+}
 ````
 
 

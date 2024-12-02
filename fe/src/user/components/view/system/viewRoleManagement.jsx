@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Menu, Button, Input, Table, Space, Checkbox, Layout } from 'antd'
 import { FolderOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
 import BG from '../../../../assets/defaultLogo.png'
@@ -8,30 +8,31 @@ import ModalMenu from '../../modal/system/modalMenu'
 import { getPaginatedRolesRootMenu } from '../../../../features/system/getPaginatedRolesRootMenu'
 import { getPaginatedRolesMenu } from '../../../../features/system/getPaginatedRolesMenu'
 import { getPaginatedRolesUsers } from '../../../../features/system/getPaginatedRolesUsers'
+import debounce from 'lodash.debounce';
 const { Header, Content, Footer } = Layout
-
-function ViewRoleManagement({ groups }) {
+const menuStyle = { borderInlineEnd: 'none' }
+function ViewRoleManagement({ groups , changedIds, setChangedIds,  setSelectedRowKeys , selectedRowKeys }) {
   const [selectedGroup, setSelectedGroup] = useState(null)
   const [openView, setOpenView] = useState(false)
   const [userInfo, setUserInfo] = useState({
     groupName: '',
     note: '',
   })
-  const [loading, setLoading] = useState(true);
-  const [loading3, setLoading3] = useState(true);
-  const [error, setError] = useState(null);
-  const [page1, setPage1] = useState(1);
-  const [page2, setPage2] = useState(1);
-  const [page3, setPage3] = useState(1);
-  const [limit1, setLimit1] = useState(50);
-  const [limit2, setLimit2] = useState(50);
-  const [limit3, setLimit3] = useState(50);
-  const [total1, setTotal1] = useState(50);
-  const [total2, setTotal2] = useState(50);
-  const [total3, setTotal3] = useState(50);
-  const [totalPages3, setTotalPages3] = useState(50);
-  const [totalPages2, setTotalPages2] = useState(50);
-  const [totalPages1, setTotalPages1] = useState(50);
+  const [loading, setLoading] = useState(true)
+  const [loading3, setLoading3] = useState(true)
+  const [error, setError] = useState(null)
+  const [page1, setPage1] = useState(1)
+  const [page2, setPage2] = useState(1)
+  const [page3, setPage3] = useState(1)
+  const [limit1, setLimit1] = useState(50)
+  const [limit2, setLimit2] = useState(50)
+  const [limit3, setLimit3] = useState(50)
+  const [total1, setTotal1] = useState(50)
+  const [total2, setTotal2] = useState(50)
+  const [total3, setTotal3] = useState(50)
+  const [totalPages3, setTotalPages3] = useState(50)
+  const [totalPages2, setTotalPages2] = useState(50)
+  const [totalPages1, setTotalPages1] = useState(50)
   const [openModel1, setOpenModel1] = useState(false)
   const [openModel2, setOpenModel2] = useState(false)
   const [openModel3, setOpenModel3] = useState(false)
@@ -39,75 +40,91 @@ function ViewRoleManagement({ groups }) {
   const [updateData1, setUpdateData2] = useState([])
   const [data2, setData2] = useState([])
   const [data3, setData3] = useState([])
-  const [selectedRowKeys1, setSelectedRowKeys1] = useState([]);
-  const [selectedRowKeys2, setSelectedRowKeys2] = useState([]);
-  const [selectedRowKeys3, setSelectedRowKeys3] = useState([]);
+  const [selectedRowKeys1, setSelectedRowKeys1] = useState([])
+  const [selectedRowKeys2, setSelectedRowKeys2] = useState([])
+  const [selectedRowKeys3, setSelectedRowKeys3] = useState([])
+  
+  const handleTableSelectionChange = (newSelectedRowKeys, tableKey) => {
+    // Cập nhật trạng thái cho bảng tương ứng
+    setSelectedRowKeys((prevSelectedKeys) => ({
+      ...prevSelectedKeys,
+      [tableKey]: newSelectedRowKeys, // Lưu trữ mảng Id đã chọn của bảng đó
+    }));
+  };
+
   const fetchData1 = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const response = await getPaginatedRolesRootMenu(selectedGroup, 'rootmenu', page1, limit1);
+      const response = await getPaginatedRolesRootMenu(
+        selectedGroup,
+        'rootmenu',
+        page1,
+        limit1,
+      )
       if (response.success) {
-        setData1(response.data);
+        setData1(response.data)
         setTotal1(response.data.total)
         setTotalPages1(response.data.totalPages)
       }
     } catch (error) {
-      setError(error.message || 'Đã xảy ra lỗi');
-      setData1([]);
+      setError(error.message || 'Đã xảy ra lỗi')
+      setData1([])
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const fetchData2 = async () => {
-    setLoading(true);
+  const fetchData2 = useCallback(async () => {
+    setLoading(true)
     try {
-      const response = await getPaginatedRolesMenu(selectedGroup, 'menu', page2, limit2);
+      const response = await getPaginatedRolesMenu(
+        selectedGroup,
+        'menu',
+        page2,
+        limit2,
+      )
       if (response.success) {
-        setData2(response.data);
+        setData2(response.data)
         setTotal2(response.data.total)
         setTotalPages2(response.data.totalPages)
       }
     } catch (error) {
-      setError(error.message || 'Đã xảy ra lỗi');
-      setData2([]);
+      setError(error.message || 'Đã xảy ra lỗi')
+      setData2([])
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }, [selectedGroup, page2, limit2])
+
   const fetchData3 = async () => {
-    setLoading3(true);
+    setLoading3(true)
     try {
-      const response = await getPaginatedRolesUsers(selectedGroup, 'user', page3, limit3);
+      const response = await getPaginatedRolesUsers(
+        selectedGroup,
+        'user',
+        page3,
+        limit3,
+      )
       if (response.success) {
-        setData3(response.data);
+        setData3(response.data)
         setTotal3(response.total)
         setTotalPages3(response.totalPages)
       }
     } catch (error) {
-      setError(error.message || 'Đã xảy ra lỗi');
-      setData3([]);
+      setError(error.message || 'Đã xảy ra lỗi')
+      setData3([])
     } finally {
-      setLoading3(false);
+      setLoading3(false)
     }
-  };
+  }
 
   useEffect(() => {
     if (selectedGroup !== null) {
-      fetchData1();
+      fetchData1()
+      fetchData2()
+      fetchData3()
     }
-  }, [selectedGroup]);
-  useEffect(() => {
-    if (selectedGroup !== null) {
-      fetchData2();
-    }
-  }, [selectedGroup]);
-  useEffect(() => {
-    if (selectedGroup !== null) {
-      fetchData3();
-    }
-  }, [selectedGroup, page3, limit3]);
-
+  }, [selectedGroup])
 
   const handleAddRow1 = () => {
     setOpenModel1(true)
@@ -126,11 +143,7 @@ function ViewRoleManagement({ groups }) {
   }
   const closeModal3 = () => {
     setOpenModel3(false)
-
   }
-
-
-
 
   const handleGroupClick = (groupId) => {
     setSelectedGroup(groupId)
@@ -143,22 +156,53 @@ function ViewRoleManagement({ groups }) {
   }
 
 
-
   const handlePermissionChange1 = (id, permissionType) => {
     const newData = [...data1];
-    const recordIndex = newData.findIndex(record => record.Id === id);
+    const recordIndex = newData.findIndex((record) => record.Id === id);
+  
     if (recordIndex !== -1) {
-      newData[recordIndex][permissionType] = !newData[recordIndex][permissionType];
+      const newValue = !newData[recordIndex][permissionType];
+      newData[recordIndex][permissionType] = newValue;
       setData1(newData);
+  
+      setChangedIds((prev) => {
+        const existingIndex = prev.findIndex(
+          (change) => change.id === id && change.column === permissionType
+        );
+  
+        if (existingIndex !== -1) {
+          const updatedChanges = [...prev];
+          updatedChanges[existingIndex] = { id, column: permissionType, value: newValue };
+          return updatedChanges;
+        }
+        return [...prev, { id, column: permissionType, value: newValue }];
+      });
     }
   };
+  
+  
 
   const handlePermissionChange2 = (id, permissionType) => {
     const newData = [...data2];
-    const recordIndex = newData.findIndex(record => record.Id === id);
+    const recordIndex = newData.findIndex((record) => record.Id === id);
+  
     if (recordIndex !== -1) {
-      newData[recordIndex][permissionType] = !newData[recordIndex][permissionType];
+      const newValue = !newData[recordIndex][permissionType];
+      newData[recordIndex][permissionType] = newValue;
       setData2(newData);
+  
+      setChangedIds((prev) => {
+        const existingIndex = prev.findIndex(
+          (change) => change.id === id && change.column === permissionType
+        );
+  
+        if (existingIndex !== -1) {
+          const updatedChanges = [...prev];
+          updatedChanges[existingIndex] = { id, column: permissionType, value: newValue };
+          return updatedChanges;
+        }
+        return [...prev, { id, column: permissionType, value: newValue }];
+      });
     }
   };
 
@@ -172,10 +216,8 @@ function ViewRoleManagement({ groups }) {
 
   const userColumns = [
     { title: 'UserId', dataIndex: 'UserId', key: 'UserId' },
-    { title: 'UserName', dataIndex: 'UserName', key: 'UserName' }
-
+    { title: 'UserName', dataIndex: 'UserName', key: 'UserName' },
   ]
-
 
   const permissionColumns1 = [
     { title: 'Name', dataIndex: 'Label', key: 'Label' },
@@ -272,6 +314,8 @@ function ViewRoleManagement({ groups }) {
       ),
     },
   ]
+
+  
   const handleTableChange3 = (pagination) => {
     setPage3(pagination.current)
     setLimit3(pagination.pageSize)
@@ -291,9 +335,13 @@ function ViewRoleManagement({ groups }) {
           NHÓM NGƯỜI DÙNG
         </div>
         <Menu
+               style={menuStyle}
           mode="inline"
           selectedKeys={[selectedGroup?.toString()]}
-          onClick={(e) => handleGroupClick(Number(e.key))}
+          onClick={(e) => {
+            handleGroupClick(Number(e.key)); 
+            setChangedIds([]); 
+          }}
           className=" border-none border-r-0"
         >
           {groups.map((group) => (
@@ -329,8 +377,9 @@ function ViewRoleManagement({ groups }) {
               />
             </div>
             <div className="mb-4">
-              <div className="font-medium text-xs mb-2">Quyền Truy Nhóm Menu</div>
-
+              <div className="font-medium text-xs mb-2">
+                Quyền Truy Nhóm Menu
+              </div>
 
               <Table
                 dataSource={data1}
@@ -338,9 +387,13 @@ function ViewRoleManagement({ groups }) {
                 rowKey="Id"
                 size="small"
                 rowSelection={{
-                  selectedRowKeys1,
-                  onChange: setSelectedRowKeys1,
-                  selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT, Table.SELECTION_NONE],
+                  selectedRowKeys: selectedRowKeys.table1, 
+                  onChange: (selectedKeys) => handleTableSelectionChange(selectedKeys, 'table1'),
+                  selections: [
+                    Table.SELECTION_ALL,
+                    Table.SELECTION_INVERT,
+                    Table.SELECTION_NONE,
+                  ],
                 }}
                 pagination={{
                   current: page1,
@@ -366,7 +419,9 @@ function ViewRoleManagement({ groups }) {
               />
             </div>
             <div className="mb-4">
-              <div className="font-medium text-xs mb-2">Quyền Truy Cập Menu</div>
+              <div className="font-medium text-xs mb-2">
+                Quyền Truy Cập Menu
+              </div>
               <Table
                 dataSource={data2}
                 columns={permissionColumns2}
@@ -374,9 +429,13 @@ function ViewRoleManagement({ groups }) {
                 size="small"
                 bordered
                 rowSelection={{
-                  selectedRowKeys2,
-                  onChange: setSelectedRowKeys2,
-                  selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT, Table.SELECTION_NONE],
+                  selectedRowKeys: selectedRowKeys.table2, 
+                  onChange: (selectedKeys) => handleTableSelectionChange(selectedKeys, 'table2'),
+                  selections: [
+                    Table.SELECTION_ALL,
+                    Table.SELECTION_INVERT,
+                    Table.SELECTION_NONE,
+                  ],
                 }}
                 pagination={{
                   current: page2,
@@ -411,9 +470,13 @@ function ViewRoleManagement({ groups }) {
                 size="small"
                 bordered
                 rowSelection={{
-                  selectedRowKeys3,
-                  onChange: setSelectedRowKeys3,
-                  selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT, Table.SELECTION_NONE],
+                  selectedRowKeys: selectedRowKeys.table3, 
+                  onChange: (selectedKeys) => handleTableSelectionChange(selectedKeys, 'table3'),
+                  selections: [
+                    Table.SELECTION_ALL,
+                    Table.SELECTION_INVERT,
+                    Table.SELECTION_NONE,
+                  ],
                 }}
                 pagination={{
                   current: page3,
@@ -452,13 +515,24 @@ function ViewRoleManagement({ groups }) {
             </Content>
           </>
         )}
-        <ModalRootMenu isOpen={openModel1}
-          onClose={closeModal1} groupId={selectedGroup} fetchData1={fetchData1} />
-        <ModalMenu isOpen={openModel2}
-          onClose={closeModal2} groupId={selectedGroup} fetchData2={fetchData2} />
-        <ModalUsers isOpen={openModel3}
-          onClose={closeModal3} groupId={selectedGroup} fetchData3={fetchData3} />
-
+        <ModalRootMenu
+          isOpen={openModel1}
+          onClose={closeModal1}
+          groupId={selectedGroup}
+          fetchData1={fetchData1}
+        />
+        <ModalMenu
+          isOpen={openModel2}
+          onClose={closeModal2}
+          groupId={selectedGroup}
+          fetchData2={fetchData2}
+        />
+        <ModalUsers
+          isOpen={openModel3}
+          onClose={closeModal3}
+          groupId={selectedGroup}
+          fetchData3={fetchData3}
+        />
       </div>
     </div>
   )

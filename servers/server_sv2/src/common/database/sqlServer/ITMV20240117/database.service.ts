@@ -61,7 +61,7 @@ export class DatabaseService {
 
 
   async findAuthByEmpID(UserId: string): Promise<any> {
-    const query = `SELECT * FROM _TCAUser_WEB WHERE UserId = '${UserId}'`;
+    const query = `SELECT * FROM "_TCAUser_WEB" WHERE "UserId" = '${UserId}'`;
 
     try {
       const result = await this.queryRunner.query(query);

@@ -3,37 +3,39 @@ import { DataEditor, GridCellKind } from '@glideapps/glide-data-grid'
 import { Button } from 'antd'
 import '@glideapps/glide-data-grid/dist/index.css'
 import { useNavigate } from 'react-router-dom'
-import '../../../../static/css/customTabe.css'
 import { CompactSelection } from '@glideapps/glide-data-grid'
 
 const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
 
-function TableMenuManagement({ data }) {
+function TableTransferWaitingIqcStockInBarcode({ data,selection, setSelection }) {
   const [gridData, setGridData] = useState([])
   const [showSearch, setShowSearch] = useState(false)
   const ref = (useRef < data) | (null > null)
   const onSearchClose = useCallback(() => setShowSearch(false), [])
-  const [clickedRowData, setClickedRowData] = useState(null)
-  const [clickedRowDataList, setClickedRowDataList] = useState([])
-  const [isMinusClicked, setIsMinusClicked] = useState(false)
-  const [lastClickedCell, setLastClickedCell] = useState(null)
-  const [selection, setSelection] = useState({
-    columns: CompactSelection.empty(),
-    rows: CompactSelection.empty(),
-  })
+
   const columns = useMemo(
     () => [
-      { title: 'Menu Root ID' },
-      { title: 'Menu Sub Root ID' },
-      { title: 'Key' },
-      { title: 'Label', width: 300 },
-      { title: 'Link', width: 350 },
-      { title: 'Type' },
+      { title: 'WHName' },
+      { title: 'ItemNo' },
+      { title: 'LotNo' },
+      { title: 'LotNoFull' },
+      { title: 'Qty' },
+      { title: 'DateCode' },
+      { title: 'ReelNo' },
+      { title: 'Barcode' },
+      { title: 'CreateDate' },
+      { title: 'RegDate' },
+      { title: 'YYWW' },
+      { title: 'YYMM' },
+      { title: 'YYMMDD' },
+      { title: 'InvoiceNo' },
+      { title: 'DateIn' },
     ],
     [],
   )
+
   const [cols, setCols] = useState(columns)
   const onColumnResize = useCallback(
     (column, newSize) => {
@@ -55,23 +57,41 @@ function TableMenuManagement({ data }) {
     ([col, row]) => {
       const person = gridData[row] || {}
       const {
-        MenuRootId = '',
-        MenuSubRootId = '',
-        Key = '',
-        Label = '',
-        Link = '',
-        Type = '',
+        WHName = '',
+        ItemNo = '',
+        LotNo = '',
+        LotNoFull = '',
+        Qty = '',
+        DateCode = '',
+        ReelNo = '',
+        Barcode = '',
+        CreateDate = '',
+        RegDate = '',
+        YYWW = '',
+        YYMM = '',
+        YYMMDD = '',
+        InvoiceNo = '',
+        DateIn = '',
       } = person
 
       const safeString = (value) => (value != null ? String(value) : '')
 
       const columnMap = {
-        0: { kind: GridCellKind.Text, data: safeString(MenuRootId) },
-        1: { kind: GridCellKind.Text, data: safeString(MenuSubRootId) },
-        2: { kind: GridCellKind.Text, data: safeString(Key) },
-        3: { kind: GridCellKind.Text, data: safeString(Label) },
-        4: { kind: GridCellKind.Text, data: safeString(Link) },
-        5: { kind: GridCellKind.Text, data: safeString(Type) },
+        0: { kind: GridCellKind.Text, data: safeString(WHName) },
+        1: { kind: GridCellKind.Text, data: safeString(ItemNo) },
+        2: { kind: GridCellKind.Text, data: safeString(LotNo) },
+        3: { kind: GridCellKind.Text, data: safeString(LotNoFull) },
+        4: { kind: GridCellKind.Text, data: safeString(Qty) },
+        5: { kind: GridCellKind.Text, data: safeString(DateCode) },
+        5: { kind: GridCellKind.Text, data: safeString(ReelNo) },
+        5: { kind: GridCellKind.Text, data: safeString(Barcode) },
+        5: { kind: GridCellKind.Text, data: safeString(CreateDate) },
+        5: { kind: GridCellKind.Text, data: safeString(RegDate) },
+        5: { kind: GridCellKind.Text, data: safeString(YYWW) },
+        5: { kind: GridCellKind.Text, data: safeString(YYMM) },
+        5: { kind: GridCellKind.Text, data: safeString(YYMMDD) },
+        5: { kind: GridCellKind.Text, data: safeString(InvoiceNo) },
+        5: { kind: GridCellKind.Text, data: safeString(DateIn) },
       }
 
       if (columnMap.hasOwnProperty(col)) {
@@ -95,53 +115,13 @@ function TableMenuManagement({ data }) {
     setGridData(data)
   }, [data])
 
-  const onCellClicked = (cell, event) => {
-    let rowIndex
-
-    if (cell[0] !== -1) {
-      console.log('Ignoring click on cell, cell[0] is neither -1 nor 1')
-      return
-    }
-
-    if (cell[0] === -1) {
-      rowIndex = cell[1]
-      setIsMinusClicked(true)
-    } else {
-      rowIndex = cell[0]
-      setIsMinusClicked(false)
-    }
-
-    if (
-      lastClickedCell &&
-      lastClickedCell[0] === cell[0] &&
-      lastClickedCell[1] === cell[1]
-    ) {
-      console.log('Click again on the same cell, deactivating.')
-      setLastClickedCell(null)
-      setClickedRowData(null)
-      return
-    }
-
-    if (rowIndex >= 0 && rowIndex < gridData.length) {
-      const rowData = gridData[rowIndex]
-      setClickedRowData(rowData)
-      setLastClickedCell(cell)
-    } else {
-      console.log('Invalid row index:', rowIndex)
-    }
-
-    console.log('Cell clicked:', cell)
-    console.log('Row data:', gridData[rowIndex])
-    console.log('Event:', event)
-  }
 
   const onGridSelectionChange = (newSelection) => {
     console.log('Selection aborted', newSelection)
   }
 
   return (
-    <div className="w-full gap-1 h-full flex items-center justify-center pb-8">
-      <div className="w-full h-full flex flex-col border bg-white rounded-lg overflow-hidden ">
+      <div className="w-full h-full border-t border-b overflow-hidden scroll-container ">
         <DataEditor
           columns={cols}
           getCellContent={getData}
@@ -156,14 +136,12 @@ function TableMenuManagement({ data }) {
           onColumnResize={onColumnResize}
           smoothScrollY={true}
           smoothScrollX={true}
-          onCellClicked={onCellClicked}
           rowSelect="multi"
           gridSelection={selection}
           onGridSelectionChange={setSelection}
         />
-      </div>
     </div>
   )
 }
 
-export default TableMenuManagement
+export default TableTransferWaitingIqcStockInBarcode

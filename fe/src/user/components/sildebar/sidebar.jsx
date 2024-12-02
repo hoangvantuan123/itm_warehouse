@@ -170,11 +170,16 @@ const Sidebar = ({ permissions, rootMenu }) => {
 
                   <ul className="space-y-1 border-t border-gray-100 pt-4">
                     {rootMenu
-                      .filter((item) => selectedItems.includes(item.RootMenuKey))
+                      .filter((item) =>
+                        selectedItems.includes(item.RootMenuKey),
+                      )
                       .map((item) =>
                         item.RootMenuUtilities ? (
                           <li key={item.RootMenuKey}>
-                            <Tooltip title={item.RootMenuLabel} placement="right">
+                            <Tooltip
+                              title={item.RootMenuLabel}
+                              placement="right"
+                            >
                               <a
                                 onClick={() => handleOnClickMenuFast(item)}
                                 className="group relative flex justify-center rounded-lg px-2 py-2 border mb-2 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
@@ -242,7 +247,9 @@ const Sidebar = ({ permissions, rootMenu }) => {
                       className="flex items-center justify-start"
                     >
                       {iconMapping[item?.RootMenuIcon]}
-                      <span className="ml-3 uppercase">{t(item?.RootMenuLabel)}</span>
+                      <span className="ml-3 uppercase">
+                        {t(item?.RootMenuLabel)}
+                      </span>
                     </Link>
                   </Menu.Item>
                 ))}
@@ -256,8 +263,9 @@ const Sidebar = ({ permissions, rootMenu }) => {
               collapsed={collapsed}
               collapsedWidth={0}
               onCollapse={toggleSidebar}
-              className={`${collapsed ? 'p-0 border-none' : 'p-2 border-r'
-                } h-screen overflow-auto scroll-container transition-all duration-300 ease-in-out`}
+              className={`${
+                collapsed ? 'p-0 border-none' : 'p-2 border-r'
+              } h-screen overflow-auto scroll-container transition-all duration-300 ease-in-out`}
             >
               <SidebarContent
                 collapsed={collapsed}
