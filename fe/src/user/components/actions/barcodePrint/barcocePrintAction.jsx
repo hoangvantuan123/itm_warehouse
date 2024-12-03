@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
-import { Card, Button, Modal } from 'antd';
+import { Card, Button, Modal, Space, Input, Typography, DatePicker, Checkbox, Row, Col } from 'antd';
 import { SaveFilled } from '@ant-design/icons';
 
 import ZebraBrowserPrintWrapper from 'zebra-browser-print-wrapper';
 import LabelItem from "./labeldesign";
 
 import { useReactToPrint } from "react-to-print";
+
+
+
 
 
 export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect }) {
@@ -190,14 +193,16 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect }
 
     const [isModalVisible, setIsModalVisible] = useState(false);
 
-    const printRef = useRef();
+    const printRef = useRef({});
 
     const showModal = () => {
         setIsModalVisible(true);
     };
 
+
+
     const handleOk = useReactToPrint({
-        content: () => printRef.current,
+        contentRef: printRef.current,
         pageStyle: `
             @page {
                 size: 10cm 2cm; 
@@ -206,100 +211,310 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect }
             body {
                 margin: 0;
                 padding: 0;
+                overflow: visible;
             }
         `,
-
-
     }
     );
 
-};
+    const onOk = () => {
+        setTimeout(() => {
 
-const handleCancel = () => {
-    setIsModalVisible(false);
-};
+            // Tạo iframe ẩn để in nội dung
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
 
-const printLabel1 = () => {
-    showModal(); // Hiển thị popup
-};
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            doc.open();
 
-const btnPrintPop = async () => {
-    try {
+            const styles = Array.from(document.styleSheets)
+            .map(styleSheet => {
+                try {
+                    return Array.from(styleSheet.cssRules)
+                        .map(rule => rule.cssText)
+                        .join('\n');
+                } catch (e) {
+                    return '';
+                }
+            })
+            .join('\n');
 
-        const browserPrint = new ZebraBrowserPrintWrapper();
-        const defaultPrinter = await browserPrint.getAvailablePrinters();
-        console.log("defaultPrinter", defaultPrinter);
+            doc.write(`<style>${styles}</style>`);
 
-        browserPrint.setPrinter(defaultPrinter);
+            doc.write(`
+                <style>
+                    @page {
+                        size: 5in 0.79in;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                    }
+                    html, body {
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: flex-start;
+                        align-items: center;
+                    }
+                </style>
+            `);
+
+            if (printRef.current) {
+
+                console.log("innerHTML", printRef.current.innerHTML);
+                console.log("current", printRef.current);
+                doc.write(printRef.current.innerHTML);
+
+                console.log(doc);
+            }
+
+            doc.close();
+
+            iframe.onload = () => {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+
+                setTimeout(() => {
+                    document.body.removeChild(iframe);
+                }, 1000);
+            };
+        }, 1000);
+    };
 
 
-        const printerStatus = await browserPrint.checkPrinterStatus();
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
+
+    const printLabel1 = () => {
+        showModal();
+    };
+
+    const btnPrintPop = async () => {
+        try {
 
 
-        if (printerStatus.isReadyToPrint) {
 
-            const zpl = `^XA
+            const browserPrint = new ZebraBrowserPrintWrapper();
+            const defaultPrinter = await browserPrint.getAvailablePrinters();
+            console.log("defaultPrinter", defaultPrinter);
+
+            browserPrint.setPrinter(defaultPrinter);
+
+
+            const printerStatus = await browserPrint.checkPrinterStatus();
+
+
+            if (printerStatus.isReadyToPrint) {
+
+                const zpl = `^XA
                         ^BY2,2,100
                         ^FO20,20^BC^FD${serial}^FS
                         ^XZ`;
 
-            // browserPrint.print(zpl);
+                // browserPrint.print(zpl);
 
-        }
-        else {
-            console.error("No connect");
-        }
+            }
+            else {
+                console.error("No connect");
+            }
 
 
-    } catch (error) {
-        throw new Error(error);
+        } catch (error) {
+            throw new Error(error);
+        };
     }
 
 
 
 
-return (
-    <div className="mt-1">
-        <Card className="mb-2 p-2 shadow-sm" size="small">
+    return (
+        <div className="mt-1">
+            <Card className="mb-2 p-2 shadow-sm" size="small">
 
-            <div className="flex gap-2 justify-end mt-2">
+                <Card className="mb-2 p-2 shadow-sm" size="small" >
+                    <div className="flex gap-3">
+                        <Space direction="vertical" size={6}>
+                            <Typography.Text>From date</Typography.Text>
+                            <DatePicker className="w-full" />
+                        </Space>
+                        <Space direction="vertical" size={6}>
+                            <Typography.Text>To date</Typography.Text>
+                            <DatePicker className="w-full" />
+                        </Space>
+                        <Space direction="vertical" size={6}>
+                            <Typography.Text>Vendor</Typography.Text>
+                            <Input className="w-full bg-blue-50" />
 
-                <Button
+                        </Space>
+                        <Space direction="vertical" size={6}>
+                            <Typography.Text>Mat ID</Typography.Text>
+                            <Input className="w-full bg-blue-50" />
+                        </Space>
+                        <Space direction="vertical" size={6}>
+                            <Typography.Text className="text-red-500">Lot No</Typography.Text>
+                            <Input className="w-full bg-blue-50" />
 
-                    type={'PRINT' === 'Save' ? 'primary' : 'default'}
-                    icon={<SaveFilled />}
-                    size="middle"
-                    className="uppercase"
-                    onClick={printLabel1}
-                >
-                    PRINT LABEL
-                </Button>
+                        </Space>
 
-                <Button
+                        <Space direction="horizontal" size={6}>
+                            <Button
 
-                    type={'PRINT' === 'Save' ? 'primary' : 'default'}
-                    icon={<SaveFilled />}
-                    size="middle"
-                    className="uppercase"
-                    onClick={printImages}
-                >
-                    PRINT LABEL TEST
-                </Button>
+                                type={'PRINT' === 'Save' ? 'primary' : 'default'}
+                                icon={<SaveFilled />}
+                                size="middle"
+                                className="uppercase"
+                                onClick={printLabel1}
+                            >
+                                PRINT LABEL
+                            </Button>
 
-                <Button
-                    type={'PRINT' === 'Save' ? 'primary' : 'default'}
-                    icon={<SaveFilled />}
-                    size="middle"
-                    className="uppercase"
-                    onClick={btnSearch}
-                >
-                    SEARCH
-                </Button>
+                            <Button
+
+                                type={'PRINT' === 'Save' ? 'primary' : 'default'}
+                                icon={<SaveFilled />}
+                                size="middle"
+                                className="uppercase"
+                                onClick={printImages}
+                            >
+                                PRINT LABEL TEST
+                            </Button>
+
+                            <Button
+                                type={'PRINT' === 'Save' ? 'primary' : 'default'}
+                                icon={<SaveFilled />}
+                                size="middle"
+                                className="uppercase"
+                                onClick={btnSearch}
+                            >
+                                SEARCH
+                            </Button>
+
+                        </Space>
+
+
+                    </div>
+
+                </Card>
+
+                <Card className="mb-2 p-2 shadow-sm" size="small">
+                    <Row>
+                        <div className="flex gap-3">
+                            <Space direction="vertical" size={6}>
+                                <Typography.Text>Vendor</Typography.Text>
+                                <Input className="w-20 bg-blue-50" />
+
+                            </Space>
+
+                            <Space direction="vertical" size={6}>
+                                <Typography.Text>Part No</Typography.Text>
+                                <Input className="w-20 bg-blue-50" />
+
+                            </Space>
+                            <Space direction="vertical" size={6}>
+                                <Typography.Text>Mat ID</Typography.Text>
+                                <Input className="w-20 bg-blue-50" />
+
+                            </Space>
+                            <Space direction="vertical" size={6}>
+                                <Typography.Text>Lot Total CNT</Typography.Text>
+                                <Input className="w-20 bg-blue-50" />
+
+                            </Space>
+
+                            <Space direction="vertical" size={6}>
+                                <Typography.Text>Lot No</Typography.Text>
+                                <Input className="w-20 bg-blue-50" />
+
+                            </Space>
+
+                            <Space direction="vertical" size={6}>
+                                <Typography.Text>QTY</Typography.Text>
+                                <Input className="w-20 bg-blue-50" />
+
+                            </Space>
+                            <Space direction="vertical" size={6}>
+                                <Typography.Text>Date</Typography.Text>
+                                <Input className="w-20 bg-blue-50" />
+
+                            </Space>
+
+                            <Space direction="vertical" size={6}>
+                                <Typography.Text>Reel No</Typography.Text>
+                                <Input className="w-20 bg-blue-50" />
+
+                            </Space>
+
+                            <Space direction="vertical" size={6}>
+                                <Typography.Text>UserID</Typography.Text>
+                                <Input className="w-20 bg-blue-50" />
+
+                            </Space>
+                            <Space direction="vertical" size={6}>
+                                <Typography.Text>Issuse NO</Typography.Text>
+                                <Input className="w-20 bg-blue-50" />
+
+                            </Space>
+                            <Space direction="vertical" size={6}>
+                                <Typography.Text>Remark</Typography.Text>
+                                <Input className="w-full bg-blue-50" />
+
+                            </Space>
+                        </div>
+
+                    </Row>
+
+                    <Row >
+
+
+                        <Space direction="horizontal" size={6}>
+                            <Typography.Text>1D BARCODE POSITION</Typography.Text>
+                            <Input className="w-20 bg-blue-50" />
+                            <Input className="w-20 bg-blue-50" />
+
+                        </Space>
+
+                        <Space direction="horizontal" size={6}>
+                            <Typography.Text>1D BARCODE SIZE</Typography.Text>
+                            <Input className="w-20 bg-blue-50" />
+                            <Input className="w-20 bg-blue-50" />
+                        </Space>
+
+
+                        <Space direction="horizontal" size={6}>
+                            <Typography.Text>2D BARCODE POSITION</Typography.Text>
+                            <Input className="w-20 bg-blue-50" />
+                            <Input className="w-20 bg-blue-50" />
+
+                        </Space>
+
+                        <Space direction="horizontal" size={6}>
+                            <Typography.Text>2D BARCODE SIZE</Typography.Text>
+                            <Input className="w-20 bg-blue-50" />
+                            <Input className="w-20 bg-blue-50" />
+                        </Space>
+
+                        <Space direction="horizontal" size={6}>
+                            <Typography.Text>PAPER SIZE</Typography.Text>
+
+                            <Input className="w-20 bg-blue-50" />
+                            <Input className="w-20 bg-blue-50" />
+
+                        </Space>
+                        <Checkbox title="Print Preview"> Print Preview</Checkbox>
+
+                    </Row>
+
+                </Card>
+
+
 
                 <Modal
                     title="Print Label Confirmation"
                     visible={isModalVisible}
-                    onOk={handleOk}
+                    onOk={onOk}
                     onCancel={handleCancel}
                 >
 
@@ -310,18 +525,17 @@ return (
                         className="uppercase"
                         onClick={btnPrintPop}
                     >
-                        SEARCH
+                        Conntect
                     </Button>
-                    <LabelItem labelData1={data} btnPrint={handleOk} />
-                    <p>Are you sure you want to print the label?</p>
+                    <div ref={printRef} >
+                        <LabelItem />
+
+                    </div>
 
                 </Modal>
+            </Card>
 
+        </div>
 
-            </div>
-        </Card>
-
-    </div>
-
-);
-    }
+    );
+}

@@ -1,10 +1,9 @@
 import { Card, Col, Row, Typography, QRCode } from "antd";
 import Barcode from "react-barcode";
 
-const { Text } = Typography;
 
 
-const LabelItem = ({ labelData1, btnPrint }) => {
+const  LabelItem = () => {
 
     const labelData = {
         code: 'AAAAA',
@@ -16,75 +15,48 @@ const LabelItem = ({ labelData1, btnPrint }) => {
         barcodeData: 'AAAAA/206/1000/202202/2.0',
     };
 
-    return (
-        <Card
-            style={{
-                width: "10cm",
-                height: "5cm", // Tăng chiều cao của card để có không gian cho tất cả nội dung
-                padding: 0,
-                overflow: "hidden",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between"
-            }}
-        >
-            {/* Barcode */}
-            <Row justify="center" style={{ marginBottom: 5 }}>
-                <Col>
+        return (
+
+            <div
+                className=" w-auto h-auto p-2 pt-2 justify-center"
+
+            >
+                <div className="flex  flex-col justify-center items-center ">
+
                     <Barcode
                         value={labelData.barcodeData}
                         width={1}
-                        height={40} // Tăng chiều cao barcode nếu cần
+                        height={20}
                         displayValue={false}
+                        margin={0}
                     />
-                </Col>
-            </Row>
-
-            {/* Barcode Text */}
-            <Row justify="center" style={{ marginBottom: 5 }}>
-                <Col>
-                    <Text style={{ fontSize: "8px" }} strong>
-                        {labelData.barcodeData}
-                    </Text>
-                </Col>
-            </Row>
-
-            {/* Information Rows */}
-            <Row justify="start" style={{ fontSize: "8px" }}>
-                <Col span={12}>
-                    <Row justify="start">
-                        <Col span={12}>
-                            <Text strong>Code: {labelData.code}</Text>
-                        </Col>
-                        <Col span={12}>
-                            <Text strong>Qty: {labelData.qty}</Text>
-                        </Col>
-                    </Row>
-                    <Row justify="start">
-                        <Col span={12}>
-                            <Text strong>Lot: {labelData.lot}</Text>
-                        </Col>
-                        <Col span={12}>
-                            <Text strong>DC: {labelData.dc}</Text>
-                        </Col>
-                    </Row>
-                    <Row justify="start">
-                        <Col span={12}>
-                            <Text strong>Reel: {labelData.reel}</Text>
-                        </Col>
-                        <Col span={12}>
-                            <Text strong>UserID: {labelData.userId}</Text>
-                        </Col>
-                    </Row>
-                </Col>
-
-                {/* QR Code */}
-                
-            </Row>
-        </Card>
+                    <h4 className="text-[8px]">{labelData.barcodeData}</h4>
+                </div>
 
 
-    )
+                <div className=" flex gap-3 justify-center items-center">
+                    <div className="">
+                        <h4 className="text-[8px]">Code: DI0992</h4>
+                        <h4 className="text-[8px]">DC: 2400</h4>
+                    </div>
+                    <div className="">
+                        <h4 className="text-[8px]">Lot: RU33862628</h4>
+                        <h4 className="text-[8px]">Rell: 6782</h4>
+                    </div>
+                    <div className="">
+                        <h4 className="text-[8px]">Qty: 15000 </h4>
+                        <h4 className="text-[8px]">UserID: Vm1234567</h4>
+                    </div>
+
+                    <div className="">
+                        <QRCode type="svg" value={labelData.barcodeData} size={28} bordered= {false} />
+                    </div>
+                </div>
+            </div>
+
+
+        )
+
 };
 
 export default LabelItem;
