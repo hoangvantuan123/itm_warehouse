@@ -135,6 +135,7 @@ export default function Users({ permissions, isMobile }) {
       setLoadingCodeHelp(false)
     }
   }
+  
   const handleEmpSeqQuery = () => {
     if (empSeq !== null) {
       SHREmpInQuery(formDataEmpSeq)

@@ -20,6 +20,7 @@ import Login from '../auth/login'
 import decodeJWT from '../../utils/decode-JWT'
 import { transformDataMenu } from '../../utils/transformDataMenu'
 import ErrorPage from '../page/default/errorPage'
+import StockOutRequestDetails from '../page/material/stockOutRequestDetails'
 const DeliveryList = lazy(() => import('../page/material/deliveryList'))
 const WaitingIqcStockIn = lazy(
   () => import('../page/material/waitingIqcStockIn'),
@@ -189,6 +190,21 @@ const UserRouter = () => {
                       element={
                         checkActionPermission(userPermissions, 'user_management-1-1', 'View') ? (
                           <UserManagement
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
+                        ) : (
+                          <ErrorPage
+
+                          />
+                        )
+                      }
+                    />
+                    <Route
+                      path="u/warehouse/material/stock-out-request-details/:id"
+                      element={
+                        checkActionPermission(userPermissions, 'material-1-4', 'View') ? (
+                          <StockOutRequestDetails
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />

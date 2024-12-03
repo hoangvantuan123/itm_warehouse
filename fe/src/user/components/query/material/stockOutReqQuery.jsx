@@ -23,7 +23,13 @@ export default function StockOutRequestQuery({
     setToDate,
     toDate,
     dataUnit, 
-    setBizUnit
+    setBizUnit, 
+    handleSearch1,
+    handleSearch2,
+    handleSearch3,
+    setModalVisible1,
+    loadingCodeHelp,
+    modalVisible1,
 }) {
     const handleFormDate = (date) => {
         setFormData(date)
@@ -40,7 +46,7 @@ export default function StockOutRequestQuery({
                 <Row className="gap-4 flex items-center ">
                     <Col>
                         <Form.Item
-                            label={<span className="uppercase text-xs">Ngày yêu cầu 1</span>}
+                            label={<span className="uppercase text-[10px]">Ngày yêu cầu 1</span>}
                             className="mb-0"
                         >
                             <DatePicker
@@ -52,7 +58,7 @@ export default function StockOutRequestQuery({
                     </Col>
                     <Col>
                         <Form.Item
-                            label={<span className="uppercase text-xs">Ngày yêu cầu 2</span>}
+                            label={<span className="uppercase text-[10px]">Ngày yêu cầu 2</span>}
                             className="mb-0"
                         >
                             <DatePicker
@@ -66,7 +72,7 @@ export default function StockOutRequestQuery({
 
                     <Col>
                         <Form.Item
-                            label={<span className="uppercase text-xs">Nơi sản xuất</span>}
+                            label={<span className="uppercase text-[10px]">Nơi sản xuất</span>}
                             className="mb-0"
                         >
                             <Select
@@ -86,43 +92,61 @@ export default function StockOutRequestQuery({
                     </Col>
                     <Col>
                         <Form.Item
-                            label={<span className="uppercase text-xs">Bộ phận yêu cầu</span>}
+                            label={<span className="uppercase text-[10px]">Bộ phận yêu cầu</span>}
                             className="mb-0"
                         >
                             <Input
                                
                                 size="small"
                                 className=" text-sm p-2 bg-blue-50"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        handleSearch1()
+                                    }
+                                  }}
+                                  onDoubleClick={handleSearch1}
                             />
                         </Form.Item>
                     </Col>
                     <Col>
                         <Form.Item
-                            label={<span className="uppercase text-xs">Người yêu cầu</span>}
+                            label={<span className="uppercase text-[10px]">Người yêu cầu</span>}
                             className="mb-0"
                         >
                             <Input
                                
                                 size="small"
                                  className=" text-sm p-2 bg-blue-50"
+                                 onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        handleSearch2()
+                                    }
+                                  }}
+                                  onDoubleClick={handleSearch2}
                             />
                         </Form.Item>
                     </Col>
                     <Col>
                         <Form.Item
-                            label={<span className="uppercase text-xs">Khách hàng</span>}
+                            label={<span className="uppercase text-[10px]">Khách hàng</span>}
                             className="mb-0"
                         >
                             <Input
                                
                                 size="small"
                                 className=" text-sm p-2 bg-blue-50"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        handleSearch3()
+                                    }
+                                  }}
+                                  onDoubleClick={handleSearch3}
                             />
                         </Form.Item>
                     </Col>
                     <Col>
                         <Form.Item
-                            label={<span className="uppercase text-xs">Số yêu cầu</span>}
+                            label={<span className="uppercase text-[10px]">Số yêu cầu</span>}
                             className="mb-0"
                         >
                             <Input
@@ -134,7 +158,7 @@ export default function StockOutRequestQuery({
                     </Col>
                     <Col>
                         <Form.Item
-                            label={<span className="uppercase text-xs">Số yêu cầu</span>}
+                            label={<span className="uppercase text-[10px]">Số yêu cầu</span>}
                             className="mb-0"
                         >
                             <Input
@@ -146,7 +170,7 @@ export default function StockOutRequestQuery({
                     </Col>
                     <Col>
                         <Form.Item
-                            label={<span className="uppercase text-xs">Số kế hoạch</span>}
+                            label={<span className="uppercase text-[10px]">Số kế hoạch</span>}
                             className="mb-0"
                         >
                             <Input
@@ -158,7 +182,7 @@ export default function StockOutRequestQuery({
                     </Col>
                     <Col>
                         <Form.Item
-                            label={<span className="uppercase text-xs">Số lệnh sản xuất</span>}
+                            label={<span className="uppercase text-[10px]">Số lệnh sản xuất</span>}
                             className="mb-0"
                         >
                             <Input
@@ -170,7 +194,7 @@ export default function StockOutRequestQuery({
                     </Col>
                     <Col>
                         <Form.Item
-                            label={<span className="uppercase text-xs">Phân loại kho</span>}
+                            label={<span className="uppercase text-[10px]">Phân loại kho</span>}
                             className="mb-0"
                         >
                             <Select

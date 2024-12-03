@@ -36,7 +36,7 @@ export default function WaitingIqcStockInQuery({
         <Row className="gap-4 flex items-center">
           <Col>
             <Form.Item
-              label={<span className="uppercase text-xs">Date</span>}
+              label={<span className="uppercase text-[10px]">Date</span>}
               className="mb-0"
             >
               <Input
@@ -50,7 +50,7 @@ export default function WaitingIqcStockInQuery({
 
           <Col>
             <Form.Item
-              label={<span className="uppercase text-xs">MAT Barcode</span>}
+              label={<span className="uppercase text-[10px]">MAT Barcode</span>}
               tooltip="MAT Barcode"
               className="mb-0"
             >
@@ -67,7 +67,7 @@ export default function WaitingIqcStockInQuery({
 
           <Col>
             <Form.Item
-              label={<span className="uppercase text-xs">Delivery No</span>}
+              label={<span className="uppercase text-[10px]">Delivery No</span>}
               className="mb-0"
             >
               <Input
@@ -81,7 +81,7 @@ export default function WaitingIqcStockInQuery({
 
           <Col>
             <Form.Item
-              label={<span className="uppercase text-xs">Biz Unit</span>}
+              label={<span className="uppercase text-[10px]">Biz Unit</span>}
               className="mb-0"
             >
               <Input
@@ -95,7 +95,7 @@ export default function WaitingIqcStockInQuery({
 
           <Col>
             <Form.Item
-              label={<span className="uppercase text-xs">Purchase Type</span>}
+              label={<span className="uppercase text-[10px]">Purchase Type</span>}
               className="mb-0"
             >
               <Input
@@ -109,7 +109,7 @@ export default function WaitingIqcStockInQuery({
 
           <Col>
             <Form.Item
-              label={<span className="uppercase text-xs">YYWW</span>}
+              label={<span className="uppercase text-[10px]">YYWW</span>}
               className="mb-0"
             >
               <Title level={3} className="text-gray-800">
@@ -120,7 +120,7 @@ export default function WaitingIqcStockInQuery({
 
           <Col>
             <Form.Item
-              label={<span className="uppercase text-xs">YYYYMM</span>}
+              label={<span className="uppercase text-[10px]">YYYYMM</span>}
               className="mb-0"
             >
               <Title level={3} className="text-gray-800">

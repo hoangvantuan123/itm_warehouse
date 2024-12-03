@@ -125,6 +125,19 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
   })
+  const [isOpenDetails, setIsOpenDetails] = useState(false);
+
+  useEffect(() => {
+    const savedState = localStorage.getItem("detailsStateIqc");
+    setIsOpenDetails(savedState === "open");
+  }, []);
+
+  const handleToggle = (event) => {
+    const isOpen = event.target.open; 
+    setIsOpenDetails(isOpen);
+    localStorage.setItem("detailsStateIqc", isOpen ? "open" : "closed");
+  };
+
 
 
 
@@ -676,7 +689,8 @@ const handleDelete = useCallback(
             </div>
             <details
               className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
-              open
+              open={isOpenDetails}
+              onToggle={handleToggle}
             >
               <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
                 <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600">
@@ -723,7 +737,7 @@ const handleDelete = useCallback(
         modal5Open={modal5Open}
         successMessage={successMessage}
       />
-      <ErrorPage modal3Open={modal3Open} setModal3Open={setModal3Open} />
+      <ErrorPage modal3Open={modal3Open} setModal3Open={setModal3Open} pathRouter="/u/warehouse/material/delivery-list" />
     </>
   )
 }

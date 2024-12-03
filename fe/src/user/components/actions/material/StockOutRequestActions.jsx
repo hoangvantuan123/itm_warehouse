@@ -7,7 +7,7 @@ import {
   SearchOutlined,
 } from '@ant-design/icons'
 
-export default function StockOutRequestActions() {
+export default function StockOutRequestActions({nextPage}) {
   return (
     <div className="flex items-center gap-2">
       <Button
@@ -18,6 +18,7 @@ export default function StockOutRequestActions() {
         className="uppercase"
         color="default"
         variant="filled"
+        onClick={nextPage}
         style={{ backgroundColor: '#f0f0f0', borderColor: '#d9d9d9' }}
       >
         XỬ LÝ XUẤT KHO

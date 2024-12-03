@@ -105,6 +105,20 @@ export default function DeliveryList({ permissions, isMobile }) {
   const [clickedRowData, setClickedRowData] = useState(null)
   const [clickedRowDataList, setClickedRowDataList] = useState([])
   const [gridData, setGridData] = useState([])
+  const [isOpenDetails, setIsOpenDetails] = useState(false);
+
+  useEffect(() => {
+    const savedState = localStorage.getItem("detailsStateDelist");
+    setIsOpenDetails(savedState === "open");
+  }, []);
+
+  const handleToggle = (event) => {
+    const isOpen = event.target.open; 
+    setIsOpenDetails(isOpen);
+    localStorage.setItem("detailsStateDelist", isOpen ? "open" : "closed");
+  };
+
+
   const fetchDeliveryData = useCallback(async () => {
     setLoading(true)
     try {
@@ -114,7 +128,7 @@ export default function DeliveryList({ permissions, isMobile }) {
         deliveryNo,
         bizUnit,
       )
-      setData(deliveryResponse?.data || dataM)
+      setData(deliveryResponse?.data || [])
     } catch (error) {
       setData([])
     } finally {
@@ -258,7 +272,8 @@ export default function DeliveryList({ permissions, isMobile }) {
             </div>
             <details
               className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
-              open
+              open={isOpenDetails}
+              onToggle={handleToggle}
             >
               <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
                 <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600">

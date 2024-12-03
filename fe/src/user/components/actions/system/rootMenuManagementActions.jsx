@@ -1,10 +1,20 @@
 import { useState } from 'react'
 import { Button } from 'antd'
-import { SaveOutlined, PlusOutlined } from '@ant-design/icons'
+import { SaveOutlined, PlusOutlined, FileDoneOutlined } from '@ant-design/icons'
 
 export default function RootMenuManagementActions({ openModal }) {
   return (
     <div className="flex items-center gap-2">
+
+<Button
+        key="Reset"
+        icon={<FileDoneOutlined />}
+        size="middle"
+        className="uppercase"
+        type="default"
+      >
+        Open
+      </Button>
       <Button
         key="Save"
         type="primary"

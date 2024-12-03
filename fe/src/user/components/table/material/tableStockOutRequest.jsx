@@ -216,9 +216,8 @@ function TableStockOutRequest({
           onColumnResize={onColumnResize}
           smoothScrollY={true}
           smoothScrollX={true}
-
+  rowSelect="single"
           onCellClicked={onCellClicked}
-          rowSelect="single"
           gridSelection={selection}
           onGridSelectionChange={setSelection}
         />

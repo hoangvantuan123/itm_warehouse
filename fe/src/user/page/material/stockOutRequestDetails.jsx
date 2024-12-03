@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useParams } from 'react-router-dom'
 import { Helmet } from 'react-helmet'
 import { Input, Space, Table, Typography, message, Tabs, Layout } from 'antd'
 const { Title, Text } = Typography
@@ -13,12 +14,10 @@ import { debounce } from 'lodash'
 import { useNavigate } from 'react-router-dom'
 import { encodeBase64Url } from '../../../utils/decode-JWT'
 import CryptoJS from 'crypto-js'
-import StockOutRequestQuery from '../../components/query/material/stockOutReqQuery'
 import StockOutRequestActions from '../../components/actions/material/StockOutRequestActions'
-import TableStockOutRequest from '../../components/table/material/tableStockOutRequest'
-import CodeHelpStockOut1 from '../../components/modal/material/codeHelpStockOut1'
-import CodeHelpStockOut2 from '../../components/modal/material/codeHelpStockOut2'
-import CodeHelpStockOut3 from '../../components/modal/material/codeHelpStockOut3'
+import StockOutRequestActionsDetails from '../../components/actions/material/StockOutRequestActionsDetails'
+import StockOutRequestQueryDetails from '../../components/query/material/stockOutReqQueryDetails'
+import TableStockOutRequestDetails from '../../components/table/material/tableStockOutRequestDetails'
 
 const gridDataDA = [
   {
@@ -108,11 +107,11 @@ const gridDataDA = [
 ]
 
 
-export default function StockOutRequest({ permissions, isMobile }) {
+export default function StockOutRequestDetails({ permissions, isMobile }) {
   const { t } = useTranslation()
   const gridRef = useRef(null)
   const navigate = useNavigate()
-
+  const { id } = useParams()
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState(gridDataDA)
   const [dataUnit, setDataUnit] = useState([])
@@ -136,20 +135,54 @@ export default function StockOutRequest({ permissions, isMobile }) {
   const [modalVisible3, setModalVisible3] = useState(false)
   const [loadingCodeHelp, setLoadingCodeHelp] = useState(false)
   const [errorCodeHelp, setErrorCodeHelp] = useState('')
-
+  const secretKey = 'TEST_ACCESS_KEY'
+/*  */
+const [filteredData, setFilteredData] = useState(null)
+const [modal3Open, setModal3Open] = useState(false)
   useEffect(() => {
-    const savedState = localStorage.getItem("detailsStateStockOut");
+    const savedState = localStorage.getItem("detailsStateStockOutDetails");
     setIsOpenDetails(savedState === "open");
   }, []);
 
   const handleToggle = (event) => {
     const isOpen = event.target.open; 
     setIsOpenDetails(isOpen);
-    localStorage.setItem("detailsStateStockOut", isOpen ? "open" : "closed");
+    localStorage.setItem("detailsStateStockOutDetails", isOpen ? "open" : "closed");
   };
 
 
+  const decodeBase64Url = (base64Url) => {
+    try {
+      let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+      const padding =
+        base64.length % 4 === 0 ? '' : '='.repeat(4 - (base64.length % 4))
+      return base64 + padding
+    } catch (error) {
+      throw new Error('Invalid Base64 URL')
+    }
+  }
+  const decryptData = (encryptedToken) => {
+    try {
+      const base64Data = decodeBase64Url(encryptedToken)
+      const bytes = CryptoJS.AES.decrypt(base64Data, secretKey)
+      const decryptedData = bytes.toString(CryptoJS.enc.Utf8)
+      return JSON.parse(decryptedData)
+    } catch (error) {
+      setModal3Open(true)
+      return null
+    }
+  }
+  useEffect(() => {
+    if (id) {
+      const data = decryptData(id)
+      console.log('data' , data)
+      if (data) {
+        setFilteredData(data)
+      }
+    }
+  }, [id])
 
+  
   const fetchDeliveryData = useCallback(async () => {
     setLoading(true)
     try {
@@ -194,9 +227,9 @@ export default function StockOutRequest({ permissions, isMobile }) {
   )
 
 
-  const nextPage = useCallback(() => {
+  const nextPageStockIn = useCallback(() => {
     if (keyPath) {
-      navigate(`/u/warehouse/material/stock-out-request-details/${keyPath}`)
+      navigate(`/u/warehouse/material/waiting-iqc-stock-in/${keyPath}`)
     }
   }, [keyPath, navigate])
 
@@ -227,12 +260,12 @@ export default function StockOutRequest({ permissions, isMobile }) {
       return
     }
 
-    if (rowIndex >= 0 && rowIndex < data.length) {
-      const rowData = data[rowIndex]
+    if (rowIndex >= 0 && rowIndex < gridData.length) {
+      const rowData = gridData[rowIndex]
 
       const filteredData = {
-        IDX_NO: rowData.IDX_NO,
-       
+        IsStop: rowData.IsStop,
+      
       }
       const secretKey = 'TEST_ACCESS_KEY'
       const encryptedData = CryptoJS.AES.encrypt(
@@ -296,7 +329,7 @@ export default function StockOutRequest({ permissions, isMobile }) {
               <Title level={4} className="mt-2 uppercase opacity-85 ">
                 {t('Stock Out Request')}
               </Title>
-              <StockOutRequestActions nextPage={nextPage} />
+              <StockOutRequestActionsDetails/>
             </div>
             <details
               className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
@@ -314,7 +347,7 @@ export default function StockOutRequest({ permissions, isMobile }) {
               </summary>
               <div className="flex p-2 gap-4">
 
-                <StockOutRequestQuery
+                <StockOutRequestQueryDetails
                   formData={formData}
                   setFormData={setFormData}
                   setToDate={setToDate}
@@ -322,14 +355,6 @@ export default function StockOutRequest({ permissions, isMobile }) {
                   dataUnit={dataUnit}
                   setBizUnit={setBizUnit}
 
-                  handleSearch1={handleSearch1}
-                  handleSearch2={handleSearch2}
-                  handleSearch3={handleSearch3}
-                  setModalVisible1={setModalVisible1}
-                  setModalVisible2={setModalVisible2}
-                  loadingCodeHelp={loadingCodeHelp}
-                  modalVisible1={modalVisible1}
-                  modalVisible2={modalVisible2}
                   
                 />
               </div>
@@ -337,7 +362,7 @@ export default function StockOutRequest({ permissions, isMobile }) {
           </div>
 
           <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg">
-            <TableStockOutRequest data={data}
+            <TableStockOutRequestDetails data={data}
               loading={loading}
               setData={setData}
               onCellClicked={onCellClicked}
@@ -348,23 +373,7 @@ export default function StockOutRequest({ permissions, isMobile }) {
           </div>
         </div>
       </div>
-      <CodeHelpStockOut1
-         setModalVisible={setModalVisible1}
-         modalVisible={modalVisible1}
-         loadingCodeHelp={loadingCodeHelp}
-         handleSearch={handleSearch1}
-      />
-      <CodeHelpStockOut2 
-       setModalVisible={setModalVisible2}
-       modalVisible={modalVisible2}
-       loadingCodeHelp={loadingCodeHelp}
-       handleSearch={handleSearch2}
-       
-      />
-      <CodeHelpStockOut3  setModalVisible={setModalVisible3}
-       modalVisible={modalVisible3}
-       loadingCodeHelp={loadingCodeHelp}
-       handleSearch={handleSearch3}/>
+     
     </>
   )
 }

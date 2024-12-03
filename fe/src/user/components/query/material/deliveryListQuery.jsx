@@ -43,7 +43,7 @@ export default function DeliveryListQuery({
         <Row className="gap-4 flex items-center ">
           <Col>
             <Form.Item
-              label={<span className="uppercase text-xs">Date 1</span>}
+              label={<span className="uppercase text-[10px]">Date 1</span>}
               className="mb-0"
             >
               <DatePicker
@@ -55,7 +55,7 @@ export default function DeliveryListQuery({
           </Col>
           <Col>
             <Form.Item
-              label={<span className="uppercase text-xs">Date 2</span>}
+              label={<span className="uppercase text-[10px]">Date 2</span>}
               className="mb-0"
             >
               <DatePicker
@@ -69,7 +69,7 @@ export default function DeliveryListQuery({
 
           <Col>
             <Form.Item
-              label={<span className="uppercase text-xs">Delivery No</span>}
+              label={<span className="uppercase text-[10px]">Delivery No</span>}
               className="mb-0"
             >
               <Input
@@ -84,7 +84,7 @@ export default function DeliveryListQuery({
 
           <Col>
             <Form.Item
-              label={<span className="uppercase text-xs">Acc Unit</span>}
+              label={<span className="uppercase text-[10px]">Acc Unit</span>}
               className="mb-0"
             >
               <Select
