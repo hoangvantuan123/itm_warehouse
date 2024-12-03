@@ -6,20 +6,31 @@ const { Header, Content } = Layout;
 import 'moment/locale/vi';
 import BarcodePrintAction from '../../components/actions/barcodePrint/barcocePrintAction';
 import TableBarcodePrint from '../../components/table/barcodePrint/tableBarcodePrint';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getPageMat } from '../../../services/printBarcodeService';
 
 export default function BarcodePrint({ permissions, isMobile }) {
 
-    const [data, setData] = useState([])
+    const [data, setData] = useState([]);
     const { t } = useTranslation();
 
-    const [selectState, setSelectState] = useState([]);
+    const [dataInfo, setDataInfo] = useState([]);
+
+    const [rowChecked, setRowChecked] = useState([]);
 
 
     const onHandleData = function setDataHandle(varData) {
         setData(varData);
     }
+
+    useEffect(() => {
+        const fetchData = async () => {
+          const response = await getPageMat();
+          setData(response?.data);
+        };
+    
+        fetchData();
+      }, []);
 
     const btnSearch = async () => {
         const resData = await getPageMat();
@@ -27,13 +38,30 @@ export default function BarcodePrint({ permissions, isMobile }) {
 
     }
 
+    const handleSeclecData = function setSelectData(ev) {
 
-    const handleSeclecData =  function setSelectData (ev) {
+        setRowChecked(null);
         const gridInstance = ev.instance;
+
+        const scrollTop = gridInstance.el.scrollTop;
+        const scrollLeft = gridInstance.el.scrollLeft;
+
         const checkedRows = gridInstance.getCheckedRows();
-        setSelectState(checkedRows);
-        
-    }
+        setRowChecked(checkedRows);
+
+        setTimeout(() => {
+            gridInstance.el.scrollTop = scrollTop;
+            gridInstance.el.scrollLeft = scrollLeft;
+          }, 0);
+    };
+
+    const handleClickRow = function clickRow(ev) {
+
+        setDataInfo(null);
+        const { rowKey, instance } = ev;
+        const row = instance.getRow(rowKey);
+        setDataInfo(row);
+    };
 
 
 
@@ -48,13 +76,13 @@ export default function BarcodePrint({ permissions, isMobile }) {
                     <Title level={5} className="mt-2 uppercase">
                         {t('PRINT BARCODE')}
                     </Title>
-                    <BarcodePrintAction dataSearch={onHandleData} btnSearch={btnSearch} dataSelect={selectState}/>
+                    <BarcodePrintAction dataSearch={onHandleData} btnSearch={btnSearch} dataSelect={rowChecked} dataInfo={dataInfo} />
                 </Header>
 
                 <Content className="flex-grow px-4  bg-slate-50">
                     <div className="h-full flex flex-col">
                         <div className="flex-grow">
-                            <TableBarcodePrint data={data} handleSelect={handleSeclecData}/>
+                            <TableBarcodePrint data={data} handleSelect={handleSeclecData} handleClickRow={handleClickRow} />
                         </div>
                     </div>
                 </Content>

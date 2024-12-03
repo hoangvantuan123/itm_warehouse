@@ -1,23 +1,42 @@
 import { useRef, useState } from "react";
-
+import ReactDOM from 'react-dom';
 import { Card, Button, Modal, Space, Input, Typography, DatePicker, Checkbox, Row, Col } from 'antd';
 import { SaveFilled } from '@ant-design/icons';
 
 import ZebraBrowserPrintWrapper from 'zebra-browser-print-wrapper';
 import LabelItem from "./labeldesign";
 
-import { useReactToPrint } from "react-to-print";
 
 
 
 
 
-export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect }) {
 
-    const [img, setImg] = useState(null);
+export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect, dataInfo, btnPrintPreview }) {
+
     const [zplcode, setZplCode] = useState('');
 
-    const [loading, setLoading] = useState(false);
+    const [sizeLabel, setSizeLabel] = useState({
+
+        barCodePosX: '',
+        barCodePosY: '',
+        barCodeSizeX: '',
+        barCodeSizeY: '',
+        QrPosX: '',
+        QrPosY: '',
+        QrSizeX: '',
+        QrSizeY: '',
+        paperSizeX: '',
+        paperSizeY: ''
+
+    });
+
+    const handleInputChange = (e, field) => {
+        setSizeLabel(prevState => ({
+            ...prevState,
+            [field]: e.target.value 
+        }));
+    };
 
     const printLabel = async () => {
 
@@ -108,7 +127,6 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect }
 
             try {
                 const response = await fetch(`http://api.labelary.com/v1/printers/12dpmm/labels/4.94x0.91/0/`, options);
-
                 if (!response.ok) {
                     throw new Error('Error generating preview');
                 }
@@ -196,31 +214,7 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect }
     const printRef = useRef({});
 
     const showModal = () => {
-        setIsModalVisible(true);
-    };
-
-
-
-    const handleOk = useReactToPrint({
-        contentRef: printRef.current,
-        pageStyle: `
-            @page {
-                size: 10cm 2cm; 
-                margin: 0;
-            }
-            body {
-                margin: 0;
-                padding: 0;
-                overflow: visible;
-            }
-        `,
-    }
-    );
-
-    const onOk = () => {
         setTimeout(() => {
-
-            // Tạo iframe ẩn để in nội dung
             const iframe = document.createElement('iframe');
             iframe.style.display = 'none';
             document.body.appendChild(iframe);
@@ -229,16 +223,16 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect }
             doc.open();
 
             const styles = Array.from(document.styleSheets)
-            .map(styleSheet => {
-                try {
-                    return Array.from(styleSheet.cssRules)
-                        .map(rule => rule.cssText)
-                        .join('\n');
-                } catch (e) {
-                    return '';
-                }
-            })
-            .join('\n');
+                .map(styleSheet => {
+                    try {
+                        return Array.from(styleSheet.cssRules)
+                            .map(rule => rule.cssText)
+                            .join('\n');
+                    } catch (e) {
+                        return '';
+                    }
+                })
+                .join('\n');
 
             doc.write(`<style>${styles}</style>`);
 
@@ -257,17 +251,86 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect }
                         justify-content: flex-start;
                         align-items: center;
                     }
+                 
+                }
                 </style>
             `);
 
-            if (printRef.current) {
+            const labelHtml = printRef.current.innerHTML;
+            doc.write(labelHtml);
 
-                console.log("innerHTML", printRef.current.innerHTML);
-                console.log("current", printRef.current);
-                doc.write(printRef.current.innerHTML);
+            console.log(printRef);
+            doc.close();
 
-                console.log(doc);
-            }
+            iframe.onload = () => {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+
+                setTimeout(() => {
+                    document.body.removeChild(iframe);
+                }, 1000);
+            };
+        }, 1000);
+    };
+
+    const onOk = () => {
+        setTimeout(() => {
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            doc.open();
+
+            const styles = Array.from(document.styleSheets)
+                .map(styleSheet => {
+                    try {
+                        return Array.from(styleSheet.cssRules)
+                            .map(rule => rule.cssText)
+                            .join('\n');
+                    } catch (e) {
+                        return '';
+                    }
+                })
+                .join('\n');
+
+            doc.write(`<style>${styles}</style>`);
+
+            doc.write(`
+                <style>
+                    @page {
+                        size: 5in 0.79in;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                    }
+                    html, body {
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: flex-start;
+                        align-items: center;
+                    }
+                 
+                }
+                </style>
+            `);
+
+            const tempContainer = document.createElement('div');
+            document.body.appendChild(tempContainer);
+
+            ReactDOM.render(
+                <>
+                    {dataSelect.map((item, index) => (
+                        <LabelItem label={item} />
+                    ))}
+                </>,
+                tempContainer
+            );
+            const labelHtml = tempContainer.innerHTML;
+
+            console.log(labelHtml);
+            doc.write(labelHtml);
 
             doc.close();
 
@@ -283,19 +346,16 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect }
     };
 
 
-
     const handleCancel = () => {
         setIsModalVisible(false);
     };
 
-    const printLabel1 = () => {
+    const previewLabel = () => {
         showModal();
     };
 
     const btnPrintPop = async () => {
         try {
-
-
 
             const browserPrint = new ZebraBrowserPrintWrapper();
             const defaultPrinter = await browserPrint.getAvailablePrinters();
@@ -366,20 +426,9 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect }
                                 icon={<SaveFilled />}
                                 size="middle"
                                 className="uppercase"
-                                onClick={printLabel1}
+                                onClick={onOk}
                             >
                                 PRINT LABEL
-                            </Button>
-
-                            <Button
-
-                                type={'PRINT' === 'Save' ? 'primary' : 'default'}
-                                icon={<SaveFilled />}
-                                size="middle"
-                                className="uppercase"
-                                onClick={printImages}
-                            >
-                                PRINT LABEL TEST
                             </Button>
 
                             <Button
@@ -415,7 +464,7 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect }
                             </Space>
                             <Space direction="vertical" size={6}>
                                 <Typography.Text>Mat ID</Typography.Text>
-                                <Input className="w-20 bg-blue-50" />
+                                <Input className="w-20 bg-blue-50" value={dataInfo?.ITEMCD} />
 
                             </Space>
                             <Space direction="vertical" size={6}>
@@ -426,30 +475,30 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect }
 
                             <Space direction="vertical" size={6}>
                                 <Typography.Text>Lot No</Typography.Text>
-                                <Input className="w-20 bg-blue-50" />
+                                <Input className="w-20 bg-blue-50" value={dataInfo?.LOTNO} />
 
                             </Space>
 
                             <Space direction="vertical" size={6}>
                                 <Typography.Text>QTY</Typography.Text>
-                                <Input className="w-20 bg-blue-50" />
+                                <Input className="w-20 bg-blue-50" value={dataInfo?.QTY} />
 
                             </Space>
                             <Space direction="vertical" size={6}>
                                 <Typography.Text>Date</Typography.Text>
-                                <Input className="w-20 bg-blue-50" />
+                                <Input className="w-20 bg-blue-50" value={dataInfo?.DATECODE} />
 
                             </Space>
 
                             <Space direction="vertical" size={6}>
                                 <Typography.Text>Reel No</Typography.Text>
-                                <Input className="w-20 bg-blue-50" />
+                                <Input className="w-20 bg-blue-50" value={dataInfo?.REELNO} />
 
                             </Space>
 
                             <Space direction="vertical" size={6}>
                                 <Typography.Text>UserID</Typography.Text>
-                                <Input className="w-20 bg-blue-50" />
+                                <Input className="w-20 bg-blue-50" value={dataInfo?.USER_ID} />
 
                             </Space>
                             <Space direction="vertical" size={6}>
@@ -459,51 +508,56 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect }
                             </Space>
                             <Space direction="vertical" size={6}>
                                 <Typography.Text>Remark</Typography.Text>
-                                <Input className="w-full bg-blue-50" />
-
+                                <Input className="w-full bg-blue-50" value={dataInfo?.LOT_ID} />
                             </Space>
                         </div>
 
                     </Row>
 
-                    <Row >
-
-
+                    <Row className="mt-4">
                         <Space direction="horizontal" size={6}>
                             <Typography.Text>1D BARCODE POSITION</Typography.Text>
-                            <Input className="w-20 bg-blue-50" />
-                            <Input className="w-20 bg-blue-50" />
+                            <Input className="w-20 bg-blue-50" value={sizeLabel.barCodePosX} onChange={(e) => handleInputChange(e, 'barCodePosX')}/>
+                            <Input className="w-20 bg-blue-50" value={sizeLabel.barCodePosY} onChange={(e) => handleInputChange(e, 'barCodePosY')} />
 
                         </Space>
 
                         <Space direction="horizontal" size={6}>
                             <Typography.Text>1D BARCODE SIZE</Typography.Text>
-                            <Input className="w-20 bg-blue-50" />
-                            <Input className="w-20 bg-blue-50" />
+                            <Input className="w-20 bg-blue-50" value={sizeLabel.barCodeSizeX} onChange={(e) => handleInputChange(e, 'barCodeSizeX')} />
+                            <Input className="w-20 bg-blue-50" value={sizeLabel.barCodeSizeY} onChange={(e) => handleInputChange(e, 'barCodeSizeY')}/>
                         </Space>
 
 
                         <Space direction="horizontal" size={6}>
                             <Typography.Text>2D BARCODE POSITION</Typography.Text>
-                            <Input className="w-20 bg-blue-50" />
-                            <Input className="w-20 bg-blue-50" />
+                            <Input className="w-20 bg-blue-50" value={sizeLabel.QrPosX} onChange={(e) => handleInputChange(e, 'QrPosX')} />
+                            <Input className="w-20 bg-blue-50" value={sizeLabel.QrPosY} onChange={(e) => handleInputChange(e, 'QrPosY')} />
 
                         </Space>
 
                         <Space direction="horizontal" size={6}>
                             <Typography.Text>2D BARCODE SIZE</Typography.Text>
-                            <Input className="w-20 bg-blue-50" />
-                            <Input className="w-20 bg-blue-50" />
+                            <Input className="w-20 bg-blue-50" value={sizeLabel.QrSizeX} onChange={(e) => handleInputChange(e, 'QrSizeX')} />
+                            <Input className="w-20 bg-blue-50" value={sizeLabel.QrSizeY} onChange={(e) => handleInputChange(e, 'QrSizeY')} />
                         </Space>
 
                         <Space direction="horizontal" size={6}>
                             <Typography.Text>PAPER SIZE</Typography.Text>
 
-                            <Input className="w-20 bg-blue-50" />
-                            <Input className="w-20 bg-blue-50" />
+                            <Input className="w-20 bg-blue-50" value={sizeLabel.paperSizeX} onChange={(e) => handleInputChange(e, 'paperSizeX')} />
+                            <Input className="w-20 bg-blue-50" value={sizeLabel.paperSizeY} onChange={(e) => handleInputChange(e, 'paperSizeY')}/>
 
                         </Space>
-                        <Checkbox title="Print Preview"> Print Preview</Checkbox>
+                        <Button
+                            
+                            icon={<SaveFilled />}
+                            size="middle"
+                            className="uppercase"
+                            onClick={previewLabel}
+                        >
+                            Preview
+                        </Button>
 
                     </Row>
 
@@ -517,22 +571,13 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect }
                     onOk={onOk}
                     onCancel={handleCancel}
                 >
-
-                    <Button
-                        type={'PRINT' === 'Save' ? 'primary' : 'default'}
-                        icon={<SaveFilled />}
-                        size="middle"
-                        className="uppercase"
-                        onClick={btnPrintPop}
-                    >
-                        Conntect
-                    </Button>
-                    <div ref={printRef} >
-                        <LabelItem />
-
-                    </div>
-
+                    
                 </Modal>
+                <div ref={printRef} className="hidden" >
+                        <LabelItem label={dataInfo} />
+                </div>
+
+
             </Card>
 
         </div>

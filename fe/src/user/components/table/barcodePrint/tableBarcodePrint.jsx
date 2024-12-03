@@ -2,12 +2,9 @@ import 'tui-grid/dist/tui-grid.css'
 import Grid from '@toast-ui/react-grid'
 import TuiGrid from 'tui-grid';
 import '../../../../static/css/customTabe.css'
-import { useState } from 'react';
 
-function TableBarcodePrint({data, handleSelect}) {
+function TableBarcodePrint({data, handleSelect, handleClickRow}) {
 
-
-    // const navigate = useNavigate();
     const tblStockOut = [
         { name: 'TRAN_CODE', header: 'TRAN CODE', sortable: true, filter: 'text' },
         { name: 'TRAN_SEQ', header: 'TRAN SEQ', sortable: true, filter: 'text' },
@@ -65,7 +62,7 @@ function TableBarcodePrint({data, handleSelect}) {
                 data={data}
                 columns={tblStockOut}
                 rowHeight={100}
-                bodyHeight="fitToParent"
+                bodyHeight={450}
                 rowHeaders={['rowNum', 'checkbox']}
                 pagination={{
                     perPage: 100,
@@ -76,6 +73,8 @@ function TableBarcodePrint({data, handleSelect}) {
                 className='w-full'
                 scrollX={true}
                 onCheck={handleSelect}
+                onUncheck={handleSelect}
+                onClick={handleClickRow}
 
             />
         </div>
