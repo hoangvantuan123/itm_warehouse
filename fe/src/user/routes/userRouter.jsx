@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, lazy, Suspense } from 'react'
+import { useEffect, useState, useMemo, lazy, Suspense, useCallback } from 'react'
 import {
   BrowserRouter as Router,
   Routes,
@@ -18,7 +18,8 @@ import ViewTest from '../page/test/viewTest'
 import Home from '../page/home/home'
 import Login from '../auth/login'
 import decodeJWT from '../../utils/decode-JWT'
-
+import { transformDataMenu } from '../../utils/transformDataMenu'
+import ErrorPage from '../page/default/errorPage'
 const DeliveryList = lazy(() => import('../page/material/deliveryList'))
 const WaitingIqcStockIn = lazy(
   () => import('../page/material/waitingIqcStockIn'),
@@ -34,56 +35,104 @@ const RootMenuTechnique = lazy(() => import('../page/system/rootMenuTechnique'))
 const { Content } = Layout
 
 const UserRouter = () => {
-  const { t } = useTranslation()
-  const navigate = useNavigate()
-  const location = useLocation()
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [menuTransForm, setMenuTransForm] = useState([]);
+  const [rootMenuItems, setRootMenuItems] = useState([]);
+  const [errorMenu, setErrorMenu] = useState(false);
   const [userPermissions, setUserPermissions] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [showSpinner, setShowSpinner] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const [menuSettingItems, setMenuSettingItems] = useState([])
-  const [rootMenu, setRootMenu] = useState([])
+
+  const rolesMenu = localStorage.getItem('roles_menu');
+
+
+  const processRolesMenu = useCallback(async () => {
+    if (!rolesMenu) return;
+    try {
+      const data = decodeJWT(rolesMenu);
+      const settingItems = data?.data[0]?.menu || [];
+      const rootMenuItems = data?.data[1]?.rootMenu || [];
+      setUserPermissions(settingItems);
+      setRootMenuItems(rootMenuItems);
+      const transformedMenu = transformDataMenu(settingItems);
+      setMenuTransForm(transformedMenu);
+    } catch (error) {
+      setErrorMenu(true);
+    }
+  }, [rolesMenu]);
+
   useEffect(() => {
-    const token = localStorage.getItem('roles_menu')
-    const data = decodeJWT(token)
-    setMenuSettingItems(data?.data[0].menu || [])
-    setRootMenu(
-      data?.data[1].rootMenu || [
-        {
-          RootMenuKey: 'warehouse',
-          RootMenuLabel: 'Warehouse Management',
-          RootMenuIcon: 'ContainerOutlined',
-          RootMenuLink: '/u/warehouse',
-          RootMenuUtilities: true,
-        },
-        {
-          RootMenuKey: 'users',
-          RootMenuLabel: 'USERS',
-          RootMenuIcon: 'TeamOutlined',
-          RootMenuLink: '/u/add',
-          RootMenuUtilities: true,
-        },
-        {
-          RootMenuKey: 'system_settings',
-          RootMenuLabel: 'System Settings',
-          RootMenuIcon: 'SettingOutlined',
-          RootMenuLink: '/u/add',
-          RootMenuUtilities: true,
-        },
-      ],
-    )
+    processRolesMenu();
+  }, [processRolesMenu]);
+
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 820)
+    }
+
+    handleResize()
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
   }, [])
+
+
+  const skippedRoutes = [
+    '/u/login',
+    '/u/home'
+  ]
+
+
+  const checkLoginStatus = () => {
+    const token = Cookies.get('a_a')
+    const userInfo = localStorage.getItem('userInfo')
+    const rolesMenu = localStorage.getItem('roles_menu')
+
+    if (token && userInfo && rolesMenu) {
+      setIsLoggedIn(true)
+    } else {
+      Cookies.remove('a_a')
+      localStorage.removeItem('userInfo')
+      localStorage.removeItem('rolesMenu')
+      navigate('/u/login')
+    }
+  }
+
+  useEffect(() => {
+    if (
+      !skippedRoutes.includes(location.pathname) &&
+      !location.pathname.startsWith('/test/') &&
+      !location.pathname.startsWith('/downloads/')
+    ) {
+      checkLoginStatus()
+    }
+  }, [location.pathname])
+
+  if (errorMenu) return <ErrorPage />
+
+
 
   return (
     <Routes>
-      <Route path="u/login" element={<Login />} />
+
+      <Route path="u/login" element={<Login processRolesMenu={processRolesMenu} />} />
       <Route
         path="/*"
         element={
           <Layout className="h-[calc(100vh-30px)]">
             <Sidebar
               permissions={userPermissions}
-              rootMenu={rootMenu}
-              menuSettingItems={menuSettingItems}
+              rootMenu={rootMenuItems}
+              menuTransForm={menuTransForm}
             />
             <Layout>
               <Content className="bg-slate-50">
@@ -93,15 +142,14 @@ const UserRouter = () => {
                     <Route
                       path="u/warehouse/material/delivery-list"
                       element={
-                        checkActionPermission(userPermissions, '', '') ? (
+                        checkActionPermission(userPermissions, 'material-1-1', 'View') ? (
                           <DeliveryList
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />
                         ) : (
-                          <DeliveryList
-                            permissions={userPermissions}
-                            isMobile={isMobile}
+                          <ErrorPage
+
                           />
                         )
                       }
@@ -109,15 +157,14 @@ const UserRouter = () => {
                     <Route
                       path="u/warehouse/material/waiting-iqc-stock-in/:id"
                       element={
-                        checkActionPermission(userPermissions, '', '') ? (
+                        checkActionPermission(userPermissions, 'material-1-1', 'View') ? (
                           <WaitingIqcStockIn
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />
                         ) : (
-                          <WaitingIqcStockIn
-                            permissions={userPermissions}
-                            isMobile={isMobile}
+                          <ErrorPage
+
                           />
                         )
                       }
@@ -125,15 +172,14 @@ const UserRouter = () => {
                     <Route
                       path="u/warehouse/material/stock-out-request"
                       element={
-                        checkActionPermission(userPermissions, '', '') ? (
+                        checkActionPermission(userPermissions, 'material-1-4', 'View') ? (
                           <StockOutRequest
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />
                         ) : (
-                          <StockOutRequest
-                            permissions={userPermissions}
-                            isMobile={isMobile}
+                          <ErrorPage
+
                           />
                         )
                       }
@@ -141,15 +187,14 @@ const UserRouter = () => {
                     <Route
                       path="u/system_settings/users/user-management"
                       element={
-                        checkActionPermission(userPermissions, '', '') ? (
+                        checkActionPermission(userPermissions, 'user_management-1-1', 'View') ? (
                           <UserManagement
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />
                         ) : (
-                          <UserManagement
-                            permissions={userPermissions}
-                            isMobile={isMobile}
+                          <ErrorPage
+
                           />
                         )
                       }
@@ -157,15 +202,14 @@ const UserRouter = () => {
                     <Route
                       path="u/system_settings/users/user-management/profile/:id/:name"
                       element={
-                        checkActionPermission(userPermissions, '', '') ? (
+                        checkActionPermission(userPermissions, 'user_management-1-2', 'View') ? (
                           <ProfileUserId
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />
                         ) : (
-                          <ProfileUserId
-                            permissions={userPermissions}
-                            isMobile={isMobile}
+                          <ErrorPage
+
                           />
                         )
                       }
@@ -173,15 +217,14 @@ const UserRouter = () => {
                     <Route
                       path="u/system_settings/users/role-management"
                       element={
-                        checkActionPermission(userPermissions, '', '') ? (
+                        checkActionPermission(userPermissions, 'user_management-1-2', 'View') ? (
                           <RoleManagement
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />
                         ) : (
-                          <RoleManagement
-                            permissions={userPermissions}
-                            isMobile={isMobile}
+                          <ErrorPage
+
                           />
                         )
                       }
@@ -189,15 +232,14 @@ const UserRouter = () => {
                     <Route
                       path="u/system_settings/technique/menu-items"
                       element={
-                        checkActionPermission(userPermissions, '', '') ? (
+                        checkActionPermission(userPermissions, 'technique-1-2', 'View') ? (
                           <MenuTechnique
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />
                         ) : (
-                          <MenuTechnique
-                            permissions={userPermissions}
-                            isMobile={isMobile}
+                          <ErrorPage
+
                           />
                         )
                       }
@@ -205,33 +247,32 @@ const UserRouter = () => {
                     <Route
                       path="u/system_settings/technique/root-menu"
                       element={
-                        checkActionPermission(userPermissions, '', '') ? (
+                        checkActionPermission(userPermissions, 'technique-1-1', 'View') ? (
                           <RootMenuTechnique
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />
                         ) : (
-                          <RootMenuTechnique
-                            permissions={userPermissions}
-                            isMobile={isMobile}
+                          <ErrorPage
+
                           />
                         )
                       }
                     />
                     <Route
                       path=""
-                      element={
-                        checkActionPermission(userPermissions, '', '') ? (
-                          <Home
-                            permissions={userPermissions}
-                            isMobile={isMobile}
-                          />
-                        ) : (
-                          <Home
-                            permissions={userPermissions}
-                            isMobile={isMobile}
-                          />
-                        )
+                      element={<Home
+                        permissions={userPermissions}
+                        isMobile={isMobile}
+                      />
+                      }
+                    />
+                    <Route
+                      path="/u/home"
+                      element={<Home
+                        permissions={userPermissions}
+                        isMobile={isMobile}
+                      />
                       }
                     />
                   </Routes>
@@ -247,6 +288,7 @@ const UserRouter = () => {
 
 const App = () => (
   <Router>
+
     <UserRouter />
   </Router>
 )

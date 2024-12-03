@@ -42,7 +42,7 @@ export default function BreadcrumbRouter() {
     }, [])
 
   breadcrumbItems.unshift({
-    path: '/home',
+    path: '/u/home',
     breadcrumbName: (
       <>
         <span>HOME</span>

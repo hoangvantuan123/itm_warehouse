@@ -60,6 +60,8 @@ SELECT
     m.Label AS MenuLabel,  
     m.Link AS MenuLink,
     m.Type AS MenuType,
+    m.MenuRootId AS MenuRootId,
+    m.MenuSubRootId AS MenuSubRootId,
     rm.[Key] AS RootMenuKey,  
     rm.Label AS RootMenuLabel,  
     rm.Icon AS RootMenuIcon, 
@@ -77,7 +79,6 @@ AND r.Type IN ('rootmenu', 'menu');
 
             const datas = await this.databaseService.executeQuery(query);
             if (datas.length === 0) {
-                console.log("No data found for UserId:", UserId);
                 return [];
             }
 
@@ -98,7 +99,7 @@ AND r.Type IN ('rootmenu', 'menu');
         const mergedData = data.reduce((acc, item) => {
             const { Id, View, Edit, Create, Delete, MenuId, GroupId, UserId, RootMenuId, Type, Name
                 , MenuKey, MenuLabel, MenuLink, MenuType, RootMenuKey, RootMenuLabel, RootMenuIcon, RootMenuLink,
-                RootMenuUtilities
+                RootMenuUtilities, MenuSubRootId, MenuRootId
 
             } = item;
 
@@ -118,7 +119,10 @@ AND r.Type IN ('rootmenu', 'menu');
                         MenuKey: MenuKey,
                         MenuLabel: MenuLabel,
                         MenuLink: MenuLink,
-                        MenuType: MenuType
+                        MenuType: MenuType,
+                        MenuRootId: MenuRootId,
+                        MenuSubRootId: MenuSubRootId
+
                     };
                 } else {
                     acc.menu[MenuId].View = acc.menu[MenuId].View && View;

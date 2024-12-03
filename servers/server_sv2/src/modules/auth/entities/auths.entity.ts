@@ -4,98 +4,98 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 export class TCAUserWEB {
 
     @Column({  nullable: true })
-    CompanySeq: number | null;
+    CompanySeq: number ;
 
     @PrimaryColumn({ type: 'int' })
     UserSeq: number;
 
     @Column({  length: 100, nullable: true })
-    UserId: string | null;
+    UserId: string;
 
     @Column({ type: 'int' })
     UserType: number;
 
     @Column({  length: 100, nullable: true })
-    UserName: string | null;
+    UserName: string;
 
     @Column({  nullable: true })
-    EmpSeq: number | null;
+    EmpSeq: number ;
 
     @Column({  nullable: true })
-    LoginPwd: string | null;
+    LoginPwd: string;
 
     @Column({   nullable: true })
-    Password1: string | null;
+    Password1: string ;
 
     @Column({   nullable: true })
-    Password2: string | null;
+    Password2: string ;
 
     @Column({   nullable: true })
-    Password3: string | null;
+    Password3: string;
 
     @Column({  nullable: true })
-    CustSeq: number | null;
+    CustSeq: number;
 
     @Column({  nullable: true })
-    DeptSeq: number | null;
+    DeptSeq: number;
 
     @Column({  nullable: true })
-    UserSecu: number | null;
+    UserSecu: number;
 
     @Column({  nullable: true })
-    LoginStatus: number | null;
+    LoginStatus: number;
 
     @Column({  length: 8, nullable: true })
-    LoginDate: string | null;
+    LoginDate: string;
 
     @Column({  length: 8, nullable: true })
-    PwdChgDate: string | null;
+    PwdChgDate: string;
 
     @Column({  length: 2000, nullable: true })
-    PassHis: string | null;
+    PassHis: string ;
 
     @Column({  length: 50, nullable: true })
-    PwdMailAdder: string | null;
+    PwdMailAdder: string ;
 
     @Column({  nullable: true })
-    LoginFailCnt: number | null;
+    LoginFailCnt: number ;
 
     @Column({  length: 1, nullable: true })
-    PwdType: string | null;
+    PwdType: string ;
 
     @Column({  nullable: true })
-    LoginType: number | null;
+    LoginType: number;
 
     @Column({  nullable: true })
-    ManagementType: number | null;
+    ManagementType: number ;
 
     @Column({  nullable: true })
-    LastUserSeq: number | null;
+    LastUserSeq: number;
 
     @Column({  nullable: true })
-    LastDateTime: Date | null;
+    LastDateTime: Date;
 
     @Column({  length: 20, nullable: true })
-    Dsn: string | null;
+    Dsn: string;
 
     @Column({  length: 100, nullable: true })
-    Remark: string | null;
+    Remark: string;
 
     @Column({  length: 8, nullable: true })
-    UserlimitDate: string | null;
+    UserlimitDate: string ;
 
     @Column({  nullable: true })
-    LoginFailFirstTime: Date | null;
+    LoginFailFirstTime: Date ;
 
     @Column({  nullable: true })
-    IsLayoutAdmin: number | null;
+    IsLayoutAdmin: number ;
 
     @Column({  length: 1, nullable: true })
-    IsGroupWareUser: string | null;
+    IsGroupWareUser: string;
 
     @Column({  nullable: true })
-    SMUserType: number | null;
+    SMUserType: number ;
 
     @Column({  nullable: true })
-    LicenseType: number | null;
+    LicenseType: number ;
 }

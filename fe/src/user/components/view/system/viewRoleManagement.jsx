@@ -11,7 +11,7 @@ import { getPaginatedRolesUsers } from '../../../../features/system/getPaginated
 import debounce from 'lodash.debounce';
 const { Header, Content, Footer } = Layout
 const menuStyle = { borderInlineEnd: 'none' }
-function ViewRoleManagement({ groups , changedIds, setChangedIds,  setSelectedRowKeys , selectedRowKeys }) {
+function ViewRoleManagement({ groups, changedIds, setChangedIds, setSelectedRowKeys, selectedRowKeys, setCheckStatus, checkStatus }) {
   const [selectedGroup, setSelectedGroup] = useState(null)
   const [openView, setOpenView] = useState(false)
   const [userInfo, setUserInfo] = useState({
@@ -40,15 +40,11 @@ function ViewRoleManagement({ groups , changedIds, setChangedIds,  setSelectedRo
   const [updateData1, setUpdateData2] = useState([])
   const [data2, setData2] = useState([])
   const [data3, setData3] = useState([])
-  const [selectedRowKeys1, setSelectedRowKeys1] = useState([])
-  const [selectedRowKeys2, setSelectedRowKeys2] = useState([])
-  const [selectedRowKeys3, setSelectedRowKeys3] = useState([])
-  
+
   const handleTableSelectionChange = (newSelectedRowKeys, tableKey) => {
-    // Cập nhật trạng thái cho bảng tương ứng
     setSelectedRowKeys((prevSelectedKeys) => ({
       ...prevSelectedKeys,
-      [tableKey]: newSelectedRowKeys, // Lưu trữ mảng Id đã chọn của bảng đó
+      [tableKey]: newSelectedRowKeys,
     }));
   };
 
@@ -65,6 +61,7 @@ function ViewRoleManagement({ groups , changedIds, setChangedIds,  setSelectedRo
         setData1(response.data)
         setTotal1(response.data.total)
         setTotalPages1(response.data.totalPages)
+        setCheckStatus(false)
       }
     } catch (error) {
       setError(error.message || 'Đã xảy ra lỗi')
@@ -86,6 +83,7 @@ function ViewRoleManagement({ groups , changedIds, setChangedIds,  setSelectedRo
       if (response.success) {
         setData2(response.data)
         setTotal2(response.data.total)
+        setCheckStatus(false)
         setTotalPages2(response.data.totalPages)
       }
     } catch (error) {
@@ -109,6 +107,7 @@ function ViewRoleManagement({ groups , changedIds, setChangedIds,  setSelectedRo
         setData3(response.data)
         setTotal3(response.total)
         setTotalPages3(response.totalPages)
+        setCheckStatus(false)
       }
     } catch (error) {
       setError(error.message || 'Đã xảy ra lỗi')
@@ -119,12 +118,12 @@ function ViewRoleManagement({ groups , changedIds, setChangedIds,  setSelectedRo
   }
 
   useEffect(() => {
-    if (selectedGroup !== null) {
+    if (selectedGroup !== null || !checkStatus) {
       fetchData1()
       fetchData2()
       fetchData3()
     }
-  }, [selectedGroup])
+  }, [selectedGroup, checkStatus])
 
   const handleAddRow1 = () => {
     setOpenModel1(true)
@@ -159,17 +158,17 @@ function ViewRoleManagement({ groups , changedIds, setChangedIds,  setSelectedRo
   const handlePermissionChange1 = (id, permissionType) => {
     const newData = [...data1];
     const recordIndex = newData.findIndex((record) => record.Id === id);
-  
+
     if (recordIndex !== -1) {
       const newValue = !newData[recordIndex][permissionType];
       newData[recordIndex][permissionType] = newValue;
       setData1(newData);
-  
+
       setChangedIds((prev) => {
         const existingIndex = prev.findIndex(
           (change) => change.id === id && change.column === permissionType
         );
-  
+
         if (existingIndex !== -1) {
           const updatedChanges = [...prev];
           updatedChanges[existingIndex] = { id, column: permissionType, value: newValue };
@@ -179,23 +178,23 @@ function ViewRoleManagement({ groups , changedIds, setChangedIds,  setSelectedRo
       });
     }
   };
-  
-  
+
+
 
   const handlePermissionChange2 = (id, permissionType) => {
     const newData = [...data2];
     const recordIndex = newData.findIndex((record) => record.Id === id);
-  
+
     if (recordIndex !== -1) {
       const newValue = !newData[recordIndex][permissionType];
       newData[recordIndex][permissionType] = newValue;
       setData2(newData);
-  
+
       setChangedIds((prev) => {
         const existingIndex = prev.findIndex(
           (change) => change.id === id && change.column === permissionType
         );
-  
+
         if (existingIndex !== -1) {
           const updatedChanges = [...prev];
           updatedChanges[existingIndex] = { id, column: permissionType, value: newValue };
@@ -231,43 +230,11 @@ function ViewRoleManagement({ groups , changedIds, setChangedIds,  setSelectedRo
           onChange={() => handlePermissionChange1(record.Id, 'View')}
         />
       ),
-    },
-    {
-      title: 'Edit',
-      dataIndex: 'Edit',
-      key: 'Edit',
-      render: (edit, record) => (
-        <Checkbox
-          checked={edit}
-          onChange={() => handlePermissionChange1(record.Id, 'Edit')}
-        />
-      ),
-    },
-    {
-      title: 'Create',
-      dataIndex: 'Create',
-      key: 'Create',
-      render: (create, record) => (
-        <Checkbox
-          checked={create}
-          onChange={() => handlePermissionChange1(record.Id, 'Create')}
-        />
-      ),
-    },
-    {
-      title: 'Delete',
-      dataIndex: 'Delete',
-      key: 'Delete',
-      render: (deletePermission, record) => (
-        <Checkbox
-          checked={deletePermission}
-          onChange={() => handlePermissionChange1(record.Id, 'Delete')}
-        />
-      ),
-    },
+    }
   ]
 
   const permissionColumns2 = [
+    { title: 'MenuType', dataIndex: 'MenuType', key: 'MenuType' },
     { title: 'Name', dataIndex: 'Label', key: 'Label' },
     {
       title: 'View',
@@ -315,7 +282,7 @@ function ViewRoleManagement({ groups , changedIds, setChangedIds,  setSelectedRo
     },
   ]
 
-  
+
   const handleTableChange3 = (pagination) => {
     setPage3(pagination.current)
     setLimit3(pagination.pageSize)
@@ -335,12 +302,12 @@ function ViewRoleManagement({ groups , changedIds, setChangedIds,  setSelectedRo
           NHÓM NGƯỜI DÙNG
         </div>
         <Menu
-               style={menuStyle}
+          style={menuStyle}
           mode="inline"
           selectedKeys={[selectedGroup?.toString()]}
           onClick={(e) => {
-            handleGroupClick(Number(e.key)); 
-            setChangedIds([]); 
+            handleGroupClick(Number(e.key));
+            setChangedIds([]);
           }}
           className=" border-none border-r-0"
         >
@@ -377,7 +344,7 @@ function ViewRoleManagement({ groups , changedIds, setChangedIds,  setSelectedRo
               />
             </div>
             <div className="mb-4">
-              <div className="font-medium text-xs mb-2">
+              <div className="font-medium text-xs mb-2 uppercase">
                 Quyền Truy Nhóm Menu
               </div>
 
@@ -387,7 +354,7 @@ function ViewRoleManagement({ groups , changedIds, setChangedIds,  setSelectedRo
                 rowKey="Id"
                 size="small"
                 rowSelection={{
-                  selectedRowKeys: selectedRowKeys.table1, 
+                  selectedRowKeys: selectedRowKeys.table1,
                   onChange: (selectedKeys) => handleTableSelectionChange(selectedKeys, 'table1'),
                   selections: [
                     Table.SELECTION_ALL,
@@ -419,7 +386,7 @@ function ViewRoleManagement({ groups , changedIds, setChangedIds,  setSelectedRo
               />
             </div>
             <div className="mb-4">
-              <div className="font-medium text-xs mb-2">
+              <div className="font-medium text-xs mb-2 uppercase">
                 Quyền Truy Cập Menu
               </div>
               <Table
@@ -429,7 +396,7 @@ function ViewRoleManagement({ groups , changedIds, setChangedIds,  setSelectedRo
                 size="small"
                 bordered
                 rowSelection={{
-                  selectedRowKeys: selectedRowKeys.table2, 
+                  selectedRowKeys: selectedRowKeys.table2,
                   onChange: (selectedKeys) => handleTableSelectionChange(selectedKeys, 'table2'),
                   selections: [
                     Table.SELECTION_ALL,
@@ -460,7 +427,7 @@ function ViewRoleManagement({ groups , changedIds, setChangedIds,  setSelectedRo
               />
             </div>
             <div className="mb-4">
-              <div className="font-medium text-xs mb-2">
+              <div className="font-medium text-xs mb-2 uppercase">
                 Danh Sách Người Dùng
               </div>
               <Table
@@ -470,7 +437,7 @@ function ViewRoleManagement({ groups , changedIds, setChangedIds,  setSelectedRo
                 size="small"
                 bordered
                 rowSelection={{
-                  selectedRowKeys: selectedRowKeys.table3, 
+                  selectedRowKeys: selectedRowKeys.table3,
                   onChange: (selectedKeys) => handleTableSelectionChange(selectedKeys, 'table3'),
                   selections: [
                     Table.SELECTION_ALL,

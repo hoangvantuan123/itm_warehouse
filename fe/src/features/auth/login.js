@@ -14,13 +14,15 @@ export const LoginAuth = async ({ login, password }) => {
       credentials: 'same-origin',
     })
 
-    if (!response.ok) {
-      throw new Error('Invalid credentials')
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      const errorMessage = data.error?.message || 'Unknown error occurred';
+      const errorCode = data.error?.code || 'UNKNOWN_ERROR';
+      throw new Error(`${errorMessage} (Code: ${errorCode})`);
     }
-    const data = await response.json()
-    console.log(data)
-    return data
+    return data;
   } catch (error) {
-    throw new Error('Đăng nhập thất bại: ' + error.message)
+    throw new Error('Đăng nhập thất bại: ' + error.message);
   }
-}
+};

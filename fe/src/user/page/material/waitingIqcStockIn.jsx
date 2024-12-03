@@ -114,7 +114,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const [modal5Open, setModal5Open] = useState(false)
   const [error, setError] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
-  const [scanHistory, setScanHistory] = useState(dataB)
+  const [scanHistory, setScanHistory] = useState([])
   const dataRefSacenHistory = useRef(scanHistory)
   const [status, setStatus] = useState(false)
   const [filteredData, setFilteredData] = useState(null)
@@ -278,7 +278,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
             PermitNo: dataResSuccess?.PermitNo,
           },
         ];
-        callback(); // Call the callback function once history is updated
+        callback(); 
         return updatedHistory;
       }
       return prevHistory;
@@ -298,7 +298,6 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
         setYYWW(dataResSuccess?.YYWW);
         setYYYYMM(dataResSuccess?.YYMM);
   
-        // Add to scan history first and only update the data afterward
         addToScanHistory(dataResSuccess, () => {
           setData((prevData) =>
             prevData.map((item) =>

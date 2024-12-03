@@ -15,7 +15,7 @@ const languages = [
   { key: 'en', label: 'English' },
   { key: 'ko', label: '한국어' },
 ]
-export default function Login({ fetchPermissions }) {
+export default function Login({ fetchPermissions, processRolesMenu }) {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const [form] = Form.useForm()
@@ -43,11 +43,10 @@ export default function Login({ fetchPermissions }) {
 
       if (response.success) {
         localStorage.setItem('userInfo', JSON.stringify(response.data.user))
-        localStorage.setItem('language', response.data.user.language)
         localStorage.setItem('roles_menu', response.data.tokenRolesUserMenu)
-        Cookies.set('accessToken', response.data.token)
+        Cookies.set('a_a', response.data.token)
+        processRolesMenu()
         navigate('/u/home')
-        fetchPermissions()
       } else {
         switch (response.error.code) {
           case 'ACCOUNT_NOT_ACTIVATED':

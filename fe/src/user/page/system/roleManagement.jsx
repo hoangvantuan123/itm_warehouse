@@ -3,16 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Helmet } from 'react-helmet'
 import { Input, Space, Table, Typography, message, Tabs, Layout } from 'antd'
 const { Title, Text } = Typography
-import { FilterOutlined } from '@ant-design/icons'
-import { ArrowIcon } from '../../components/icons'
-import dayjs from 'dayjs'
-import { GetCodeHelp } from '../../../features/codeHelp/getCodeHelp'
-import { GetDeliveryList } from '../../../features/material/getDeliveryList'
 import { debounce } from 'lodash'
-import { useNavigate } from 'react-router-dom'
-import { encodeBase64Url } from '../../../utils/decode-JWT'
-import CryptoJS from 'crypto-js'
-import UserManagementQuery from '../../components/query/system/userManagementQuery'
 import RoleManagementActions from '../../components/actions/system/roleManagementActions'
 import DrawerAddUserGroups from '../../components/drawer/system/addUserGroups'
 import { GetAllResGroups } from '../../../features/system/getGroups'
@@ -23,25 +14,16 @@ import { DeleteRolesUser } from '../../../features/system/deleteRolesUser'
 export default function RoleManagement({ permissions, isMobile }) {
   const { t } = useTranslation()
   const gridRef = useRef(null)
-  const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState([])
-  const [dataUnit, setDataUnit] = useState([])
   const [groups, setGroups] = useState([])
-  const [formData, setFormData] = useState(dayjs().startOf('month'))
-  const [toDate, setToDate] = useState(dayjs())
-  const [deliveryNo, setDeliveryNo] = useState('')
-  const [bizUnit, setBizUnit] = useState(4)
-  const [checkedRowKey, setCheckedRowKey] = useState(null)
-  const [keyPath, setKeyPath] = useState(null)
-  const [checkedPath, setCheckedPath] = useState(false)
   const [changedIds, setChangedIds] = useState([]);
-  const formatDate = useCallback((date) => date.format('YYYYMMDD'), [])
   const [selectedRowKeys, setSelectedRowKeys] = useState({
     table1: [],
     table2: [],
-    table3: [], 
+    table3: [],
   });
+  const [checkStatus, setCheckStatus] = useState(false);
   const getAllSelectedKeys = () => {
     return [
       ...selectedRowKeys.table1,
@@ -86,37 +68,39 @@ export default function RoleManagement({ permissions, isMobile }) {
 
   const handleSubmitSheet = useCallback(async () => {
     if (changedIds.length === 0) {
-      console.log('No changes to submit.');
+      message.warning('No changes to submit.')
+
       return;
     }
 
     const response = await PostUpdateRolesUser(changedIds);
 
     if (response.success) {
-      console.log('Save successful:', response.message);
-      setChangedIds([]); 
+      message.success('Save successful!')
+      setChangedIds([]);
     } else {
-      console.error('Save failed:', response.message);
+      message.error('Save failed!')
     }
   }, [changedIds]);
+
   const handleDeleteDataSheet = useCallback(async () => {
-    const ids = getAllSelectedKeys(); 
+    const ids = getAllSelectedKeys();
     if (ids.length === 0) {
-      console.log('No rows selected');
+      message.warning('No rows selected.')
       return;
     }
-
     const response = await DeleteRolesUser(ids);
-
     if (response.success) {
-      console.log('Delete successful:', response.message);
+
+      message.success('Delete successful!')
+      setCheckStatus(true)
       setSelectedRowKeys({
         table1: [],
         table2: [],
         table3: [],
       });
     } else {
-      console.error('Save failed:', response.message);
+      message.error('Save failed!')
     }
   }, [selectedRowKeys]);
 
@@ -145,13 +129,13 @@ export default function RoleManagement({ permissions, isMobile }) {
             <ViewRoleManagement
               data={data}
               loading={loading}
-              gridRef={gridRef}
-              setData={setData}
               groups={groups}
               setChangedIds={setChangedIds}
               changedIds={changedIds}
               setSelectedRowKeys={setSelectedRowKeys}
               selectedRowKeys={selectedRowKeys}
+              setCheckStatus={setCheckStatus}
+              checkStatus={checkStatus}
             />
           </div>
         </div>

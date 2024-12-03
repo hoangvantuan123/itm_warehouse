@@ -10,7 +10,6 @@ import { TCARootMenusWEB } from '../entities/rootMenus.entity';
 import { TCARolesUsersWEB } from '../entities/rolesUsers.entity';
 import { TCAUserWEB } from 'src/modules/auth/entities/auths.entity';
 import { CreateResUsersDto } from '../dto/users.dto';
-import { TCAGroupUsersWEB } from '../entities/groupUsers.entity';
 import { UpdateRoleDto } from '../dto/updateRole.dto';
 
 
@@ -27,8 +26,7 @@ export class SystemUsersService {
 
     @InjectRepository(TCARolesUsersWEB)
     private readonly resTCARolesUserWEBRepository: Repository<TCARolesUsersWEB>,
-    @InjectRepository(TCAGroupUsersWEB)
-    private readonly resTCAGroupUserWEBRepository: Repository<TCAGroupUsersWEB>,
+
 
     private readonly databaseService: DatabaseService) { }
 
@@ -373,6 +371,7 @@ export class SystemUsersService {
                 rolesUsers."Type" AS "Type",
                 rolesUsers."Name" AS "Name",
                 menus."Label" AS "Label",
+                menus."Type" AS "MenuType",
                 ROW_NUMBER() OVER (ORDER BY rolesUsers."Id" ASC) AS row_num
             FROM "_TCARolesUsers_WEB" rolesUsers
             LEFT JOIN "_TCAMenus_WEB" menus

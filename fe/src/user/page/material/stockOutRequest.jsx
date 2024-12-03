@@ -6,91 +6,112 @@ const { Title, Text } = Typography
 import { FilterOutlined } from '@ant-design/icons'
 import { ArrowIcon } from '../../components/icons'
 import dayjs from 'dayjs'
-import DeliveryActions from '../../components/actions/material/deliveryActions'
 import TableDeliveryList from '../../components/table/material/tableDeliveryList'
 import { GetCodeHelp } from '../../../features/codeHelp/getCodeHelp'
 import { GetDeliveryList } from '../../../features/material/getDeliveryList'
-import DeliveryListQuery from '../../components/query/material/deliveryListQuery'
 import { debounce } from 'lodash'
 import { useNavigate } from 'react-router-dom'
 import { encodeBase64Url } from '../../../utils/decode-JWT'
 import CryptoJS from 'crypto-js'
+import StockOutRequestQuery from '../../components/query/material/stockOutReqQuery'
+import StockOutRequestActions from '../../components/actions/material/StockOutRequestActions'
+import TableStockOutRequest from '../../components/table/material/tableStockOutRequest'
 
-const dataM = [
+const gridDataDA = [
   {
-    DelvNo: 'D001',
-    DelvMngNo: 'DM001',
-    ImpType: 'Import',
-    TotalQty: 100,
-    OkQty: 95,
-    RemainQty: 5,
-    DelvDate: '2024-11-28',
-    CustSeq: 'C001',
-    CustNm: 'Customer A',
-    DomOrImp: 'Domestic',
-    PurchaseType: 'Wholesale',
-    BizUnitName: 'Unit A',
-    BizUnit: 'A1',
-    EmpSeq: 'E001',
-    EmpName: 'John Doe',
-    DeptSeq: 'D001',
+    IDX_NO: '123',
+    IsStop: true,
+    IsConfirm: false,
+    FactUnitName: 'Unit A',
+    ReqDate: '2024-12-01',
+    OutReqNo: 'REQ-001',
     DeptName: 'Sales',
-    CurrSeq: 'USD',
-    CurrName: 'US Dollar',
-    ExRate: 1.0,
+    EmpName: 'John Doe',
+    CustName: 'Customer 1',
+    UseTypeName: 'Use Type 1',
+    WorkOrderNo: 'WO-001',
+    AssyItemName: 'Item A',
+    AssyItemNo: '12345',
+    AssyItemSpec: 'Spec 1',
+    AssyUnitName: 'Unit 1',
+    ProcName: 'Proc A',
+    AssyQty: '100',
+    AssyProgQty: '50',
+    ItemName: 'Item B',
+    ItemNo: '67890',
+    ItemSpec: 'Spec 2',
+    UnitName: 'Box',
+    Qty: '200',
+    ProgQty: '150',
+    IsReturn: false,
+    Remark: 'No issues',
+    ItemSeq: '1',
+    ItemUnitSeq: '1',
+    AssyItemSeq: '1',
+    PJTSeq: 'PJT-001',
+    WBSSeq: 'WBS-001',
+    FactUnit: 'Fact A',
+    OutReqSeq: 'REQSEQ-001',
+    UseType: 'Type A',
+    OSPPOSeq: 'OS-001',
+    ProgStatus: 'In Progress',
+    ProgStatusName: 'In Progress Status',
+    ProdPlanNo: 'PLAN-001',
+    ProdPlanSeq: 'SEQ-001',
+    ProdReqNo: 'REQ-001',
   },
   {
-    DelvNo: 'D002',
-    DelvMngNo: 'DM002',
-    ImpType: 'Domestic',
-    TotalQty: 200,
-    OkQty: 190,
-    RemainQty: 10,
-    DelvDate: '2024-11-29',
-    CustSeq: 'C002',
-    CustNm: 'Customer B',
-    DomOrImp: 'Import',
-    PurchaseType: 'Retail',
-    BizUnitName: 'Unit B',
-    BizUnit: 'B1',
-    EmpSeq: 'E002',
-    EmpName: 'Jane Smith',
-    DeptSeq: 'D002',
-    DeptName: 'Logistics',
-    CurrSeq: 'EUR',
-    CurrName: 'Euro',
-    ExRate: 0.85,
-  },
-  {
-    DelvNo: 'D003',
-    DelvMngNo: 'DM003',
-    ImpType: 'Export',
-    TotalQty: 150,
-    OkQty: 145,
-    RemainQty: 5,
-    DelvDate: '2024-11-30',
-    CustSeq: 'C003',
-    CustNm: 'Customer C',
-    DomOrImp: 'Export',
-    PurchaseType: 'Online',
-    BizUnitName: 'Unit C',
-    BizUnit: 'C1',
-    EmpSeq: 'E003',
-    EmpName: 'Robert Brown',
-    DeptSeq: 'D003',
-    DeptName: 'Procurement',
-    CurrSeq: 'JPY',
-    CurrName: 'Japanese Yen',
-    ExRate: 150.5,
+    IDX_NO: '124',
+    IsStop: false,
+    IsConfirm: true,
+    FactUnitName: 'Unit B',
+    ReqDate: '2024-12-02',
+    OutReqNo: 'REQ-002',
+    DeptName: 'Marketing',
+    EmpName: 'Jane Doe',
+    CustName: 'Customer 2',
+    UseTypeName: 'Use Type 2',
+    WorkOrderNo: 'WO-002',
+    AssyItemName: 'Item B',
+    AssyItemNo: '67891',
+    AssyItemSpec: 'Spec 3',
+    AssyUnitName: 'Unit 2',
+    ProcName: 'Proc B',
+    AssyQty: '200',
+    AssyProgQty: '100',
+    ItemName: 'Item C',
+    ItemNo: '98765',
+    ItemSpec: 'Spec 4',
+    UnitName: 'Pack',
+    Qty: '300',
+    ProgQty: '250',
+    IsReturn: true,
+    Remark: 'Returned item',
+    ItemSeq: '2',
+    ItemUnitSeq: '2',
+    AssyItemSeq: '2',
+    PJTSeq: 'PJT-002',
+    WBSSeq: 'WBS-002',
+    FactUnit: 'Fact B',
+    OutReqSeq: 'REQSEQ-002',
+    UseType: 'Type B',
+    OSPPOSeq: 'OS-002',
+    ProgStatus: 'Completed',
+    ProgStatusName: 'Completed Status',
+    ProdPlanNo: 'PLAN-002',
+    ProdPlanSeq: 'SEQ-002',
+    ProdReqNo: 'REQ-002',
   },
 ]
+
+
 export default function StockOutRequest({ permissions, isMobile }) {
   const { t } = useTranslation()
   const gridRef = useRef(null)
   const navigate = useNavigate()
 
   const [loading, setLoading] = useState(false)
-  const [data, setData] = useState([])
+  const [data, setData] = useState(gridDataDA)
   const [dataUnit, setDataUnit] = useState([])
   const [formData, setFormData] = useState(dayjs().startOf('month'))
   const [toDate, setToDate] = useState(dayjs())
@@ -100,17 +121,15 @@ export default function StockOutRequest({ permissions, isMobile }) {
   const [keyPath, setKeyPath] = useState(null)
   const [checkedPath, setCheckedPath] = useState(false)
   const formatDate = useCallback((date) => date.format('YYYYMMDD'), [])
-
+  const [isMinusClicked, setIsMinusClicked] = useState(false)
+  const [lastClickedCell, setLastClickedCell] = useState(null)
+  const [clickedRowData, setClickedRowData] = useState(null)
+  const [clickedRowDataList, setClickedRowDataList] = useState([])
+  const [gridData, setGridData] = useState([])
   const fetchDeliveryData = useCallback(async () => {
     setLoading(true)
     try {
-      const deliveryResponse = await GetDeliveryList(
-        formatDate(formData),
-        formatDate(toDate),
-        deliveryNo,
-        bizUnit,
-      )
-      setData(deliveryResponse?.data)
+
     } catch (error) {
       setData([])
     } finally {
@@ -140,6 +159,7 @@ export default function StockOutRequest({ permissions, isMobile }) {
     }
   }, [])
 
+
   const debouncedFetchDeliveryData = useMemo(
     () => debounce(fetchDeliveryData, 100),
     [fetchDeliveryData],
@@ -149,17 +169,42 @@ export default function StockOutRequest({ permissions, isMobile }) {
     [fetchCodeHelpData],
   )
 
-  const handleCheck = useCallback(
-    (ev) => {
-      const { rowKey } = ev
-      const gridInstance = gridRef.current?.getInstance()
-      const previousCheckedRowKey = checkedRowKey
 
-      if (previousCheckedRowKey !== null && gridInstance) {
-        gridInstance.uncheck(previousCheckedRowKey)
-      }
+  const nextPageStockIn = useCallback(() => {
+    if (keyPath) {
+      navigate(`/u/warehouse/material/waiting-iqc-stock-in/${keyPath}`)
+    }
+  }, [keyPath, navigate])
 
-      const rowData = data[rowKey]
+
+  const onCellClicked = (cell, event) => {
+    let rowIndex
+
+    if (cell[0] !== -1) {
+      return
+    }
+
+    if (cell[0] === -1) {
+      rowIndex = cell[1]
+      setIsMinusClicked(true)
+    } else {
+      rowIndex = cell[0]
+      setIsMinusClicked(false)
+    }
+
+    if (
+      lastClickedCell &&
+      lastClickedCell[0] === cell[0] &&
+      lastClickedCell[1] === cell[1]
+    ) {
+      setKeyPath(null)
+      setLastClickedCell(null)
+      setClickedRowData(null)
+      return
+    }
+
+    if (rowIndex >= 0 && rowIndex < gridData.length) {
+      const rowData = gridData[rowIndex]
 
       const filteredData = {
         DelvNo: rowData.DelvNo,
@@ -183,27 +228,19 @@ export default function StockOutRequest({ permissions, isMobile }) {
         CurrName: rowData.CurrName,
         ExRate: rowData.ExRate,
       }
-
       const secretKey = 'TEST_ACCESS_KEY'
       const encryptedData = CryptoJS.AES.encrypt(
         JSON.stringify(filteredData),
         secretKey,
       ).toString()
       const encryptedToken = encodeBase64Url(encryptedData)
-
-      setCheckedRowKey(rowKey)
       setKeyPath(encryptedToken)
-      navigate(`/u/warehouse/material/waiting-iqc-stock-in/${encryptedToken}`)
-    },
-    [checkedRowKey, data],
-  )
-
-  const nextPageStockIn = useCallback(() => {
-    if (keyPath && !checkedPath) {
-      setCheckedPath(true)
-      navigate(`/u/warehouse/material/waiting-iqc-stock-in/${keyPath}`)
+      setClickedRowData(rowData)
+      setLastClickedCell(cell)
     }
-  }, [keyPath, checkedPath, navigate])
+
+  }
+
 
   useEffect(() => {
     debouncedFetchDeliveryData()
@@ -221,19 +258,16 @@ export default function StockOutRequest({ permissions, isMobile }) {
   return (
     <>
       <Helmet>
-        <title>ITM - {t('Delivery List')}</title>
+        <title>ITM - {t('Stock Out Request')}</title>
       </Helmet>
       <div className="bg-slate-50 p-3 h-screen overflow-hidden">
         <div className="flex flex-col gap-4 md:grid md:grid-cols-4 md:grid-rows-[auto_1fr] md:gap-4 h-full">
           <div className="col-start-1 col-end-5 row-start-1 w-full rounded-lg ">
             <div className="flex items-center justify-between mb-2">
               <Title level={4} className="mt-2 uppercase opacity-85 ">
-                {t('Delivery List')}
+                {t('Stock Out Request')}
               </Title>
-              <DeliveryActions
-                fetchData={fetchDeliveryData}
-                nextPageStockIn={nextPageStockIn}
-              />
+              <StockOutRequestActions />
             </div>
             <details
               className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
@@ -249,32 +283,28 @@ export default function StockOutRequest({ permissions, isMobile }) {
                 </span>
               </summary>
               <div className="flex p-2 gap-4">
-                <DeliveryListQuery
+
+                <StockOutRequestQuery
                   formData={formData}
                   setFormData={setFormData}
-                  setDeliveryNo={setDeliveryNo}
                   setToDate={setToDate}
                   toDate={toDate}
-                  deliveryNo={deliveryNo}
-                  bizUnit={bizUnit}
-                  setBizUnit={setBizUnit}
                   dataUnit={dataUnit}
+                  setBizUnit={setBizUnit}
                 />
               </div>
             </details>
           </div>
 
-          <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg  overflow-auto">
-            <TableDeliveryList
-              data={data}
-              setCheckedPath={setCheckedPath}
-              checkedPath={checkedPath}
-              setKeyPath={setKeyPath}
+          <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg">
+            <TableStockOutRequest data={data}
               loading={loading}
-              handleCheck={handleCheck}
-              gridRef={gridRef}
               setData={setData}
-            />
+              onCellClicked={onCellClicked}
+              setGridData={setGridData}
+              gridData={gridData} />
+
+
           </div>
         </div>
       </div>

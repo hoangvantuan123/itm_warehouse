@@ -12,28 +12,31 @@ import { debounce } from 'lodash'
 import { useNavigate } from 'react-router-dom'
 import { encodeBase64Url } from '../../../utils/decode-JWT'
 import CryptoJS from 'crypto-js'
+import { UpdatePass2 } from '../../../features/admin/updatePass'
 import UserManagementActions from '../../components/actions/system/userManagementActions'
 import TableUserManagement from '../../components/table/system/tableUserManagement'
 import UserManagementQuery from '../../components/query/system/userManagementQuery'
-
+import { CompactSelection } from '@glideapps/glide-data-grid'
 export default function UserManagement({ permissions, isMobile }) {
   const { t } = useTranslation()
   const gridRef = useRef(null)
   const navigate = useNavigate()
   const [test, setTest] = useState('')
   const [loading, setLoading] = useState(false)
+  const [loadingUpdatePass, setLoadingUpadtePass] = useState(false)
   const [loading2, setLoading2] = useState(false)
   const [data, setData] = useState([])
   const [formData, setFormData] = useState(dayjs().startOf('month'))
   const [toDate, setToDate] = useState(dayjs())
   const [userId, setUserId] = useState('')
   const [userName, setUserName] = useState('')
-  const [userIdSearch, setUserIdSearch] = useState('')
-  const [userNameSearch, setUserNameSearch] = useState('')
-  const [checkedRowKey, setCheckedRowKey] = useState(null)
   const [keyPath, setKeyPath] = useState(null)
   const [checkedPath, setCheckedPath] = useState(false)
   const [searchTriggered, setSearchTriggered] = useState(false)
+  const [selection, setSelection] = useState({
+    columns: CompactSelection.empty(),
+    rows: CompactSelection.empty(),
+  })
 
   const formatDate = useCallback((date) => date.format('YYYYMMDD'), [])
 
@@ -47,34 +50,67 @@ export default function UserManagement({ permissions, isMobile }) {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [userId, userName])
 
   const debouncedFetchDeliveryData = useMemo(
-    () => debounce(fetchSystemUsersData, 100),
+    () => debounce(fetchSystemUsersData, 300),
     [fetchSystemUsersData],
   )
   const handleSearch = () => {
     setSearchTriggered(true)
     fetchSystemUsersData()
   }
+  useEffect(() => {
+    if (!userId && !userName) {
+      fetchSystemUsersData();
+    }
+  }, [fetchSystemUsersData, userId, userName]);
 
-  const handleCheck = useCallback(
-    (ev) => {
-      /*   const { rowKey } = ev;
-      const gridInstance = gridRef.current?.getInstance();
-      const previousCheckedRowKey = checkedRowKey;
-  
-      if (previousCheckedRowKey !== null && gridInstance) {
-        gridInstance.uncheck(previousCheckedRowKey);
+  useEffect(() => {
+    if (searchTriggered) {
+      debouncedFetchDeliveryData();
+    }
+    return () => {
+      debouncedFetchDeliveryData.cancel();
+    };
+  }, [debouncedFetchDeliveryData, searchTriggered]);
+  const getSelectedRowIndices = () => {
+    const selectedRows = selection.rows.items;
+    let indices = [];
+
+    selectedRows.forEach((range) => {
+      const start = range[0];
+      const end = range[1] - 1;
+
+      for (let i = start; i <= end; i++) {
+        indices.push(i);
       }
-  
-      const rowData = data[rowKey];
-      setCheckedRowKey(rowKey);
-  
-      navigate(`/u/system_settings/users/user-management/profile/${rowData?.UserId}/${rowData?.UserName}`); */
+    });
+
+    return indices;
+  };
+  const handleUpdatePassUsers = useCallback(
+    async () => {
+      setLoadingUpadtePass(true);
+      const loadingMessage = message.loading("Updating passwords...", 0);
+
+      try {
+        const selectedRowIndices = getSelectedRowIndices();
+
+        const selectedIds = selectedRowIndices.map((index) => data[index].UserId);
+
+        await UpdatePass2(selectedIds);
+
+        loadingMessage();
+        message.success("Passwords updated successfully!");
+      } catch (error) {
+        message.error("Failed to update passwords. Please try again.");
+      } finally {
+        setLoadingUpadtePass(false);
+      }
     },
-    [checkedRowKey, data],
-  )
+    [data, selection]
+  );
 
   return (
     <>
@@ -88,7 +124,7 @@ export default function UserManagement({ permissions, isMobile }) {
               <Title level={4} className="mt-2 uppercase opacity-85 ">
                 {t('USER MANAGEMENT')}
               </Title>
-              <UserManagementActions handleSearch={handleSearch} />
+              <UserManagementActions handleSearch={handleSearch} handleUpdatePassUsers={handleUpdatePassUsers} />
             </div>
             <details
               className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
@@ -122,9 +158,10 @@ export default function UserManagement({ permissions, isMobile }) {
               checkedPath={checkedPath}
               setKeyPath={setKeyPath}
               loading={loading}
-              handleCheck={handleCheck}
               gridRef={gridRef}
               setData={setData}
+              setSelection={setSelection}
+              selection={selection}
             />
           </div>
         </div>

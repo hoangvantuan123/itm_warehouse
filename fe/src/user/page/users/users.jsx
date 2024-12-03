@@ -35,11 +35,13 @@ export default function Users({ permissions, isMobile }) {
   const [modalVisible, setModalVisible] = useState(false)
   const [selectedEmpIDs, setSelectedEmpIDs] = useState([])
   const [loadingDelete, setLoadingDelete] = useState(false)
+  
   let today = new Date()
   let year = today.getFullYear()
   let month = (today.getMonth() + 1).toString().padStart(2, '0')
   let day = today.getDate().toString().padStart(2, '0')
   let formattedDate = `${year}${month}${day}`
+
   const [startDate, endDate] =
     Array.isArray(dateRange) && dateRange.length === 2
       ? dateRange.map((date, index) => {
