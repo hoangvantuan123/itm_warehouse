@@ -8,6 +8,7 @@ import { LoginAuth } from '../../features/auth/login'
 import decodeJWT from '../../utils/decode-JWT'
 import Cookies from 'js-cookie'
 import BgCarousel from '../components/carousel/bgCarousel'
+import { ChangePassword } from '../../features/auth/changePassword'
 import Logo from '../../assets/ItmLogo.png'
 const { Title, Text } = Typography
 const languages = [
@@ -42,6 +43,7 @@ export default function Login({ fetchPermissions, processRolesMenu }) {
       const response = await LoginAuth({ login, password })
 
       if (response.success) {
+        console.log('response' , response)
         localStorage.setItem('userInfo', JSON.stringify(response.data.user))
         localStorage.setItem('roles_menu', response.data.tokenRolesUserMenu)
         Cookies.set('a_a', response.data.token)
@@ -50,6 +52,7 @@ export default function Login({ fetchPermissions, processRolesMenu }) {
       } else {
         switch (response.error.code) {
           case 'ACCOUNT_NOT_ACTIVATED':
+            console.log('ACCOUNT_NOT_ACTIVATED')
             setStatus(true)
             break
           case 'USER_NOT_FOUND':
@@ -69,6 +72,44 @@ export default function Login({ fetchPermissions, processRolesMenu }) {
       setLoading(false)
     }
   }
+
+  const handleChangePassword = async () => {
+    if (!oldPassword || !newPassword || !confirmNewPassword) {
+      setError('Please fill in all required fields!');
+      return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      setError('New passwords do not match!');
+      return;
+    }
+
+    if (newPassword === oldPassword) {
+      setError('New password cannot be the same as the old password. Please choose a different one!');
+      return;
+    }
+
+    try {
+      const response = await ChangePassword(employeeId,oldPassword, newPassword);
+console.log('response' , response)
+      if (response.success) {
+
+        message.success(response.message || 'Password changed successfully!');
+
+        setStatus(false);
+        setNewPassword('');
+        setConfirmNewPassword('');
+        setOldPassword('');
+        setCurrentView('login');
+        form.resetFields();
+        setError(null);
+      } else {
+        setError(response.message);
+      }
+    } catch (error) {
+      setError('An error occurred while changing the password. Please try again later.');
+    }
+  };
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search)
@@ -272,6 +313,7 @@ export default function Login({ fetchPermissions, processRolesMenu }) {
                     type="button"
                     className="w-full rounded-lg h-full bg-gray-700 text-white mt-4 p-3 text-base hover:bg-gray-700 first-line:relative hover:text-white"
                     size="large"
+                    onClick={handleChangePassword}
                   >
                     Change Password
                   </button>

@@ -18,7 +18,8 @@ import { GetAllRootMenus } from '../../../features/system/getRootMenu'
 import RootMenuManagementActions from '../../components/actions/system/rootMenuManagementActions'
 import DrawerAddRootMenu from '../../components/drawer/system/addRootMenu'
 import TableRootMenuManagement from '../../components/table/system/tableRootMenuManagement'
-
+import { DeleteRootMenus } from '../../../features/system/deleteRootMenus'
+import { CompactSelection } from '@glideapps/glide-data-grid'
 export default function RootMenuTechnique({ permissions, isMobile }) {
   const { t } = useTranslation()
   const gridRef = useRef(null)
@@ -33,7 +34,15 @@ export default function RootMenuTechnique({ permissions, isMobile }) {
   const [checkedPath, setCheckedPath] = useState(false)
   const formatDate = useCallback((date) => date.format('YYYYMMDD'), [])
   const [isModalOpen, setIsModalOpen] = useState(false)
-
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [clickedRowData, setClickedRowData] = useState(null)
+  const [clickedRowDataList, setClickedRowDataList] = useState([])
+  const [isMinusClicked, setIsMinusClicked] = useState(false)
+  const [lastClickedCell, setLastClickedCell] = useState(null)
+  const [selection, setSelection] = useState({
+    columns: CompactSelection.empty(),
+    rows: CompactSelection.empty(),
+  })
   const fetchDataRootMenus = useCallback(async () => {
     setLoading(true)
     try {
@@ -65,6 +74,78 @@ export default function RootMenuTechnique({ permissions, isMobile }) {
     setIsModalOpen(false)
   }
 
+  const onCellClicked = (cell, event) => {
+    let rowIndex
+
+    if (cell[0] !== -1) {
+      return
+    }
+
+    if (cell[0] === -1) {
+      rowIndex = cell[1]
+      setIsMinusClicked(true)
+    } else {
+      rowIndex = cell[0]
+      setIsMinusClicked(false)
+    }
+
+    if (
+      lastClickedCell &&
+      lastClickedCell[0] === cell[0] &&
+      lastClickedCell[1] === cell[1]
+    ) {
+      setLastClickedCell(null)
+      setClickedRowData(null)
+      return
+    }
+
+    if (rowIndex >= 0 && rowIndex < menus.length) {
+      const rowData = menus[rowIndex]
+      setClickedRowData(rowData)
+      setLastClickedCell(cell)
+    } 
+
+  }
+  const getSelectedRowIds = () => {
+    const selectedRows = selection.rows.items;
+    let ids = [];
+  
+    selectedRows.forEach((range) => {
+      const start = range[0];
+      const end = range[1] - 1;
+  
+      for (let i = start; i <= end; i++) {
+        ids.push(menus[i]?.Id);
+      }
+    });
+  
+    return ids.filter(id => id !== undefined);
+  };
+  
+  const handleDeleteDataSheet = useCallback(
+    async (e) => {
+      const selectedRowIds = getSelectedRowIds();
+      if (selectedRowIds.length === 0) {
+        message.warning('Vui lòng chọn ít nhất một hàng để xóa.');
+        return;
+      } 
+  
+      const remainingRows = menus.filter((row) =>
+        !selectedRowIds.includes(row.id)
+      );
+  
+      const response = await DeleteRootMenus(selectedRowIds);
+      
+      if (response.data.success) {
+        debouncedFetchDataMenus()
+        message.success(response.data.message)
+      } else {
+        message.error(response.data.message)
+      }
+    },
+    [menus, selection]
+  );
+  
   return (
     <>
       <Helmet>
@@ -77,12 +158,12 @@ export default function RootMenuTechnique({ permissions, isMobile }) {
               <Title level={4} className="mt-2 uppercase opacity-85 ">
                 {t('Root Menu Management')}
               </Title>
-              <RootMenuManagementActions openModal={openModal} />
+              <RootMenuManagementActions openModal={openModal} handleDeleteDataSheet={handleDeleteDataSheet} />
             </div>
           </div>
 
           <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg  overflow-auto">
-            <TableRootMenuManagement data={menus} />
+            <TableRootMenuManagement data={menus} onCellClicked={onCellClicked} setSelection={setSelection} selection={selection}/>
           </div>
         </div>
         <DrawerAddRootMenu

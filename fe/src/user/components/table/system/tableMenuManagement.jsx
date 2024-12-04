@@ -10,7 +10,7 @@ const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
 
-function TableMenuManagement({ data }) {
+function TableMenuManagement({ data , setSelection , selection}) {
   const [gridData, setGridData] = useState([])
   const [showSearch, setShowSearch] = useState(false)
   const ref = (useRef < data) | (null > null)
@@ -19,10 +19,7 @@ function TableMenuManagement({ data }) {
   const [clickedRowDataList, setClickedRowDataList] = useState([])
   const [isMinusClicked, setIsMinusClicked] = useState(false)
   const [lastClickedCell, setLastClickedCell] = useState(null)
-  const [selection, setSelection] = useState({
-    columns: CompactSelection.empty(),
-    rows: CompactSelection.empty(),
-  })
+  
   const columns = useMemo(
     () => [
       { title: 'Menu Root ID' },
@@ -126,18 +123,11 @@ function TableMenuManagement({ data }) {
       const rowData = gridData[rowIndex]
       setClickedRowData(rowData)
       setLastClickedCell(cell)
-    } else {
-      console.log('Invalid row index:', rowIndex)
-    }
+    } 
 
-    console.log('Cell clicked:', cell)
-    console.log('Row data:', gridData[rowIndex])
-    console.log('Event:', event)
   }
 
-  const onGridSelectionChange = (newSelection) => {
-    console.log('Selection aborted', newSelection)
-  }
+  
 
   return (
     <div className="w-full gap-1 h-full flex items-center justify-center pb-8">

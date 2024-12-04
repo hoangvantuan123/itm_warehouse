@@ -367,4 +367,20 @@ export class SystemUsersController {
         return await this.systemUsersService.deleteRolesByIds(ids);
     }
 
+    @Delete('delete/groups')
+    async deleteGroups(@Body() body: { ids: number[] }): Promise<any> {
+        const { ids } = body;
+        return await this.systemUsersService.deleteGroupsByIds(ids);
+    }
+
+    @Delete('delete/menus')
+    async deleteMenus(@Body() body: { ids: number[] }): Promise<any> {
+        const { ids } = body;
+        return await this.systemUsersService.deleteMennusByIds(ids);
+    }
+    @Delete('delete/root-menu')
+    async deleteRootMenus(@Body() body: { ids: number[] }): Promise<any> {
+        const { ids } = body;
+        return await this.systemUsersService.deleteRootMenusByIds(ids);
+    }
 }

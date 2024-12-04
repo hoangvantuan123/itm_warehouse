@@ -18,6 +18,8 @@ import MenuManagementActions from '../../components/actions/system/menuManagemen
 import TableMenuManagement from '../../components/table/system/tableMenuManagement'
 import DrawerAddMenu from '../../components/drawer/system/addMenu'
 import { GetAllMenus } from '../../../features/system/getMenus'
+import { DeleteMenus } from '../../../features/system/deleteMenus'
+import { CompactSelection } from '@glideapps/glide-data-grid'
 const generateRandomData = () => {
   const menuRootIds = [1, 2, 3, 4, 5]
   const types = ['main', 'sub']
@@ -74,7 +76,10 @@ export default function MenuTechnique({ permissions, isMobile }) {
   const [checkedPath, setCheckedPath] = useState(false)
   const formatDate = useCallback((date) => date.format('YYYYMMDD'), [])
   const [isModalOpen, setIsModalOpen] = useState(false)
-
+  const [selection, setSelection] = useState({
+    columns: CompactSelection.empty(),
+    rows: CompactSelection.empty(),
+  })
   const fetchDataMenus = useCallback(async () => {
     setLoading(true)
     try {
@@ -105,7 +110,43 @@ export default function MenuTechnique({ permissions, isMobile }) {
   const closeModal = () => {
     setIsModalOpen(false)
   }
-
+  const getSelectedRowIds = () => {
+    const selectedRows = selection.rows.items;
+    let ids = [];
+  
+    selectedRows.forEach((range) => {
+      const start = range[0];
+      const end = range[1] - 1;
+  
+      for (let i = start; i <= end; i++) {
+        ids.push(menus[i]?.Id);
+      }
+    });
+  
+    return ids.filter(id => id !== undefined);
+  };
+  const handleDeleteDataSheet = useCallback(
+    async (e) => {
+      const selectedRowIds = getSelectedRowIds();
+      if (selectedRowIds.length === 0) {
+        message.warning('Vui lòng chọn ít nhất một hàng để xóa.');
+        return;
+      } 
+  
+      const remainingRows = menus.filter((row) =>
+        !selectedRowIds.includes(row.id)
+      );
+  
+      const response = await DeleteMenus(selectedRowIds);
+      if (response.data.success) {
+        debouncedFetchDataMenus()
+        message.success(response.data.message)
+      } else {
+        message.error(response.data.message)
+      }
+    },
+    [menus, selection]
+  );
   return (
     <>
       <Helmet>
@@ -121,12 +162,13 @@ export default function MenuTechnique({ permissions, isMobile }) {
               <MenuManagementActions
                 fetchDataMenus={fetchDataMenus}
                 openModal={openModal}
+                handleDeleteDataSheet={handleDeleteDataSheet}
               />
             </div>
           </div>
 
           <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg  overflow-auto">
-            <TableMenuManagement data={menus} />
+            <TableMenuManagement data={menus} setSelection={setSelection} selection={selection} />
           </div>
         </div>
 

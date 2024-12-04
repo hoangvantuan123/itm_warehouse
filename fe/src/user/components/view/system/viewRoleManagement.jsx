@@ -11,9 +11,9 @@ import { getPaginatedRolesUsers } from '../../../../features/system/getPaginated
 import debounce from 'lodash.debounce';
 const { Header, Content, Footer } = Layout
 const menuStyle = { borderInlineEnd: 'none' }
-function ViewRoleManagement({ groups, changedIds, setChangedIds, setSelectedRowKeys, selectedRowKeys, setCheckStatus, checkStatus }) {
-  const [selectedGroup, setSelectedGroup] = useState(null)
-  const [openView, setOpenView] = useState(false)
+function ViewRoleManagement({ groups, changedIds, setChangedIds, setSelectedRowKeys, selectedRowKeys, setCheckStatus, checkStatus , setSelectedGroup , selectedGroup , setOpenView, openView}) {
+ 
+
   const [userInfo, setUserInfo] = useState({
     groupName: '',
     note: '',
@@ -95,7 +95,7 @@ function ViewRoleManagement({ groups, changedIds, setChangedIds, setSelectedRowK
   }, [selectedGroup, page2, limit2])
 
   const fetchData3 = async () => {
-    setLoading3(true)
+    setLoading(true)
     try {
       const response = await getPaginatedRolesUsers(
         selectedGroup,
@@ -113,7 +113,7 @@ function ViewRoleManagement({ groups, changedIds, setChangedIds, setSelectedRowK
       setError(error.message || 'Đã xảy ra lỗi')
       setData3([])
     } finally {
-      setLoading3(false)
+      setLoading(false)
     }
   }
 

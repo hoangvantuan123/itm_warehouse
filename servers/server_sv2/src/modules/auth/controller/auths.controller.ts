@@ -15,8 +15,9 @@ import {
 import * as jwt from 'jsonwebtoken';
 import { jwtConstants } from 'src/config/security.config';
 import { UserAuthService } from '../service/user.service';
+import { Response } from 'express';
 import { AuthService } from '../service/auths.service';
-import { LoginDto } from '../dto/login.dto';
+import { LoginDto, ChangePasswordDto } from '../dto/login.dto';
 
 @Controller('v2/acc')
 export class AuthController {
@@ -54,5 +55,38 @@ export class AuthController {
 
         return await this.appService.getDataRolesUserRaw(userId);
     }
+    
+    
+    @Post('p2/change-password')
+async changePassword(
+    @Req() req: Request,
+    @Body() changePasswordDto: ChangePasswordDto,
+    @Res() res: Response,
+) {
+    const { employeeId, oldPassword, newPassword } = changePasswordDto;
+console.log('employeeId' , employeeId)
+console.log('oldPassword' , oldPassword)
+console.log('newPassword' , newPassword)
+
+    try {
+        // Call the changePassword2 service method
+        const result = await this.appService.changePassword2(employeeId, oldPassword, newPassword);
+
+        // Send response without 'status' field
+        return res.json({
+            success: result.success,
+            message: result.success ? result.message : result.error?.message || 'An error occurred',
+            code: result.success ? undefined : result.error?.code || 'UNKNOWN_ERROR',
+        });
+
+    } catch (error) {
+        // Send response without 'status' field and handle internal server error
+        return res.json({
+            success: false,
+            message: 'An unexpected error occurred',
+        });
+    }
+}
+
 
 }

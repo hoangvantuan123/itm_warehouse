@@ -10,19 +10,13 @@ const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
 
-function TableRootMenuManagement({ data }) {
+function TableRootMenuManagement({ data, onCellClicked, setSelection , selection}) {
   const [gridData, setGridData] = useState([])
   const [showSearch, setShowSearch] = useState(false)
   const ref = (useRef < data) | (null > null)
   const onSearchClose = useCallback(() => setShowSearch(false), [])
-  const [clickedRowData, setClickedRowData] = useState(null)
-  const [clickedRowDataList, setClickedRowDataList] = useState([])
-  const [isMinusClicked, setIsMinusClicked] = useState(false)
-  const [lastClickedCell, setLastClickedCell] = useState(null)
-  const [selection, setSelection] = useState({
-    columns: CompactSelection.empty(),
-    rows: CompactSelection.empty(),
-  })
+ 
+
   const columns = useMemo(
     () => [
       { title: 'Key' },
@@ -81,54 +75,12 @@ function TableRootMenuManagement({ data }) {
 
   const [lastActivated, setLastActivated] = useState(undefined)
 
-  const onCellActivated = useCallback((cell) => {
-    console.log('cell', cell)
-    setLastActivated(cell)
-  }, [])
-
+ 
   useEffect(() => {
     setGridData(data)
   }, [data])
 
-  const onCellClicked = (cell, event) => {
-    let rowIndex
 
-    if (cell[0] !== -1) {
-      console.log('Ignoring click on cell, cell[0] is neither -1 nor 1')
-      return
-    }
-
-    if (cell[0] === -1) {
-      rowIndex = cell[1]
-      setIsMinusClicked(true)
-    } else {
-      rowIndex = cell[0]
-      setIsMinusClicked(false)
-    }
-
-    if (
-      lastClickedCell &&
-      lastClickedCell[0] === cell[0] &&
-      lastClickedCell[1] === cell[1]
-    ) {
-      console.log('Click again on the same cell, deactivating.')
-      setLastClickedCell(null)
-      setClickedRowData(null)
-      return
-    }
-
-    if (rowIndex >= 0 && rowIndex < gridData.length) {
-      const rowData = gridData[rowIndex]
-      setClickedRowData(rowData)
-      setLastClickedCell(cell)
-    } else {
-      console.log('Invalid row index:', rowIndex)
-    }
-
-    console.log('Cell clicked:', cell)
-    console.log('Row data:', gridData[rowIndex])
-    console.log('Event:', event)
-  }
 
   const onGridSelectionChange = (newSelection) => {
     console.log('Selection aborted', newSelection)

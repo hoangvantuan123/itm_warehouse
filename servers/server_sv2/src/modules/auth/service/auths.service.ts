@@ -179,20 +179,44 @@ AND r.Type IN ('rootmenu', 'menu');
             const user = await this.databaseService.findAuthByEmpID(login);
 
             if (!user) {
-                throw new NotFoundException('User not found');
-            }
-
+                return {
+                  success: false,
+                  error: {
+                    message: `User with login ${login} not found`,
+                    code: 'USER_NOT_FOUND',
+                  },
+                };
+              }
             const isPasswordValid = await bcrypt.compare(password, user.Password2);
 
             if (!isPasswordValid) {
                 return {
                     success: false,
                     error: {
-                        message: 'Invalid credentials',
+                        message: 'Invalid credentials. Please check your login and password.',
                         code: 'INVALID_CREDENTIALS',
                     },
                 };
             }
+            if (user.StatusAcc) {
+                return {
+                  success: false,
+                  error: {
+                    message: 'Your account has been locked. Please contact support for further details.',
+                    code: 'ACCOUNT_LOCKED',
+                  },
+                };
+              }
+              if (!user.CheckPass1) {
+                return {
+                  success: false,
+                  error: {
+                    message: 'Account is not fully activated. Please change your password to activate your account.',
+                    code: 'ACCOUNT_NOT_ACTIVATED',
+                  },
+                };
+              }
+              
             const token = jwt.sign(
                 {
                     UserId: user.UserId,
@@ -274,6 +298,71 @@ AND r.Type IN ('rootmenu', 'menu');
         }
     }
 
+
+    async changePassword2(
+        employeeId: string,
+        oldPassword: string,
+        newPassword: string,
+      ): Promise<{ success: boolean; message: string; error?: { message: string; code: string } }> {
+        try {
+          const user = await this.databaseService.findAuthByEmpID(employeeId);
+      
+          if (!user) {
+            return {
+              success: false,
+              message: 'An error occurred', 
+              error: {
+                message: 'User not found',
+                code: 'USER_NOT_FOUND',
+              },
+            };
+          }
+      
+          const isOldPasswordValid = await bcrypt.compare(oldPassword, user.Password2);
+      
+          if (!isOldPasswordValid) {
+            return {
+              success: false,
+              message: 'An error occurred', 
+              error: {
+                message: 'Old password is incorrect',
+                code: 'OLD_PASS_INCORRECT',
+              },
+            };
+          }
+      
+          const hashedNewPassword = await this.hashPassword(newPassword);
+          user.Password2 = hashedNewPassword;
+      
+          await this.userWEBRepository.update(
+            { UserId: employeeId },
+            {
+              Password2: hashedNewPassword,
+              Active: true,
+              CheckPass1: true
+            }
+          );
+      
+          return {
+            success: true,
+            message: 'Password changed successfully',
+          };
+        } catch (error) {
+      
+          return {
+            success: false,
+            message: 'An unexpected error occurred',
+            error: {
+              message: error.message || 'Internal server error',
+              code: 'INTERNAL_ERROR',
+            },
+          };
+        }
+      }
+      
+      
+      
+   
 
 
 

@@ -60,21 +60,21 @@ export class DatabaseService {
   }
 
 
-  async findAuthByEmpID(UserId: string): Promise<any> {
-    const query = `SELECT * FROM "_TCAUser_WEB" WHERE "UserId" = '${UserId}'`;
+ async findAuthByEmpID(UserId: string): Promise<any> {
+  const query = `SELECT * FROM "_TCAUser_WEB" WHERE "UserId" = '${UserId}'`;
 
-    try {
-      const result = await this.queryRunner.query(query);
+  try {
+    const result = await this.queryRunner.query(query);
 
-      if (!result || result.length === 0) {
-        throw new NotFoundException(`User with UserId ${UserId} not found`);
-      }
-
-      return result[0];
-    } catch (error) {
-      console.error(`Error executing query for UserId ${UserId}:`, error);
-      throw error;
+    if (!result || result.length === 0) {
+      throw new NotFoundException(`UserId ${UserId} not found in the system`);
     }
+
+    return result[0];
+  } catch (error) {
+    throw error;
   }
+}
+
 
 }

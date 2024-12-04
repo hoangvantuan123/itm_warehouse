@@ -77,3 +77,8 @@ WHERE r.GroupId IN (SELECT GroupId FROM GroupIDs)
 AND r.Type IN ('rootmenu', 'menu');
 
 ````
+
+
+ EXEC GetFilteredTCAUserWEB 
+        @UserId = N'',
+        @UserName = N'';

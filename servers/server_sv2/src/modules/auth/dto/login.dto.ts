@@ -5,3 +5,10 @@ export class LoginDto {
     login: string;
     password: string;
 }
+
+
+export class ChangePasswordDto {
+    oldPassword: string;
+    newPassword: string;
+    employeeId: string;
+  }

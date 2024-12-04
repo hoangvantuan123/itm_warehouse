@@ -1,10 +1,38 @@
 import { useState } from 'react'
-import { Button } from 'antd'
-import { SaveOutlined, PlusOutlined , FileDoneOutlined} from '@ant-design/icons'
+import { Button, Dropdown, message } from 'antd';
+import { SaveOutlined, PlusOutlined , FileDoneOutlined, DeleteOutlined} from '@ant-design/icons'
 
-export default function MenuManagementActions({ openModal }) {
+export default function MenuManagementActions({ openModal,handleDeleteDataSheet }) {
+  const [visible, setVisible] = useState(false);
+
+  const handleMenuClick = (e) => {
+    if (e.key === '1') {
+      handleDeleteDataSheet()
+    } else {
+      message.info(`Đang phát triển`);
+    }
+  };
+  const items = [
+ 
+    {
+      label: 'Xóa',
+      key: '1',
+      icon: <DeleteOutlined />,
+      danger: true,
+    },
+
+  ];
+  const menuProps = {
+    items,
+    onClick: handleMenuClick,
+  };
   return (
     <div className="flex items-center gap-2">
+       <Dropdown.Button menu={menuProps}  >
+        <span className="uppercase">
+          Actions
+        </span>
+      </Dropdown.Button>
       <Button
         key="Reset"
         icon={<FileDoneOutlined />}
@@ -24,16 +52,7 @@ export default function MenuManagementActions({ openModal }) {
       >
         ADD MENU
       </Button>
-      <Button
-        key="Save"
-        type="primary"
-        icon={<SaveOutlined />}
-        size="middle"
-        className="uppercase"
-        style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
-      >
-        Save
-      </Button>
+      
     </div>
   )
 }

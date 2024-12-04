@@ -10,6 +10,8 @@ import { GetAllResGroups } from '../../../features/system/getGroups'
 import ViewRoleManagement from '../../components/view/system/viewRoleManagement'
 import { PostUpdateRolesUser } from '../../../features/system/postUpdateRolesUser'
 import { DeleteRolesUser } from '../../../features/system/deleteRolesUser'
+import { DeleteGroups } from '../../../features/system/deleteGroups'
+import WarningDeleteGroup from '../../components/modal/system/warningDeleteGroup'
 
 export default function RoleManagement({ permissions, isMobile }) {
   const { t } = useTranslation()
@@ -23,6 +25,9 @@ export default function RoleManagement({ permissions, isMobile }) {
     table2: [],
     table3: [],
   });
+  const [openView, setOpenView] = useState(false)
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState(null)
   const [checkStatus, setCheckStatus] = useState(false);
   const getAllSelectedKeys = () => {
     return [
@@ -34,7 +39,6 @@ export default function RoleManagement({ permissions, isMobile }) {
 
   const [isModalOpenAddUserGroups, setIsModalOpenAddUserGroups] =
     useState(false)
-
   const fetchDataGroups = useCallback(async () => {
     setLoading(true)
     try {
@@ -103,6 +107,13 @@ export default function RoleManagement({ permissions, isMobile }) {
       message.error('Save failed!')
     }
   }, [selectedRowKeys]);
+  const handleDeleteGroups = useCallback(async () => {
+    if(!selectedGroup){
+      message.warning('Không có nhóm để xoá!')
+      return;
+    }
+    setOpenModal(true)
+  }, [selectedGroup]);
 
   return (
     <>
@@ -121,6 +132,7 @@ export default function RoleManagement({ permissions, isMobile }) {
                 openModalAddUserGroups={openModalAddUserGroups}
                 handleSubmitSheet={handleSubmitSheet}
                 handleDeleteDataSheet={handleDeleteDataSheet}
+                handleDeleteGroups={handleDeleteGroups}
               />
             </div>
           </div>
@@ -135,7 +147,11 @@ export default function RoleManagement({ permissions, isMobile }) {
               setSelectedRowKeys={setSelectedRowKeys}
               selectedRowKeys={selectedRowKeys}
               setCheckStatus={setCheckStatus}
+              setSelectedGroup={setSelectedGroup}
               checkStatus={checkStatus}
+              selectedGroup={selectedGroup}
+              setOpenView={setOpenView}
+              openView={openView}
             />
           </div>
         </div>
@@ -145,6 +161,7 @@ export default function RoleManagement({ permissions, isMobile }) {
           onClose={closeModalAddUserGroups}
           fetchDataGroups={fetchDataGroups}
         />
+        <WarningDeleteGroup modalOpen={openModal} setModalOpen={setOpenModal}  selectedGroup={selectedGroup} setSelectedGroup={setSelectedGroup} setOpenView={setOpenView} fetchDataGroups={fetchDataGroups}/>
       </div>
     </>
   )

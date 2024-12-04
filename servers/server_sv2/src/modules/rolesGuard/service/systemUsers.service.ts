@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository , In} from 'typeorm';
 import { SimpleQueryResult } from 'src/common/interfaces/simple-query-result.interface';
 import { DatabaseService } from 'src/common/database/sqlServer/ITMV20240117/database.service';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from 'src/common/utils/constants';
@@ -482,7 +482,7 @@ export class SystemUsersService {
 
   async deleteRolesByIds(ids: number[]): Promise<any> {
     try {
-      const result = await this.resTCARolesUserWEBRepository.delete(ids);
+      const result = await this.resTCARolesUserWEBRepository.delete({ Id: In(ids) });
       if (result.affected > 0) {
         return {
           success: true,
@@ -498,6 +498,107 @@ export class SystemUsersService {
       return {
         success: false,
         message: 'Error while deleting records',
+        error: error.message,
+      };
+    }
+  }
+
+
+  async deleteGroupsByIds(ids: number[]): Promise<any> {
+    try {
+      const result = await this.resTCAGroupsWEBRepository.delete({ Id: In(ids) });
+  
+      if (result.affected > 0) {
+        const result2 = await this.resTCARolesUserWEBRepository.delete({ GroupId: In(ids) });
+  
+        return {
+          success: true,
+          message: `${result.affected} group(s) deleted successfully, and ${result2.affected} related record(s) deleted successfully`,
+        };
+      } else {
+        return {
+          success: false,
+          message: 'No groups found to delete.',
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Error while deleting records.',
+        error: error.message,
+      };
+    }
+  }
+  
+  async deleteMennusByIds(ids: number[]): Promise<any> {
+    try {
+      const existingRecords = await this.resTCARolesUserWEBRepository.find({
+        where: {
+          MenuId: In(ids),
+        },
+      });
+      if (existingRecords.length > 0) {
+        return {
+          success: false,
+          message: 'Cannot delete menus because there are related records in TCARolesUsersWEB.',
+        };
+      }
+  
+      const result = await this.resTCAMenusWEBRepository.delete({ Id: In(ids) });
+  
+      if (result.affected > 0) {
+        return {
+          success: true,
+          message: `${result.affected} record(s) deleted successfully`,
+        };
+      } else {
+        return {
+          success: false,
+          message: 'No records found to delete',
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Error while deleting records',
+        error: error.message,
+      };
+    }
+  }
+  
+
+  async deleteRootMenusByIds(ids: number[]): Promise<any> {
+    try {
+      const existingRecords = await this.resTCARolesUserWEBRepository.find({
+        where: {
+          RootMenuId: In(ids),
+        },
+      });
+  
+      if (existingRecords.length > 0) {
+        return {
+          success: false,
+          message: 'Cannot delete root menus because there are related records in TCARolesUsersWEB.',
+        };
+      }
+  
+      const result = await this.resTCARootMenusWEBRepository.delete({ Id: In(ids) });
+  
+      if (result.affected > 0) {
+        return {
+          success: true,
+          message: `${result.affected} record(s) deleted successfully`,
+        };
+      } else {
+        return {
+          success: false,
+          message: 'No records found to delete',
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Error while deleting records.',
         error: error.message,
       };
     }

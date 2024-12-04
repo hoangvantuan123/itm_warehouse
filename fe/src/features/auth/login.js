@@ -16,13 +16,8 @@ export const LoginAuth = async ({ login, password }) => {
 
     const data = await response.json();
 
-    if (!response.ok || !data.success) {
-      const errorMessage = data.error?.message || 'Unknown error occurred';
-      const errorCode = data.error?.code || 'UNKNOWN_ERROR';
-      throw new Error(`${errorMessage} (Code: ${errorCode})`);
-    }
     return data;
   } catch (error) {
-    throw new Error('Đăng nhập thất bại: ' + error.message);
+    throw new Error(error.message);
   }
 };
