@@ -23,12 +23,13 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const navigate = useNavigate()
   const { id } = useParams()
   const [loading, setLoading] = useState(false)
-  const [data, setData] = useState([])
+  const [dataA, setDataA] = useState([])
 
   const [isOpenDetails, setIsOpenDetails] = useState(false);
   const secretKey = 'TEST_ACCESS_KEY'
   /*  */
   const [filteredData, setFilteredData] = useState(null)
+  console.log(filteredData)
   const [modal3Open, setModal3Open] = useState(false)
   useEffect(() => {
     const savedState = localStorage.getItem("detailsStateStockOutDetails");
@@ -65,26 +66,29 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
       return null
     }
   }
-  useEffect(() => {
-    if (id) {
-      const data = decryptData(id)
-      if (data) {
-        setFilteredData(data)
-      }
-    }
-  }, [id])
 
   const fetchDataA = async (outReqSeq) => {
     try {
       setLoading(true)
       const response = await GetITMSPDMMOutReqItemListWEB(outReqSeq)
-      setData(response?.data || [])
+      setDataA(response?.data || [])
     } catch (error) {
-      setData([])
+      setDataA([])
     } finally {
       setLoading(false)
     }
   }
+  useEffect(() => {
+    if (id) {
+      const data = decryptData(id)
+      if (data) {
+        setFilteredData(data)
+        fetchDataA(data?.OutReqSeq)
+      }
+    }
+  }, [id])
+
+
 
 
 
@@ -125,7 +129,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
           </div>
 
           <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg">
-            <TableTransferStockOutFiFo />
+            <TableTransferStockOutFiFo sampleTableA={dataA} />
           </div>
         </div>
       </div>

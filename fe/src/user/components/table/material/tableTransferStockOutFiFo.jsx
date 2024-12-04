@@ -1,5 +1,6 @@
 
 import { ArrowLeftIcon } from '../../icons'
+import TableStockOUtFiFoA from './tableStockOutFiFoA'
 
 function TableTransferStockOutFiFo({
   sampleTableA,
@@ -17,6 +18,7 @@ function TableTransferStockOutFiFo({
       </div>
       <div className="w-[35%] h-full flex flex-col border bg-white rounded-lg overflow-hidden pb-7">
         <div className=" font-medium text-xs p-2">A</div>
+        <TableStockOUtFiFoA data={sampleTableA} />
       </div>
     </div>
   )

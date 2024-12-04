@@ -32,7 +32,7 @@ export class StockOutService {
     async ITM_SPDMMOutReqItemList_WEB(outReqSeq: string): Promise<SimpleQueryResult> {
         const query = `
           EXEC ITM_SPDMMOutReqItemList_WEB 
-           @OutReqSeq = ${outReqSeq},
+           @OutReqSeq = ${outReqSeq}
         `;
         try {
             const result = await this.databaseService.executeQuery(query);
