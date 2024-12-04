@@ -20,6 +20,7 @@ import Login from '../auth/login'
 import decodeJWT from '../../utils/decode-JWT'
 import { transformDataMenu } from '../../utils/transformDataMenu'
 import ErrorPage from '../page/default/errorPage'
+import BarcodePrint from '../page/barcodePrint/barcodePrint'
 const DeliveryList = lazy(() => import('../page/material/deliveryList'))
 const WaitingIqcStockIn = lazy(
   () => import('../page/material/waitingIqcStockIn'),
@@ -89,7 +90,8 @@ const UserRouter = () => {
 
   const skippedRoutes = [
     '/u/login',
-    '/u/home'
+    '/u/home',
+    '/u/print-barcode',
   ]
 
 
@@ -278,6 +280,15 @@ const UserRouter = () => {
                     <Route
                       path=""
                       element={<Home
+                        permissions={userPermissions}
+                        isMobile={isMobile}
+                      />
+                      }
+                    />
+
+                    <Route
+                      path="/u/print-barcode"
+                      element={<BarcodePrint
                         permissions={userPermissions}
                         isMobile={isMobile}
                       />

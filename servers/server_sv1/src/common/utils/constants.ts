@@ -30,9 +30,7 @@ export const ERROR_MESSAGES = {
   ERROR_ITMV20240117: "Failed to connect to the database ITMV20240117.",
   ERROR_DUP: "An error occurred, please review the data.",
   WARNING_BARCODE_DATABASE: "Barcode Exists on Database , Warning!!!",
-  WARNING_HOLD_BARCODE: "Material barcode HOLD!!! , Warning!!!"
-
-  ERROR_DUP: "An error occurred, please review the data.",
+  WARNING_HOLD_BARCODE: "Material barcode HOLD!!! , Warning!!!",
   ERROR_ITMBARCODE: "Failed to connect to the database ITMBARCODE.",
 };
 

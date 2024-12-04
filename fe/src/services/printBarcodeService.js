@@ -1,11 +1,84 @@
-import { json } from "react-router-dom";
+import axios from "axios";
 import { HOST_API_SERVER_1 } from ".";
 
-export const getPageMat = async () => {
 
-    const res = await fetch(`${HOST_API_SERVER_1}/print-barcode/paginated`)
-    if (!res.ok) throw new Error('Failed to fetch data');
+export const GetPageItem = async (
+    fromDate,
+    toDate,
+    vendor,
+    matID,
+    lotNo,
+  ) => {
+    try {
+      const url = `${HOST_API_SERVER_1}/print-barcode/paginated`
+  
+      const response = await axios.get(url, {
+        params: {
+          fromDate,
+          toDate,
+          vendor,
+          matID,
+          lotNo,
+          pageIndex: 1,
+          pageSize:100,
+        },
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+  
+      if (response.status === 200) {
+        return {
+          success: true,
+          data: response.data,
+        }
+      } else {
+        return {
+          success: false,
+          message: ERROR_MESSAGES.ERROR,
+        }
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response
+          ? error.response.data.message
+          : ERROR_MESSAGES.ERROR,
+      }
+    }
+  }
 
-    const parsedUMatInfo = res.json();
-    return parsedUMatInfo || null;
-}
+  export const CreatePrintLabel = (requestData) => {
+    const requestParams = {
+      ...DEFAULTS,
+      ...requestData,
+    }
+    const dataToSend = {
+      ip: requestParams.ip,
+      port: requestParams.port,
+      data: requestParams.data,
+    }
+  
+    return axios
+      .post(
+        `${HOST_API_SERVER_1}/v1/print-barcode/printer`,
+        dataToSend,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+      .then((response) => {
+        if (response.status === 200 || response.status === 201) {
+          return response.data
+        }
+        throw new Error('Error from API: ' + response.data.message)
+      })
+      .catch((error) => {
+        const errorMessage = error.response
+          ? error.response.data.message || 'Error from API'
+          : 'Unknown error occurred'
+        throw new Error(errorMessage)
+      })
+  }

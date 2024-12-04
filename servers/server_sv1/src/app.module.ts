@@ -5,12 +5,13 @@ import { Connection } from 'typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { HealthController } from './health.controller';
-import { sqlServerITMV20240117 } from './config/database.config';
+import { mysqlITMBARCODE, sqlServerITMV20240117 } from './config/database.config';
 import { APP_FILTER } from '@nestjs/core';
 import { StockInModule } from './modules/material/module/stockIn.module';
 import { CodeHelpComboQueryModule } from './modules/codeHelp/module/codeHelpComboQuery.module';
 import { AuthsModule } from './modules/auth/module/auths.module';
 import { RolesUsersModule } from './modules/rolesGuard/module/rolesUsers.module';
+import { PrintBarcodeModule } from './modules/print_barcode/modules/printBarcodeModule';
 
 @Module({
   imports: [
@@ -22,8 +23,13 @@ import { RolesUsersModule } from './modules/rolesGuard/module/rolesUsers.module'
       ...sqlServerITMV20240117,
       name: 'ITMV20240117',
     }),
+    TypeOrmModule.forRoot({
+      ...mysqlITMBARCODE,
+      name: 'ITMBARCODE',
+    }),
     StockInModule,
-    CodeHelpComboQueryModule
+    CodeHelpComboQueryModule,
+    PrintBarcodeModule,
   ],
   providers: [{
     provide: APP_FILTER,
@@ -34,6 +40,7 @@ import { RolesUsersModule } from './modules/rolesGuard/module/rolesUsers.module'
 export class AppModule implements OnModuleInit {
   constructor(
     @InjectConnection('ITMV20240117') private readonly connection2: Connection,
+    @InjectConnection('ITMBARCODE') private readonly conITMBARCODE: Connection,
   ) { }
 
   async onModuleInit() {

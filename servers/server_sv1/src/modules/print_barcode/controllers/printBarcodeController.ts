@@ -27,14 +27,13 @@ export class PrintBarcodeController {
         }
     }
 
-
     @Post('printer')
     async checkPrinter(
         @Body() barcodeDto : BarcodeDto
     ) {
         try {
-            const result = await this.printBarcodeService.connectionPrinter(barcodeDto);
-            return { status: true, message: SUCCESS_MESSAGES.REQUEST_SUCCESS, data: result };
+            const result = await this.printBarcodeService.printByZplCode(barcodeDto);
+            return {result};
         } catch (error) {
             return {
                 status: false,

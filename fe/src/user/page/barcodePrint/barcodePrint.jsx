@@ -6,37 +6,66 @@ const { Header, Content } = Layout;
 import 'moment/locale/vi';
 import BarcodePrintAction from '../../components/actions/barcodePrint/barcocePrintAction';
 import TableBarcodePrint from '../../components/table/barcodePrint/tableBarcodePrint';
-import { useEffect, useMemo, useState } from 'react';
-import { getPageMat } from '../../../services/printBarcodeService';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import dayjs from 'dayjs';
+import { debounce } from 'lodash';
+import { GetPageItem } from '../../../services/printBarcodeService';
 
 export default function BarcodePrint({ permissions, isMobile }) {
-
+    const [loading, setLoading] = useState(false)
     const [data, setData] = useState([]);
     const { t } = useTranslation();
-
     const [dataInfo, setDataInfo] = useState([]);
-
     const [rowChecked, setRowChecked] = useState([]);
+    const [fromDate, setFromDate] = useState(dayjs().startOf('month'))
+    const [toDate, setToDate] = useState(dayjs().startOf('month'))
+    const formatDate = useCallback((date) => date.format('YYYYMMDD'), [])
 
+    const [vendor, setVendor] = useState('')
+    const [matID, setMatID] = useState('')
+    const [lotNo, setLotNo] = useState('')
+    const [gridData, setGridData] = useState([])
+
+    const [selectRow, setSelectRow] = useState(null);
 
     const onHandleData = function setDataHandle(varData) {
         setData(varData);
-    }
+    };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const response = await getPageMat();
-            setData(response?.data);
-        };
+    const fetchItemList = useCallback(async () => {
+        setLoading(true)
+        try {
+          const itemList = await GetPageItem(
+            formatDate(fromDate),
+            formatDate(toDate),
+            vendor,
+            matID,
+            lotNo,
+          );
+          setData(itemList?.data.data || [])
+        } catch (error) {
+          setData([])
+        } finally {
+          setLoading(false)
+        }
+      }, [fromDate, toDate, vendor, matID, lotNo])
 
-        fetchData();
-    }, []);
+      const debouncedFetchItemData = useMemo(
+        () => debounce(fetchItemList, 100),
+        [fetchItemList],
+      )
 
-    const btnSearch = async () => {
-        const resData = await getPageMat();
-        setData(resData?.data)
+      useEffect(() => {
+        debouncedFetchItemData()
+        return () => {
+            debouncedFetchItemData.cancel()
+        }
+      }, [debouncedFetchItemData])
 
-    }
+      const btnSearch = () => {
+        debouncedFetchItemData();
+      }
+
 
     const handleSeclecData = function setSelectData(ev) {
 
@@ -102,13 +131,34 @@ export default function BarcodePrint({ permissions, isMobile }) {
                     <Title level={5} className="mt-2 uppercase">
                         {t('PRINT BARCODE')}
                     </Title>
-                    <BarcodePrintAction dataSearch={onHandleData} btnSearch={btnSearch} dataSelect={rowChecked} dataInfo={dataInfo} />
+                    <BarcodePrintAction 
+                    fromDate={fromDate}
+                    setFromDate={setFromDate}
+                    toDate={toDate}
+                    setToDate={setToDate}
+                    vendor={vendor}
+                    setVendor={setVendor}
+                    matID={matID}
+                    setMatID={setMatID}
+                    lotNo= {lotNo} 
+                    setLotNo={setLotNo}
+                    dataSearch={onHandleData} 
+                    btnSearch={btnSearch} 
+                    dataSelect={rowChecked} 
+                    dataInfo={dataInfo} />
                 </Header>
 
                 <Content className="flex-grow px-4  bg-slate-50">
                     <div className="h-full flex flex-col">
                         <div className="flex-grow">
-                            <TableBarcodePrint data={data} handleSelect={handleSeclecData} handleUnSelect={handleUnSelect} handleClickRow={handleClickRow} handleScroll={handleScroll} />
+                            <TableBarcodePrint 
+                            data={data} 
+                            setGridData={setGridData} 
+                            gridData={gridData}
+                            loading={loading}
+                            selectRow={selectRow}
+                            setSelectRow={setSelectRow}
+                            />
                         </div>
                     </div>
                 </Content>

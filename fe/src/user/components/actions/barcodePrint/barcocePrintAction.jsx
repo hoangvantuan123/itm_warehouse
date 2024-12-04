@@ -1,11 +1,12 @@
 import { useRef, useState } from "react";
 import ReactDOM from 'react-dom';
-import { Card, Button, Modal, Space, Input, Typography, DatePicker, Checkbox, Row, Col } from 'antd';
+import { Card, Button, Modal, Space, Input, Typography, DatePicker, Checkbox, Row, Col, Select } from 'antd';
 import { SaveFilled } from '@ant-design/icons';
 
 import ZebraBrowserPrintWrapper from 'zebra-browser-print-wrapper';
 import LabelItem from "./labeldesign";
 import Printer from 'esc-pos-printer';
+import { use } from "i18next";
 
 
 
@@ -14,13 +15,28 @@ import Printer from 'esc-pos-printer';
 
 
 
-export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect, dataInfo, btnPrintPreview }) {
+export default function BarcodePrintAction({
+    fromDate,
+    setFromDate,
+    toDate,
+    setToDate,
+    vendor,
+    setVendor,
+    matID,
+    setMatID,
+    lotNo,
+    setLotNo,
+    dataSearch,
+    btnSearch,
+    dataSelect,
+    dataInfo,
+}) {
 
     const [zplcode, setZplCode] = useState('');
 
     const [sizeLabel, setSizeLabel] = useState({
 
-        barCodePosX: Number(0) ,
+        barCodePosX: Number(0),
         barCodePosY: Number(0),
         barCodeSizeX: Number(0.8),
         barCodeSizeY: Number(20),
@@ -28,13 +44,23 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect, 
         QrPosY: Number(0),
         QrSizeX: Number(40),
         QrSizeY: Number(0),
-        paperSizeX:Number(0),
+        paperSizeX: Number(0),
         paperSizeY: Number(0),
 
     });
 
-    console.log("sizeLabel",sizeLabel);
+    const [ip, setIP] = useState('');
+    const [port, setPort] = useState('');
+    const handleFromDate = (date) => {
+        setFromDate(date);
+    }
+    const handleToDate = (date) => {
+        setToDate(date);
+    }
 
+    const handleChange = (value) => {
+        setVendor(value)
+      }
 
     const handleInputChange = (e, field) => {
         setSizeLabel(prevState => ({
@@ -42,6 +68,10 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect, 
             [field]: e.target.value
         }));
     };
+
+    const vendorList = [];
+
+    vendorList.push({"label": "MAT", value: "AMT"});
 
     const printLabel = async () => {
 
@@ -350,7 +380,7 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect, 
         }, 1000);
     };
 
-    const btnPrintLabel =() =>{
+    const btnPrintLabel = () => {
 
     }
 
@@ -359,14 +389,9 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect, 
         setIsModalVisible(false);
     };
 
-    const onHandleOk = () => {
+    const btnOpenModal = () => {
         setIsModalVisible(true);
     }
-
-    const previewLabel = () => {
-        showModal();
-    };
-
 
     return (
         <div className="mt-1">
@@ -376,24 +401,48 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect, 
                     <div className="flex gap-3">
                         <Space direction="vertical" size={6}>
                             <Typography.Text>From date</Typography.Text>
-                            <DatePicker className="w-full" />
+                            <DatePicker
+                                value={fromDate}
+                                className="w-full"
+                                onChange={handleFromDate} />
                         </Space>
                         <Space direction="vertical" size={6}>
                             <Typography.Text>To date</Typography.Text>
-                            <DatePicker className="w-full" />
+                            <DatePicker
+                                value={toDate}
+                                className="w-full"
+                                onChange={handleToDate} />
                         </Space>
                         <Space direction="vertical" size={6}>
                             <Typography.Text>Vendor</Typography.Text>
-                            <Input className="w-full bg-blue-50" />
+                            <Select
+                                id="typeSelect"
+                                defaultValue="All"
+                                size="large"
+                                style={{
+                                    width: 190,
+                                }}
+                                onChange={handleChange}
+                                options={vendorList?.map((item) => ({
+                                    label: item?.label,
+                                    value: item?.value,
+                                }))}
+                            />
 
                         </Space>
                         <Space direction="vertical" size={6}>
                             <Typography.Text>Mat ID</Typography.Text>
-                            <Input className="w-full bg-blue-50" />
+                            <Input
+                                value={matID}
+                                className="w-full bg-blue-50"
+                                onChange={(e) => setMatID(e.target.value)} />
                         </Space>
                         <Space direction="vertical" size={6}>
                             <Typography.Text className="text-red-500">Lot No</Typography.Text>
-                            <Input className="w-full bg-blue-50" />
+                            <Input
+                                value={lotNo}
+                                className="w-full bg-blue-50"
+                                onChange={(e) => setLotNo(e.target.value)} />
 
                         </Space>
 
@@ -404,7 +453,7 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect, 
                                 icon={<SaveFilled />}
                                 size="middle"
                                 className="uppercase"
-                                onClick={btnPrintLabel}
+                                onClick={btnOpenModal}
                             >
                                 PRINT LABEL
                             </Button>
@@ -496,35 +545,35 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect, 
                         <Space direction="horizontal" size={6}>
                             <Typography.Text>1D BARCODE POSITION</Typography.Text>
                             <Input className="w-20 bg-blue-50" value={sizeLabel.barCodePosX} type="number" onChange={(e) => handleInputChange(e, 'barCodePosX')} />
-                            <Input className="w-20 bg-blue-50" value={sizeLabel.barCodePosY} type="number"  onChange={(e) => handleInputChange(e, 'barCodePosY')} />
+                            <Input className="w-20 bg-blue-50" value={sizeLabel.barCodePosY} type="number" onChange={(e) => handleInputChange(e, 'barCodePosY')} />
 
                         </Space>
 
                         <Space direction="horizontal" size={6}>
                             <Typography.Text>1D BARCODE SIZE</Typography.Text>
-                            <Input className="w-20 bg-blue-50" value={sizeLabel.barCodeSizeX} type="number"  onChange={(e) => handleInputChange(e, 'barCodeSizeX')} />
-                            <Input className="w-20 bg-blue-50" value={sizeLabel.barCodeSizeY} type="number"  onChange={(e) => handleInputChange(e, 'barCodeSizeY')} />
+                            <Input className="w-20 bg-blue-50" value={sizeLabel.barCodeSizeX} type="number" onChange={(e) => handleInputChange(e, 'barCodeSizeX')} />
+                            <Input className="w-20 bg-blue-50" value={sizeLabel.barCodeSizeY} type="number" onChange={(e) => handleInputChange(e, 'barCodeSizeY')} />
                         </Space>
 
 
                         <Space direction="horizontal" size={6}>
                             <Typography.Text>2D BARCODE POSITION</Typography.Text>
-                            <Input className="w-20 bg-blue-50" value={sizeLabel.QrPosX} type="number"  onChange={(e) => handleInputChange(e, 'QrPosX')} />
-                            <Input className="w-20 bg-blue-50" value={sizeLabel.QrPosY} type="number"  onChange={(e) => handleInputChange(e, 'QrPosY')} />
+                            <Input className="w-20 bg-blue-50" value={sizeLabel.QrPosX} type="number" onChange={(e) => handleInputChange(e, 'QrPosX')} />
+                            <Input className="w-20 bg-blue-50" value={sizeLabel.QrPosY} type="number" onChange={(e) => handleInputChange(e, 'QrPosY')} />
 
                         </Space>
 
                         <Space direction="horizontal" size={6}>
                             <Typography.Text>2D BARCODE SIZE</Typography.Text>
-                            <Input className="w-20 bg-blue-50" value={sizeLabel.QrSizeX} type="number"  onChange={(e) => handleInputChange(e, 'QrSizeX')} />
-                            <Input className="w-20 bg-blue-50" value={sizeLabel.QrSizeY} type="number"  onChange={(e) => handleInputChange(e, 'QrSizeY')} />
+                            <Input className="w-20 bg-blue-50" value={sizeLabel.QrSizeX} type="number" onChange={(e) => handleInputChange(e, 'QrSizeX')} />
+                            <Input className="w-20 bg-blue-50" value={sizeLabel.QrSizeY} type="number" onChange={(e) => handleInputChange(e, 'QrSizeY')} />
                         </Space>
 
                         <Space direction="horizontal" size={6}>
                             <Typography.Text>PAPER SIZE</Typography.Text>
 
-                            <Input className="w-20 bg-blue-50" value={sizeLabel.paperSizeX} type="number"  onChange={(e) => handleInputChange(e, 'paperSizeX')} />
-                            <Input className="w-20 bg-blue-50" value={sizeLabel.paperSizeY} type="number"  onChange={(e) => handleInputChange(e, 'paperSizeY')} />
+                            <Input className="w-20 bg-blue-50" value={sizeLabel.paperSizeX} type="number" onChange={(e) => handleInputChange(e, 'paperSizeX')} />
+                            <Input className="w-20 bg-blue-50" value={sizeLabel.paperSizeY} type="number" onChange={(e) => handleInputChange(e, 'paperSizeY')} />
 
                         </Space>
                         <Button
@@ -532,7 +581,7 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect, 
                             icon={<SaveFilled />}
                             size="middle"
                             className="uppercase"
-                            onClick={onHandleOk}
+                            onClick={btnOpenModal}
                         >
                             Preview
                         </Button>
@@ -544,12 +593,19 @@ export default function BarcodePrintAction({ dataSearch, btnSearch, dataSelect, 
                 <Modal
                     title="Print Label Confirmation"
                     visible={isModalVisible}
-                    onOk={onOk}
+                    onOk={btnPrintLabel}
                     onCancel={handleCancel}
                     className="w-2"
                 >
-                    <div ref={printRef}  >
-                        <LabelItem label={dataInfo} dataSize={sizeLabel}/>
+                    <Space direction="horizontal" size={6}>
+                            <Typography.Text>PRINTER</Typography.Text>
+
+                            <Input className="w-20 bg-blue-50" placeholder="PORT" value={port} onChange={(e) => setPort(e.target.value)} />
+                            <Input className="w-50 bg-blue-50" placeholder="IP" value={ip}  onChange={(e) => setIP(e.target.value)} />
+
+                        </Space>
+                    <div>
+                        <LabelItem label={dataInfo} dataSize={sizeLabel} />
                     </div>
 
 
