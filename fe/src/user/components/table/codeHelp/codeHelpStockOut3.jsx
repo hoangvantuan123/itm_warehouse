@@ -2,42 +2,28 @@ import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { DataEditor, GridCellKind } from '@glideapps/glide-data-grid'
 import { Button } from 'antd'
 import '@glideapps/glide-data-grid/dist/index.css'
-import { useNavigate } from 'react-router-dom'
 import { CompactSelection } from '@glideapps/glide-data-grid'
 
 const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
 
-function TableStockOutRequestDetails({
-  data,
-  onCellClicked,
-  gridData,
-  setGridData
-}) {
-
+function TableCodeHelpStockOut3({ data, onCellClicked }) {
+  const [gridData, setGridData] = useState([])
   const [showSearch, setShowSearch] = useState(false)
   const ref = (useRef < data) | (null > null)
   const onSearchClose = useCallback(() => setShowSearch(false), [])
-  const [vals, setVals] = useState([false, false, false]);
-
   const [selection, setSelection] = useState({
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
   })
   const columns = useMemo(
     () => [
-      { title: 'prodOrderNo' },
-      { title: 'prodPlanNo' },
-      { title: 'invoiceNo' },
-      { title: 'materialName' },
-      { title: 'materialCode' },
-      { title: 'materialSpec' },
-      { title: 'unit' },
-      { title: 'workCenter' },
-      { title: 'requestedQty' },
-      { title: 'totalStock' },
-      { title: 'notes' },
+      { title: 'CustSeq' },
+      { title: 'FullName' },
+      { title: 'CustNo' },
+      { title: 'BizNo' },
+      { title: 'UMCustClassName' }
     ],
     [],
   )
@@ -63,43 +49,29 @@ function TableStockOutRequestDetails({
     ([col, row]) => {
       const person = gridData[row] || {}
       const {
-        prodOrderNo = '',      
-        prodPlanNo = '',       // Số kế hoạch sản xuất
-        invoiceNo = '',        // Số hoá đơn
-        materialName = '',     // Tên vật liệu
-        materialCode = '',     // Mã vật liệu
-        materialSpec = '',     // Quy cách vật liệu
-        unit = '',             // Đơn vị
-        workCenter = '',       // Work center
-        requestedQty = '',     // Số lượng đề nghị
-        totalStock = '',       // Tổng kho phân xưởng
-        notes = ''             // Ghi chú
-      } = person;
+        CustSeq = '',
+        FullName = '',
+        CustNo = '',
+        BizNo = '',
+        UMCustClassName = '',
+      } = person
 
       const safeString = (value) => (value != null ? String(value) : '')
-      const safeBoolean = (value) => (value ? '✔' : '✘')
 
       const columnMap = {
-        2: { kind: GridCellKind.Text, data: safeString(prodOrderNo) },
-        2: { kind: GridCellKind.Text, data: safeString(prodPlanNo) },
-        2: { kind: GridCellKind.Text, data: safeString(invoiceNo) },
-        2: { kind: GridCellKind.Text, data: safeString(materialName) },
-        2: { kind: GridCellKind.Text, data: safeString(materialCode) },
-        2: { kind: GridCellKind.Text, data: safeString(materialSpec) },
-        2: { kind: GridCellKind.Text, data: safeString(unit) },
-        2: { kind: GridCellKind.Text, data: safeString(workCenter) },
-        2: { kind: GridCellKind.Text, data: safeString(requestedQty) },
-        2: { kind: GridCellKind.Text, data: safeString(totalStock) },
-        2: { kind: GridCellKind.Text, data: safeString(notes) },
-      
-      };
+        0: { kind: GridCellKind.Text, data: safeString(CustSeq) },
+        1: { kind: GridCellKind.Text, data: safeString(FullName) },
+        2: { kind: GridCellKind.Text, data: safeString(CustNo) },
+        3: { kind: GridCellKind.Text, data: safeString(BizNo) },
+        4: { kind: GridCellKind.Text, data: safeString(UMCustClassName) },
+      }
 
       if (columnMap.hasOwnProperty(col)) {
         const { kind, data } = columnMap[col]
         return { kind, data, displayData: data }
       }
 
-      return { kind: '', data: '', displayData: '' }
+      return { kind: GridCellKind.Text, data: '', displayData: '' }
     },
     [gridData],
   )
@@ -116,8 +88,9 @@ function TableStockOutRequestDetails({
   }, [data])
 
 
+
   return (
-    <div className="w-full gap-1 h-full flex items-center justify-center pb-8  overflow-hidden">
+    <div className="w-full gap-1 h-full flex items-center justify-center pb-8">
       <div className="w-full h-full flex flex-col border bg-white rounded-lg overflow-hidden ">
         <DataEditor
           columns={cols}
@@ -133,8 +106,8 @@ function TableStockOutRequestDetails({
           onColumnResize={onColumnResize}
           smoothScrollY={true}
           smoothScrollX={true}
-  rowSelect="single"
           onCellClicked={onCellClicked}
+          rowSelect="multi"
           gridSelection={selection}
           onGridSelectionChange={setSelection}
         />
@@ -143,4 +116,4 @@ function TableStockOutRequestDetails({
   )
 }
 
-export default TableStockOutRequestDetails
+export default TableCodeHelpStockOut3

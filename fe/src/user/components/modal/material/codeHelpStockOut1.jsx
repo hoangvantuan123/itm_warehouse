@@ -4,7 +4,8 @@ import { SearchOutlined, FilterOutlined } from '@ant-design/icons'
 import { ArrowIcon } from '../../icons'
 import TableCodeHelpStockOut1 from '../../table/codeHelp/codeHelpStockOut1'
 const { Search } = Input
-
+import CryptoJS from 'crypto-js'
+import { encodeBase64Url } from '../../../../utils/decode-JWT'
 
 export default function CodeHelpStockOut1({
   setConditionSeq,
@@ -13,10 +14,62 @@ export default function CodeHelpStockOut1({
   setModalVisible,
   setKeyword,
   keyword,
-  loadingCodeHelp,
+  fetchCodehelpData1,
   handleSearch,
+  setSubConditionSql,
+  setDeptName,
+  setDeptSeq,
+  setData1
 }) {
-  
+
+  const [isMinusClicked, setIsMinusClicked] = useState(false)
+  const [lastClickedCell, setLastClickedCell] = useState(null)
+  const [clickedRowData, setClickedRowData] = useState(null)
+  const [keyPath, setKeyPath] = useState(null)
+  const handleConditionSeq = (e) => {
+    setConditionSeq(e)
+  }
+  const handleSubConditionSql = (e) => {
+    setSubConditionSql(e)
+  }
+  const onCellClicked = (cell, event) => {
+    let rowIndex
+
+    if (cell[0] !== -1) {
+      return
+    }
+
+    if (cell[0] === -1) {
+      rowIndex = cell[1]
+      setIsMinusClicked(true)
+    } else {
+      rowIndex = cell[0]
+      setIsMinusClicked(false)
+    }
+
+    if (
+      lastClickedCell &&
+      lastClickedCell[0] === cell[0] &&
+      lastClickedCell[1] === cell[1]
+    ) {
+      setDeptName('')
+      setDeptSeq('')
+      setLastClickedCell(null)
+      setClickedRowData(null)
+      return
+    }
+
+    if (rowIndex >= 0 && rowIndex < data.length) {
+      const rowData = data[rowIndex]
+
+      setDeptName(rowData?.BeDeptName)
+      setDeptSeq(rowData?.BeDeptSeq)
+      setClickedRowData(rowData)
+      setLastClickedCell(cell)
+    }
+  }
+
+
   return (
     <div>
       <Modal
@@ -33,87 +86,90 @@ export default function CodeHelpStockOut1({
           style={{ display: 'flex', flexDirection: 'column', height: '75vh' }}
           className='gap-4'
         >
-         
-                <details
-              className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
-              open
-            >
-              <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
-                <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600">
-                  <FilterOutlined />
-                  Điều kiện truy vấn
-                </h2>
-                <span className="relative size-5 shrink-0">
-                  <ArrowIcon />
-                </span>
-              </summary>
-              <div className="flex p-2 gap-4">
-              <div className="flex flex-col">
-              <Select
-                id="typeSelect"
-                defaultValue="Bộ phận"
-                style={{ width: 120 }}
-                size="middle"
-                options={[
-                  { value: 1, label: 'Bộ phận' },
-                  { value: 2, label: 'Mã bộ phận' },
-                ]}
-              />
-            </div>
-            <div className="flex flex-col">
-              <Select
-                id="typeSelect"
-                defaultValue="All"
-                style={{ width: 300 }}
-                size="middle"
-                options={[
-                  { value: '', label: 'All' },
-                  {
-                    value: 'TypeSeq = 3031001',
-                    label: 'Người đương chức, đương nhiệm',
-                  },
-                  {
-                    value: 'TypeSeq = 3031002',
-                    label: 'Người thôi việc, nghỉ làm',
-                  },
-                  { value: 'IsInOut = 2', label: 'Nhân viên bên ngoài' },
-                ]}
-              />
-            </div>
-            <div className="flex flex-col w-full">
-              <Search
-                allowClear
-                size="middle"
-                placeholder="Tìm kiếm"
-                value={keyword}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleSearch()
-                  }
-                }}
-                onChange={(e) => setKeyword(e.target.value)}
-                className=" w-full"
-              />
-            </div>
-            <div className="flex flex-col">
-              <Button
-                type="primary"
-                icon={<SearchOutlined />}
-                size="middle"
-              >
-                Truy vấn
-              </Button>
-            </div>
-              </div>
-            </details>
-      
 
-            <TableCodeHelpStockOut1/>
+          <details
+            className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
+            open
+          >
+            <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
+              <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600">
+                <FilterOutlined />
+                Điều kiện truy vấn
+              </h2>
+              <span className="relative size-5 shrink-0">
+                <ArrowIcon />
+              </span>
+            </summary>
+            <div className="flex p-2 gap-4">
+              <div className="flex flex-col">
+                <Select
+                  id="typeSelect"
+                  defaultValue="Bộ phận"
+                  style={{ width: 120 }}
+                  size="middle"
+                  onChange={handleConditionSeq}
+                  options={[
+                    { value: 1, label: 'Bộ phận' },
+                    { value: 0, label: 'Mã bộ phận' },
+                  ]}
+                />
+              </div>
+              <div className="flex flex-col">
+                <Select
+                  id="typeSelect"
+                  defaultValue="Sử dụng"
+                  style={{ width: 300 }}
+                  size="middle"
+                  options={[
+                    {
+                      value: 'IsUse = 1',
+                      label: 'Sử dụng',
+                    },
+                    {
+                      value: 'IsUse = 0',
+                      label: 'Chưa sử dụng',
+                    },
+                  ]}
+                  onChange={handleSubConditionSql}
+                />
+              </div>
+              <div className="flex flex-col w-full">
+                <Search
+                  allowClear
+                  size="middle"
+                  placeholder="Tìm kiếm"
+                  value={keyword}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleSearch()
+                    }
+                  }}
+                  onChange={(e) => setKeyword(e.target.value)}
+                  className=" w-full"
+                />
+              </div>
+              <div className="flex flex-col">
+                <Button
+                  type="primary"
+                  icon={<SearchOutlined />}
+                  size="middle"
+                  onClick={fetchCodehelpData1}
+                >
+                  Truy vấn
+                </Button>
+              </div>
+            </div>
+          </details>
+
+
+          <TableCodeHelpStockOut1 data={data} onCellClicked={onCellClicked} />
         </div>
-        <div className="flex justify-end ">
+        <div className="flex justify-end gap-4 ">
+
           <Button type="primary" onClick={() => setModalVisible(false)}>
-            Cancel
+            Save
           </Button>
+
         </div>
       </Modal>
     </div>

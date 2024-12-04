@@ -22,14 +22,18 @@ export default function StockOutRequestQuery({
     setFormData,
     setToDate,
     toDate,
-    dataUnit, 
-    setBizUnit, 
+    dataUnit,
+    setBizUnit,
     handleSearch1,
     handleSearch2,
     handleSearch3,
-    setModalVisible1,
-    loadingCodeHelp,
-    modalVisible1,
+    minorName,
+    setFactUnit,
+    setProgStatus,
+    minorName2,
+    setUseType, deptName, empName, custName,
+    prodPlanNo, setProdPlanNo, setWorkOrderNo, workOrderNo,
+    prodReqNo, setProdReqNo, outReqNo, setOutReqNo
 }) {
     const handleFormDate = (date) => {
         setFormData(date)
@@ -38,11 +42,21 @@ export default function StockOutRequestQuery({
         setToDate(date)
     }
     const handleChange = (value) => {
-        setBizUnit(value)
+        setFactUnit(value)
+    }
+    const handleChangeMinorName = (value) => {
+        setProgStatus(value)
+    }
+    const handleChangeMinorName2 = (value) => {
+        setUseType(value)
     }
     return (
         <div className="flex items-center gap-2">
-            <Form layout="vertical">
+            <Form layout="vertical" onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                }
+            }}>
                 <Row className="gap-4 flex items-center ">
                     <Col>
                         <Form.Item
@@ -53,6 +67,7 @@ export default function StockOutRequestQuery({
                                 className="w-full text-sm p-2"
                                 value={formData}
                                 onChange={handleFormDate}
+                                format="YYYY-MM-DD"
                             />
                         </Form.Item>
                     </Col>
@@ -85,7 +100,7 @@ export default function StockOutRequestQuery({
                                 onChange={handleChange}
                                 options={dataUnit?.map((item) => ({
                                     label: item?.AccUnitName,
-                                    value: item?.BizUnit,
+                                    value: item?.FactUnit,
                                 }))}
                             />
                         </Form.Item>
@@ -96,15 +111,15 @@ export default function StockOutRequestQuery({
                             className="mb-0"
                         >
                             <Input
-                               
                                 size="small"
                                 className=" text-sm p-2 bg-blue-50"
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
                                         handleSearch1()
                                     }
-                                  }}
-                                  onDoubleClick={handleSearch1}
+                                }}
+                                value={deptName}
+                                onDoubleClick={handleSearch1}
                             />
                         </Form.Item>
                     </Col>
@@ -114,15 +129,16 @@ export default function StockOutRequestQuery({
                             className="mb-0"
                         >
                             <Input
-                               
+
                                 size="small"
-                                 className=" text-sm p-2 bg-blue-50"
-                                 onKeyDown={(e) => {
+                                className=" text-sm p-2 bg-blue-50"
+                                onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
                                         handleSearch2()
                                     }
-                                  }}
-                                  onDoubleClick={handleSearch2}
+                                }}
+                                value={empName}
+                                onDoubleClick={handleSearch2}
                             />
                         </Form.Item>
                     </Col>
@@ -132,15 +148,17 @@ export default function StockOutRequestQuery({
                             className="mb-0"
                         >
                             <Input
-                               
+
                                 size="small"
                                 className=" text-sm p-2 bg-blue-50"
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
                                         handleSearch3()
                                     }
-                                  }}
-                                  onDoubleClick={handleSearch3}
+                                }}
+
+                                value={custName}
+                                onDoubleClick={handleSearch3}
                             />
                         </Form.Item>
                     </Col>
@@ -150,31 +168,22 @@ export default function StockOutRequestQuery({
                             className="mb-0"
                         >
                             <Input
-                               
+                                value={outReqNo}
+                                onChange={(e) => setOutReqNo(e.target.value)}
                                 size="small"
                                 className=" text-sm p-2"
                             />
                         </Form.Item>
                     </Col>
-                    <Col>
-                        <Form.Item
-                            label={<span className="uppercase text-[10px]">Số yêu cầu</span>}
-                            className="mb-0"
-                        >
-                            <Input
-                               
-                                size="small"
-                                className=" text-sm p-2"
-                            />
-                        </Form.Item>
-                    </Col>
+
                     <Col>
                         <Form.Item
                             label={<span className="uppercase text-[10px]">Số kế hoạch</span>}
                             className="mb-0"
                         >
                             <Input
-                               
+                                value={prodPlanNo}
+                                onChange={(e) => setProdPlanNo(e.target.value)}
                                 size="small"
                                 className=" text-sm p-2"
                             />
@@ -186,7 +195,21 @@ export default function StockOutRequestQuery({
                             className="mb-0"
                         >
                             <Input
-                               
+                                value={workOrderNo}
+                                onChange={(e) => setWorkOrderNo(e.target.value)}
+                                size="small"
+                                className=" text-sm p-2"
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col>
+                        <Form.Item
+                            label={<span className="uppercase text-[10px]">Số yêu cầu sản xuất</span>}
+                            className="mb-0"
+                        >
+                            <Input
+                                value={prodReqNo}
+                                onChange={(e) => setProdReqNo(e.target.value)}
                                 size="small"
                                 className=" text-sm p-2"
                             />
@@ -202,8 +225,34 @@ export default function StockOutRequestQuery({
                                 defaultValue="All"
                                 size="large"
                                 style={{
-                                    width: 190,
+                                    width: 240,
                                 }}
+                                onChange={handleChangeMinorName2}
+                                options={minorName2?.map((item) => ({
+                                    label: item?.MinorName,
+                                    value: item?.Value,
+                                }))}
+
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col>
+                        <Form.Item
+                            label={<span className="uppercase text-[10px]">Trạng thái</span>}
+                            className="mb-0"
+                        >
+                            <Select
+                                id="typeSelect"
+                                defaultValue="All"
+                                size="large"
+                                style={{
+                                    width: 240,
+                                }}
+                                onChange={handleChangeMinorName}
+                                options={minorName?.map((item) => ({
+                                    label: item?.MinorName,
+                                    value: item?.Value,
+                                }))}
 
                             />
                         </Form.Item>

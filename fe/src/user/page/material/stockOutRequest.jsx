@@ -7,7 +7,7 @@ import { FilterOutlined } from '@ant-design/icons'
 import { ArrowIcon } from '../../components/icons'
 import dayjs from 'dayjs'
 import TableDeliveryList from '../../components/table/material/tableDeliveryList'
-import { GetCodeHelp } from '../../../features/codeHelp/getCodeHelp'
+import { GetCodeHelpCombo } from '../../../features/codeHelp/getCodeHelpCombo'
 import { GetDeliveryList } from '../../../features/material/getDeliveryList'
 import { debounce } from 'lodash'
 import { useNavigate } from 'react-router-dom'
@@ -19,107 +19,27 @@ import TableStockOutRequest from '../../components/table/material/tableStockOutR
 import CodeHelpStockOut1 from '../../components/modal/material/codeHelpStockOut1'
 import CodeHelpStockOut2 from '../../components/modal/material/codeHelpStockOut2'
 import CodeHelpStockOut3 from '../../components/modal/material/codeHelpStockOut3'
-
-const gridDataDA = [
-  {
-    IDX_NO: '123',
-    IsStop: true,
-    IsConfirm: false,
-    FactUnitName: 'Unit A',
-    ReqDate: '2024-12-01',
-    OutReqNo: 'REQ-001',
-    DeptName: 'Sales',
-    EmpName: 'John Doe',
-    CustName: 'Customer 1',
-    UseTypeName: 'Use Type 1',
-    WorkOrderNo: 'WO-001',
-    AssyItemName: 'Item A',
-    AssyItemNo: '12345',
-    AssyItemSpec: 'Spec 1',
-    AssyUnitName: 'Unit 1',
-    ProcName: 'Proc A',
-    AssyQty: '100',
-    AssyProgQty: '50',
-    ItemName: 'Item B',
-    ItemNo: '67890',
-    ItemSpec: 'Spec 2',
-    UnitName: 'Box',
-    Qty: '200',
-    ProgQty: '150',
-    IsReturn: false,
-    Remark: 'No issues',
-    ItemSeq: '1',
-    ItemUnitSeq: '1',
-    AssyItemSeq: '1',
-    PJTSeq: 'PJT-001',
-    WBSSeq: 'WBS-001',
-    FactUnit: 'Fact A',
-    OutReqSeq: 'REQSEQ-001',
-    UseType: 'Type A',
-    OSPPOSeq: 'OS-001',
-    ProgStatus: 'In Progress',
-    ProgStatusName: 'In Progress Status',
-    ProdPlanNo: 'PLAN-001',
-    ProdPlanSeq: 'SEQ-001',
-    ProdReqNo: 'REQ-001',
-  },
-  {
-    IDX_NO: '124',
-    IsStop: false,
-    IsConfirm: true,
-    FactUnitName: 'Unit B',
-    ReqDate: '2024-12-02',
-    OutReqNo: 'REQ-002',
-    DeptName: 'Marketing',
-    EmpName: 'Jane Doe',
-    CustName: 'Customer 2',
-    UseTypeName: 'Use Type 2',
-    WorkOrderNo: 'WO-002',
-    AssyItemName: 'Item B',
-    AssyItemNo: '67891',
-    AssyItemSpec: 'Spec 3',
-    AssyUnitName: 'Unit 2',
-    ProcName: 'Proc B',
-    AssyQty: '200',
-    AssyProgQty: '100',
-    ItemName: 'Item C',
-    ItemNo: '98765',
-    ItemSpec: 'Spec 4',
-    UnitName: 'Pack',
-    Qty: '300',
-    ProgQty: '250',
-    IsReturn: true,
-    Remark: 'Returned item',
-    ItemSeq: '2',
-    ItemUnitSeq: '2',
-    AssyItemSeq: '2',
-    PJTSeq: 'PJT-002',
-    WBSSeq: 'WBS-002',
-    FactUnit: 'Fact B',
-    OutReqSeq: 'REQSEQ-002',
-    UseType: 'Type B',
-    OSPPOSeq: 'OS-002',
-    ProgStatus: 'Completed',
-    ProgStatusName: 'Completed Status',
-    ProdPlanNo: 'PLAN-002',
-    ProdPlanSeq: 'SEQ-002',
-    ProdReqNo: 'REQ-002',
-  },
-]
+import { SPDMMOutReqListQueryWeb } from '../../../features/material/postStockOutList'
+import { GetCodeHelp } from '../../../features/codeHelp/getCodeHelp'
 
 
 export default function StockOutRequest({ permissions, isMobile }) {
   const { t } = useTranslation()
   const gridRef = useRef(null)
   const navigate = useNavigate()
-
+  /*OutReqSeq
+    */
   const [loading, setLoading] = useState(false)
-  const [data, setData] = useState(gridDataDA)
+  const [data, setData] = useState([])
   const [dataUnit, setDataUnit] = useState([])
+  const [minorName, setMinorName] = useState([])
+  const [minorName2, setMinorName2] = useState([])
   const [formData, setFormData] = useState(dayjs().startOf('month'))
   const [toDate, setToDate] = useState(dayjs())
-  const [deliveryNo, setDeliveryNo] = useState('')
   const [bizUnit, setBizUnit] = useState(4)
+  const [factUnit, setFactUnit] = useState('')
+  const [progStatus, setProgStatus] = useState('')
+  const [useType, setUseType] = useState('')
   const [checkedRowKey, setCheckedRowKey] = useState(null)
   const [keyPath, setKeyPath] = useState(null)
   const [checkedPath, setCheckedPath] = useState(false)
@@ -127,66 +47,197 @@ export default function StockOutRequest({ permissions, isMobile }) {
   const [isMinusClicked, setIsMinusClicked] = useState(false)
   const [lastClickedCell, setLastClickedCell] = useState(null)
   const [clickedRowData, setClickedRowData] = useState(null)
-  const [clickedRowDataList, setClickedRowDataList] = useState([])
   const [gridData, setGridData] = useState([])
   const [isOpenDetails, setIsOpenDetails] = useState(false);
   /* CodeHelp */
   const [modalVisible1, setModalVisible1] = useState(false)
+  const [data1, setData1] = useState([])
+  const [data2, setData2] = useState([])
+  const [data3, setData3] = useState([])
   const [modalVisible2, setModalVisible2] = useState(false)
   const [modalVisible3, setModalVisible3] = useState(false)
   const [loadingCodeHelp, setLoadingCodeHelp] = useState(false)
-  const [errorCodeHelp, setErrorCodeHelp] = useState('')
-
+  const [conditionSeq, setConditionSeq] = useState(1)
+  const [subConditionSql, setSubConditionSql] = useState(1)
+  const [keyword, setKeyword] = useState('')
+  const [deptName, setDeptName] = useState('')
+  const [deptSeq, setDeptSeq] = useState('')
+  const [empName, setEmpName] = useState('')
+  const [empSeq, setEmpSeq] = useState('')
+  const [custSeq, setCustSeq] = useState('')
+  const [custName, setCustName] = useState('')
+  const [prodPlanNo, setProdPlanNo] = useState('')
+  const [workOrderNo, setWorkOrderNo] = useState('')
+  const [prodReqNo, setProdReqNo] = useState('')
+  const [outReqNo, setOutReqNo] = useState('')
   useEffect(() => {
     const savedState = localStorage.getItem("detailsStateStockOut");
     setIsOpenDetails(savedState === "open");
   }, []);
 
+
+
+
   const handleToggle = (event) => {
-    const isOpen = event.target.open; 
+    const isOpen = event.target.open;
     setIsOpenDetails(isOpen);
     localStorage.setItem("detailsStateStockOut", isOpen ? "open" : "closed");
   };
 
 
 
-  const fetchDeliveryData = useCallback(async () => {
+  const fetchSPDMMOutReqListQueryWeb = useCallback(async () => {
     setLoading(true)
     try {
-
+      const formA = {
+        IsChangedMst: '1',
+        FactUnit: factUnit,
+        ReqDate: formatDate(formData),
+        ReqDateTo: formatDate(toDate),
+        OutReqNo: outReqNo,
+        UseType: useType,
+        DeptName: '',
+        DeptSeq: deptSeq,
+        EmpSeq: empSeq,
+        EmpName: '',
+        CustSeq: custSeq,
+        CustName: '',
+        ProgStatus: progStatus,
+        ProdPlanNo: prodPlanNo,
+        WorkOrderNo: workOrderNo,
+        ProdReqNo: prodReqNo,
+      }
+      const response = await SPDMMOutReqListQueryWeb(formA)
+      setData(response?.data || [])
     } catch (error) {
       setData([])
     } finally {
       setLoading(false)
     }
-  }, [formData, toDate, deliveryNo, bizUnit, formatDate])
+  }, [formData, toDate, factUnit, progStatus, useType, deptSeq, empSeq, custSeq, prodPlanNo, workOrderNo, prodReqNo, outReqNo])
 
-  const fetchCodeHelpData = useCallback(async () => {
+
+  const fetchCodehelpData1 = useCallback(async () => {
     setLoading(true)
     try {
-      const codeHelpResponse = await GetCodeHelp(
-        '',
+      const response = await GetCodeHelp(
+        'Q',
         6,
-        10003,
+        10010,
         1,
-        '%',
+        keyword,
         '',
         '',
         '',
         '',
-      )
-      setDataUnit(codeHelpResponse?.data || [])
+        conditionSeq,
+        1,
+        100000,
+        subConditionSql,
+        '1',
+        0,
+        0,
+        0,
+        0,
+        0,
+        18770)
+      setData1(response?.data || [])
     } catch (error) {
-      setDataUnit([])
+      setData1([])
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [conditionSeq, subConditionSql, keyword])
 
 
-  const debouncedFetchDeliveryData = useMemo(
-    () => debounce(fetchDeliveryData, 100),
-    [fetchDeliveryData],
+  const fetchCodehelpData2 = useCallback(async () => {
+    setLoading(true)
+    try {
+      const response = await GetCodeHelp('Q',
+        6,
+        10009,
+        1,
+        keyword,
+        '',
+        '',
+        '',
+        '',
+        conditionSeq,
+        1,
+        100000,
+        subConditionSql,
+        '1',
+        0,
+        0,
+        0,
+        0,
+        0,
+        18770)
+      setData2(response?.data || [])
+    } catch (error) {
+      setData2([])
+    } finally {
+      setLoading(false)
+    }
+  }, [conditionSeq, subConditionSql, keyword])
+  const fetchCodehelpData3 = useCallback(async () => {
+    setLoading(true)
+    try {
+
+
+      const response = await GetCodeHelp('Q',
+        6,
+        17071,
+        1,
+        keyword,
+        '',
+        '',
+        '',
+        '',
+        conditionSeq,
+        1,
+        100000,
+        'SMCustStatus=2004001',
+        '1',
+        0,
+        0,
+        0,
+        0,
+        0,
+        18770)
+      setData3(response?.data || [])
+    } catch (error) {
+      setData3([])
+    } finally {
+      setLoading(false)
+    }
+  }, [conditionSeq, subConditionSql, keyword])
+
+  const fetchCodeHelpData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [codeHelpResponse1, codeHelpResponse2, codeHelpResponse3] = await Promise.all([
+        GetCodeHelpCombo('', 6, 60001, 1, '%', '', '', '', ''),
+        GetCodeHelpCombo('', 6, 19998, 1, '%', '6036', '', '', ''),
+        GetCodeHelpCombo('', 6, 19998, 1, '%', '6044', '', '', '')
+      ]);
+
+      setDataUnit(codeHelpResponse1?.data || []);
+      setMinorName(codeHelpResponse2?.data || []);
+      setMinorName2(codeHelpResponse3?.data || []);
+    } catch (error) {
+      setDataUnit([]);
+      setMinorName([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+
+
+  const debouncedFetchSPDMMOutReqListQueryWeb = useMemo(
+    () => debounce(fetchSPDMMOutReqListQueryWeb, 100),
+    [fetchSPDMMOutReqListQueryWeb],
   )
   const debouncedFetchCodeHelpData = useMemo(
     () => debounce(fetchCodeHelpData, 100),
@@ -194,9 +245,10 @@ export default function StockOutRequest({ permissions, isMobile }) {
   )
 
 
+
   const nextPage = useCallback(() => {
     if (keyPath) {
-      navigate(`/u/warehouse/material/stock-out-request-details/${keyPath}`)
+      navigate(`/u/warehouse/material/stock-out-request/${keyPath}`)
     }
   }, [keyPath, navigate])
 
@@ -232,7 +284,34 @@ export default function StockOutRequest({ permissions, isMobile }) {
 
       const filteredData = {
         IDX_NO: rowData.IDX_NO,
-       
+        EmpName: rowData.EmpName,
+        FactUnit: rowData.FactUnit,
+        FactUnitName: rowData.FactUnitName,
+        IsConfirm: rowData.IsConfirm,
+        IsReturn: rowData.IsReturn,
+        IsStop: rowData.IsStop,
+        ItemName: rowData.ItemName,
+        ItemNo: rowData.ItemNo,
+        ItemSeq: rowData.ItemSeq,
+        ItemSpec: rowData.ItemSpec,
+        ItemUnitSeq: rowData.ItemUnitSeq,
+        OSPPOSeq: rowData.OSPPOSeq,
+        OutReqNo: rowData.OutReqNo,
+        OutReqSeq: rowData.OutReqSeq,
+        PJTSeq: rowData.PJTSeq,
+        ProdPlanSeq: rowData.ProdPlanSeq,
+        ProdReqNo: rowData.ProdReqNo,
+        ProgQty: rowData.ProgQty,
+        ProgStatus: rowData.ProgStatus,
+        ProgStatusName: rowData.ProgStatusName,
+        Qty: rowData.Qty,
+        Remark: rowData.Remark,
+        ReqDate: rowData.ReqDate,
+        UnitName: rowData.UnitName,
+        UseType: rowData.UseType,
+        UseTypeName: rowData.UseTypeName,
+        WBSSeq: rowData.WBSSeq,
+        WorkOrderNo: rowData.WorkOrderNo,
       }
       const secretKey = 'TEST_ACCESS_KEY'
       const encryptedData = CryptoJS.AES.encrypt(
@@ -248,41 +327,33 @@ export default function StockOutRequest({ permissions, isMobile }) {
   }
 
 
-  useEffect(() => {
-    debouncedFetchDeliveryData()
-    return () => {
-      debouncedFetchDeliveryData.cancel()
-    }
-  }, [debouncedFetchDeliveryData])
 
+
+
+  const handleSearch1 = async () => {
+    setLoadingCodeHelp(true)
+    setModalVisible1(true)
+    fetchCodehelpData1()
+
+  }
+  const handleSearch2 = async () => {
+    setLoadingCodeHelp(true)
+    setModalVisible2(true)
+    fetchCodehelpData2()
+
+  }
+
+  const handleSearch3 = async () => {
+    setLoadingCodeHelp(true)
+    setModalVisible3(true)
+    fetchCodehelpData3()
+  }
   useEffect(() => {
     debouncedFetchCodeHelpData()
     return () => {
       debouncedFetchCodeHelpData.cancel()
     }
   }, [debouncedFetchCodeHelpData])
-
-
-  const handleSearch1 = async () => {
-    setLoadingCodeHelp(true)
-    setModalVisible1(true)
-    setErrorCodeHelp('')
-   
-  }
-  const handleSearch2 = async () => {
-    setLoadingCodeHelp(true)
-    setModalVisible2(true)
-    setErrorCodeHelp('')
-   
-  }
-  
-  const handleSearch3 = async () => {
-    setLoadingCodeHelp(true)
-    setModalVisible3(true)
-    setErrorCodeHelp('')
-   
-  }
-  
 
   return (
     <>
@@ -296,7 +367,7 @@ export default function StockOutRequest({ permissions, isMobile }) {
               <Title level={4} className="mt-2 uppercase opacity-85 ">
                 {t('Stock Out Request')}
               </Title>
-              <StockOutRequestActions nextPage={nextPage} />
+              <StockOutRequestActions nextPage={nextPage} debouncedFetchSPDMMOutReqListQueryWeb={debouncedFetchSPDMMOutReqListQueryWeb} />
             </div>
             <details
               className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
@@ -321,7 +392,7 @@ export default function StockOutRequest({ permissions, isMobile }) {
                   toDate={toDate}
                   dataUnit={dataUnit}
                   setBizUnit={setBizUnit}
-
+                  deptName={deptName}
                   handleSearch1={handleSearch1}
                   handleSearch2={handleSearch2}
                   handleSearch3={handleSearch3}
@@ -330,7 +401,22 @@ export default function StockOutRequest({ permissions, isMobile }) {
                   loadingCodeHelp={loadingCodeHelp}
                   modalVisible1={modalVisible1}
                   modalVisible2={modalVisible2}
-                  
+                  setMinorName={setMinorName}
+                  minorName={minorName}
+                  setFactUnit={setFactUnit}
+                  setProgStatus={setProgStatus}
+                  minorName2={minorName2}
+                  setUseType={setUseType}
+                  empName={empName}
+                  custName={custName}
+                  setProdPlanNo={setProdPlanNo}
+                  prodPlanNo={prodPlanNo}
+                  setWorkOrderNo={setWorkOrderNo}
+                  workOrderNo={workOrderNo}
+                  setProdReqNo={setProdReqNo}
+                  prodReqNo={prodReqNo}
+                  setOutReqNo={setOutReqNo}
+                  outReqNo={outReqNo}
                 />
               </div>
             </details>
@@ -343,28 +429,53 @@ export default function StockOutRequest({ permissions, isMobile }) {
               onCellClicked={onCellClicked}
               setGridData={setGridData}
               gridData={gridData} />
-
-
           </div>
         </div>
       </div>
       <CodeHelpStockOut1
-         setModalVisible={setModalVisible1}
-         modalVisible={modalVisible1}
-         loadingCodeHelp={loadingCodeHelp}
-         handleSearch={handleSearch1}
+        setModalVisible={setModalVisible1}
+        modalVisible={modalVisible1}
+        loadingCodeHelp={loadingCodeHelp}
+        handleSearch={handleSearch1}
+        data={data1}
+        setConditionSeq={setConditionSeq}
+        setSubConditionSql={setSubConditionSql}
+        fetchCodehelpData1={fetchCodehelpData1}
+        keyword={keyword}
+        setKeyword={setKeyword}
+        setDeptSeq={setDeptSeq}
+        setDeptName={setDeptName}
+        setData1={setData1}
       />
-      <CodeHelpStockOut2 
-       setModalVisible={setModalVisible2}
-       modalVisible={modalVisible2}
-       loadingCodeHelp={loadingCodeHelp}
-       handleSearch={handleSearch2}
-       
+      <CodeHelpStockOut2
+        setModalVisible={setModalVisible2}
+        modalVisible={modalVisible2}
+        loadingCodeHelp={loadingCodeHelp}
+        handleSearch={handleSearch2}
+        data={data2}
+        setConditionSeq={setConditionSeq}
+        setSubConditionSql={setSubConditionSql}
+        fetchCodehelpData2={fetchCodehelpData2}
+        keyword={keyword}
+        setKeyword={setKeyword}
+        setEmpName={setEmpName}
+        setEmpSeq={setEmpSeq}
+
       />
-      <CodeHelpStockOut3  setModalVisible={setModalVisible3}
-       modalVisible={modalVisible3}
-       loadingCodeHelp={loadingCodeHelp}
-       handleSearch={handleSearch3}/>
+      <CodeHelpStockOut3
+        setModalVisible={setModalVisible3}
+        modalVisible={modalVisible3}
+        loadingCodeHelp={loadingCodeHelp}
+        handleSearch={handleSearch3}
+        data={data3}
+        setConditionSeq={setConditionSeq}
+        setSubConditionSql={setSubConditionSql}
+        fetchCodehelpData3={fetchCodehelpData3}
+        keyword={keyword}
+        setKeyword={setKeyword}
+        setCustName={setCustName}
+        setCustSeq={setCustSeq}
+      />
     </>
   )
 }

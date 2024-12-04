@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Helmet } from 'react-helmet'
 import { Typography, message, Modal } from 'antd'
@@ -21,76 +22,7 @@ import { CheckAllProceduresStockIn } from '../../../features/material/postCheckA
 import LoadSubmit from '../default/loadSubmit'
 import SuccessSubmit from '../default/successSubmit'
 import { CompactSelection } from '@glideapps/glide-data-grid'
-const dataB = [
-  {
-    WHName: 'Warehouse A',
-    ItemNo: 'A12345',
-    LotNo: 'L001',
-    Qty: 100,
-    DateCode: '202311',
-    ReelNo: 'R001',
-    Barcode: '123456789012',
-    CreateDate: '2023-11-20',
-    RegDate: '2023-11-21',
-    YYWW: '2347',
-    YYMM: '2311',
-    YYMMDD: '231120',
-    InvoiceNo: 'INV001',
-    BizUnit: 'BU001',
-    DateIn: '2023-11-19',
-  },
-  {
-    WHName: 'Warehouse B',
-    ItemNo: 'B67890',
-    LotNo: 'L002',
-    Qty: 200,
-    DateCode: '202312',
-    ReelNo: 'R002',
-    Barcode: '987654321098',
-    CreateDate: '2023-12-01',
-    RegDate: '2023-12-02',
-    YYWW: '2348',
-    YYMM: '2312',
-    YYMMDD: '231201',
-    InvoiceNo: 'INV002',
-    BizUnit: 'BU002',
-    DateIn: '2023-11-30',
-  },
-  {
-    WHName: 'Warehouse C',
-    ItemNo: 'C54321',
-    LotNo: 'L003',
-    Qty: 150,
-    DateCode: '202401',
-    ReelNo: 'R003',
-    Barcode: '111222333444',
-    CreateDate: '2024-01-10',
-    RegDate: '2024-01-11',
-    YYWW: '2402',
-    YYMM: '2401',
-    YYMMDD: '240110',
-    InvoiceNo: 'INV003',
-    BizUnit: 'BU003',
-    DateIn: '2024-01-09',
-  },
-  {
-    WHName: 'Warehouse D',
-    ItemNo: 'D11223',
-    LotNo: 'L004',
-    Qty: 300,
-    DateCode: '202402',
-    ReelNo: 'R004',
-    Barcode: '555666777888',
-    CreateDate: '2024-02-15',
-    RegDate: '2024-02-16',
-    YYWW: '2407',
-    YYMM: '2402',
-    YYMMDD: '240215',
-    InvoiceNo: 'INV004',
-    BizUnit: 'BU004',
-    DateIn: '2024-02-14',
-  },
-];
+
 
 
 export default function WaitingIqcStockIn({ permissions, isMobile }) {
@@ -99,7 +31,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const workerRef = useRef(null)
   const inputCodeRef = useRef(null)
   const [loading, setLoading] = useState(true)
-
+  const navigate = useNavigate()
   const gridRef = useRef(null)
   const [inputCode, setInputCode] = useState(null)
   const [inputBarCode, setInputBarCode] = useState(null)
@@ -133,7 +65,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   }, []);
 
   const handleToggle = (event) => {
-    const isOpen = event.target.open; 
+    const isOpen = event.target.open;
     setIsOpenDetails(isOpen);
     localStorage.setItem("detailsStateIqc", isOpen ? "open" : "closed");
   };
@@ -182,12 +114,13 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
       const decryptedData = bytes.toString(CryptoJS.enc.Utf8)
       return JSON.parse(decryptedData)
     } catch (error) {
+      navigate(`/u/warehouse/material/stock-out-request`)
       setModal3Open(true)
       return null
     }
   }
 
-  
+
   useEffect(() => {
     if (id) {
       const data = decryptData(id)
@@ -232,14 +165,14 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const addToScanHistory = useCallback((dataResSuccess, callback) => {
     const newLotNoFull = dataResSuccess?.LotNoFull?.trim().toLowerCase();
     const newBarcode = dataResSuccess?.Barcode?.trim().toLowerCase();
-  
+
     setScanHistory((prevHistory) => {
       const isExist = prevHistory.some(
         (item) =>
           item.LotNoFull?.trim().toLowerCase() === newLotNoFull &&
           item.Barcode?.trim().toLowerCase() === newBarcode
       );
-  
+
       if (!isExist) {
         const updatedHistory = [
           ...prevHistory,
@@ -291,13 +224,13 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
             PermitNo: dataResSuccess?.PermitNo,
           },
         ];
-        callback(); 
+        callback();
         return updatedHistory;
       }
       return prevHistory;
     });
   }, []);
-  
+
 
   const debouncedCheckBarcode = useCallback(
     debounce(async (formData, resultMessage) => {
@@ -310,16 +243,16 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
         setInputCode(null);
         setYYWW(dataResSuccess?.YYWW);
         setYYYYMM(dataResSuccess?.YYMM);
-  
+
         addToScanHistory(dataResSuccess, () => {
           setData((prevData) =>
             prevData.map((item) =>
               item.ItemNo === formData.itemNo
                 ? {
-                    ...item,
-                    OkQty: item.OkQty + formData.qty,
-                    RemainQty: item.RemainQty - formData.qty,
-                  }
+                  ...item,
+                  OkQty: item.OkQty + formData.qty,
+                  RemainQty: item.RemainQty - formData.qty,
+                }
                 : item,
             )
           );
@@ -331,7 +264,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     }, 100),
     [addToScanHistory]
   );
-  
+
   const handleCheckBarcode = useCallback((barcode) => {
     const currentTableData = dataRef.current
     const currentScanHistory = dataRefSacenHistory.current
@@ -557,7 +490,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
         setModal4Open(false)
         setResult(null)
         setError('Chưa có dữ liệu để gửi. Vui lòng quét dữ liệu trước khi gửi.')
-     
+
         return
       }
       const xmlForCloseCheck = createXmlDataCloseCheck(filteredData)
@@ -604,46 +537,46 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   )
 
 
-const getSelectedRowIndices = () => {
-  const selectedRows = selection.rows.items;
-  let indices = [];
+  const getSelectedRowIndices = () => {
+    const selectedRows = selection.rows.items;
+    let indices = [];
 
-  selectedRows.forEach((range) => {
-    const start = range[0];
-    const end = range[1] -1 ;
+    selectedRows.forEach((range) => {
+      const start = range[0];
+      const end = range[1] - 1;
 
-    for (let i = start; i <= end; i++) {
-      indices.push(i);
-    }
-  });
+      for (let i = start; i <= end; i++) {
+        indices.push(i);
+      }
+    });
 
-  return indices;
-};
+    return indices;
+  };
 
-const handleDelete = useCallback(
-  async (e) => {
-    e.preventDefault();
+  const handleDelete = useCallback(
+    async (e) => {
+      e.preventDefault();
 
-    const selectedRowIndices = getSelectedRowIndices();
-    if (selectedRowIndices.length === 0) {
-      setModal2Open(true);
-      setError('Vui lòng chọn ít nhất một hàng để xóa.');
-      return;
-    }
-    if (scanHistory.length === 0) {
-      setModal2Open(true);
-      setError('Không có dữ liệu nào để xóa.');
-      return;
-    }
+      const selectedRowIndices = getSelectedRowIndices();
+      if (selectedRowIndices.length === 0) {
+        setModal2Open(true);
+        setError('Vui lòng chọn ít nhất một hàng để xóa.');
+        return;
+      }
+      if (scanHistory.length === 0) {
+        setModal2Open(true);
+        setError('Không có dữ liệu nào để xóa.');
+        return;
+      }
 
-    const remainingRows = scanHistory.filter((row, index) => 
-      !selectedRowIndices.includes(index)
-    );
+      const remainingRows = scanHistory.filter((row, index) =>
+        !selectedRowIndices.includes(index)
+      );
 
-    setScanHistory(remainingRows);
-  },
-  [scanHistory, selection]
-);
+      setScanHistory(remainingRows);
+    },
+    [scanHistory, selection]
+  );
 
   const handleRestFrom = useCallback(
     async (e) => {

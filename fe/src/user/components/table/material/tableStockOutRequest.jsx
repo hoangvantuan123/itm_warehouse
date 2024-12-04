@@ -91,8 +91,8 @@ function TableStockOutRequest({
     ([col, row]) => {
       const person = gridData[row] || {}
       const {
-        IsStop = false,
-        IsConfirm = false,
+        IsStop = '',
+        IsConfirm = '',
         FactUnitName = '',
         ReqDate = '',
         OutReqNo = '',
@@ -114,7 +114,7 @@ function TableStockOutRequest({
         UnitName = '',
         Qty = '',
         ProgQty = '',
-        IsReturn = false,
+        IsReturn = '',
         Remark = '',
         ItemSeq = '',
         ItemUnitSeq = '',
@@ -133,11 +133,11 @@ function TableStockOutRequest({
       } = person
 
       const safeString = (value) => (value != null ? String(value) : '')
-      const safeBoolean = (value) => (value ? '✔' : '✘')
+      const safeBoolean = (value) => (value === "0" ? '✔' : '✘');
 
       const columnMap = {
-        0: { kind: GridCellKind.Boolean, data: IsStop },
-        1: { kind: GridCellKind.Boolean, data: IsConfirm },
+        0: { kind: GridCellKind.Text, data: safeBoolean(IsStop) },
+        1: { kind: GridCellKind.Text, data: safeBoolean(IsConfirm) },
         2: { kind: GridCellKind.Text, data: safeString(FactUnitName) },
         3: { kind: GridCellKind.Text, data: safeString(ReqDate) },
         4: { kind: GridCellKind.Text, data: safeString(OutReqNo) },
@@ -216,7 +216,7 @@ function TableStockOutRequest({
           onColumnResize={onColumnResize}
           smoothScrollY={true}
           smoothScrollX={true}
-  rowSelect="single"
+          rowSelect="single"
           onCellClicked={onCellClicked}
           gridSelection={selection}
           onGridSelectionChange={setSelection}

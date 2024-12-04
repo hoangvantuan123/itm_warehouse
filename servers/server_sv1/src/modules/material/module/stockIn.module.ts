@@ -5,6 +5,8 @@ import { GenerateXmlService } from '../generate-xml/generate-xml.service';
 import { EmployeeController } from '../controller/stockIn.controller';
 import { DeliveryListService } from '../service/deliveryList.service';
 import { DeliveryListController } from '../controller/deliveryList.controller';
+import { StockOutController } from '../controller/stockOut.controller';
+import { StockOutService } from '../service/stockOut.service';
 
 @Module({
   imports: [],
@@ -12,9 +14,10 @@ import { DeliveryListController } from '../controller/deliveryList.controller';
     DatabaseService,
     StockInService,
     GenerateXmlService,
-    DeliveryListService
+    DeliveryListService,
+    StockOutService
   ],
-  controllers: [EmployeeController, DeliveryListController ],
+  controllers: [EmployeeController, DeliveryListController, StockOutController],
   exports: [],
 })
 export class StockInModule { }

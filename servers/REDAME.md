@@ -1,17 +1,28 @@
-``` export const sqlServerITMV20240117: TypeOrmModuleOptions = {
-  type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'tuanhoang',
-      password: 'your_password',
-      database: 'itmv20240117',
-      synchronize: true,
-      entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-      migrations: [__dirname + '/migrations/*{.ts,.js}'],
-      logging: ['query', 'error', 'schema'],
+```
+export const sqlServerITMV20240117: TypeOrmModuleOptions = {
+  type: 'mssql',
+  host: 'localhost',
+  port: 1433,
+  username: 'sa',
+  password: 'YourStrongPassword!',
+  database: 'ITMV20240117',
+  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+  synchronize: true,
+  logging: true,
+  cache: true,
+  extra: {
+    trustServerCertificate: true,
+    encrypt: false,
+    connectionTimeout: 5000,
+    max: 100,
+    min: 10,
+    idleTimeoutMillis: 30000,
+  },
+  maxQueryExecutionTime: 1000
+}
 
-  
-};```
+
+```
 
 
 

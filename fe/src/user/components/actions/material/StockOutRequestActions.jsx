@@ -7,7 +7,7 @@ import {
   SearchOutlined,
 } from '@ant-design/icons'
 
-export default function StockOutRequestActions({nextPage}) {
+export default function StockOutRequestActions({nextPage, debouncedFetchSPDMMOutReqListQueryWeb}) {
   return (
     <div className="flex items-center gap-2">
       <Button
@@ -28,6 +28,7 @@ export default function StockOutRequestActions({nextPage}) {
         type="primary"
         icon={<SearchOutlined />}
         size="middle"
+        onClick={debouncedFetchSPDMMOutReqListQueryWeb}
         className="uppercase"
       >
         SEARCH

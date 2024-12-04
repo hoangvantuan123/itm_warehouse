@@ -20,7 +20,6 @@ import Login from '../auth/login'
 import decodeJWT from '../../utils/decode-JWT'
 import { transformDataMenu } from '../../utils/transformDataMenu'
 import ErrorPage from '../page/default/errorPage'
-import StockOutRequestDetails from '../page/material/stockOutRequestDetails'
 const DeliveryList = lazy(() => import('../page/material/deliveryList'))
 const WaitingIqcStockIn = lazy(
   () => import('../page/material/waitingIqcStockIn'),
@@ -32,6 +31,7 @@ const RoleManagement = lazy(() => import('../page/system/roleManagement'))
 const ProfileUserId = lazy(() => import('../page/system/profileUserId'))
 const MenuTechnique = lazy(() => import('../page/system/menuTechnique'))
 const RootMenuTechnique = lazy(() => import('../page/system/rootMenuTechnique'))
+const StockOutRequestFiFo = lazy(() => import('../page/material/stockOutFiFo'))
 
 const { Content } = Layout
 
@@ -201,10 +201,10 @@ const UserRouter = () => {
                       }
                     />
                     <Route
-                      path="u/warehouse/material/stock-out-request-details/:id"
+                      path="u/warehouse/material/stock-out-request/:id"
                       element={
                         checkActionPermission(userPermissions, 'material-1-4', 'View') ? (
-                          <StockOutRequestDetails
+                          <StockOutRequestFiFo
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />

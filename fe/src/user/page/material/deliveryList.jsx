@@ -8,7 +8,7 @@ import { ArrowIcon } from '../../components/icons'
 import dayjs from 'dayjs'
 import DeliveryActions from '../../components/actions/material/deliveryActions'
 import TableDeliveryList from '../../components/table/material/tableDeliveryList'
-import { GetCodeHelp } from '../../../features/codeHelp/getCodeHelp'
+import { GetCodeHelpCombo } from '../../../features/codeHelp/getCodeHelpCombo'
 import { GetDeliveryList } from '../../../features/material/getDeliveryList'
 import DeliveryListQuery from '../../components/query/material/deliveryListQuery'
 import { debounce } from 'lodash'
@@ -16,74 +16,7 @@ import { useNavigate } from 'react-router-dom'
 import { encodeBase64Url } from '../../../utils/decode-JWT'
 import CryptoJS from 'crypto-js'
 
-const dataM = [
-  {
-    DelvNo: 'D001',
-    DelvMngNo: 'DM001',
-    ImpType: 'Import',
-    TotalQty: 100,
-    OkQty: 95,
-    RemainQty: 5,
-    DelvDate: '2024-11-28',
-    CustSeq: 'C001',
-    CustNm: 'Customer A',
-    DomOrImp: 'Domestic',
-    PurchaseType: 'Wholesale',
-    BizUnitName: 'Unit A',
-    BizUnit: 'A1',
-    EmpSeq: 'E001',
-    EmpName: 'John Doe',
-    DeptSeq: 'D001',
-    DeptName: 'Sales',
-    CurrSeq: 'USD',
-    CurrName: 'US Dollar',
-    ExRate: 1.0,
-  },
-  {
-    DelvNo: 'D002',
-    DelvMngNo: 'DM002',
-    ImpType: 'Domestic',
-    TotalQty: 200,
-    OkQty: 190,
-    RemainQty: 10,
-    DelvDate: '2024-11-29',
-    CustSeq: 'C002',
-    CustNm: 'Customer B',
-    DomOrImp: 'Import',
-    PurchaseType: 'Retail',
-    BizUnitName: 'Unit B',
-    BizUnit: 'B1',
-    EmpSeq: 'E002',
-    EmpName: 'Jane Smith',
-    DeptSeq: 'D002',
-    DeptName: 'Logistics',
-    CurrSeq: 'EUR',
-    CurrName: 'Euro',
-    ExRate: 0.85,
-  },
-  {
-    DelvNo: 'D003',
-    DelvMngNo: 'DM003',
-    ImpType: 'Export',
-    TotalQty: 150,
-    OkQty: 145,
-    RemainQty: 5,
-    DelvDate: '2024-11-30',
-    CustSeq: 'C003',
-    CustNm: 'Customer C',
-    DomOrImp: 'Export',
-    PurchaseType: 'Online',
-    BizUnitName: 'Unit C',
-    BizUnit: 'C1',
-    EmpSeq: 'E003',
-    EmpName: 'Robert Brown',
-    DeptSeq: 'D003',
-    DeptName: 'Procurement',
-    CurrSeq: 'JPY',
-    CurrName: 'Japanese Yen',
-    ExRate: 150.5,
-  },
-]
+
 export default function DeliveryList({ permissions, isMobile }) {
   const { t } = useTranslation()
   const gridRef = useRef(null)
@@ -139,7 +72,7 @@ export default function DeliveryList({ permissions, isMobile }) {
   const fetchCodeHelpData = useCallback(async () => {
     setLoading(true)
     try {
-      const codeHelpResponse = await GetCodeHelp(
+      const codeHelpResponse = await GetCodeHelpCombo(
         '',
         6,
         10003,
