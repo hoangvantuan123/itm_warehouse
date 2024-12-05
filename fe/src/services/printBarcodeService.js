@@ -20,7 +20,7 @@ export const GetPageItem = async (
           matID,
           lotNo,
           pageIndex: 1,
-          pageSize:100,
+          pageSize:500,
         },
         headers: {
           'Content-Type': 'application/json',
@@ -54,6 +54,7 @@ export const GetPageItem = async (
       ip: requestData.ip,
       port: requestData.port,
       data: requestData.data,
+      newlabel: requestData.newlabel
     }
 
     console.log(requestData);

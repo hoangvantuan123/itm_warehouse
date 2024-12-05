@@ -4,8 +4,6 @@ import Barcode from "react-barcode";
 
 const LabelItem = ({ label, dataSize }) => {
 
-    console.log("label", label);
-
     const labelData = {
         code: label?.ITEMCD,
         lot: label?.LOTNO,
@@ -29,7 +27,6 @@ const LabelItem = ({ label, dataSize }) => {
         paperSizeY: Number(dataSize?.paperSizeY),
     };
 
-    console.log('size', size);
     return (
 
         <div className="grid grid-cols-4 gap-0 w-auto h-auto  justify-center border">

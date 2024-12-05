@@ -24,8 +24,11 @@ export default function BarcodePrintAction({
     dataInfo,
     btnPrinter,
     rowSelects,
+    setRowChecked,
 
 }) {
+
+    console.log(rowSelects)
 
     const [sizeLabel, setSizeLabel] = useState({
 
@@ -41,6 +44,31 @@ export default function BarcodePrintAction({
         paperSizeY: Number(0),
 
     });
+
+
+    const [newLabel, setNewLabel] = useState({
+
+        VENDOR: '',
+        PARTNO: '',
+        ITEMCD: '',
+        LOTTOTALCNT: Number(0),
+        LOTNO: '',
+        QTY: Number(0),
+        DATECODE: Number(),
+        REELNO: '',
+        USER_ID: '',
+        REMARK: '',
+        ISSUENO: '',
+        LOTID: ''
+
+    });
+
+    const handleInputNewLabel = (e, field) => {
+        setNewLabel(prevState => ({
+            ...prevState,
+            [field]: e.target.value
+        }));
+    };
 
     const [ip, setIP] = useState('');
     const [port, setPort] = useState('');
@@ -84,6 +112,24 @@ export default function BarcodePrintAction({
         setIsModalVisible(true);
         btnPrinter();
     }
+
+    const btnOpenModalPreview = () => {
+        setIsModalVisible(true);
+        setRowChecked(null);
+        let LOTID = newLabel.ITEMCD + '/' + newLabel.LOTNO + '/' + newLabel.QTY + '/' + newLabel.DATECODE + '/' + newLabel.REELNO;
+
+        setNewLabel(prevState => {
+            const updatedLabel = {
+                ...prevState,
+                LOT_ID: LOTID,
+            };
+
+            setRowChecked([updatedLabel]);
+
+            return updatedLabel;
+        });
+        
+    };
 
 
     const postPrint = useCallback(async () => {
@@ -218,56 +264,56 @@ export default function BarcodePrintAction({
 
                             <Space direction="vertical" size={6}>
                                 <Typography.Text>Part No</Typography.Text>
-                                <Input className="w-20 bg-blue-50" />
+                                <Input className="w-20 bg-blue-50" value={newLabel.PARTNO} onChange={(e) => handleInputNewLabel(e, 'PARTNO')} />
 
                             </Space>
                             <Space direction="vertical" size={6}>
                                 <Typography.Text>Mat ID</Typography.Text>
-                                <Input className="w-20 bg-blue-50" value={dataInfo?.ITEMCD} />
+                                <Input className="w-20 bg-blue-50" value={newLabel.ITEMCD} onChange={(e) => handleInputNewLabel(e, 'ITEMCD')} />
 
                             </Space>
                             <Space direction="vertical" size={6}>
                                 <Typography.Text>Lot Total CNT</Typography.Text>
-                                <Input className="w-20 bg-blue-50" />
+                                <Input className="w-20 bg-blue-50" value={newLabel.LOTTOTALCNT} onChange={(e) => handleInputNewLabel(e, 'LOTTOTALCNT')} />
 
                             </Space>
 
                             <Space direction="vertical" size={6}>
                                 <Typography.Text>Lot No</Typography.Text>
-                                <Input className="w-20 bg-blue-50" value={dataInfo?.LOTNO} />
+                                <Input className="w-20 bg-blue-50" value={newLabel.LOTNO} onChange={(e) => handleInputNewLabel(e, 'LOTNO')} />
 
                             </Space>
 
                             <Space direction="vertical" size={6}>
                                 <Typography.Text>QTY</Typography.Text>
-                                <Input className="w-20 bg-blue-50" value={dataInfo?.QTY} />
+                                <Input className="w-20 bg-blue-50" value={newLabel.QTY} onChange={(e) => handleInputNewLabel(e, 'QTY')} />
 
                             </Space>
                             <Space direction="vertical" size={6}>
                                 <Typography.Text>Date</Typography.Text>
-                                <Input className="w-20 bg-blue-50" value={dataInfo?.DATECODE} />
+                                <Input className="w-20 bg-blue-50" value={newLabel.DATECODE} onChange={(e) => handleInputNewLabel(e, 'DATECODE')} />
 
                             </Space>
 
                             <Space direction="vertical" size={6}>
                                 <Typography.Text>Reel No</Typography.Text>
-                                <Input className="w-20 bg-blue-50" value={dataInfo?.REELNO} />
+                                <Input className="w-20 bg-blue-50" value={newLabel.REELNO} onChange={(e) => handleInputNewLabel(e, 'REELNO')} />
 
                             </Space>
 
                             <Space direction="vertical" size={6}>
                                 <Typography.Text>UserID</Typography.Text>
-                                <Input className="w-20 bg-blue-50" value={dataInfo?.USER_ID} />
+                                <Input className="w-20 bg-blue-50" value={newLabel.USER_ID} onChange={(e) => handleInputNewLabel(e, 'USER_ID')} />
 
                             </Space>
                             <Space direction="vertical" size={6}>
                                 <Typography.Text>Issuse NO</Typography.Text>
-                                <Input className="w-20 bg-blue-50" />
+                                <Input className="w-20 bg-blue-50" value={newLabel.ISSUENO} onChange={(e) => handleInputNewLabel(e, 'ISSUENO')} />
 
                             </Space>
                             <Space direction="vertical" size={6}>
                                 <Typography.Text>Remark</Typography.Text>
-                                <Input className="w-full bg-blue-50" value={dataInfo?.LOT_ID} />
+                                <Input className="w-full bg-blue-50" value={newLabel.REMARK} onChange={(e) => handleInputNewLabel(e, 'REMARK')} />
                             </Space>
                         </div>
 
@@ -313,7 +359,7 @@ export default function BarcodePrintAction({
                             icon={<SaveFilled />}
                             size="middle"
                             className="uppercase"
-                            onClick={btnOpenModal}
+                            onClick={btnOpenModalPreview}
                         >
                             Preview
                         </Button>

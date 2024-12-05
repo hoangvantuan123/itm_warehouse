@@ -161,6 +161,7 @@ export default function BarcodePrint({ permissions, isMobile }) {
                         dataInfo={dataInfo}
                         btnPrinter={handleBtnPrinter}
                         rowSelects={rowChecked}
+                        setRowChecked= {setRowChecked}
                     />
                 </Header>
 
