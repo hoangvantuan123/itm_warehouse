@@ -9,9 +9,11 @@ import {
   Select,
   message,
   Drawer,
+  Input,
 } from 'antd'
 import { getRootMenusNotInRole } from '../../../../features/system/getRootMenusNotInRole'
 import { PostRolesRootMenu } from '../../../../features/system/postRolesRootMenu'
+import { SearchOutlined } from '@ant-design/icons'
 
 const { Title } = Typography
 const { Option } = Select
@@ -30,16 +32,21 @@ export default function ModalRootMenu({
   const [total, setTotal] = useState(0)
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
   const [data, setData] = useState([])
+  const [filteredData, setFilteredData] = useState([]) // Data đã lọc
+  const [searchColumn, setSearchColumn] = useState('') // Cột tìm kiếm
+
   const fetchData = async () => {
     setLoading(true)
     try {
       const response = await getRootMenusNotInRole(groupId)
       if (response.success) {
         setData(response.data)
+        setFilteredData(response.data) // Lưu dữ liệu gốc khi fetch
       }
     } catch (error) {
       setError(error.message || 'Đã xảy ra lỗi')
       setData([])
+      setFilteredData([])
     } finally {
       setLoading(false)
     }
@@ -84,6 +91,28 @@ export default function ModalRootMenu({
       console.error('Error:', error)
       message.error('Lỗi khi thêm!')
     }
+  }
+
+  // Xử lý tìm kiếm
+  const handleSearch = () => {
+    if (!searchValue || !searchColumn) {
+      return // Không tìm kiếm nếu không có từ khóa và cột
+    }
+
+    const filtered = data.filter((item) =>
+      item[searchColumn]
+        ?.toString()
+        .toLowerCase()
+        .includes(searchValue.toLowerCase()),
+    )
+    setFilteredData(filtered)
+  }
+
+  // Reset lại dữ liệu
+  const handleReset = () => {
+    setSearchValue('')
+    setSearchColumn('')
+    setFilteredData(data) // Quay lại dữ liệu gốc
   }
 
   const columns = [
@@ -141,6 +170,39 @@ export default function ModalRootMenu({
     >
       <div className="font-medium text-xs mb-4">DATA ROOT MENU</div>
 
+      <div
+        style={{ marginBottom: 16 }}
+        className="border w-full  p-3 rounded-lg flex gap-3"
+      >
+        <Select
+          placeholder="Chọn cột tìm kiếm"
+          value={searchColumn}
+          onChange={setSearchColumn}
+          size="middle"
+          className="w-32"
+        >
+          <Option value="Label">Label</Option>
+          <Option value="Link">Link</Option>
+          <Option value="Key">Key</Option>
+        </Select>
+        <Input
+          placeholder="Nhập từ khóa tìm kiếm"
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+          size="middle"
+        />
+        <Button
+          type="primary"
+          icon={<SearchOutlined />}
+          onClick={handleSearch}
+          style={{ marginRight: 8 }}
+        >
+          Tìm kiếm
+        </Button>
+        <Button onClick={handleReset}>Reset</Button>
+      </div>
+
+      {/* Bảng dữ liệu */}
       <Table
         rowSelection={{
           selectedRowKeys,
@@ -154,10 +216,19 @@ export default function ModalRootMenu({
         size="small"
         bordered
         columns={columns}
-        dataSource={data}
+        dataSource={filteredData}
         rowKey="Id"
-        className="cursor-pointer pb-0 "
+        className="cursor-pointer pb-0"
         loading={loading}
+        pagination={{
+          current: page,
+          pageSize: limit,
+          total: total,
+          showSizeChanger: true,
+          onChange: (page, pageSize) =>
+            handleTableChange({ current: page, pageSize }),
+        }}
+        onChange={(pagination) => handleTableChange(pagination)}
       />
     </Drawer>
   )

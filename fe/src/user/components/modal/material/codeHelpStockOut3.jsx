@@ -5,7 +5,6 @@ import { ArrowIcon } from '../../icons'
 import TableCodeHelpStockOut3 from '../../table/codeHelp/codeHelpStockOut3'
 const { Search } = Input
 
-
 export default function CodeHelpStockOut3({
   setConditionSeq,
   data,
@@ -17,7 +16,7 @@ export default function CodeHelpStockOut3({
   setSubConditionSql,
   fetchCodehelpData3,
   setCustSeq,
-  setCustName
+  setCustName,
 }) {
   const [isMinusClicked, setIsMinusClicked] = useState(false)
   const [lastClickedCell, setLastClickedCell] = useState(null)
@@ -79,9 +78,8 @@ export default function CodeHelpStockOut3({
       >
         <div
           style={{ display: 'flex', flexDirection: 'column', height: '75vh' }}
-          className='gap-4'
+          className="gap-4"
         >
-
           <details
             className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
             open
@@ -110,7 +108,6 @@ export default function CodeHelpStockOut3({
                   ]}
                   onChange={handleConditionSeq}
                 />
-
               </div>
 
               <div className="flex flex-col w-full">

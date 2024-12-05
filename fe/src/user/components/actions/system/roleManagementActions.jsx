@@ -1,51 +1,52 @@
 import { useState } from 'react'
-import { Button, Dropdown, message } from 'antd';
+import { Button, Dropdown, message } from 'antd'
 import { SaveOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 
-export default function RoleManagementActions({ openModalAddUserGroups , handleSubmitSheet , handleDeleteDataSheet , handleDeleteGroups}) {
-  const [visible, setVisible] = useState(false);
+export default function RoleManagementActions({
+  openModalAddUserGroups,
+  handleSubmitSheet,
+  handleDeleteDataSheet,
+  handleDeleteGroups,
+}) {
+  const [visible, setVisible] = useState(false)
 
   const handleMenuClick = (e) => {
     switch (e.key) {
       case '1':
-        handleDeleteDataSheet();
-        break;
+        handleDeleteDataSheet()
+        break
       case '2':
-        handleDeleteGroups();
-        break;
+        handleDeleteGroups()
+        break
       default:
-        message.info('Đang phát triển');
-        break;
+        message.info('Đang phát triển')
+        break
     }
-  };
-  
+  }
+
   const items = [
- 
     {
       label: 'Delete Row',
       key: '1',
       icon: <DeleteOutlined />,
       danger: true,
     },
- 
+
     {
       label: 'Delete Group',
       key: '2',
       icon: <DeleteOutlined />,
       danger: true,
     },
-
-  ];
+  ]
   const menuProps = {
     items,
     onClick: handleMenuClick,
-  };
+  }
   return (
     <div className="flex items-center gap-2">
-      <Dropdown.Button menu={menuProps}  >
-        <span className="uppercase">
-          Actions
-        </span>
+      <Dropdown.Button menu={menuProps}>
+        <span className="uppercase">Actions</span>
       </Dropdown.Button>
 
       <Button
@@ -69,7 +70,6 @@ export default function RoleManagementActions({ openModalAddUserGroups , handleS
       >
         Save
       </Button>
-      
     </div>
   )
 }

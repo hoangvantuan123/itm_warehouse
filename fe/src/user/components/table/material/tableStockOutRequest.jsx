@@ -4,22 +4,17 @@ import { Button } from 'antd'
 import '@glideapps/glide-data-grid/dist/index.css'
 import { useNavigate } from 'react-router-dom'
 import { CompactSelection } from '@glideapps/glide-data-grid'
+import { TableOutlined } from '@ant-design/icons'
 
 const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
 
-function TableStockOutRequest({
-  data,
-  onCellClicked,
-  gridData,
-  setGridData
-}) {
-
+function TableStockOutRequest({ data, onCellClicked, gridData, setGridData, loading }) {
   const [showSearch, setShowSearch] = useState(false)
   const ref = (useRef < data) | (null > null)
   const onSearchClose = useCallback(() => setShowSearch(false), [])
-  const [vals, setVals] = useState([false, false, false]);
+  const [vals, setVals] = useState([false, false, false])
 
   const [selection, setSelection] = useState({
     columns: CompactSelection.empty(),
@@ -133,11 +128,11 @@ function TableStockOutRequest({
       } = person
 
       const safeString = (value) => (value != null ? String(value) : '')
-      const safeBoolean = (value) => (value === "0" ? '✔' : '✘');
+      const safeBoolean = (value) => (value === '0' ? '✔' : '✘')
 
       const columnMap = {
-        0: { kind: GridCellKind.Text, data: safeBoolean(IsStop) },
-        1: { kind: GridCellKind.Text, data: safeBoolean(IsConfirm) },
+        0: { kind: GridCellKind.Boolean, data: IsStop },
+        1: { kind: GridCellKind.Boolean, data: IsConfirm },
         2: { kind: GridCellKind.Text, data: safeString(FactUnitName) },
         3: { kind: GridCellKind.Text, data: safeString(ReqDate) },
         4: { kind: GridCellKind.Text, data: safeString(OutReqNo) },
@@ -159,7 +154,7 @@ function TableStockOutRequest({
         20: { kind: GridCellKind.Text, data: safeString(UnitName) },
         21: { kind: GridCellKind.Text, data: safeString(Qty) },
         22: { kind: GridCellKind.Text, data: safeString(ProgQty) },
-        23: { kind: GridCellKind.Text, data: safeBoolean(IsReturn) },
+        23: { kind: GridCellKind.Boolean, data: IsReturn },
         24: { kind: GridCellKind.Text, data: safeString(Remark) },
         25: { kind: GridCellKind.Text, data: safeString(ItemSeq) },
         26: { kind: GridCellKind.Text, data: safeString(ItemUnitSeq) },
@@ -175,7 +170,7 @@ function TableStockOutRequest({
         36: { kind: GridCellKind.Text, data: safeString(ProdPlanNo) },
         37: { kind: GridCellKind.Text, data: safeString(ProdPlanSeq) },
         38: { kind: GridCellKind.Text, data: safeString(ProdReqNo) },
-      };
+      }
 
       if (columnMap.hasOwnProperty(col)) {
         const { kind, data } = columnMap[col]
@@ -198,10 +193,13 @@ function TableStockOutRequest({
     setGridData(data)
   }, [data])
 
-
   return (
     <div className="w-full gap-1 h-full flex items-center justify-center pb-8  overflow-hidden">
       <div className="w-full h-full flex flex-col border bg-white rounded-lg overflow-hidden ">
+        <h2 className="text-xs font-medium flex items-center gap-2 p-2 text-blue-600 uppercase">
+          <TableOutlined />
+          DATA SHEET
+        </h2>
         <DataEditor
           columns={cols}
           getCellContent={getData}
@@ -220,6 +218,13 @@ function TableStockOutRequest({
           onCellClicked={onCellClicked}
           gridSelection={selection}
           onGridSelectionChange={setSelection}
+          getRowThemeOverride={(i) =>
+            i % 2 === 0
+              ? undefined
+              : {
+                bgCell: '#FBFBFB',
+              }
+          }
         />
       </div>
     </div>

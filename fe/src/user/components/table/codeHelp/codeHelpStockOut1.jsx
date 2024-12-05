@@ -9,15 +9,12 @@ const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
 
-function TableCodeHelpStockOut1({ data, onCellClicked }) {
+function TableCodeHelpStockOut1({ data, onCellClicked, setSelection, selection }) {
   const [gridData, setGridData] = useState([])
   const [showSearch, setShowSearch] = useState(false)
   const ref = (useRef < data) | (null > null)
   const onSearchClose = useCallback(() => setShowSearch(false), [])
-  const [selection, setSelection] = useState({
-    columns: CompactSelection.empty(),
-    rows: CompactSelection.empty(),
-  })
+
   const columns = useMemo(
     () => [
       { title: 'BeDeptName' },
@@ -61,7 +58,7 @@ function TableCodeHelpStockOut1({ data, onCellClicked }) {
         0: { kind: GridCellKind.Text, data: safeString(BeDeptName) },
         1: { kind: GridCellKind.Text, data: safeString(BeBegDate) },
         2: { kind: GridCellKind.Text, data: safeString(BeEndDate) },
-        3: { kind: GridCellKind.Text, data: safeString(DeptRemark) }
+        3: { kind: GridCellKind.Text, data: safeString(DeptRemark) },
       }
 
       if (columnMap.hasOwnProperty(col)) {
@@ -77,17 +74,13 @@ function TableCodeHelpStockOut1({ data, onCellClicked }) {
   const [lastActivated, setLastActivated] = useState(undefined)
 
   const onCellActivated = useCallback((cell) => {
-    console.log('cell', cell)
     setLastActivated(cell)
   }, [])
 
   useEffect(() => {
     setGridData(data)
   }, [data])
-
-
-
- 
+  
   return (
     <div className="w-full gap-1 h-full flex items-center justify-center pb-8">
       <div className="w-full h-full flex flex-col border bg-white rounded-lg overflow-hidden ">

@@ -1,20 +1,14 @@
 import axios from 'axios'
-import {
-  HOST_API_SERVER_1
-} from '../../services'
-import {
-  ERROR_MESSAGES
-} from '../../utils/constants'
+import { HOST_API_SERVER_1 } from '../../services'
+import { ERROR_MESSAGES } from '../../utils/constants'
 
-export const GetITMSPDMMOutReqItemListWEB = async (
-  outReqSeq,
-) => {
+export const GetITMSPDMMOutReqItemListWEB = async (outReqSeq) => {
   try {
     const url = `${HOST_API_SERVER_1}/mssql/stock-out/itm-spd-mm-out-req-item-list`
 
     const response = await axios.get(url, {
       params: {
-        outReqSeq
+        outReqSeq,
       },
       headers: {
         'Content-Type': 'application/json',
@@ -35,8 +29,9 @@ export const GetITMSPDMMOutReqItemListWEB = async (
   } catch (error) {
     return {
       success: false,
-      message: error.response ?
-        error.response.data.message : ERROR_MESSAGES.ERROR,
+      message: error.response
+        ? error.response.data.message
+        : ERROR_MESSAGES.ERROR,
     }
   }
 }

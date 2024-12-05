@@ -23,7 +23,7 @@ function TableCodeHelpStockOut3({ data, onCellClicked }) {
       { title: 'FullName' },
       { title: 'CustNo' },
       { title: 'BizNo' },
-      { title: 'UMCustClassName' }
+      { title: 'UMCustClassName' },
     ],
     [],
   )
@@ -86,8 +86,6 @@ function TableCodeHelpStockOut3({ data, onCellClicked }) {
   useEffect(() => {
     setGridData(data)
   }, [data])
-
-
 
   return (
     <div className="w-full gap-1 h-full flex items-center justify-center pb-8">

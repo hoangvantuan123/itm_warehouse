@@ -9,7 +9,11 @@ const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
 
-function TableTransferWaitingIqcStockInBarcode({ data,selection, setSelection }) {
+function TableTransferWaitingIqcStockInBarcode({
+  data,
+  selection,
+  setSelection,
+}) {
   const [gridData, setGridData] = useState([])
   const [showSearch, setShowSearch] = useState(false)
   const ref = (useRef < data) | (null > null)
@@ -83,15 +87,15 @@ function TableTransferWaitingIqcStockInBarcode({ data,selection, setSelection })
         3: { kind: GridCellKind.Text, data: safeString(LotNoFull) },
         4: { kind: GridCellKind.Text, data: safeString(Qty) },
         5: { kind: GridCellKind.Text, data: safeString(DateCode) },
-        5: { kind: GridCellKind.Text, data: safeString(ReelNo) },
-        5: { kind: GridCellKind.Text, data: safeString(Barcode) },
-        5: { kind: GridCellKind.Text, data: safeString(CreateDate) },
-        5: { kind: GridCellKind.Text, data: safeString(RegDate) },
-        5: { kind: GridCellKind.Text, data: safeString(YYWW) },
-        5: { kind: GridCellKind.Text, data: safeString(YYMM) },
-        5: { kind: GridCellKind.Text, data: safeString(YYMMDD) },
-        5: { kind: GridCellKind.Text, data: safeString(InvoiceNo) },
-        5: { kind: GridCellKind.Text, data: safeString(DateIn) },
+        6: { kind: GridCellKind.Text, data: safeString(ReelNo) },
+        7: { kind: GridCellKind.Text, data: safeString(Barcode) },
+        8: { kind: GridCellKind.Text, data: safeString(CreateDate) },
+        9: { kind: GridCellKind.Text, data: safeString(RegDate) },
+        10: { kind: GridCellKind.Text, data: safeString(YYWW) },
+        11: { kind: GridCellKind.Text, data: safeString(YYMM) },
+        12: { kind: GridCellKind.Text, data: safeString(YYMMDD) },
+        13: { kind: GridCellKind.Text, data: safeString(InvoiceNo) },
+        14: { kind: GridCellKind.Text, data: safeString(DateIn) },
       }
 
       if (columnMap.hasOwnProperty(col)) {
@@ -115,31 +119,37 @@ function TableTransferWaitingIqcStockInBarcode({ data,selection, setSelection })
     setGridData(data)
   }, [data])
 
-
   const onGridSelectionChange = (newSelection) => {
     console.log('Selection aborted', newSelection)
   }
 
   return (
-      <div className="w-full h-full border-t border-b overflow-hidden scroll-container ">
-        <DataEditor
-          columns={cols}
-          getCellContent={getData}
-          rows={gridData.length}
-          showSearch={showSearch}
-          getCellsForSelection={true}
-          onSearchClose={onSearchClose}
-          width="100%"
-          height="100%"
-          rowMarkers={('checkbox-visible', 'both')}
-          useRef={useRef}
-          onColumnResize={onColumnResize}
-          smoothScrollY={true}
-          smoothScrollX={true}
-          rowSelect="multi"
-          gridSelection={selection}
-          onGridSelectionChange={setSelection}
-        />
+    <div className="w-full h-full border-t border-b overflow-hidden scroll-container ">
+      <DataEditor
+        columns={cols}
+        getCellContent={getData}
+        rows={gridData.length}
+        showSearch={showSearch}
+        getCellsForSelection={true}
+        onSearchClose={onSearchClose}
+        width="100%"
+        height="100%"
+        rowMarkers={('checkbox-visible', 'both')}
+        useRef={useRef}
+        onColumnResize={onColumnResize}
+        smoothScrollY={true}
+        smoothScrollX={true}
+        rowSelect="multi"
+        gridSelection={selection}
+        onGridSelectionChange={setSelection}
+        getRowThemeOverride={(i) =>
+          i % 2 === 0
+            ? undefined
+            : {
+                bgCell: '#FBFBFB',
+              }
+        }
+      />
     </div>
   )
 }

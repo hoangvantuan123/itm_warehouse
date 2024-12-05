@@ -15,7 +15,7 @@ import { debounce } from 'lodash'
 import { useNavigate } from 'react-router-dom'
 import { encodeBase64Url } from '../../../utils/decode-JWT'
 import CryptoJS from 'crypto-js'
-
+import NoneData from '../default/noneData'
 
 export default function DeliveryList({ permissions, isMobile }) {
   const { t } = useTranslation()
@@ -38,19 +38,18 @@ export default function DeliveryList({ permissions, isMobile }) {
   const [clickedRowData, setClickedRowData] = useState(null)
   const [clickedRowDataList, setClickedRowDataList] = useState([])
   const [gridData, setGridData] = useState([])
-  const [isOpenDetails, setIsOpenDetails] = useState(false);
+  const [isOpenDetails, setIsOpenDetails] = useState(false)
 
   useEffect(() => {
-    const savedState = localStorage.getItem("detailsStateDelist");
-    setIsOpenDetails(savedState === "open");
-  }, []);
+    const savedState = localStorage.getItem('detailsStateDelist')
+    setIsOpenDetails(savedState === 'open')
+  }, [])
 
   const handleToggle = (event) => {
-    const isOpen = event.target.open; 
-    setIsOpenDetails(isOpen);
-    localStorage.setItem("detailsStateDelist", isOpen ? "open" : "closed");
-  };
-
+    const isOpen = event.target.open
+    setIsOpenDetails(isOpen)
+    localStorage.setItem('detailsStateDelist', isOpen ? 'open' : 'closed')
+  }
 
   const fetchDeliveryData = useCallback(async () => {
     setLoading(true)
@@ -100,13 +99,11 @@ export default function DeliveryList({ permissions, isMobile }) {
     [fetchCodeHelpData],
   )
 
-
   const nextPageStockIn = useCallback(() => {
     if (keyPath) {
       navigate(`/u/warehouse/material/waiting-iqc-stock-in/${keyPath}`)
     }
   }, [keyPath, navigate])
-
 
   const onCellClicked = (cell, event) => {
     let rowIndex
@@ -166,12 +163,10 @@ export default function DeliveryList({ permissions, isMobile }) {
       ).toString()
       const encryptedToken = encodeBase64Url(encryptedData)
       setKeyPath(encryptedToken)
-      setClickedRowData(rowData) 
+      setClickedRowData(rowData)
       setLastClickedCell(cell)
-    } 
-
+    }
   }
-
 
   useEffect(() => {
     debouncedFetchDeliveryData()
@@ -209,7 +204,7 @@ export default function DeliveryList({ permissions, isMobile }) {
               onToggle={handleToggle}
             >
               <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
-                <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600">
+                <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600 uppercase">
                   <FilterOutlined />
                   {t('Điều kiện truy vấn')}
                 </h2>
@@ -234,18 +229,26 @@ export default function DeliveryList({ permissions, isMobile }) {
           </div>
 
           <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg  overflow-auto">
-            <TableDeliveryList
-              data={data}
-              setCheckedPath={setCheckedPath}
-              checkedPath={checkedPath}
-              setKeyPath={setKeyPath}
-              loading={loading}
-              setData={setData}
-              onCellClicked={onCellClicked}
-              setGridData={setGridData}
-              gridData={gridData}
-           />
 
+            {data.length > 0 ? (
+              <>
+                <TableDeliveryList
+                  data={data}
+                  setCheckedPath={setCheckedPath}
+                  checkedPath={checkedPath}
+                  setKeyPath={setKeyPath}
+                  loading={loading}
+                  setData={setData}
+                  onCellClicked={onCellClicked}
+                  setGridData={setGridData}
+                  gridData={gridData}
+                />
+              </>
+            ) : (
+              <>
+                <NoneData />
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
-import { HOST_API_SERVER_2 } from "../../services";
-import axios from 'axios';
+import { HOST_API_SERVER_2 } from '../../services'
+import axios from 'axios'
 export const ChangePassword = async (employeeId, oldPassword, newPassword) => {
   try {
     const response = await axios.post(
@@ -11,18 +11,18 @@ export const ChangePassword = async (employeeId, oldPassword, newPassword) => {
       },
       {
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-      }
-    );
+      },
+    )
 
     if (response.status === 201 && response.data.success === true) {
-      return { success: true, message: response.data.message };
+      return { success: true, message: response.data.message }
     }
   } catch (error) {
     return {
       success: false,
-      message: error.response ? error.response.data.message : "Có lỗi xảy ra",
-    };
+      message: error.response ? error.response.data.message : 'Có lỗi xảy ra',
+    }
   }
-};
+}

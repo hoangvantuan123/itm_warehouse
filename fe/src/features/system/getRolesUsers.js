@@ -1,10 +1,6 @@
 import axios from 'axios'
-import {
-  HOST_API_SERVER_2
-} from '../../services'
-import {
-  ERROR_MESSAGES
-} from '../../utils/constants'
+import { HOST_API_SERVER_2 } from '../../services'
+import { ERROR_MESSAGES } from '../../utils/constants'
 
 export const GetSysttemUsersList = async (userId, userName) => {
   try {
@@ -34,9 +30,9 @@ export const GetSysttemUsersList = async (userId, userName) => {
   } catch (error) {
     return {
       success: false,
-      message: error.response ?
-        error.response.data.message :
-        ERROR_MESSAGES.ERROR,
+      message: error.response
+        ? error.response.data.message
+        : ERROR_MESSAGES.ERROR,
     }
   }
 }

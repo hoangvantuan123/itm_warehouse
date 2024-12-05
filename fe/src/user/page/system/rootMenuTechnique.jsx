@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet'
 import { Input, Space, Table, Typography, message, Tabs, Layout } from 'antd'
 const { Title, Text } = Typography
 import { FilterOutlined } from '@ant-design/icons'
-import { ArrowIcon } from '../../components/icons'
+
 import dayjs from 'dayjs'
 import { GetCodeHelp } from '../../../features/codeHelp/getCodeHelp'
 import { GetDeliveryList } from '../../../features/material/getDeliveryList'
@@ -34,7 +34,7 @@ export default function RootMenuTechnique({ permissions, isMobile }) {
   const [checkedPath, setCheckedPath] = useState(false)
   const formatDate = useCallback((date) => date.format('YYYYMMDD'), [])
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([])
   const [clickedRowData, setClickedRowData] = useState(null)
   const [clickedRowDataList, setClickedRowDataList] = useState([])
   const [isMinusClicked, setIsMinusClicked] = useState(false)
@@ -43,6 +43,7 @@ export default function RootMenuTechnique({ permissions, isMobile }) {
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
   })
+  const [showSearch, setShowSearch] = useState(false)
   const fetchDataRootMenus = useCallback(async () => {
     setLoading(true)
     try {
@@ -103,39 +104,38 @@ export default function RootMenuTechnique({ permissions, isMobile }) {
       const rowData = menus[rowIndex]
       setClickedRowData(rowData)
       setLastClickedCell(cell)
-    } 
-
+    }
   }
   const getSelectedRowIds = () => {
-    const selectedRows = selection.rows.items;
-    let ids = [];
-  
+    const selectedRows = selection.rows.items
+    let ids = []
+
     selectedRows.forEach((range) => {
-      const start = range[0];
-      const end = range[1] - 1;
-  
+      const start = range[0]
+      const end = range[1] - 1
+
       for (let i = start; i <= end; i++) {
-        ids.push(menus[i]?.Id);
+        ids.push(menus[i]?.Id)
       }
-    });
-  
-    return ids.filter(id => id !== undefined);
-  };
-  
+    })
+
+    return ids.filter((id) => id !== undefined)
+  }
+
   const handleDeleteDataSheet = useCallback(
     async (e) => {
-      const selectedRowIds = getSelectedRowIds();
+      const selectedRowIds = getSelectedRowIds()
       if (selectedRowIds.length === 0) {
-        message.warning('Vui lòng chọn ít nhất một hàng để xóa.');
-        return;
-      } 
-  
-      const remainingRows = menus.filter((row) =>
-        !selectedRowIds.includes(row.id)
-      );
-  
-      const response = await DeleteRootMenus(selectedRowIds);
-      
+        message.warning('Vui lòng chọn ít nhất một hàng để xóa.')
+        return
+      }
+
+      const remainingRows = menus.filter(
+        (row) => !selectedRowIds.includes(row.id),
+      )
+
+      const response = await DeleteRootMenus(selectedRowIds)
+
       if (response.data.success) {
         debouncedFetchDataMenus()
         message.success(response.data.message)
@@ -143,9 +143,20 @@ export default function RootMenuTechnique({ permissions, isMobile }) {
         message.error(response.data.message)
       }
     },
-    [menus, selection]
-  );
-  
+    [menus, selection],
+  )
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        e.preventDefault()
+        setShowSearch(true)
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
   return (
     <>
       <Helmet>
@@ -158,12 +169,23 @@ export default function RootMenuTechnique({ permissions, isMobile }) {
               <Title level={4} className="mt-2 uppercase opacity-85 ">
                 {t('Root Menu Management')}
               </Title>
-              <RootMenuManagementActions openModal={openModal} handleDeleteDataSheet={handleDeleteDataSheet} />
+              <RootMenuManagementActions
+                openModal={openModal}
+                handleDeleteDataSheet={handleDeleteDataSheet}
+                data={menus}
+              />
             </div>
           </div>
 
           <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg  overflow-auto">
-            <TableRootMenuManagement data={menus} onCellClicked={onCellClicked} setSelection={setSelection} selection={selection}/>
+            <TableRootMenuManagement
+              data={menus}
+              onCellClicked={onCellClicked}
+              setSelection={setSelection}
+              selection={selection}
+              showSearch={showSearch}
+              setShowSearch={setShowSearch}
+            />
           </div>
         </div>
         <DrawerAddRootMenu

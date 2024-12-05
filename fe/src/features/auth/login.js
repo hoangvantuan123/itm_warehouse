@@ -14,10 +14,10 @@ export const LoginAuth = async ({ login, password }) => {
       credentials: 'same-origin',
     })
 
-    const data = await response.json();
+    const data = await response.json()
 
-    return data;
+    return data
   } catch (error) {
-    throw new Error(error.message);
+    throw new Error(error.message)
   }
-};
+}

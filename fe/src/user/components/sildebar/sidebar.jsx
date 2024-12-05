@@ -20,7 +20,7 @@ import {
   AppstoreAddOutlined,
   UserOutlined,
   PlusOutlined,
-  FolderOpenOutlined
+  FolderOpenOutlined,
 } from '@ant-design/icons'
 
 import { SettingIcon, FileMenuIcon, LogoutIcon } from './icon'
@@ -35,7 +35,7 @@ import ModalLogout from '../modal/logout/modalLogout'
 
 const Sidebar = ({ permissions, rootMenu, menuTransForm }) => {
   const location = useLocation()
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   const userFromLocalStorage = JSON.parse(localStorage.getItem('userInfo'))
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [selectedItems, setSelectedItems] = useState(() => {
@@ -58,7 +58,7 @@ const Sidebar = ({ permissions, rootMenu, menuTransForm }) => {
   const [labelMenu, setLabelMenu] = useState(
     localStorage.getItem('labelMenu') || null,
   )
-  const [logoutDrawerVisible, setLogoutDrawerVisible] = useState(false);
+  const [logoutDrawerVisible, setLogoutDrawerVisible] = useState(false)
 
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState(
@@ -126,7 +126,6 @@ const Sidebar = ({ permissions, rootMenu, menuTransForm }) => {
     localStorage.setItem('COLLAPSED_STATE', false)
   }
 
-
   const handleCheckboxChange = (e, itemKey) => {
     const newSelectedItems = e.target.checked
       ? [...selectedItems, itemKey]
@@ -137,36 +136,40 @@ const Sidebar = ({ permissions, rootMenu, menuTransForm }) => {
   }
 
   const openModalShowLogout = () => {
-    setLogoutDrawerVisible(true);
+    setLogoutDrawerVisible(true)
   }
   const confirmLogout = useCallback(async () => {
     Cookies.remove('a_a')
     localStorage.removeItem('userInfo')
     localStorage.removeItem('rolesMenu')
-    navigate('/u/login');
+    navigate('/u/login')
   }, [])
-
 
   const shortcutMenu = (
     <Menu>
-      {rootMenu.map((item) => (
-        item.View === true && (<Menu.Item key={item.RootMenuKey}>
-          <Checkbox
-            checked={selectedItems.includes(item.RootMenuKey)}
-            onChange={(e) => handleCheckboxChange(e, item.RootMenuKey)}
-          >
-            <span className="ml-3 uppercase">{t(item.RootMenuLabel)}</span>
-          </Checkbox>
-        </Menu.Item>)
-
-      ))}
+      {rootMenu.map(
+        (item) =>
+          item.View === true && (
+            <Menu.Item key={item.RootMenuKey}>
+              <Checkbox
+                checked={selectedItems.includes(item.RootMenuKey)}
+                onChange={(e) => handleCheckboxChange(e, item.RootMenuKey)}
+              >
+                <span className="ml-3 uppercase">{t(item.RootMenuLabel)}</span>
+              </Checkbox>
+            </Menu.Item>
+          ),
+      )}
     </Menu>
   )
 
-
   return (
     <>
-      <ModalLogout setModalOpen={setLogoutDrawerVisible} modalOpen={logoutDrawerVisible} confirmLogout={confirmLogout} />
+      <ModalLogout
+        setModalOpen={setLogoutDrawerVisible}
+        modalOpen={logoutDrawerVisible}
+        confirmLogout={confirmLogout}
+      />
       {!isMobile ? (
         <div className="flex">
           <div className="flex h-screen w-16 flex-col justify-between border-e bg-white">
@@ -193,25 +196,28 @@ const Sidebar = ({ permissions, rootMenu, menuTransForm }) => {
 
                   <ul className="space-y-1 border-t border-gray-100 pt-4">
                     {rootMenu
-                      .filter((item) => selectedItems.includes(item.RootMenuKey))
+                      .filter((item) =>
+                        selectedItems.includes(item.RootMenuKey),
+                      )
                       .map((item) => {
                         if (item.View === true) {
-                          return (
-                            item.RootMenuUtilities ? (
-                              <li key={item.RootMenuKey}>
-                                <Tooltip title={item.RootMenuLabel} placement="right">
-                                  <a
-                                    onClick={() => handleOnClickMenuFast(item)}
-                                    className="group relative flex justify-center rounded-lg px-2 py-2 border mb-2 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                                  >
-                                    {iconMapping[item.RootMenuIcon]}
-                                  </a>
-                                </Tooltip>
-                              </li>
-                            ) : null
-                          );
+                          return item.RootMenuUtilities ? (
+                            <li key={item.RootMenuKey}>
+                              <Tooltip
+                                title={item.RootMenuLabel}
+                                placement="right"
+                              >
+                                <a
+                                  onClick={() => handleOnClickMenuFast(item)}
+                                  className="group relative flex justify-center rounded-lg px-2 py-2 border mb-2 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                                >
+                                  {iconMapping[item.RootMenuIcon]}
+                                </a>
+                              </Tooltip>
+                            </li>
+                          ) : null
                         }
-                        return null;
+                        return null
                       })}
 
                     <li>
@@ -231,7 +237,7 @@ const Sidebar = ({ permissions, rootMenu, menuTransForm }) => {
             </div>
 
             <div className="sticky inset-x-0 bottom-0 border-t border-gray-100 bg-white p-2">
-              <div >
+              <div>
                 {/*   <button
                   type="submit"
                   className="group relative mb-5 flex w-full justify-center rounded-lg px-2 py-1.5 text-sm text-gray-500 bg-gray-100 hover:text-gray-700"
@@ -271,22 +277,22 @@ const Sidebar = ({ permissions, rootMenu, menuTransForm }) => {
                 className="border-r-0"
                 onClick={(e) => handleOnClickMenuItem(e)}
               >
-                {rootMenu.map((item) => (
-                  item.View === true && (
-                    <Menu.Item key={item.RootMenuKey}>
-                      <Link
-                        onClick={() => handleonclickMenu(item)}
-                        className="flex items-center justify-start"
-                      >
-                        {iconMapping[item?.RootMenuIcon]}
-                        <span className="ml-3 uppercase">
-                          {t(item?.RootMenuLabel)}
-                        </span>
-                      </Link>
-                    </Menu.Item>
-                  )
-                ))}
-
+                {rootMenu.map(
+                  (item) =>
+                    item.View === true && (
+                      <Menu.Item key={item.RootMenuKey}>
+                        <Link
+                          onClick={() => handleonclickMenu(item)}
+                          className="flex items-center justify-start"
+                        >
+                          {iconMapping[item?.RootMenuIcon]}
+                          <span className="ml-3 uppercase">
+                            {t(item?.RootMenuLabel)}
+                          </span>
+                        </Link>
+                      </Menu.Item>
+                    ),
+                )}
               </Menu>
             </Sider>
           )}
@@ -297,8 +303,9 @@ const Sidebar = ({ permissions, rootMenu, menuTransForm }) => {
               collapsed={collapsed}
               collapsedWidth={0}
               onCollapse={toggleSidebar}
-              className={`${collapsed ? 'p-0 border-none' : 'p-2 border-r'
-                } h-screen overflow-auto scroll-container transition-all duration-300 ease-in-out`}
+              className={`${
+                collapsed ? 'p-0 border-none' : 'p-2 border-r'
+              } h-screen overflow-auto scroll-container transition-all duration-300 ease-in-out`}
             >
               <SidebarContent
                 collapsed={collapsed}
@@ -326,8 +333,12 @@ const Sidebar = ({ permissions, rootMenu, menuTransForm }) => {
                           key={item.Id}
                           title={
                             <span className="flex items-center justify-start">
-                              <FolderOpenOutlined style={{ fontSize: "20px" }} />
-                              <span className="ml-3 uppercase">{t(item?.MenuLabel)}</span>
+                              <FolderOpenOutlined
+                                style={{ fontSize: '20px' }}
+                              />
+                              <span className="ml-3 uppercase">
+                                {t(item?.MenuLabel)}
+                              </span>
                             </span>
                           }
                         >
@@ -339,12 +350,14 @@ const Sidebar = ({ permissions, rootMenu, menuTransForm }) => {
                                   to={subItem.MenuLink}
                                   className="flex items-center justify-start"
                                 >
-                                  <span className="uppercase">{t(subItem.MenuLabel)}</span>
+                                  <span className="uppercase">
+                                    {t(subItem.MenuLabel)}
+                                  </span>
                                 </Link>
                               </Menu.Item>
                             ))}
                         </Menu.SubMenu>
-                      );
+                      )
                     } else if (item?.MenuType === 'menu') {
                       return (
                         <Menu.Item key={item.Id}>
@@ -352,17 +365,18 @@ const Sidebar = ({ permissions, rootMenu, menuTransForm }) => {
                             to={item.MenuLink}
                             className="flex items-center justify-start"
                           >
-                            <FolderOpenOutlined style={{ fontSize: "20px" }} />
-                            <span className="ml-3 uppercase">{t(item.MenuLabel)}</span>
+                            <FolderOpenOutlined style={{ fontSize: '20px' }} />
+                            <span className="ml-3 uppercase">
+                              {t(item.MenuLabel)}
+                            </span>
                           </Link>
                         </Menu.Item>
-                      );
+                      )
                     }
                   }
-                  return null;
+                  return null
                 })}
               </Menu>
-
             </Sider>
           )}
         </div>
@@ -418,7 +432,6 @@ const Sidebar = ({ permissions, rootMenu, menuTransForm }) => {
           </div>
         </Footer>
       )}
-
     </>
   )
 }

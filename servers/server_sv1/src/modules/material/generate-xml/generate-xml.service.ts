@@ -62,7 +62,7 @@ export class GenerateXmlService {
     <ProdDate xml:space="preserve"></ProdDate>
     <STDUnitSeq>${item?.StdUnitSeq}</STDUnitSeq>
     <STDUnitName>${item?.STDUnitName}</STDUnitName>
-    <STDQty>${item?.StdQty}</STDQty>
+    <STDQty>${item?.Qty}</STDQty>
     <ItemName>${item?.ItemName}</ItemName>
     <ItemNo>${item?.ItemNo}</ItemNo>
     <UnitName>${item?.UnitName}</UnitName>

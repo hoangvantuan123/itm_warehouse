@@ -43,7 +43,7 @@ export default function Login({ fetchPermissions, processRolesMenu }) {
       const response = await LoginAuth({ login, password })
 
       if (response.success) {
-        console.log('response' , response)
+        console.log('response', response)
         localStorage.setItem('userInfo', JSON.stringify(response.data.user))
         localStorage.setItem('roles_menu', response.data.tokenRolesUserMenu)
         Cookies.set('a_a', response.data.token)
@@ -75,41 +75,48 @@ export default function Login({ fetchPermissions, processRolesMenu }) {
 
   const handleChangePassword = async () => {
     if (!oldPassword || !newPassword || !confirmNewPassword) {
-      setError('Please fill in all required fields!');
-      return;
+      setError('Please fill in all required fields!')
+      return
     }
 
     if (newPassword !== confirmNewPassword) {
-      setError('New passwords do not match!');
-      return;
+      setError('New passwords do not match!')
+      return
     }
 
     if (newPassword === oldPassword) {
-      setError('New password cannot be the same as the old password. Please choose a different one!');
-      return;
+      setError(
+        'New password cannot be the same as the old password. Please choose a different one!',
+      )
+      return
     }
 
     try {
-      const response = await ChangePassword(employeeId,oldPassword, newPassword);
-console.log('response' , response)
+      const response = await ChangePassword(
+        employeeId,
+        oldPassword,
+        newPassword,
+      )
+      console.log('response', response)
       if (response.success) {
+        message.success(response.message || 'Password changed successfully!')
 
-        message.success(response.message || 'Password changed successfully!');
-
-        setStatus(false);
-        setNewPassword('');
-        setConfirmNewPassword('');
-        setOldPassword('');
-        setCurrentView('login');
-        form.resetFields();
-        setError(null);
+        setStatus(false)
+        setNewPassword('')
+        setConfirmNewPassword('')
+        setOldPassword('')
+        setCurrentView('login')
+        form.resetFields()
+        setError(null)
       } else {
-        setError(response.message);
+        setError(response.message)
       }
     } catch (error) {
-      setError('An error occurred while changing the password. Please try again later.');
+      setError(
+        'An error occurred while changing the password. Please try again later.',
+      )
     }
-  };
+  }
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search)

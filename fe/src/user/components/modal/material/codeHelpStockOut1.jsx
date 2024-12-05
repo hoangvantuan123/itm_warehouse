@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { Modal, Button, Select, Input } from 'antd'
 import { SearchOutlined, FilterOutlined } from '@ant-design/icons'
 import { ArrowIcon } from '../../icons'
@@ -6,6 +6,7 @@ import TableCodeHelpStockOut1 from '../../table/codeHelp/codeHelpStockOut1'
 const { Search } = Input
 import CryptoJS from 'crypto-js'
 import { encodeBase64Url } from '../../../../utils/decode-JWT'
+import { CompactSelection } from '@glideapps/glide-data-grid'
 
 export default function CodeHelpStockOut1({
   setConditionSeq,
@@ -19,12 +20,16 @@ export default function CodeHelpStockOut1({
   setSubConditionSql,
   setDeptName,
   setDeptSeq,
-  setData1
+  setData1,
+  deptName
 }) {
-
   const [isMinusClicked, setIsMinusClicked] = useState(false)
   const [lastClickedCell, setLastClickedCell] = useState(null)
   const [clickedRowData, setClickedRowData] = useState(null)
+  const [selection, setSelection] = useState({
+    columns: CompactSelection.empty(),
+    rows: CompactSelection.empty(),
+  })
   const [keyPath, setKeyPath] = useState(null)
   const handleConditionSeq = (e) => {
     setConditionSeq(e)
@@ -34,8 +39,8 @@ export default function CodeHelpStockOut1({
   }
   const onCellClicked = (cell, event) => {
     let rowIndex
-
     if (cell[0] !== -1) {
+      console.log('onCellClicked')
       return
     }
 
@@ -61,15 +66,24 @@ export default function CodeHelpStockOut1({
 
     if (rowIndex >= 0 && rowIndex < data.length) {
       const rowData = data[rowIndex]
-
       setDeptName(rowData?.BeDeptName)
       setDeptSeq(rowData?.BeDeptSeq)
       setClickedRowData(rowData)
       setLastClickedCell(cell)
     }
   }
-
-
+  const resetTable = () => {
+    setSelection({
+      columns: CompactSelection.empty(),
+      rows: CompactSelection.empty(),
+    });
+  };
+  const handleClose = () => {
+    setModalVisible(false)
+    setDeptName('')
+    setDeptSeq('')
+    resetTable()
+  }
   return (
     <div>
       <Modal
@@ -84,9 +98,8 @@ export default function CodeHelpStockOut1({
       >
         <div
           style={{ display: 'flex', flexDirection: 'column', height: '75vh' }}
-          className='gap-4'
+          className="gap-4"
         >
-
           <details
             className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
             open
@@ -138,13 +151,13 @@ export default function CodeHelpStockOut1({
                   allowClear
                   size="middle"
                   placeholder="Tìm kiếm"
-                  value={keyword}
+                  value={deptName}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       handleSearch()
                     }
                   }}
-                  onChange={(e) => setKeyword(e.target.value)}
+                  onChange={(e) => setDeptName(e.target.value)}
                   className=" w-full"
                 />
               </div>
@@ -161,15 +174,15 @@ export default function CodeHelpStockOut1({
             </div>
           </details>
 
-
-          <TableCodeHelpStockOut1 data={data} onCellClicked={onCellClicked} />
+          <TableCodeHelpStockOut1 data={data} onCellClicked={onCellClicked} setSelection={setSelection} selection={selection} />
         </div>
         <div className="flex justify-end gap-4 ">
-
+          <Button onClick={handleClose}>
+            Cancel
+          </Button>
           <Button type="primary" onClick={() => setModalVisible(false)}>
             Save
           </Button>
-
         </div>
       </Modal>
     </div>

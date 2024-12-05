@@ -1,34 +1,34 @@
-import axios from 'axios';
-import { HOST_API_SERVER_2 } from '../../services';
-import { ERROR_MESSAGES } from '../../utils/constants';
-import { accessToken } from '../../services/tokenService';
+import axios from 'axios'
+import { HOST_API_SERVER_2 } from '../../services'
+import { ERROR_MESSAGES } from '../../utils/constants'
+import { accessToken } from '../../services/tokenService'
 
 export const DeleteGroups = async (ids) => {
   try {
-    const token = accessToken();
+    const token = accessToken()
 
     const response = await axios.delete(
       `${HOST_API_SERVER_2}/mssql/system-users/delete/groups`,
       {
-        data: { ids }, 
+        data: { ids },
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-      }
-    );
+      },
+    )
 
     if (response.status === 200 || response.status === 201) {
       return {
         success: true,
         message: response.data.message || 'Operation successful',
         data: response.data,
-      };
+      }
     } else {
       return {
         success: false,
         message: `Unexpected status code: ${response.status}`,
-      };
+      }
     }
   } catch (error) {
     return {
@@ -36,6 +36,6 @@ export const DeleteGroups = async (ids) => {
       message: error.response
         ? error.response.data.message || 'Có lỗi xảy ra'
         : 'Không thể kết nối tới server',
-    };
+    }
   }
-};
+}

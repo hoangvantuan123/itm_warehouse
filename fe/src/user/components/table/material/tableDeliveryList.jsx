@@ -4,7 +4,7 @@ import { Button } from 'antd'
 import '@glideapps/glide-data-grid/dist/index.css'
 import { useNavigate } from 'react-router-dom'
 import { CompactSelection } from '@glideapps/glide-data-grid'
-
+import { TableOutlined } from '@ant-design/icons'
 const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
@@ -17,11 +17,10 @@ function TableDeliveryList({
   setKeyPath,
   checkedPath,
   setCheckedPath,
-  onCellClicked, 
-  gridData, 
-  setGridData
+  onCellClicked,
+  gridData,
+  setGridData,
 }) {
-
   const [showSearch, setShowSearch] = useState(false)
   const ref = (useRef < data) | (null > null)
   const onSearchClose = useCallback(() => setShowSearch(false), [])
@@ -145,7 +144,6 @@ function TableDeliveryList({
     setGridData(data)
   }, [data])
 
-
   const onGridSelectionChange = (newSelection) => {
     console.log('Selection aborted', newSelection)
   }
@@ -153,6 +151,10 @@ function TableDeliveryList({
   return (
     <div className="w-full gap-1 h-full flex items-center justify-center pb-8">
       <div className="w-full h-full flex flex-col border bg-white rounded-lg overflow-hidden ">
+        <h2 className="text-xs font-medium flex items-center gap-2 p-2 text-blue-600 uppercase">
+          <TableOutlined />
+          DATA SHEET
+        </h2>
         <DataEditor
           columns={cols}
           getCellContent={getData}
@@ -171,6 +173,13 @@ function TableDeliveryList({
           rowSelect="single"
           gridSelection={selection}
           onGridSelectionChange={setSelection}
+          getRowThemeOverride={(i) =>
+            i % 2 === 0
+              ? undefined
+              : {
+                  bgCell: '#FBFBFB',
+                }
+          }
         />
       </div>
     </div>

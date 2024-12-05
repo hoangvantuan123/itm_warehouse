@@ -9,9 +9,12 @@ import {
   Select,
   message,
   Drawer,
+  Input,
 } from 'antd'
 import { getUsersNotInRole } from '../../../../features/system/getUsersNotInRole'
 import { PostRolesUser } from '../../../../features/system/postRolesUser'
+import { SearchOutlined } from '@ant-design/icons'
+
 const { Title } = Typography
 const { Option } = Select
 
@@ -23,16 +26,22 @@ export default function ModalUsers({ isOpen, onClose, groupId, fetchData3 }) {
   const [total, setTotal] = useState(0)
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
   const [data, setData] = useState([])
+  const [filteredData, setFilteredData] = useState([])
+  const [searchText, setSearchText] = useState('')
+  const [searchColumn, setSearchColumn] = useState('')
+
   const fetchData = async () => {
     setLoading(true)
     try {
       const response = await getUsersNotInRole(groupId)
       if (response.success) {
         setData(response.data)
+        setFilteredData(response.data) // Lưu dữ liệu gốc khi fetch
       }
     } catch (error) {
       setError(error.message || 'Đã xảy ra lỗi')
       setData([])
+      setFilteredData([])
     } finally {
       setLoading(false)
     }
@@ -51,7 +60,7 @@ export default function ModalUsers({ isOpen, onClose, groupId, fetchData3 }) {
     try {
       const result = await PostRolesUser(selectedRowKeys, groupId, 'user')
       if (result.success) {
-        message.success('Cập nhật  thành công')
+        message.success('Cập nhật thành công')
         setSelectedRowKeys([])
         onClose()
         fetchData3()
@@ -61,12 +70,31 @@ export default function ModalUsers({ isOpen, onClose, groupId, fetchData3 }) {
     }
   }
 
+  const handleSearch = () => {
+    if (!searchText || !searchColumn) {
+      return
+    }
+
+    let filtered = data.filter((item) =>
+      item[searchColumn]
+        ?.toString()
+        .toLowerCase()
+        .includes(searchText.toLowerCase()),
+    )
+    setFilteredData(filtered)
+  }
+
+  const handleReset = () => {
+    setSearchText('')
+    setSearchColumn('')
+    setFilteredData(data)
+  }
+
   const columns = [
     {
       title: 'UserSeq',
       dataIndex: 'UserSeq',
       key: 'UserSeq',
-      sorter: (a, b) => a.UserSeq.localeCompare(b.UserSeq),
     },
     {
       title: 'UserId',
@@ -106,6 +134,7 @@ export default function ModalUsers({ isOpen, onClose, groupId, fetchData3 }) {
         <Button
           key="submit"
           type="primary"
+          className="ml-5"
           onClick={handleFinish}
           style={{ backgroundColor: '#1890ff', borderColor: '#1890ff' }}
         >
@@ -113,7 +142,39 @@ export default function ModalUsers({ isOpen, onClose, groupId, fetchData3 }) {
         </Button>,
       ]}
     >
-      <div className="font-medium text-xs mb-4">DATA USERS </div>
+      <div className="font-medium text-xs mb-4">DATA USERS</div>
+
+      <div
+        style={{ marginBottom: 16 }}
+        className="border w-full  p-3 rounded-lg flex gap-3"
+      >
+        <Select
+          placeholder="Chọn cột tìm kiếm"
+          value={searchColumn}
+          onChange={setSearchColumn}
+          size="middle"
+          className="w-32"
+        >
+          <Option value="UserSeq">UserSeq</Option>
+          <Option value="UserId">UserId</Option>
+          <Option value="UserName">UserName</Option>
+        </Select>
+        <Input
+          placeholder="Nhập từ khóa tìm kiếm"
+          value={searchText}
+          size="middle"
+          onChange={(e) => setSearchText(e.target.value)}
+        />
+        <Button
+          type="primary"
+          icon={<SearchOutlined />}
+          onClick={handleSearch}
+          style={{ marginRight: 8 }}
+        >
+          Tìm kiếm
+        </Button>
+        <Button onClick={handleReset}>Reset</Button>
+      </div>
 
       <Table
         rowSelection={{
@@ -128,9 +189,9 @@ export default function ModalUsers({ isOpen, onClose, groupId, fetchData3 }) {
         size="small"
         bordered
         columns={columns}
-        dataSource={data}
+        dataSource={filteredData}
         rowKey="UserId"
-        className="cursor-pointer pb-0 "
+        className="cursor-pointer pb-0"
         loading={loading}
         pagination={{
           current: page,

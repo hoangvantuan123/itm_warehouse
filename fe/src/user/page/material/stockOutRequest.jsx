@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Helmet } from 'react-helmet'
-import { Input, Space, Table, Typography, message, Tabs, Layout } from 'antd'
+import { Input, notification, Table, Typography, Alert, Spin, Layout } from 'antd'
 const { Title, Text } = Typography
-import { FilterOutlined } from '@ant-design/icons'
+import { FilterOutlined, LoadingOutlined } from '@ant-design/icons'
 import { ArrowIcon } from '../../components/icons'
 import dayjs from 'dayjs'
 import TableDeliveryList from '../../components/table/material/tableDeliveryList'
@@ -21,15 +21,18 @@ import CodeHelpStockOut2 from '../../components/modal/material/codeHelpStockOut2
 import CodeHelpStockOut3 from '../../components/modal/material/codeHelpStockOut3'
 import { SPDMMOutReqListQueryWeb } from '../../../features/material/postStockOutList'
 import { GetCodeHelp } from '../../../features/codeHelp/getCodeHelp'
-
-
+import NoneData from '../default/noneData'
+import NotificationApp from '../default/notificationStatus'
+const { Header, Content, Footer } = Layout
 export default function StockOutRequest({ permissions, isMobile }) {
   const { t } = useTranslation()
   const gridRef = useRef(null)
   const navigate = useNavigate()
   /*OutReqSeq
-    */
+   */
   const [loading, setLoading] = useState(false)
+  const [loadingA, setLoadingA] = useState(false)
+  const [errorA, setErrorA] = useState(false)
   const [data, setData] = useState([])
   const [dataUnit, setDataUnit] = useState([])
   const [minorName, setMinorName] = useState([])
@@ -40,15 +43,13 @@ export default function StockOutRequest({ permissions, isMobile }) {
   const [factUnit, setFactUnit] = useState('')
   const [progStatus, setProgStatus] = useState('')
   const [useType, setUseType] = useState('')
-  const [checkedRowKey, setCheckedRowKey] = useState(null)
   const [keyPath, setKeyPath] = useState(null)
-  const [checkedPath, setCheckedPath] = useState(false)
-  const formatDate = useCallback((date) => date.format('YYYYMMDD'), [])
+  const formatDate = useCallback((date) => date.format('YYYYMMDD'), '')
   const [isMinusClicked, setIsMinusClicked] = useState(false)
   const [lastClickedCell, setLastClickedCell] = useState(null)
   const [clickedRowData, setClickedRowData] = useState(null)
   const [gridData, setGridData] = useState([])
-  const [isOpenDetails, setIsOpenDetails] = useState(false);
+  const [isOpenDetails, setIsOpenDetails] = useState(false)
   /* CodeHelp */
   const [modalVisible1, setModalVisible1] = useState(false)
   const [data1, setData1] = useState([])
@@ -70,24 +71,35 @@ export default function StockOutRequest({ permissions, isMobile }) {
   const [workOrderNo, setWorkOrderNo] = useState('')
   const [prodReqNo, setProdReqNo] = useState('')
   const [outReqNo, setOutReqNo] = useState('')
+
+  const [spinning, setSpinning] = useState(false);
+  const [percent, setPercent] = useState(0);
+  const showLoader = () => {
+    setSpinning(true);
+    let ptg = -10;
+    const interval = setInterval(() => {
+      ptg += 5;
+      setPercent(ptg);
+      if (ptg > 120) {
+        clearInterval(interval);
+        setSpinning(false);
+        setPercent(0);
+      }
+    }, 100);
+  };
   useEffect(() => {
-    const savedState = localStorage.getItem("detailsStateStockOut");
-    setIsOpenDetails(savedState === "open");
-  }, []);
-
-
-
+    const savedState = localStorage.getItem('detailsStateStockOut')
+    setIsOpenDetails(savedState === 'open')
+  }, [])
 
   const handleToggle = (event) => {
-    const isOpen = event.target.open;
-    setIsOpenDetails(isOpen);
-    localStorage.setItem("detailsStateStockOut", isOpen ? "open" : "closed");
-  };
-
-
+    const isOpen = event.target.open
+    setIsOpenDetails(isOpen)
+    localStorage.setItem('detailsStateStockOut', isOpen ? 'open' : 'closed')
+  }
 
   const fetchSPDMMOutReqListQueryWeb = useCallback(async () => {
-    setLoading(true)
+    setLoadingA(true)
     try {
       const formA = {
         IsChangedMst: '1',
@@ -110,11 +122,25 @@ export default function StockOutRequest({ permissions, isMobile }) {
       const response = await SPDMMOutReqListQueryWeb(formA)
       setData(response?.data || [])
     } catch (error) {
-      setData([])
+      setErrorA(true)
     } finally {
-      setLoading(false)
+      setLoadingA(false)
     }
-  }, [formData, toDate, factUnit, progStatus, useType, deptSeq, empSeq, custSeq, prodPlanNo, workOrderNo, prodReqNo, outReqNo])
+  }, [
+    formData,
+    toDate,
+    factUnit,
+    progStatus,
+    useType,
+    deptSeq,
+    empSeq,
+    custSeq,
+    prodPlanNo,
+    workOrderNo,
+    prodReqNo,
+    outReqNo,
+  ])
+
 
 
   const fetchCodehelpData1 = useCallback(async () => {
@@ -125,7 +151,7 @@ export default function StockOutRequest({ permissions, isMobile }) {
         6,
         10010,
         1,
-        keyword,
+        deptName,
         '',
         '',
         '',
@@ -140,20 +166,21 @@ export default function StockOutRequest({ permissions, isMobile }) {
         0,
         0,
         0,
-        18770)
+        18770,
+      )
       setData1(response?.data || [])
     } catch (error) {
       setData1([])
     } finally {
       setLoading(false)
     }
-  }, [conditionSeq, subConditionSql, keyword])
-
+  }, [conditionSeq, subConditionSql, deptName])
 
   const fetchCodehelpData2 = useCallback(async () => {
     setLoading(true)
     try {
-      const response = await GetCodeHelp('Q',
+      const response = await GetCodeHelp(
+        'Q',
         6,
         10009,
         1,
@@ -172,7 +199,8 @@ export default function StockOutRequest({ permissions, isMobile }) {
         0,
         0,
         0,
-        18770)
+        18770,
+      )
       setData2(response?.data || [])
     } catch (error) {
       setData2([])
@@ -183,9 +211,8 @@ export default function StockOutRequest({ permissions, isMobile }) {
   const fetchCodehelpData3 = useCallback(async () => {
     setLoading(true)
     try {
-
-
-      const response = await GetCodeHelp('Q',
+      const response = await GetCodeHelp(
+        'Q',
         6,
         17071,
         1,
@@ -204,7 +231,8 @@ export default function StockOutRequest({ permissions, isMobile }) {
         0,
         0,
         0,
-        18770)
+        18770,
+      )
       setData3(response?.data || [])
     } catch (error) {
       setData3([])
@@ -214,44 +242,37 @@ export default function StockOutRequest({ permissions, isMobile }) {
   }, [conditionSeq, subConditionSql, keyword])
 
   const fetchCodeHelpData = useCallback(async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const [codeHelpResponse1, codeHelpResponse2, codeHelpResponse3] = await Promise.all([
-        GetCodeHelpCombo('', 6, 60001, 1, '%', '', '', '', ''),
-        GetCodeHelpCombo('', 6, 19998, 1, '%', '6036', '', '', ''),
-        GetCodeHelpCombo('', 6, 19998, 1, '%', '6044', '', '', '')
-      ]);
+      const [codeHelpResponse1, codeHelpResponse2, codeHelpResponse3] =
+        await Promise.all([
+          GetCodeHelpCombo('', 6, 60001, 1, '%', '', '', '', ''),
+          GetCodeHelpCombo('', 6, 19998, 1, '%', '6036', '', '', ''),
+          GetCodeHelpCombo('', 6, 19998, 1, '%', '6044', '', '', ''),
+        ])
 
-      setDataUnit(codeHelpResponse1?.data || []);
-      setMinorName(codeHelpResponse2?.data || []);
-      setMinorName2(codeHelpResponse3?.data || []);
+      setDataUnit(codeHelpResponse1?.data || [])
+      setMinorName(codeHelpResponse2?.data || [])
+      setMinorName2(codeHelpResponse3?.data || [])
     } catch (error) {
-      setDataUnit([]);
-      setMinorName([]);
+      setDataUnit([])
+      setMinorName([])
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, []);
+  }, [])
 
 
-
-  const debouncedFetchSPDMMOutReqListQueryWeb = useMemo(
-    () => debounce(fetchSPDMMOutReqListQueryWeb, 100),
-    [fetchSPDMMOutReqListQueryWeb],
-  )
   const debouncedFetchCodeHelpData = useMemo(
     () => debounce(fetchCodeHelpData, 100),
     [fetchCodeHelpData],
   )
-
-
 
   const nextPage = useCallback(() => {
     if (keyPath) {
       navigate(`/u/warehouse/material/stock-out-request/${keyPath}`)
     }
   }, [keyPath, navigate])
-
 
   const onCellClicked = (cell, event) => {
     let rowIndex
@@ -323,24 +344,17 @@ export default function StockOutRequest({ permissions, isMobile }) {
       setClickedRowData(rowData)
       setLastClickedCell(cell)
     }
-
   }
-
-
-
-
 
   const handleSearch1 = async () => {
     setLoadingCodeHelp(true)
     setModalVisible1(true)
     fetchCodehelpData1()
-
   }
   const handleSearch2 = async () => {
     setLoadingCodeHelp(true)
     setModalVisible2(true)
     fetchCodehelpData2()
-
   }
 
   const handleSearch3 = async () => {
@@ -367,7 +381,12 @@ export default function StockOutRequest({ permissions, isMobile }) {
               <Title level={4} className="mt-2 uppercase opacity-85 ">
                 {t('Stock Out Request')}
               </Title>
-              <StockOutRequestActions nextPage={nextPage} debouncedFetchSPDMMOutReqListQueryWeb={debouncedFetchSPDMMOutReqListQueryWeb} />
+              <StockOutRequestActions
+                nextPage={nextPage}
+                debouncedFetchSPDMMOutReqListQueryWeb={
+                  fetchSPDMMOutReqListQueryWeb
+                }
+              />
             </div>
             <details
               className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
@@ -375,7 +394,7 @@ export default function StockOutRequest({ permissions, isMobile }) {
               onToggle={handleToggle}
             >
               <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
-                <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600">
+                <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600 uppercase">
                   <FilterOutlined />
                   {t('Điều kiện truy vấn')}
                 </h2>
@@ -384,7 +403,6 @@ export default function StockOutRequest({ permissions, isMobile }) {
                 </span>
               </summary>
               <div className="flex p-2 gap-4">
-
                 <StockOutRequestQuery
                   formData={formData}
                   setFormData={setFormData}
@@ -393,6 +411,8 @@ export default function StockOutRequest({ permissions, isMobile }) {
                   dataUnit={dataUnit}
                   setBizUnit={setBizUnit}
                   deptName={deptName}
+                  setDeptName={setDeptName}
+                  setDeptSeq={setDeptSeq}
                   handleSearch1={handleSearch1}
                   handleSearch2={handleSearch2}
                   handleSearch3={handleSearch3}
@@ -423,12 +443,24 @@ export default function StockOutRequest({ permissions, isMobile }) {
           </div>
 
           <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg">
-            <TableStockOutRequest data={data}
-              loading={loading}
-              setData={setData}
-              onCellClicked={onCellClicked}
-              setGridData={setGridData}
-              gridData={gridData} />
+
+            <NotificationApp loading={loadingA} error={errorA} />
+            {data.length > 0 ? (
+              <>
+                <TableStockOutRequest
+                  data={data}
+                  loading={loading}
+                  setData={setData}
+                  onCellClicked={onCellClicked}
+                  setGridData={setGridData}
+                  gridData={gridData}
+                />
+              </>
+            ) : (
+              <>
+                <NoneData />
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -445,6 +477,7 @@ export default function StockOutRequest({ permissions, isMobile }) {
         setKeyword={setKeyword}
         setDeptSeq={setDeptSeq}
         setDeptName={setDeptName}
+        deptName={deptName}
         setData1={setData1}
       />
       <CodeHelpStockOut2
@@ -460,7 +493,6 @@ export default function StockOutRequest({ permissions, isMobile }) {
         setKeyword={setKeyword}
         setEmpName={setEmpName}
         setEmpSeq={setEmpSeq}
-
       />
       <CodeHelpStockOut3
         setModalVisible={setModalVisible3}

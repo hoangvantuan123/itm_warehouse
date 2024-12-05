@@ -1,10 +1,8 @@
 import axios from 'axios'
-import {
-    HOST_API_SERVER_1
-} from '../../services'
+import { HOST_API_SERVER_1 } from '../../services'
 
 const generateXml = (data) => {
-    return `
+  return `
        <DataBlock1>
     <WorkingTag>A</WorkingTag>
     <IDX_NO>1</IDX_NO>
@@ -33,51 +31,52 @@ const generateXml = (data) => {
 }
 
 const DEFAULTS = {
-    xmlFlags: 2,
-    serviceSeq: 4594,
-    workingTag: '',
-    companySeq: 1,
-    languageSeq: 6,
-    userSeq: 3106,
-    pgmSeq: 1036085,
+  xmlFlags: 2,
+  serviceSeq: 4594,
+  workingTag: '',
+  companySeq: 1,
+  languageSeq: 6,
+  userSeq: 3106,
+  pgmSeq: 1036085,
 }
 
 export const SPDMMOutReqListQueryWeb = (requestData) => {
-    const requestParams = {
-        ...DEFAULTS,
-        ...requestData,
-    }
-    const xmlDocument = generateXml(requestParams)
-    const dataToSend = {
-        xmlDocument,
-        xmlFlags: requestParams.xmlFlags,
-        serviceSeq: requestParams.serviceSeq,
-        workingTag: requestParams.workingTag,
-        companySeq: requestParams.companySeq,
-        languageSeq: requestParams.languageSeq,
-        userSeq: requestParams.userSeq,
-        pgmSeq: requestParams.pgmSeq,
-    }
+  const requestParams = {
+    ...DEFAULTS,
+    ...requestData,
+  }
+  const xmlDocument = generateXml(requestParams)
+  const dataToSend = {
+    xmlDocument,
+    xmlFlags: requestParams.xmlFlags,
+    serviceSeq: requestParams.serviceSeq,
+    workingTag: requestParams.workingTag,
+    companySeq: requestParams.companySeq,
+    languageSeq: requestParams.languageSeq,
+    userSeq: requestParams.userSeq,
+    pgmSeq: requestParams.pgmSeq,
+  }
 
-    return axios
-        .post(
-            `${HOST_API_SERVER_1}/mssql/stock-out/sp-dmm-out-req-list`,
-            dataToSend, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            },
-        )
-        .then((response) => {
-            if (response.status === 200 || response.status === 201) {
-                return response.data
-            }
-            throw new Error('Error from API: ' + response.data.message)
-        })
-        .catch((error) => {
-            const errorMessage = error.response ?
-                error.response.data.message || 'Error from API' :
-                'Unknown error occurred'
-            throw new Error(errorMessage)
-        })
+  return axios
+    .post(
+      `${HOST_API_SERVER_1}/mssql/stock-out/sp-dmm-out-req-list`,
+      dataToSend,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+    .then((response) => {
+      if (response.status === 200 || response.status === 201) {
+        return response.data
+      }
+      throw new Error('Error from API: ' + response.data.message)
+    })
+    .catch((error) => {
+      const errorMessage = error.response
+        ? error.response.data.message || 'Error from API'
+        : 'Unknown error occurred'
+      throw new Error(errorMessage)
+    })
 }

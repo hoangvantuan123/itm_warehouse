@@ -19,23 +19,23 @@ export default function RoleManagement({ permissions, isMobile }) {
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState([])
   const [groups, setGroups] = useState([])
-  const [changedIds, setChangedIds] = useState([]);
+  const [changedIds, setChangedIds] = useState([])
   const [selectedRowKeys, setSelectedRowKeys] = useState({
     table1: [],
     table2: [],
     table3: [],
-  });
+  })
   const [openView, setOpenView] = useState(false)
-  const [openModal, setOpenModal] = useState(false);
+  const [openModal, setOpenModal] = useState(false)
   const [selectedGroup, setSelectedGroup] = useState(null)
-  const [checkStatus, setCheckStatus] = useState(false);
+  const [checkStatus, setCheckStatus] = useState(false)
   const getAllSelectedKeys = () => {
     return [
       ...selectedRowKeys.table1,
       ...selectedRowKeys.table2,
       ...selectedRowKeys.table3,
-    ];
-  };
+    ]
+  }
 
   const [isModalOpenAddUserGroups, setIsModalOpenAddUserGroups] =
     useState(false)
@@ -74,46 +74,45 @@ export default function RoleManagement({ permissions, isMobile }) {
     if (changedIds.length === 0) {
       message.warning('No changes to submit.')
 
-      return;
+      return
     }
 
-    const response = await PostUpdateRolesUser(changedIds);
+    const response = await PostUpdateRolesUser(changedIds)
 
     if (response.success) {
       message.success('Save successful!')
-      setChangedIds([]);
+      setChangedIds([])
     } else {
       message.error('Save failed!')
     }
-  }, [changedIds]);
+  }, [changedIds])
 
   const handleDeleteDataSheet = useCallback(async () => {
-    const ids = getAllSelectedKeys();
+    const ids = getAllSelectedKeys()
     if (ids.length === 0) {
       message.warning('No rows selected.')
-      return;
+      return
     }
-    const response = await DeleteRolesUser(ids);
+    const response = await DeleteRolesUser(ids)
     if (response.success) {
-
       message.success('Delete successful!')
       setCheckStatus(true)
       setSelectedRowKeys({
         table1: [],
         table2: [],
         table3: [],
-      });
+      })
     } else {
       message.error('Save failed!')
     }
-  }, [selectedRowKeys]);
+  }, [selectedRowKeys])
   const handleDeleteGroups = useCallback(async () => {
-    if(!selectedGroup){
+    if (!selectedGroup) {
       message.warning('Không có nhóm để xoá!')
-      return;
+      return
     }
     setOpenModal(true)
-  }, [selectedGroup]);
+  }, [selectedGroup])
 
   return (
     <>
@@ -161,7 +160,14 @@ export default function RoleManagement({ permissions, isMobile }) {
           onClose={closeModalAddUserGroups}
           fetchDataGroups={fetchDataGroups}
         />
-        <WarningDeleteGroup modalOpen={openModal} setModalOpen={setOpenModal}  selectedGroup={selectedGroup} setSelectedGroup={setSelectedGroup} setOpenView={setOpenView} fetchDataGroups={fetchDataGroups}/>
+        <WarningDeleteGroup
+          modalOpen={openModal}
+          setModalOpen={setOpenModal}
+          selectedGroup={selectedGroup}
+          setSelectedGroup={setSelectedGroup}
+          setOpenView={setOpenView}
+          fetchDataGroups={fetchDataGroups}
+        />
       </div>
     </>
   )

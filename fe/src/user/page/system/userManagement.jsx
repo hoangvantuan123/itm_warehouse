@@ -37,7 +37,7 @@ export default function UserManagement({ permissions, isMobile }) {
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
   })
-
+  const [showSearch, setShowSearch] = useState(false)
   const formatDate = useCallback((date) => date.format('YYYYMMDD'), [])
 
   const fetchSystemUsersData = useCallback(async () => {
@@ -62,56 +62,64 @@ export default function UserManagement({ permissions, isMobile }) {
   }
   useEffect(() => {
     if (!userId && !userName) {
-      fetchSystemUsersData();
+      fetchSystemUsersData()
     }
-  }, [fetchSystemUsersData, userId, userName]);
+  }, [fetchSystemUsersData, userId, userName])
 
   useEffect(() => {
     if (searchTriggered) {
-      debouncedFetchDeliveryData();
+      debouncedFetchDeliveryData()
     }
     return () => {
-      debouncedFetchDeliveryData.cancel();
-    };
-  }, [debouncedFetchDeliveryData, searchTriggered]);
+      debouncedFetchDeliveryData.cancel()
+    }
+  }, [debouncedFetchDeliveryData, searchTriggered])
   const getSelectedRowIndices = () => {
-    const selectedRows = selection.rows.items;
-    let indices = [];
+    const selectedRows = selection.rows.items
+    let indices = []
 
     selectedRows.forEach((range) => {
-      const start = range[0];
-      const end = range[1] - 1;
+      const start = range[0]
+      const end = range[1] - 1
 
       for (let i = start; i <= end; i++) {
-        indices.push(i);
+        indices.push(i)
       }
-    });
+    })
 
-    return indices;
-  };
-  const handleUpdatePassUsers = useCallback(
-    async () => {
-      setLoadingUpadtePass(true);
-      const loadingMessage = message.loading("Updating passwords...", 0);
+    return indices
+  }
+  const handleUpdatePassUsers = useCallback(async () => {
+    setLoadingUpadtePass(true)
+    const loadingMessage = message.loading('Updating passwords...', 0)
 
-      try {
-        const selectedRowIndices = getSelectedRowIndices();
+    try {
+      const selectedRowIndices = getSelectedRowIndices()
 
-        const selectedIds = selectedRowIndices.map((index) => data[index].UserId);
+      const selectedIds = selectedRowIndices.map((index) => data[index].UserId)
 
-        await UpdatePass2(selectedIds);
+      await UpdatePass2(selectedIds)
 
-        loadingMessage();
-        message.success("Passwords updated successfully!");
-      } catch (error) {
-        message.error("Failed to update passwords. Please try again.");
-      } finally {
-        setLoadingUpadtePass(false);
+      loadingMessage()
+      message.success('Passwords updated successfully!')
+    } catch (error) {
+      message.error('Failed to update passwords. Please try again.')
+    } finally {
+      setLoadingUpadtePass(false)
+    }
+  }, [data, selection])
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        e.preventDefault()
+        setShowSearch(true)
       }
-    },
-    [data, selection]
-  );
-
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
   return (
     <>
       <Helmet>
@@ -124,14 +132,18 @@ export default function UserManagement({ permissions, isMobile }) {
               <Title level={4} className="mt-2 uppercase opacity-85 ">
                 {t('USER MANAGEMENT')}
               </Title>
-              <UserManagementActions handleSearch={handleSearch} handleUpdatePassUsers={handleUpdatePassUsers} />
+              <UserManagementActions
+                handleSearch={handleSearch}
+                handleUpdatePassUsers={handleUpdatePassUsers}
+                data={data}
+              />
             </div>
             <details
               className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
               open
             >
               <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
-                <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600">
+                <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600 uppercase">
                   <FilterOutlined />
                   {t('Điều kiện truy vấn')}
                 </h2>
@@ -162,6 +174,8 @@ export default function UserManagement({ permissions, isMobile }) {
               setData={setData}
               setSelection={setSelection}
               selection={selection}
+              showSearch={showSearch}
+              setShowSearch={setShowSearch}
             />
           </div>
         </div>

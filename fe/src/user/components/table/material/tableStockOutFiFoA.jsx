@@ -27,11 +27,11 @@ function TableStockOUtFiFoA({ data }) {
       { title: 'OutReqNo' },
       { title: 'ItemName' },
       { title: 'ItemNo' },
-      { title: 'Spec' }, 
-      { title: 'UnitName' }, 
-      { title: 'RemainQty' }, 
-      { title: 'OutQty' }, 
-      { title: 'Qty1' }, 
+      { title: 'Spec' },
+      { title: 'UnitName' },
+      { title: 'RemainQty' },
+      { title: 'OutQty' },
+      { title: 'Qty1' },
     ],
     [],
   )
@@ -57,19 +57,27 @@ function TableStockOUtFiFoA({ data }) {
     ([col, row]) => {
       const person = gridData[row] || {}
       const {
+        OutReqNo = '',
+        ItemName = '',
         ItemNo = '',
-        TotalQty = '',
-        OkQty = '',
-        RemainQty = ''
+        Spec = '',
+        UnitName = '',
+        RemainQty = '',
+        OutQty = '',
+        Qty1 = '',
       } = person
 
       const safeString = (value) => (value != null ? String(value) : '')
 
       const columnMap = {
-        0: { kind: GridCellKind.Text, data: safeString(ItemNo) },
-        1: { kind: GridCellKind.Text, data: safeString(TotalQty) },
-        2: { kind: GridCellKind.Text, data: safeString(OkQty) },
-        3: { kind: GridCellKind.Text, data: safeString(RemainQty) }
+        0: { kind: GridCellKind.Text, data: safeString(OutReqNo) },
+        1: { kind: GridCellKind.Text, data: safeString(ItemName) },
+        2: { kind: GridCellKind.Text, data: safeString(ItemNo) },
+        3: { kind: GridCellKind.Text, data: safeString(Spec) },
+        4: { kind: GridCellKind.Text, data: safeString(UnitName) },
+        5: { kind: GridCellKind.Text, data: safeString(RemainQty) },
+        6: { kind: GridCellKind.Text, data: safeString(OutQty) },
+        7: { kind: GridCellKind.Text, data: safeString(Qty1) },
       }
 
       if (columnMap.hasOwnProperty(col)) {
@@ -127,8 +135,6 @@ function TableStockOUtFiFoA({ data }) {
     } else {
       console.log('Invalid row index:', rowIndex)
     }
-
-   
   }
 
   const onGridSelectionChange = (newSelection) => {
@@ -136,26 +142,33 @@ function TableStockOUtFiFoA({ data }) {
   }
 
   return (
-      <div className="w-full h-full border-t border-b overflow-hidden scroll-container ">
-        <DataEditor
-          columns={cols}
-          getCellContent={getData}
-          rows={gridData.length}
-          showSearch={showSearch}
-          getCellsForSelection={true}
-          onSearchClose={onSearchClose}
-          width="100%"
-          height="100%"
-          rowMarkers={('checkbox-visible', 'both')}
-          useRef={useRef}
-          onColumnResize={onColumnResize}
-          smoothScrollY={true}
-          smoothScrollX={true}
-          onCellClicked={onCellClicked}
-          rowSelect="single"
-          gridSelection={selection}
-          onGridSelectionChange={setSelection}
-        />
+    <div className="w-full h-full border-t border-b overflow-hidden scroll-container ">
+      <DataEditor
+        columns={cols}
+        getCellContent={getData}
+        rows={gridData.length}
+        showSearch={showSearch}
+        getCellsForSelection={true}
+        onSearchClose={onSearchClose}
+        width="100%"
+        height="100%"
+        rowMarkers={('checkbox-visible', 'both')}
+        useRef={useRef}
+        onColumnResize={onColumnResize}
+        smoothScrollY={true}
+        smoothScrollX={true}
+        onCellClicked={onCellClicked}
+        rowSelect="single"
+        gridSelection={selection}
+        onGridSelectionChange={setSelection}
+        getRowThemeOverride={(i) =>
+          i % 2 === 0
+            ? undefined
+            : {
+                bgCell: '#FBFBFB',
+              }
+        }
+      />
     </div>
   )
 }

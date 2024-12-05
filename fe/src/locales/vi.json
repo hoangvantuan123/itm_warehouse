@@ -2,5 +2,8 @@
   "auth": {
     "login": "Đăng nhập",
     "register": "Đăng ký"
+  },
+  "test": {
+    "DeliveryList": "Tiếng việt"
   }
 }

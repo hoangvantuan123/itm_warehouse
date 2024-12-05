@@ -39,4 +39,30 @@ export class StockOutController {
         return result;
     }
 
+
+
+    @Post('smaterial-qr-check-stock-out-web')
+    async processSMaterialQRStockOutCheckWEB(@Body() body: any): Promise<SimpleQueryResult> {
+        const {
+            xmlDocument,
+            xmlFlags,
+            serviceSeq,
+            workingTag,
+            companySeq,
+            languageSeq,
+            userSeq,
+            pgmSeq,
+        } = body;
+        return this.stockOutService._SMaterialQRStockOutCheck_WEB(
+            xmlDocument,
+            xmlFlags,
+            serviceSeq,
+            workingTag,
+            companySeq,
+            languageSeq,
+            userSeq,
+            pgmSeq,
+        );
+    }
+
 }

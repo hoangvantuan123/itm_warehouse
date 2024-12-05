@@ -8,12 +8,22 @@ import ModalMenu from '../../modal/system/modalMenu'
 import { getPaginatedRolesRootMenu } from '../../../../features/system/getPaginatedRolesRootMenu'
 import { getPaginatedRolesMenu } from '../../../../features/system/getPaginatedRolesMenu'
 import { getPaginatedRolesUsers } from '../../../../features/system/getPaginatedRolesUsers'
-import debounce from 'lodash.debounce';
+import debounce from 'lodash.debounce'
 const { Header, Content, Footer } = Layout
 const menuStyle = { borderInlineEnd: 'none' }
-function ViewRoleManagement({ groups, changedIds, setChangedIds, setSelectedRowKeys, selectedRowKeys, setCheckStatus, checkStatus , setSelectedGroup , selectedGroup , setOpenView, openView}) {
- 
-
+function ViewRoleManagement({
+  groups,
+  changedIds,
+  setChangedIds,
+  setSelectedRowKeys,
+  selectedRowKeys,
+  setCheckStatus,
+  checkStatus,
+  setSelectedGroup,
+  selectedGroup,
+  setOpenView,
+  openView,
+}) {
   const [userInfo, setUserInfo] = useState({
     groupName: '',
     note: '',
@@ -45,8 +55,8 @@ function ViewRoleManagement({ groups, changedIds, setChangedIds, setSelectedRowK
     setSelectedRowKeys((prevSelectedKeys) => ({
       ...prevSelectedKeys,
       [tableKey]: newSelectedRowKeys,
-    }));
-  };
+    }))
+  }
 
   const fetchData1 = async () => {
     setLoading(true)
@@ -154,56 +164,61 @@ function ViewRoleManagement({ groups, changedIds, setChangedIds, setSelectedRowK
     })
   }
 
-
   const handlePermissionChange1 = (id, permissionType) => {
-    const newData = [...data1];
-    const recordIndex = newData.findIndex((record) => record.Id === id);
+    const newData = [...data1]
+    const recordIndex = newData.findIndex((record) => record.Id === id)
 
     if (recordIndex !== -1) {
-      const newValue = !newData[recordIndex][permissionType];
-      newData[recordIndex][permissionType] = newValue;
-      setData1(newData);
+      const newValue = !newData[recordIndex][permissionType]
+      newData[recordIndex][permissionType] = newValue
+      setData1(newData)
 
       setChangedIds((prev) => {
         const existingIndex = prev.findIndex(
-          (change) => change.id === id && change.column === permissionType
-        );
+          (change) => change.id === id && change.column === permissionType,
+        )
 
         if (existingIndex !== -1) {
-          const updatedChanges = [...prev];
-          updatedChanges[existingIndex] = { id, column: permissionType, value: newValue };
-          return updatedChanges;
+          const updatedChanges = [...prev]
+          updatedChanges[existingIndex] = {
+            id,
+            column: permissionType,
+            value: newValue,
+          }
+          return updatedChanges
         }
-        return [...prev, { id, column: permissionType, value: newValue }];
-      });
+        return [...prev, { id, column: permissionType, value: newValue }]
+      })
     }
-  };
-
-
+  }
 
   const handlePermissionChange2 = (id, permissionType) => {
-    const newData = [...data2];
-    const recordIndex = newData.findIndex((record) => record.Id === id);
+    const newData = [...data2]
+    const recordIndex = newData.findIndex((record) => record.Id === id)
 
     if (recordIndex !== -1) {
-      const newValue = !newData[recordIndex][permissionType];
-      newData[recordIndex][permissionType] = newValue;
-      setData2(newData);
+      const newValue = !newData[recordIndex][permissionType]
+      newData[recordIndex][permissionType] = newValue
+      setData2(newData)
 
       setChangedIds((prev) => {
         const existingIndex = prev.findIndex(
-          (change) => change.id === id && change.column === permissionType
-        );
+          (change) => change.id === id && change.column === permissionType,
+        )
 
         if (existingIndex !== -1) {
-          const updatedChanges = [...prev];
-          updatedChanges[existingIndex] = { id, column: permissionType, value: newValue };
-          return updatedChanges;
+          const updatedChanges = [...prev]
+          updatedChanges[existingIndex] = {
+            id,
+            column: permissionType,
+            value: newValue,
+          }
+          return updatedChanges
         }
-        return [...prev, { id, column: permissionType, value: newValue }];
-      });
+        return [...prev, { id, column: permissionType, value: newValue }]
+      })
     }
-  };
+  }
 
   const handlePermissionChange = (permissionId, field) => {
     const updatedPermissions = data1.map((permission) =>
@@ -230,7 +245,7 @@ function ViewRoleManagement({ groups, changedIds, setChangedIds, setSelectedRowK
           onChange={() => handlePermissionChange1(record.Id, 'View')}
         />
       ),
-    }
+    },
   ]
 
   const permissionColumns2 = [
@@ -282,7 +297,6 @@ function ViewRoleManagement({ groups, changedIds, setChangedIds, setSelectedRowK
     },
   ]
 
-
   const handleTableChange3 = (pagination) => {
     setPage3(pagination.current)
     setLimit3(pagination.pageSize)
@@ -306,8 +320,8 @@ function ViewRoleManagement({ groups, changedIds, setChangedIds, setSelectedRowK
           mode="inline"
           selectedKeys={[selectedGroup?.toString()]}
           onClick={(e) => {
-            handleGroupClick(Number(e.key));
-            setChangedIds([]);
+            handleGroupClick(Number(e.key))
+            setChangedIds([])
           }}
           className=" border-none border-r-0"
         >
@@ -355,7 +369,8 @@ function ViewRoleManagement({ groups, changedIds, setChangedIds, setSelectedRowK
                 size="small"
                 rowSelection={{
                   selectedRowKeys: selectedRowKeys.table1,
-                  onChange: (selectedKeys) => handleTableSelectionChange(selectedKeys, 'table1'),
+                  onChange: (selectedKeys) =>
+                    handleTableSelectionChange(selectedKeys, 'table1'),
                   selections: [
                     Table.SELECTION_ALL,
                     Table.SELECTION_INVERT,
@@ -397,7 +412,8 @@ function ViewRoleManagement({ groups, changedIds, setChangedIds, setSelectedRowK
                 bordered
                 rowSelection={{
                   selectedRowKeys: selectedRowKeys.table2,
-                  onChange: (selectedKeys) => handleTableSelectionChange(selectedKeys, 'table2'),
+                  onChange: (selectedKeys) =>
+                    handleTableSelectionChange(selectedKeys, 'table2'),
                   selections: [
                     Table.SELECTION_ALL,
                     Table.SELECTION_INVERT,
@@ -438,7 +454,8 @@ function ViewRoleManagement({ groups, changedIds, setChangedIds, setSelectedRowK
                 bordered
                 rowSelection={{
                   selectedRowKeys: selectedRowKeys.table3,
-                  onChange: (selectedKeys) => handleTableSelectionChange(selectedKeys, 'table3'),
+                  onChange: (selectedKeys) =>
+                    handleTableSelectionChange(selectedKeys, 'table3'),
                   selections: [
                     Table.SELECTION_ALL,
                     Table.SELECTION_INVERT,
@@ -471,8 +488,9 @@ function ViewRoleManagement({ groups, changedIds, setChangedIds, setSelectedRowK
         ) : (
           <>
             {' '}
+
             <Content className="flex flex-col  justify-center items-center px-4">
-              <div className="text-center">
+              <div className="text-center bg-slate-500  justify-center">
                 <img
                   src={BG}
                   className=" w-96 opacity-45 h-auto mb-10"

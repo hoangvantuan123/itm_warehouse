@@ -9,7 +9,7 @@ const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
 
-function TableTransferWaitingIqcStockInOrder({ data }) {
+function TableStockOUtFiFoB({ data }) {
   const [gridData, setGridData] = useState([])
   const [showSearch, setShowSearch] = useState(false)
   const ref = (useRef < data) | (null > null)
@@ -24,10 +24,14 @@ function TableTransferWaitingIqcStockInOrder({ data }) {
   })
   const columns = useMemo(
     () => [
+      { title: 'OutReqNo' },
+      { title: 'ItemName' },
       { title: 'ItemNo' },
-      { title: 'TotalQty' },
-      { title: 'OkQty' },
+      { title: 'Spec' },
+      { title: 'UnitName' },
       { title: 'RemainQty' },
+      { title: 'OutQty' },
+      { title: 'Qty1' },
     ],
     [],
   )
@@ -52,15 +56,28 @@ function TableTransferWaitingIqcStockInOrder({ data }) {
   const getData = useCallback(
     ([col, row]) => {
       const person = gridData[row] || {}
-      const { ItemNo = '', TotalQty = '', OkQty = '', RemainQty = '' } = person
+      const {
+        OutReqNo = '',
+        ItemName = '',
+        ItemNo = '',
+        Spec = '',
+        UnitName = '',
+        RemainQty = '',
+        OutQty = '',
+        Qty1 = '',
+      } = person
 
       const safeString = (value) => (value != null ? String(value) : '')
 
       const columnMap = {
-        0: { kind: GridCellKind.Text, data: safeString(ItemNo) },
-        1: { kind: GridCellKind.Text, data: safeString(TotalQty) },
-        2: { kind: GridCellKind.Text, data: safeString(OkQty) },
-        3: { kind: GridCellKind.Text, data: safeString(RemainQty) },
+        0: { kind: GridCellKind.Text, data: safeString(OutReqNo) },
+        1: { kind: GridCellKind.Text, data: safeString(ItemName) },
+        2: { kind: GridCellKind.Text, data: safeString(ItemNo) },
+        3: { kind: GridCellKind.Text, data: safeString(Spec) },
+        4: { kind: GridCellKind.Text, data: safeString(UnitName) },
+        5: { kind: GridCellKind.Text, data: safeString(RemainQty) },
+        6: { kind: GridCellKind.Text, data: safeString(OutQty) },
+        7: { kind: GridCellKind.Text, data: safeString(Qty1) },
       }
 
       if (columnMap.hasOwnProperty(col)) {
@@ -156,4 +173,4 @@ function TableTransferWaitingIqcStockInOrder({ data }) {
   )
 }
 
-export default TableTransferWaitingIqcStockInOrder
+export default TableStockOUtFiFoB

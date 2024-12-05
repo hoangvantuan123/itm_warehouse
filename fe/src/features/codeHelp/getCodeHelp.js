@@ -1,10 +1,6 @@
 import axios from 'axios'
-import {
-  HOST_API_SERVER_1
-} from '../../services'
-import {
-  ERROR_MESSAGES
-} from '../../utils/constants'
+import { HOST_API_SERVER_1 } from '../../services'
+import { ERROR_MESSAGES } from '../../utils/constants'
 
 export const GetCodeHelp = async (
   workingTag,
@@ -26,7 +22,7 @@ export const GetCodeHelp = async (
   deptSeq,
   wkDeptSeq,
   empSeq,
-  userSeq
+  userSeq,
 ) => {
   try {
     const url = `${HOST_API_SERVER_1}/mssql/code-help-query`
@@ -73,8 +69,9 @@ export const GetCodeHelp = async (
   } catch (error) {
     return {
       success: false,
-      message: error.response ?
-        error.response.data.message : ERROR_MESSAGES.ERROR,
+      message: error.response
+        ? error.response.data.message
+        : ERROR_MESSAGES.ERROR,
     }
   }
 }

@@ -29,7 +29,7 @@ function TableCodeHelpStockOut2({ data, onCellClicked }) {
       { title: 'UMJpName' },
       { title: 'UMJdName' },
       { title: 'TypeName' },
-      { title: 'SMSexName' }
+      { title: 'SMSexName' },
     ],
     [],
   )
@@ -64,7 +64,7 @@ function TableCodeHelpStockOut2({ data, onCellClicked }) {
         UMJpName = '',
         UMJdName = '',
         TypeName = '',
-        SMSexName = ''
+        SMSexName = '',
       } = person
 
       const safeString = (value) => (value != null ? String(value) : '')
@@ -102,7 +102,6 @@ function TableCodeHelpStockOut2({ data, onCellClicked }) {
   useEffect(() => {
     setGridData(data)
   }, [data])
-
 
   return (
     <div className="w-full gap-1 h-full flex items-center justify-center pb-8">

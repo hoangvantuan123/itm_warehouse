@@ -95,7 +95,9 @@ export default function WaitingIqcStockInQuery({
 
           <Col>
             <Form.Item
-              label={<span className="uppercase text-[10px]">Purchase Type</span>}
+              label={
+                <span className="uppercase text-[10px]">Purchase Type</span>
+              }
               className="mb-0"
             >
               <Input

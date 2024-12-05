@@ -23,8 +23,6 @@ import LoadSubmit from '../default/loadSubmit'
 import SuccessSubmit from '../default/successSubmit'
 import { CompactSelection } from '@glideapps/glide-data-grid'
 
-
-
 export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const { t } = useTranslation()
   const { id } = useParams()
@@ -44,6 +42,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const [modal3Open, setModal3Open] = useState(false)
   const [modal4Open, setModal4Open] = useState(false)
   const [modal5Open, setModal5Open] = useState(false)
+  
   const [error, setError] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
   const [scanHistory, setScanHistory] = useState([])
@@ -57,22 +56,20 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
   })
-  const [isOpenDetails, setIsOpenDetails] = useState(false);
+
+
+  const [isOpenDetails, setIsOpenDetails] = useState(false)
 
   useEffect(() => {
-    const savedState = localStorage.getItem("detailsStateIqc");
-    setIsOpenDetails(savedState === "open");
-  }, []);
+    const savedState = localStorage.getItem('detailsStateIqc')
+    setIsOpenDetails(savedState === 'open')
+  }, [])
 
   const handleToggle = (event) => {
-    const isOpen = event.target.open;
-    setIsOpenDetails(isOpen);
-    localStorage.setItem("detailsStateIqc", isOpen ? "open" : "closed");
-  };
-
-
-
-
+    const isOpen = event.target.open
+    setIsOpenDetails(isOpen)
+    localStorage.setItem('detailsStateIqc', isOpen ? 'open' : 'closed')
+  }
 
   const Format = useCallback((date) => {
     const d = new Date(date)
@@ -120,7 +117,6 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     }
   }
 
-
   useEffect(() => {
     if (id) {
       const data = decryptData(id)
@@ -163,15 +159,15 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   }, [])
 
   const addToScanHistory = useCallback((dataResSuccess, callback) => {
-    const newLotNoFull = dataResSuccess?.LotNoFull?.trim().toLowerCase();
-    const newBarcode = dataResSuccess?.Barcode?.trim().toLowerCase();
+    const newLotNoFull = dataResSuccess?.LotNoFull?.trim().toLowerCase()
+    const newBarcode = dataResSuccess?.Barcode?.trim().toLowerCase()
 
     setScanHistory((prevHistory) => {
       const isExist = prevHistory.some(
         (item) =>
           item.LotNoFull?.trim().toLowerCase() === newLotNoFull &&
-          item.Barcode?.trim().toLowerCase() === newBarcode
-      );
+          item.Barcode?.trim().toLowerCase() === newBarcode,
+      )
 
       if (!isExist) {
         const updatedHistory = [
@@ -223,47 +219,46 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
             SMImpKindName: dataResSuccess?.SMImpKindName,
             PermitNo: dataResSuccess?.PermitNo,
           },
-        ];
-        callback();
-        return updatedHistory;
+        ]
+        callback()
+        return updatedHistory
       }
-      return prevHistory;
-    });
-  }, []);
-
+      return prevHistory
+    })
+  }, [])
 
   const debouncedCheckBarcode = useCallback(
     debounce(async (formData, resultMessage) => {
-      const resSuccess = await SMaterialQRCheckWeb(formData);
+      const resSuccess = await SMaterialQRCheckWeb(formData)
       if (resSuccess.success) {
-        const dataResSuccess = resSuccess.data[0];
-        message.success(resultMessage);
-        setInputBarCode(null);
-        setModal2Open(false);
-        setInputCode(null);
-        setYYWW(dataResSuccess?.YYWW);
-        setYYYYMM(dataResSuccess?.YYMM);
+        const dataResSuccess = resSuccess.data[0]
+        message.success(resultMessage)
+        setInputBarCode(null)
+        setModal2Open(false)
+        setInputCode(null)
+        setYYWW(dataResSuccess?.YYWW)
+        setYYYYMM(dataResSuccess?.YYMM)
 
         addToScanHistory(dataResSuccess, () => {
           setData((prevData) =>
             prevData.map((item) =>
               item.ItemNo === formData.itemNo
                 ? {
-                  ...item,
-                  OkQty: item.OkQty + formData.qty,
-                  RemainQty: item.RemainQty - formData.qty,
-                }
+                    ...item,
+                    OkQty: item.OkQty + formData.qty,
+                    RemainQty: item.RemainQty - formData.qty,
+                  }
                 : item,
-            )
-          );
-        });
+            ),
+          )
+        })
       } else {
-        setModal2Open(true);
-        setError(resSuccess?.message);
+        setModal2Open(true)
+        setError(resSuccess?.message)
       }
     }, 100),
-    [addToScanHistory]
-  );
+    [addToScanHistory],
+  )
 
   const handleCheckBarcode = useCallback((barcode) => {
     const currentTableData = dataRef.current
@@ -485,7 +480,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
       setResult(null)
       setModal4Open(true)
       if (scanHistory.length === 0) {
-        setLoadingSave(false);
+        setLoadingSave(false)
         setModal2Open(true)
         setModal4Open(false)
         setResult(null)
@@ -536,47 +531,46 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     [filteredData, scanHistory],
   )
 
-
   const getSelectedRowIndices = () => {
-    const selectedRows = selection.rows.items;
-    let indices = [];
+    const selectedRows = selection.rows.items
+    let indices = []
 
     selectedRows.forEach((range) => {
-      const start = range[0];
-      const end = range[1] - 1;
+      const start = range[0]
+      const end = range[1] - 1
 
       for (let i = start; i <= end; i++) {
-        indices.push(i);
+        indices.push(i)
       }
-    });
+    })
 
-    return indices;
-  };
+    return indices
+  }
 
   const handleDelete = useCallback(
     async (e) => {
-      e.preventDefault();
+      e.preventDefault()
 
-      const selectedRowIndices = getSelectedRowIndices();
+      const selectedRowIndices = getSelectedRowIndices()
       if (selectedRowIndices.length === 0) {
-        setModal2Open(true);
-        setError('Vui lòng chọn ít nhất một hàng để xóa.');
-        return;
+        setModal2Open(true)
+        setError('Vui lòng chọn ít nhất một hàng để xóa.')
+        return
       }
       if (scanHistory.length === 0) {
-        setModal2Open(true);
-        setError('Không có dữ liệu nào để xóa.');
-        return;
+        setModal2Open(true)
+        setError('Không có dữ liệu nào để xóa.')
+        return
       }
 
-      const remainingRows = scanHistory.filter((row, index) =>
-        !selectedRowIndices.includes(index)
-      );
+      const remainingRows = scanHistory.filter(
+        (row, index) => !selectedRowIndices.includes(index),
+      )
 
-      setScanHistory(remainingRows);
+      setScanHistory(remainingRows)
     },
-    [scanHistory, selection]
-  );
+    [scanHistory, selection],
+  )
 
   const handleRestFrom = useCallback(
     async (e) => {
@@ -626,7 +620,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
               onToggle={handleToggle}
             >
               <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
-                <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600">
+                <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600 uppercase">
                   <FilterOutlined />
                   {t('Điều kiện truy vấn')}
                 </h2>
@@ -670,7 +664,11 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
         modal5Open={modal5Open}
         successMessage={successMessage}
       />
-      <ErrorPage modal3Open={modal3Open} setModal3Open={setModal3Open} pathRouter="/u/warehouse/material/delivery-list" />
+      <ErrorPage
+        modal3Open={modal3Open}
+        setModal3Open={setModal3Open}
+        pathRouter="/u/warehouse/material/delivery-list"
+      />
     </>
   )
 }

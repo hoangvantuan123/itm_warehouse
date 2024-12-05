@@ -80,6 +80,7 @@ export default function MenuTechnique({ permissions, isMobile }) {
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
   })
+  const [showSearch, setShowSearch] = useState(false)
   const fetchDataMenus = useCallback(async () => {
     setLoading(true)
     try {
@@ -111,33 +112,33 @@ export default function MenuTechnique({ permissions, isMobile }) {
     setIsModalOpen(false)
   }
   const getSelectedRowIds = () => {
-    const selectedRows = selection.rows.items;
-    let ids = [];
-  
+    const selectedRows = selection.rows.items
+    let ids = []
+
     selectedRows.forEach((range) => {
-      const start = range[0];
-      const end = range[1] - 1;
-  
+      const start = range[0]
+      const end = range[1] - 1
+
       for (let i = start; i <= end; i++) {
-        ids.push(menus[i]?.Id);
+        ids.push(menus[i]?.Id)
       }
-    });
-  
-    return ids.filter(id => id !== undefined);
-  };
+    })
+
+    return ids.filter((id) => id !== undefined)
+  }
   const handleDeleteDataSheet = useCallback(
     async (e) => {
-      const selectedRowIds = getSelectedRowIds();
+      const selectedRowIds = getSelectedRowIds()
       if (selectedRowIds.length === 0) {
-        message.warning('Vui lòng chọn ít nhất một hàng để xóa.');
-        return;
-      } 
-  
-      const remainingRows = menus.filter((row) =>
-        !selectedRowIds.includes(row.id)
-      );
-  
-      const response = await DeleteMenus(selectedRowIds);
+        message.warning('Vui lòng chọn ít nhất một hàng để xóa.')
+        return
+      }
+
+      const remainingRows = menus.filter(
+        (row) => !selectedRowIds.includes(row.id),
+      )
+
+      const response = await DeleteMenus(selectedRowIds)
       if (response.data.success) {
         debouncedFetchDataMenus()
         message.success(response.data.message)
@@ -145,8 +146,21 @@ export default function MenuTechnique({ permissions, isMobile }) {
         message.error(response.data.message)
       }
     },
-    [menus, selection]
-  );
+    [menus, selection],
+  )
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        e.preventDefault()
+        setShowSearch(true)
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
   return (
     <>
       <Helmet>
@@ -163,12 +177,19 @@ export default function MenuTechnique({ permissions, isMobile }) {
                 fetchDataMenus={fetchDataMenus}
                 openModal={openModal}
                 handleDeleteDataSheet={handleDeleteDataSheet}
+                data={menus}
               />
             </div>
           </div>
 
           <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg  overflow-auto">
-            <TableMenuManagement data={menus} setSelection={setSelection} selection={selection} />
+            <TableMenuManagement
+              data={menus}
+              setSelection={setSelection}
+              selection={selection}
+              showSearch={showSearch}
+              setShowSearch={setShowSearch}
+            />
           </div>
         </div>
 

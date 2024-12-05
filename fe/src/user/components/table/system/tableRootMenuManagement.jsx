@@ -5,17 +5,23 @@ import '@glideapps/glide-data-grid/dist/index.css'
 import { useNavigate } from 'react-router-dom'
 import '../../../../static/css/customTabe.css'
 import { CompactSelection } from '@glideapps/glide-data-grid'
-
+import { TableOutlined } from '@ant-design/icons'
 const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
 
-function TableRootMenuManagement({ data, onCellClicked, setSelection , selection}) {
+function TableRootMenuManagement({
+  data,
+  onCellClicked,
+  setSelection,
+  selection,
+  setShowSearch,
+  showSearch,
+}) {
   const [gridData, setGridData] = useState([])
-  const [showSearch, setShowSearch] = useState(false)
+
   const ref = (useRef < data) | (null > null)
   const onSearchClose = useCallback(() => setShowSearch(false), [])
- 
 
   const columns = useMemo(
     () => [
@@ -75,12 +81,9 @@ function TableRootMenuManagement({ data, onCellClicked, setSelection , selection
 
   const [lastActivated, setLastActivated] = useState(undefined)
 
- 
   useEffect(() => {
     setGridData(data)
   }, [data])
-
-
 
   const onGridSelectionChange = (newSelection) => {
     console.log('Selection aborted', newSelection)
@@ -89,6 +92,10 @@ function TableRootMenuManagement({ data, onCellClicked, setSelection , selection
   return (
     <div className="w-full gap-1 h-full flex items-center justify-center pb-8">
       <div className="w-full h-full flex flex-col border bg-white rounded-lg overflow-hidden ">
+        <h2 className="text-xs font-medium flex items-center gap-2 p-2 text-blue-600 uppercase">
+          <TableOutlined />
+          DATA SHEET
+        </h2>
         <DataEditor
           columns={cols}
           getCellContent={getData}
@@ -107,6 +114,14 @@ function TableRootMenuManagement({ data, onCellClicked, setSelection , selection
           rowSelect="multi"
           gridSelection={selection}
           onGridSelectionChange={setSelection}
+          isDraggable={false}
+          getRowThemeOverride={(i) =>
+            i % 2 === 0
+              ? undefined
+              : {
+                  bgCell: '#F7F7F7',
+                }
+          }
         />
       </div>
     </div>

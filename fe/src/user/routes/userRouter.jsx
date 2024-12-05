@@ -1,4 +1,11 @@
-import { useEffect, useState, useMemo, lazy, Suspense, useCallback } from 'react'
+import {
+  useEffect,
+  useState,
+  useMemo,
+  lazy,
+  Suspense,
+  useCallback,
+} from 'react'
 import {
   BrowserRouter as Router,
   Routes,
@@ -36,42 +43,40 @@ const StockOutRequestFiFo = lazy(() => import('../page/material/stockOutFiFo'))
 const { Content } = Layout
 
 const UserRouter = () => {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const location = useLocation()
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [menuTransForm, setMenuTransForm] = useState([]);
-  const [rootMenuItems, setRootMenuItems] = useState([]);
-  const [errorMenu, setErrorMenu] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [menuTransForm, setMenuTransForm] = useState([])
+  const [rootMenuItems, setRootMenuItems] = useState([])
+  const [errorMenu, setErrorMenu] = useState(false)
   const [userPermissions, setUserPermissions] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [showSpinner, setShowSpinner] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
 
-  const rolesMenu = localStorage.getItem('roles_menu');
-
+  const rolesMenu = localStorage.getItem('roles_menu')
 
   const processRolesMenu = useCallback(async () => {
-    if (!rolesMenu) return;
+    if (!rolesMenu) return
     try {
-      const data = decodeJWT(rolesMenu);
-      const settingItems = data?.data[0]?.menu || [];
-      const rootMenuItems = data?.data[1]?.rootMenu || [];
-      setUserPermissions(settingItems);
-      setRootMenuItems(rootMenuItems);
-      const transformedMenu = transformDataMenu(settingItems);
-      setMenuTransForm(transformedMenu);
+      const data = decodeJWT(rolesMenu)
+      const settingItems = data?.data[0]?.menu || []
+      const rootMenuItems = data?.data[1]?.rootMenu || []
+      setUserPermissions(settingItems)
+      setRootMenuItems(rootMenuItems)
+      const transformedMenu = transformDataMenu(settingItems)
+      setMenuTransForm(transformedMenu)
     } catch (error) {
-      setErrorMenu(true);
+      setErrorMenu(true)
     }
-  }, [rolesMenu]);
+  }, [rolesMenu])
 
   useEffect(() => {
-    processRolesMenu();
-  }, [processRolesMenu]);
-
+    processRolesMenu()
+  }, [processRolesMenu])
 
   useEffect(() => {
     const handleResize = () => {
@@ -86,12 +91,7 @@ const UserRouter = () => {
     }
   }, [])
 
-
-  const skippedRoutes = [
-    '/u/login',
-    '/u/home'
-  ]
-
+  const skippedRoutes = ['/u/login', '/u/home']
 
   const checkLoginStatus = () => {
     const token = Cookies.get('a_a')
@@ -120,12 +120,12 @@ const UserRouter = () => {
 
   if (errorMenu) return <ErrorPage />
 
-
-
   return (
     <Routes>
-
-      <Route path="u/login" element={<Login processRolesMenu={processRolesMenu} />} />
+      <Route
+        path="u/login"
+        element={<Login processRolesMenu={processRolesMenu} />}
+      />
       <Route
         path="/*"
         element={
@@ -143,152 +143,172 @@ const UserRouter = () => {
                     <Route
                       path="u/warehouse/material/delivery-list"
                       element={
-                        checkActionPermission(userPermissions, 'material-1-1', 'View') ? (
+                        checkActionPermission(
+                          userPermissions,
+                          'material-1-1',
+                          'View',
+                        ) ? (
                           <DeliveryList
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />
                         ) : (
-                          <ErrorPage
-
-                          />
+                          <ErrorPage />
                         )
                       }
                     />
                     <Route
                       path="u/warehouse/material/waiting-iqc-stock-in/:id"
                       element={
-                        checkActionPermission(userPermissions, 'material-1-1', 'View') ? (
+                        checkActionPermission(
+                          userPermissions,
+                          'material-1-1',
+                          'View',
+                        ) ? (
                           <WaitingIqcStockIn
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />
                         ) : (
-                          <ErrorPage
-
-                          />
+                          <ErrorPage />
                         )
                       }
                     />
                     <Route
                       path="u/warehouse/material/stock-out-request"
                       element={
-                        checkActionPermission(userPermissions, 'material-1-4', 'View') ? (
+                        checkActionPermission(
+                          userPermissions,
+                          'material-1-4',
+                          'View',
+                        ) ? (
                           <StockOutRequest
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />
                         ) : (
-                          <ErrorPage
-
-                          />
+                          <ErrorPage />
                         )
                       }
                     />
                     <Route
                       path="u/system_settings/users/user-management"
                       element={
-                        checkActionPermission(userPermissions, 'user_management-1-1', 'View') ? (
+                        checkActionPermission(
+                          userPermissions,
+                          'user_management-1-1',
+                          'View',
+                        ) ? (
                           <UserManagement
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />
                         ) : (
-                          <ErrorPage
-
-                          />
+                          <ErrorPage />
                         )
                       }
                     />
                     <Route
                       path="u/warehouse/material/stock-out-request/:id"
                       element={
-                        checkActionPermission(userPermissions, 'material-1-4', 'View') ? (
+                        checkActionPermission(
+                          userPermissions,
+                          'material-1-4',
+                          'View',
+                        ) ? (
                           <StockOutRequestFiFo
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />
                         ) : (
-                          <ErrorPage
-
-                          />
+                          <ErrorPage />
                         )
                       }
                     />
                     <Route
                       path="u/system_settings/users/user-management/profile/:id/:name"
                       element={
-                        checkActionPermission(userPermissions, 'user_management-1-2', 'View') ? (
+                        checkActionPermission(
+                          userPermissions,
+                          'user_management-1-2',
+                          'View',
+                        ) ? (
                           <ProfileUserId
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />
                         ) : (
-                          <ErrorPage
-
-                          />
+                          <ErrorPage />
                         )
                       }
                     />
                     <Route
                       path="u/system_settings/users/role-management"
                       element={
-                        checkActionPermission(userPermissions, 'user_management-1-2', 'View') ? (
+                        checkActionPermission(
+                          userPermissions,
+                          'user_management-1-2',
+                          'View',
+                        ) ? (
                           <RoleManagement
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />
                         ) : (
-                          <ErrorPage
-
-                          />
+                          <ErrorPage />
                         )
                       }
                     />
                     <Route
                       path="u/system_settings/technique/menu-items"
                       element={
-                        checkActionPermission(userPermissions, 'technique-1-2', 'View') ? (
+                        checkActionPermission(
+                          userPermissions,
+                          'technique-1-2',
+                          'View',
+                        ) ? (
                           <MenuTechnique
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />
                         ) : (
-                          <ErrorPage
-
-                          />
+                          <ErrorPage />
                         )
                       }
                     />
                     <Route
                       path="u/system_settings/technique/root-menu"
                       element={
-                        checkActionPermission(userPermissions, 'technique-1-1', 'View') ? (
+                        checkActionPermission(
+                          userPermissions,
+                          'technique-1-1',
+                          'View',
+                        ) ? (
                           <RootMenuTechnique
                             permissions={userPermissions}
                             isMobile={isMobile}
                           />
                         ) : (
-                          <ErrorPage
-
-                          />
+                          <ErrorPage />
                         )
                       }
                     />
                     <Route
                       path=""
-                      element={<Home
-                        permissions={userPermissions}
-                        isMobile={isMobile}
-                      />
+                      element={
+                        <Home
+                          permissions={userPermissions}
+                          isMobile={isMobile}
+                        />
                       }
                     />
                     <Route
                       path="/u/home"
-                      element={<Home
-                        permissions={userPermissions}
-                        isMobile={isMobile}
-                      />
+                      element={
+                        <Home
+                          permissions={userPermissions}
+                          isMobile={isMobile}
+                        />
                       }
                     />
                   </Routes>
@@ -304,7 +324,6 @@ const UserRouter = () => {
 
 const App = () => (
   <Router>
-
     <UserRouter />
   </Router>
 )
