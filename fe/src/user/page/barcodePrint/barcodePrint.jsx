@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet';
-import { Typography, Layout } from 'antd';
+import { Typography, Layout, Button, message } from 'antd';
 const { Title } = Typography;
 const { Header, Content } = Layout;
 import 'moment/locale/vi';
@@ -16,7 +16,7 @@ export default function BarcodePrint({ permissions, isMobile }) {
     const [data, setData] = useState([]);
     const { t } = useTranslation();
     const [dataInfo, setDataInfo] = useState([]);
-    const [rowChecked, setRowChecked] = useState([]);
+    const [rowChecked, setRowChecked] = useState(null);
     const [fromDate, setFromDate] = useState(dayjs().startOf('month'))
     const [toDate, setToDate] = useState(dayjs().startOf('month'))
     const formatDate = useCallback((date) => date.format('YYYYMMDD'), [])
@@ -27,6 +27,7 @@ export default function BarcodePrint({ permissions, isMobile }) {
     const [gridData, setGridData] = useState([])
 
     const [selectRow, setSelectRow] = useState(null);
+    const [singleRow, setSingleRow] = useState(null);
 
     const onHandleData = function setDataHandle(varData) {
         setData(varData);
@@ -35,90 +36,102 @@ export default function BarcodePrint({ permissions, isMobile }) {
     const fetchItemList = useCallback(async () => {
         setLoading(true)
         try {
-          const itemList = await GetPageItem(
-            formatDate(fromDate),
-            formatDate(toDate),
-            vendor,
-            matID,
-            lotNo,
-          );
-          setData(itemList?.data.data || [])
+            const itemList = await GetPageItem(
+                formatDate(fromDate),
+                formatDate(toDate),
+                vendor,
+                matID,
+                lotNo,
+            );
+            setData(itemList?.data.data || [])
         } catch (error) {
-          setData([])
+            setData([])
         } finally {
-          setLoading(false)
+            setLoading(false)
         }
-      }, [fromDate, toDate, vendor, matID, lotNo])
+    }, [fromDate, toDate, vendor, matID, lotNo])
 
-      const debouncedFetchItemData = useMemo(
+    const debouncedFetchItemData = useMemo(
         () => debounce(fetchItemList, 100),
         [fetchItemList],
-      )
+    )
 
-      useEffect(() => {
+    useEffect(() => {
         debouncedFetchItemData()
         return () => {
             debouncedFetchItemData.cancel()
         }
-      }, [debouncedFetchItemData])
+    }, [debouncedFetchItemData])
 
-      const btnSearch = () => {
+    const btnSearch = () => {
         debouncedFetchItemData();
-      }
+    }
 
 
-    const handleSeclecData = function setSelectData(ev) {
+    const getMultiSelectedRows = () => {
+        const selectedRows = selectRow.rows.items;
 
-        setRowChecked(null);
-        const gridInstance = ev.instance;
+        let rows = [];
 
-        const scrollTop = gridInstance.el.scrollTop;
-        const scrollLeft = gridInstance.el.scrollLeft;
+        selectedRows.forEach((range) => {
+            const start = range[0];
+            const end = range[1] - 1;
 
-        const checkedRows = gridInstance.getCheckedRows();
-        setRowChecked(checkedRows);
-
-        setTimeout(() => {
-            gridInstance.el.scrollTop = scrollTop;
-            gridInstance.el.scrollLeft = scrollLeft;
-        }, 0);
-
-        console.log(rowChecked);
+            for (let i = start; i <= end; i++) {
+                rows.push(data[i]);
+                setDataInfo(data[i]);
+            }
+        });
+        
+        return rows;
     };
 
-    const handleClickRow = function clickRow(ev) {
 
-        setDataInfo(null);
-        const { rowKey, instance } = ev;
-        const row = instance.getRow(rowKey);
-        setDataInfo(row);
-    };
 
-    const handleScroll = async (e) => {
+    const handleBtnPrinter = useCallback(
+
+        async (e) => {
+            setRowChecked(null);
+
+            const selectedRows = getMultiSelectedRows();
+            if (selectedRows.length === 0) {
+                message.warning('Vui lòng chọn ít nhất một hàng.');
+                return;
+            }
+
+            setRowChecked(selectedRows);
+        },
+        [data, selectRow]
+
+    );
+
+    const fetchMoreData = async () => {
+    
         try {
-            const resData = await getPageMat();
-         console.log(resData)
-            setData((prevData) => [...prevData, ...resData?.data]);
+
+            const itemList = await GetPageItem(
+                formatDate(fromDate),
+                formatDate(toDate),
+                vendor,
+                matID,
+                lotNo,
+            );
+
+            setGridData((prev) => [...prev, ...itemList.data.data]);
         } catch (error) {
-            console.error("Error loading data:", error);
+            console.error("Error fetching more data:", error);
         }
-
     };
+    
+    const handleVisibleRegionChange = (region) => {
+        const { y, height } = region;
+        const totalHeight = gridData.length * 100;
+    
+        if (y + height >= totalHeight) {
 
-    const handleUnSelect = function unSelect(ev) {
-
-        setRowChecked(null);
-
-        const checkedRows = gridInstance.getCheckedRows();
-        setRowChecked(checkedRows);
-
-        setTimeout(() => {
-            gridInstance.el.scrollTop = scrollTop;
-            gridInstance.el.scrollLeft = scrollLeft;
-        }, 0);
+            fetchMoreData();
+        }
     };
-
-
 
     return (
         <Layout className="h-screen bg-slate-50">
@@ -131,33 +144,37 @@ export default function BarcodePrint({ permissions, isMobile }) {
                     <Title level={5} className="mt-2 uppercase">
                         {t('PRINT BARCODE')}
                     </Title>
-                    <BarcodePrintAction 
-                    fromDate={fromDate}
-                    setFromDate={setFromDate}
-                    toDate={toDate}
-                    setToDate={setToDate}
-                    vendor={vendor}
-                    setVendor={setVendor}
-                    matID={matID}
-                    setMatID={setMatID}
-                    lotNo= {lotNo} 
-                    setLotNo={setLotNo}
-                    dataSearch={onHandleData} 
-                    btnSearch={btnSearch} 
-                    dataSelect={rowChecked} 
-                    dataInfo={dataInfo} />
+
+                    <BarcodePrintAction
+                        fromDate={fromDate}
+                        setFromDate={setFromDate}
+                        toDate={toDate}
+                        setToDate={setToDate}
+                        vendor={vendor}
+                        setVendor={setVendor}
+                        matID={matID}
+                        setMatID={setMatID}
+                        lotNo={lotNo}
+                        setLotNo={setLotNo}
+                        dataSearch={onHandleData}
+                        btnSearch={btnSearch}
+                        dataInfo={dataInfo}
+                        btnPrinter={handleBtnPrinter}
+                        rowSelects={rowChecked}
+                    />
                 </Header>
 
                 <Content className="flex-grow px-4  bg-slate-50">
                     <div className="h-full flex flex-col">
                         <div className="flex-grow">
-                            <TableBarcodePrint 
-                            data={data} 
-                            setGridData={setGridData} 
-                            gridData={gridData}
-                            loading={loading}
-                            selectRow={selectRow}
-                            setSelectRow={setSelectRow}
+                            <TableBarcodePrint
+                                data={data}
+                                setGridData={setGridData}
+                                gridData={gridData}
+                                loading={loading}
+                                selectRow={selectRow}
+                                setSelectRow={setSelectRow}
+                                handleVisibleRegionChange={handleVisibleRegionChange}
                             />
                         </div>
                     </div>

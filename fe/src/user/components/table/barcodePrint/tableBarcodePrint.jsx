@@ -2,16 +2,27 @@ import 'tui-grid/dist/tui-grid.css'
 import '../../../../static/css/customTabe.css'
 import { CompactSelection, DataEditor, GridCellKind } from '@glideapps/glide-data-grid';
 import '@glideapps/glide-data-grid/dist/index.css'
+import { Button, message } from 'antd';
+
+
+
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { GetPageItem } from '../../../../services/printBarcodeService';
 
-function TableBarcodePrint({ data, setGridData, gridData, selectRow, setSelectRow }) {
+function TableBarcodePrint({ data, setGridData, gridData, selectRow, setSelectRow, handleVisibleRegionChange}) {
 
+    const [isMinusClicked, setIsMinusClicked] = useState(false)
+    const [lastClickedCell, setLastClickedCell] = useState(null)
+    const [clickedRowData, setClickedRowData] = useState(null)
 
     const columns = useMemo(
         () => [
+            { title: 'PLANT' },
             { title: 'TRAN_CODE' },
             { title: 'TRAN_SEQ' },
+            { title: 'TRAN_TYPE' },
+            { title: 'VENDOR' },
             { title: 'ITEMCD' },
             { title: 'LOTNO' },
             { title: 'QTY' },
@@ -44,8 +55,11 @@ function TableBarcodePrint({ data, setGridData, gridData, selectRow, setSelectRo
         ([col, row]) => {
             const dataGrid = gridData[row] || {}
             const {
+                PLANT = '',
                 TRAN_CODE = '',
                 TRAN_SEQ = '',
+                TRAN_TYPE = '',
+                VENDOR = '',
                 ITEMCD = '',
                 LOTNO = '',
                 QTY = '',
@@ -62,16 +76,19 @@ function TableBarcodePrint({ data, setGridData, gridData, selectRow, setSelectRo
             const safeString = (value) => (value != null ? String(value) : '')
 
             const columnMap = {
-                0: { kind: GridCellKind.Text, data: safeString(TRAN_CODE) },
-                1: { kind: GridCellKind.Text, data: safeString(TRAN_SEQ) },
-                2: { kind: GridCellKind.Text, data: safeString(ITEMCD) },
-                3: { kind: GridCellKind.Text, data: safeString(LOTNO) },
-                4: { kind: GridCellKind.Text, data: safeString(QTY) },
-                5: { kind: GridCellKind.Text, data: safeString(DATECODE) },
-                6: { kind: GridCellKind.Text, data: safeString(REELNO) },
-                7: { kind: GridCellKind.Text, data: safeString(DATETIME) },
-                8: { kind: GridCellKind.Text, data: safeString(LOT_ID) },
-                9: { kind: GridCellKind.Text, data: safeString(USER_ID) },
+                0: { kind: GridCellKind.Text, data: safeString(PLANT) },
+                1: { kind: GridCellKind.Text, data: safeString(TRAN_CODE) },
+                2: { kind: GridCellKind.Text, data: safeString(TRAN_SEQ) },
+                3: { kind: GridCellKind.Text, data: safeString(TRAN_TYPE) },
+                4: { kind: GridCellKind.Text, data: safeString(VENDOR) },
+                5: { kind: GridCellKind.Text, data: safeString(ITEMCD) },
+                6: { kind: GridCellKind.Text, data: safeString(LOTNO) },
+                7: { kind: GridCellKind.Text, data: safeString(QTY) },
+                8: { kind: GridCellKind.Text, data: safeString(DATECODE) },
+                9: { kind: GridCellKind.Text, data: safeString(REELNO) },
+                10: { kind: GridCellKind.Text, data: safeString(DATETIME) },
+                11: { kind: GridCellKind.Text, data: safeString(LOT_ID) },
+                12: { kind: GridCellKind.Text, data: safeString(USER_ID) },
             }
 
             if (columnMap.hasOwnProperty(col)) {
@@ -88,18 +105,60 @@ function TableBarcodePrint({ data, setGridData, gridData, selectRow, setSelectRo
         setGridData(data)
     }, [data])
 
-    const getSelectedRowsData = () => {
-        if (!selection?.rows) return [];
-        const selectedIndices = [...selection.rows];
-        console.log("selectedIndices", selectedIndices);
-        return selectedIndices.map((rowIndex) => gridData[rowIndex]);
-    };
 
     const [selection, setSelection] = useState({
         columns: CompactSelection.empty(),
         rows: CompactSelection.empty(),
-    })
-    console.log("selection", selection);
+    });
+    setSelectRow(selection);
+
+    const onCellClicked = (cell, event) => {
+        let rowIndex;
+
+        if (cell[0] !== -1) {
+            return
+        }
+
+        if (cell[0] === -1) {
+            rowIndex = cell[1]
+            setIsMinusClicked(true)
+        } else {
+            rowIndex = cell[0]
+            setIsMinusClicked(false)
+        }
+
+        if (
+            lastClickedCell &&
+            lastClickedCell[0] === cell[0] &&
+            lastClickedCell[1] === cell[1]
+        ) {
+            setKeyPath(null)
+            setLastClickedCell(null)
+            setClickedRowData(null)
+            return
+        }
+
+        if (rowIndex >= 0 && rowIndex < gridData.length) {
+            const rowData = gridData[rowIndex]
+
+            const filteredData = {
+                TRAN_CODE: rowData.TRAN_CODE,
+                TRAN_SEQ: rowData.TRAN_SEQ,
+                ITEMCD: rowData.ITEMCD,
+                LOTNO: rowData.LOTNO,
+                QTY: rowData.QTY,
+                DATECODE: rowData.DATECODE,
+                REELNO: rowData.REELNO,
+                LOT_ID: rowData.LOT_ID,
+                USER_ID: rowData.USER_ID,
+
+            }
+        setClickedRowData(rowData)
+            // setLastClickedCell(cell)
+        }
+    };
+ 
+
     return (
 
         <div className="w-full gap-1 h-full flex items-center justify-center pb-8">
@@ -118,10 +177,12 @@ function TableBarcodePrint({ data, setGridData, gridData, selectRow, setSelectRo
                     onColumnResize={onColumnResize}
                     smoothScrollY={true}
                     smoothScrollX={true}
-                    // onCellClicked={}
+                    onCellClicked={onCellClicked}
                     rowSelect="multi"
                     gridSelection={selection}
                     onGridSelectionChange={setSelection}
+                    onVisibleRegionChanged = {handleVisibleRegionChange}
+                    
                 />
             </div>
         </div>

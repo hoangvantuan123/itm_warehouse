@@ -14,9 +14,10 @@ export class PrintBarcodeController {
         @Query('lotNo') lotNo?: string,
         @Query('pageIndex') pageIndex?: number,
         @Query('pageSize') pageSize?: number,
+        @Query('vendor') vendor?: string,
     ) {
         try {
-            const result = await this.printBarcodeService.getPaginatedData(matID, lotNo, pageIndex, pageSize);
+            const result = await this.printBarcodeService.getPaginatedData(matID, lotNo, pageIndex, pageSize, vendor);
             return { status: true, message: SUCCESS_MESSAGES.REQUEST_SUCCESS, data: result };
         } catch (error) {
             return {

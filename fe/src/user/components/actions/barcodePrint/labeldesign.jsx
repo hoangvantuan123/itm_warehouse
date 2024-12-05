@@ -1,11 +1,10 @@
-import { Card, Col, Row, Typography, QRCode } from "antd";
+import { QRCode } from "antd";
 import Barcode from "react-barcode";
-
 
 
 const LabelItem = ({ label, dataSize }) => {
 
-    console.log("label", label)
+    console.log("label", label);
 
     const labelData = {
         code: label?.ITEMCD,
@@ -33,7 +32,7 @@ const LabelItem = ({ label, dataSize }) => {
     console.log('size', size);
     return (
 
-        <div className="grid grid-cols-4 gap-0 w-auto h-auto  justify-center">
+        <div className="grid grid-cols-4 gap-0 w-auto h-auto  justify-center border">
             <div className="flex flex-col justify-center items-center mt-1 col-span-4 ">
                 <Barcode
                     value={labelData.barcodeData}

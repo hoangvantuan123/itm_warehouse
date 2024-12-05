@@ -48,20 +48,19 @@ export const GetPageItem = async (
     }
   }
 
-  export const CreatePrintLabel = (requestData) => {
-    const requestParams = {
-      ...DEFAULTS,
-      ...requestData,
-    }
+  export const CreatePrintLabel = async (requestData) => {
+
     const dataToSend = {
-      ip: requestParams.ip,
-      port: requestParams.port,
-      data: requestParams.data,
+      ip: requestData.ip,
+      port: requestData.port,
+      data: requestData.data,
     }
+
+    console.log(requestData);
   
     return axios
       .post(
-        `${HOST_API_SERVER_1}/v1/print-barcode/printer`,
+        `${HOST_API_SERVER_1}/print-barcode/printer`,
         dataToSend,
         {
           headers: {
