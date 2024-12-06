@@ -21,6 +21,7 @@ import decodeJWT from '../../utils/decode-JWT'
 import { transformDataMenu } from '../../utils/transformDataMenu'
 import ErrorPage from '../page/default/errorPage'
 import BarcodePrint from '../page/barcodePrint/barcodePrint'
+import BarcodeChange from '../page/barcodePrint/barcodeChange'
 const DeliveryList = lazy(() => import('../page/material/deliveryList'))
 const WaitingIqcStockIn = lazy(
   () => import('../page/material/waitingIqcStockIn'),
@@ -92,6 +93,7 @@ const UserRouter = () => {
     '/u/login',
     '/u/home',
     '/u/print-barcode',
+    '/u/barcode-change',
   ]
 
 
@@ -289,6 +291,15 @@ const UserRouter = () => {
                     <Route
                       path="/u/print-barcode"
                       element={<BarcodePrint
+                        permissions={userPermissions}
+                        isMobile={isMobile}
+                      />
+                      }
+                    />
+
+                    <Route
+                      path="/u/barcode-change"
+                      element={<BarcodeChange
                         permissions={userPermissions}
                         isMobile={isMobile}
                       />

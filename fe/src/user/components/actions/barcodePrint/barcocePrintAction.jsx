@@ -4,7 +4,7 @@ import { Card, Button, Modal, Space, Input, Typography, DatePicker, Checkbox, Ro
 import { SaveFilled } from '@ant-design/icons';
 
 import LabelItem from "./labeldesign";
-import { CreatePrintLabel } from "../../../../services/printBarcodeService";
+import { CreatePrintLabel } from "../../../../features/barcode/printBarcodeService";
 
 
 
@@ -138,6 +138,7 @@ export default function BarcodePrintAction({
             ip,
             port,
             data: rowSelects,
+            newLabel: newLabel
         }
 
         try {

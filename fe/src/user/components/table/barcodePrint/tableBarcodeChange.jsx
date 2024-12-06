@@ -4,7 +4,8 @@ import { CompactSelection, DataEditor, GridCellKind } from '@glideapps/glide-dat
 import '@glideapps/glide-data-grid/dist/index.css'
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-function TableBarcodePrint({ data, setGridData, gridData, selectRow, setSelectRow, handleVisibleRegionChange}) {
+
+function TabelBarcodeChange({ data, setGridData, gridData, setSelectRow}) {
 
     const [isMinusClicked, setIsMinusClicked] = useState(false)
     const [lastClickedCell, setLastClickedCell] = useState(null)
@@ -15,16 +16,17 @@ function TableBarcodePrint({ data, setGridData, gridData, selectRow, setSelectRo
             { title: 'PLANT' },
             { title: 'TRAN_CODE' },
             { title: 'TRAN_SEQ' },
-            { title: 'TRAN_TYPE' },
-            { title: 'VENDOR' },
-            { title: 'ITEMCD' },
-            { title: 'LOTNO' },
+            { title: 'ITEM CODE' },
+            { title: 'LOT NO' },
             { title: 'QTY' },
-            { title: 'DATECODE' },
-            { title: 'REELNO' },
-            { title: 'DATETIME' },
-            { title: 'LOT_ID' },
+            { title: 'DATE CODE' },
+            { title: 'REEL NO' },
+            { title: 'BARCODE' },
+            { title: 'NEW BARCODE' },
+            { title: 'DATE TIME' },
+            { title: 'STATUS' },
             { title: 'USER_ID' },
+            { title: 'REMARK' },
         ],
         [],
     )
@@ -49,19 +51,20 @@ function TableBarcodePrint({ data, setGridData, gridData, selectRow, setSelectRo
         ([col, row]) => {
             const dataGrid = gridData[row] || {}
             const {
-                PLANT = '',
-                TRAN_CODE = '',
-                TRAN_SEQ = '',
-                TRAN_TYPE = '',
-                VENDOR = '',
-                ITEMCD = '',
-                LOTNO = '',
-                QTY = '',
-                DATECODE = '',
-                REELNO = '',
-                DATETIME = '',
-                LOT_ID = '',
-                USER_ID = '',
+                Plant = '',
+                Tran_code = '',
+                BarcodeSeq = '',
+                ItemNo = '',
+                LotNo = '',
+                NewQty = '',
+                DateCode = '',
+                ReelNo = '',
+                BarcodeID = '',
+                NewBarcodeID = '',
+                LastDateTime = '',
+                NewStatus = '',
+                UserID = '',
+                Remark = '',
 
             } = dataGrid
 
@@ -70,19 +73,20 @@ function TableBarcodePrint({ data, setGridData, gridData, selectRow, setSelectRo
             const safeString = (value) => (value != null ? String(value) : '')
 
             const columnMap = {
-                0: { kind: GridCellKind.Text, data: safeString(PLANT) },
-                1: { kind: GridCellKind.Text, data: safeString(TRAN_CODE) },
-                2: { kind: GridCellKind.Text, data: safeString(TRAN_SEQ) },
-                3: { kind: GridCellKind.Text, data: safeString(TRAN_TYPE) },
-                4: { kind: GridCellKind.Text, data: safeString(VENDOR) },
-                5: { kind: GridCellKind.Text, data: safeString(ITEMCD) },
-                6: { kind: GridCellKind.Text, data: safeString(LOTNO) },
-                7: { kind: GridCellKind.Text, data: safeString(QTY) },
-                8: { kind: GridCellKind.Text, data: safeString(DATECODE) },
-                9: { kind: GridCellKind.Text, data: safeString(REELNO) },
-                10: { kind: GridCellKind.Text, data: safeString(DATETIME) },
-                11: { kind: GridCellKind.Text, data: safeString(LOT_ID) },
-                12: { kind: GridCellKind.Text, data: safeString(USER_ID) },
+                0: { kind: GridCellKind.Text, data: safeString(Plant) },
+                1: { kind: GridCellKind.Text, data: safeString(Tran_code) },
+                2: { kind: GridCellKind.Text, data: safeString(BarcodeSeq) },
+                3: { kind: GridCellKind.Text, data: safeString(ItemNo) },
+                4: { kind: GridCellKind.Text, data: safeString(LotNo) },
+                5: { kind: GridCellKind.Text, data: safeString(NewQty) },
+                6: { kind: GridCellKind.Text, data: safeString(DateCode) },
+                7: { kind: GridCellKind.Text, data: safeString(ReelNo) },
+                8: { kind: GridCellKind.Text, data: safeString(BarcodeID) },
+                9: { kind: GridCellKind.Text, data: safeString(NewBarcodeID) },
+                10: { kind: GridCellKind.Text, data: safeString(LastDateTime) },
+                11: { kind: GridCellKind.Text, data: safeString(NewStatus) },
+                12: { kind: GridCellKind.Text, data: safeString(UserID) },
+                13: { kind: GridCellKind.Text, data: safeString(Remark) },
             }
 
             if (columnMap.hasOwnProperty(col)) {
@@ -95,6 +99,7 @@ function TableBarcodePrint({ data, setGridData, gridData, selectRow, setSelectRo
         [gridData],
     )
 
+    console.log("table", data);
     useEffect(() => {
         setGridData(data)
     }, [data])
@@ -148,7 +153,6 @@ function TableBarcodePrint({ data, setGridData, gridData, selectRow, setSelectRo
 
             }
         setClickedRowData(rowData)
-            // setLastClickedCell(cell)
         }
     };
  
@@ -161,13 +165,10 @@ function TableBarcodePrint({ data, setGridData, gridData, selectRow, setSelectRo
                     columns={cols}
                     getCellContent={getData}
                     rows={gridData.length}
-                    // showSearch={showSearch}
                     getCellsForSelection={true}
-                    // onSearchClose={onSearchClose}
                     width="100%"
                     height="100%"
                     rowMarkers={('checkbox-visible', 'both')}
-                    // useRef={useRef}
                     onColumnResize={onColumnResize}
                     smoothScrollY={true}
                     smoothScrollX={true}
@@ -175,7 +176,6 @@ function TableBarcodePrint({ data, setGridData, gridData, selectRow, setSelectRo
                     rowSelect="multi"
                     gridSelection={selection}
                     onGridSelectionChange={setSelection}
-                    onVisibleRegionChanged = {handleVisibleRegionChange}
                     
                 />
             </div>
@@ -184,4 +184,4 @@ function TableBarcodePrint({ data, setGridData, gridData, selectRow, setSelectRo
     );
 }
 
-export default TableBarcodePrint;
+export default TabelBarcodeChange;

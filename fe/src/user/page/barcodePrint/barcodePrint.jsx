@@ -9,7 +9,7 @@ import TableBarcodePrint from '../../components/table/barcodePrint/tableBarcodeP
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import { debounce } from 'lodash';
-import { GetPageItem } from '../../../services/printBarcodeService';
+import { GetPageItem } from '../../../features/barcode/printBarcodeService';
 
 export default function BarcodePrint({ permissions, isMobile }) {
     const [loading, setLoading] = useState(false)
@@ -19,7 +19,7 @@ export default function BarcodePrint({ permissions, isMobile }) {
     const [rowChecked, setRowChecked] = useState(null);
     const [fromDate, setFromDate] = useState(dayjs().startOf('month'))
     const [toDate, setToDate] = useState(dayjs().startOf('month'))
-    const formatDate = useCallback((date) => date.format('YYYYMMDD'), [])
+    const formatDate = useCallback((date) => date.format('YYYYMMDDHHmmss'), [])
 
     const [vendor, setVendor] = useState('')
     const [matID, setMatID] = useState('')
@@ -52,7 +52,7 @@ export default function BarcodePrint({ permissions, isMobile }) {
     }, [fromDate, toDate, vendor, matID, lotNo])
 
     const debouncedFetchItemData = useMemo(
-        () => debounce(fetchItemList, 100),
+        () => debounce(fetchItemList, 300),
         [fetchItemList],
     )
 
@@ -104,34 +104,6 @@ export default function BarcodePrint({ permissions, isMobile }) {
         [data, selectRow]
 
     );
-
-    const fetchMoreData = async () => {
-    
-        try {
-
-            const itemList = await GetPageItem(
-                formatDate(fromDate),
-                formatDate(toDate),
-                vendor,
-                matID,
-                lotNo,
-            );
-
-            setGridData((prev) => [...prev, ...itemList.data.data]);
-        } catch (error) {
-            console.error("Error fetching more data:", error);
-        }
-    };
-    
-    const handleVisibleRegionChange = (region) => {
-        const { y, height } = region;
-        const totalHeight = gridData.length * 100;
-    
-        if (y + height >= totalHeight) {
-
-            fetchMoreData();
-        }
-    };
 
     return (
         <Layout className="h-screen bg-slate-50">

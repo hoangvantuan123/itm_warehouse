@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from 'src/common/utils/constants';
-import { DatabaseService } from 'src/common/database/sqlServer/ITMBARCODE/database.service';
 
 import * as net from 'net';
 import { BarcodeDto } from '../models/barcodeDto';
 import { error, log } from 'console';
 import { ItemLabelDto } from '../models/itemLabelDto';
+import { DatabaseService } from 'src/common/database/sqlServer/ITMV20240117/database.service';
 
 
 @Injectable()
 export class PrintBarcodeService {
     constructor(
-        private readonly mySqlService: DatabaseService
+        private readonly databaseService: DatabaseService
     ) { }
 
     async getPaginatedData(
@@ -20,38 +20,39 @@ export class PrintBarcodeService {
         pageIndex: number,
         pageSize: number,
         vendor: string,
+        dateFr: string, 
+        dateTo: string,
     ) {
         try {
             const offset = (pageIndex - 1) * pageSize;
-            const result = this.GetData(matID, lotNo, offset, pageSize, vendor);
+            const result = this.GetData(matID, lotNo, offset, pageSize, vendor, dateFr, dateTo);
             return result;
         } catch (error) {
             throw new Error(ERROR_MESSAGES.INTERNAL_SERVER_ERROR);
         }
     }
 
-    async GetData(matID: string, lotNo: string, offset: number, pageSize: number, vendor: string) {
+    async GetData(matID: string, lotNo: string, offset: number, pageSize: number, vendor: string, dateFr: string, dateTo: string) {
         let query = ` SELECT PLANT, TRAN_CODE, TRAN_SEQ, TRAN_TYPE, VENDOR, ITEMCD, LOTNO, QTY, DATECODE, REELNO, DATETIME, LOT_ID, USER_ID   FROM EWIPRMTBCI WHERE (1=1) `;
-        query += await this.genWhereClause(matID, lotNo, vendor);
-        query += ` ORDER BY DATETIME DESC `
-        query += ` LIMIT ${pageSize} OFFSET ${offset} `;
-        const result = await this.mySqlService.executeQuery(
+        query += await this.genWhereClause(matID, lotNo, vendor, dateFr, dateTo);
+        query += ` ORDER BY DATETIME DESC `;
+        const result = await this.databaseService.executeQuery(
             query
         );
         return result;
     }
 
-    async genWhereClause(matID: string, lotNo: string, vendor: string) {
+    async genWhereClause(matID: string, lotNo: string, vendor: string, dateFr: string, dateTo: string) {
 
 
         let query = ``;
 
-        // if (dateFr != null) {
-        //   query += ` AND DATETIME >= '` + dateFr + `'`;
-        // }
-        // if (dateTo != null) {
-        //   query += ` AND DATETIME <= '` + dateTo + `'`;
-        // }
+        if (dateFr != null) {
+          query += ` AND DATETIME >= '` + dateFr + `'`;
+        }
+        if (dateTo != null) {
+          query += ` AND DATETIME <= '` + dateTo + `'`;
+        }
         if (vendor != '') {
             query += ` AND VENDOR LIKE '` + vendor + `'`;
         }
@@ -157,7 +158,7 @@ export class PrintBarcodeService {
     };
 
     async isExistData(barcodeDto: BarcodeDto) {
-
+        // Todo : check is exist label 
     };
 
     async createLabel(barcodeDto: BarcodeDto) {
@@ -200,7 +201,7 @@ export class PrintBarcodeService {
              values ( 'ITMVPSG', '${lotID}', '양산', '1000', '양산', '${itemLabel.matID}', '', '', ${itemLabel.qty}, 'G', 'N', 'N'); `;
 
         try {
-            await this.mySqlService.executeQuery(query);
+            await this.databaseService.executeQuery(query);
             return {
                 LOT_ID: lotID,
                 ITEMCD: itemLabel?.matID,
@@ -219,7 +220,7 @@ export class PrintBarcodeService {
         let vInNo: string = '';
         const qTrancode = ` SELECT MAX(TRAN_CODE) AS TRAN_CODE FROM EWIPRMTBCI `;
         try {
-            const result = await this.mySqlService.executeQuery(qTrancode);
+            const result = await this.databaseService.executeQuery(qTrancode);
 
             if (!result || result.length === 0) {
                 const vsNowDate = new Date().toISOString().slice(2, 10).replace(/-/g, '');
@@ -260,7 +261,7 @@ export class PrintBarcodeService {
         const qTranSeq = `SELECT MAX(TRAN_SEQ) AS TRAN_SEQ FROM EWIPRMTBCI WHERE TRAN_CODE = '${tranCode}'`;
 
         try {
-            const result = await this.mySqlService.executeQuery(qTranSeq);
+            const result = await this.databaseService.executeQuery(qTranSeq);
 
             if (!result || result.length === 0) {
                 return vInNo;
@@ -293,7 +294,7 @@ export class PrintBarcodeService {
         `;
 
         try {
-            const result = await this.mySqlService.executeQuery(sql);
+            const result = await this.databaseService.executeQuery(sql);
 
             if (!result || result.length === 0) {
                 errMsg = "LOT이 존재하지 않습니다.";
@@ -315,7 +316,7 @@ export class PrintBarcodeService {
         `;
 
         try {
-            const result = await this.mySqlService.executeQuery(sql);
+            const result = await this.databaseService.executeQuery(sql);
 
             if (!result || result.length === 0) {
                 errMsg = "품목이 존재하지 않습니다.";
@@ -332,7 +333,7 @@ export class PrintBarcodeService {
 
     async isPrintNewData(barcodeDto: BarcodeDto): Promise<boolean> {
 
-        if (Array.isArray(barcodeDto?.data) && barcodeDto?.data.length > 2) {
+        if (Array.isArray(barcodeDto?.data) && barcodeDto?.newlabel == null) {
             return false;
         }
         return true;

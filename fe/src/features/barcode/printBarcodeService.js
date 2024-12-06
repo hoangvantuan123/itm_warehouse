@@ -1,5 +1,5 @@
 import axios from "axios";
-import { HOST_API_SERVER_1 } from ".";
+import { HOST_API_SERVER_1 } from "../../services";
 
 
 export const GetPageItem = async (

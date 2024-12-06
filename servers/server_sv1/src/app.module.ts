@@ -5,13 +5,14 @@ import { Connection } from 'typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { HealthController } from './health.controller';
-import { mysqlITMBARCODE, sqlServerITMV20240117 } from './config/database.config';
+import { sqlServerITMV20240117 } from './config/database.config';
 import { APP_FILTER } from '@nestjs/core';
 import { StockInModule } from './modules/material/module/stockIn.module';
 import { CodeHelpComboQueryModule } from './modules/codeHelp/module/codeHelpComboQuery.module';
 import { AuthsModule } from './modules/auth/module/auths.module';
 import { RolesUsersModule } from './modules/rolesGuard/module/rolesUsers.module';
 import { PrintBarcodeModule } from './modules/print_barcode/modules/printBarcodeModule';
+import { BarcodeChangeModule } from './modules/barcodechange/modules/barcodeChangeModule';
 
 @Module({
   imports: [
@@ -23,13 +24,10 @@ import { PrintBarcodeModule } from './modules/print_barcode/modules/printBarcode
       ...sqlServerITMV20240117,
       name: 'ITMV20240117',
     }),
-    TypeOrmModule.forRoot({
-      ...mysqlITMBARCODE,
-      name: 'ITMBARCODE',
-    }),
     StockInModule,
     CodeHelpComboQueryModule,
     PrintBarcodeModule,
+    BarcodeChangeModule,
   ],
   providers: [{
     provide: APP_FILTER,
@@ -40,13 +38,12 @@ import { PrintBarcodeModule } from './modules/print_barcode/modules/printBarcode
 export class AppModule implements OnModuleInit {
   constructor(
     @InjectConnection('ITMV20240117') private readonly connection2: Connection,
-    @InjectConnection('ITMBARCODE') private readonly conITMBARCODE: Connection,
   ) { }
 
   async onModuleInit() {
 
 
-    if ( this.conITMBARCODE.isConnected){
+    if ( this.connection2.isConnected){
       console.log('ITMBARCODE connected');
     } 
     else {
