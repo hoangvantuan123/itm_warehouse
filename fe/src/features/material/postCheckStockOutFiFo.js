@@ -2,11 +2,12 @@ import axios from 'axios'
 import {
   HOST_API_SERVER_1
 } from '../../services'
+import { accessToken } from '../../services/tokenService'
 
 const generateXml = (data) => {
   return `
         <DataBlock1>
-          <WorkingTag>A</WorkingTag>
+          <WorkingTag>${data.WorkingTag}</WorkingTag>
           <IDX_NO>1</IDX_NO>
           <Status>0</Status>
           <DataSeq>1</DataSeq>
@@ -14,8 +15,8 @@ const generateXml = (data) => {
           <TABLE_NAME>DataBlock1</TABLE_NAME>
           <OutReqSeq>${data.OutReqSeq}</OutReqSeq>
           <OutReqItemSerl>${data.OutReqItemSerl}</OutReqItemSerl>
-          <WorkOrderSeq></WorkOrderSeq>
-          <WorkOrderSerl></WorkOrderSerl>
+          <WorkOrderSeq>${data.WorkOrderSeq}</WorkOrderSeq>
+          <WorkOrderSerl>${data.WorkOrderSerl}</WorkOrderSerl>
           <FactUnit>${data.FactUnit}</FactUnit>
           <FactUnitName>${data.FactUnitName}</FactUnitName>
           <InWHSeq>${data.InWHSeq}</InWHSeq>
@@ -38,7 +39,6 @@ const DEFAULTS = {
   xmlFlags: 2,
   serviceSeq: 60010002,
   workingTag: '',
-  companySeq: 1,
   languageSeq: 6,
   pgmSeq: 1036085,
 }
@@ -55,7 +55,6 @@ export const SMaterialQRCheckStockOutFiFoWeb = (requestData) => {
     xmlFlags: requestParams.xmlFlags,
     serviceSeq: requestParams.serviceSeq,
     workingTag: requestParams.workingTag,
-    companySeq: requestParams.companySeq,
     languageSeq: requestParams.languageSeq,
     pgmSeq: requestParams.pgmSeq,
   }

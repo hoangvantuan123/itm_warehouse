@@ -67,4 +67,23 @@ export class DatabaseService {
     }
   }
 
+
+  async findAuthCheckUser(UserId: any, EmpSeq: any, UserSeq: any): Promise<any[]> {
+    const query = `
+        SELECT  UserId , EmpSeq, UserSeq
+        FROM _TCAUser_WEB 
+        WHERE UserId = '${UserId}' 
+          AND EmpSeq = '${EmpSeq}' 
+          AND UserSeq = '${UserSeq}'
+    `;
+
+    try {
+      const result = await this.queryRunner.query(query);
+      return result || [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+
 }

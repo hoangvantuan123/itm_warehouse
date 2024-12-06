@@ -14,6 +14,8 @@ function checkBarcode(barcode, tableData, tableScanHistory) {
   const dc = parts[3] // Date Code
   const reel = parts[4] // Reel
 
+  console.log('code ', code, lot, qty, reel)
+
   const item = tableData.find((item) => item.ItemNo === code)
   const existingBarcode = tableScanHistory.find(
     (item) => item.Barcode === barcode,
@@ -50,14 +52,30 @@ function checkBarcode(barcode, tableData, tableScanHistory) {
       dc,
       reel,
       barcode,
-      permitSerl: item.PermitSerl,
-      permitSeq: item.PermitSeq,
+      UnitSeq: item.UnitSeq,
+      ItemSeq: item.ItemSeq,
+      OutWHName: item.OutWHName,
+      OutWHSeq: item.OutWHSeq,
+      InWHName: item.InWhName,
+      InWHSeq: item.InWHSeq,
+      FactUnitName: item.FactUnitName,
+      FactUnit: item.FactUnit,
+      WorkOrderSerl: item.WorkOrderSerl,
+      WorkOrderSeq: item.WorkOrderSeq,
+      OutReqItemSerl: item.OutReqItemSerl,
+      OutReqSeq: item.OutReqSeq
+
     },
   }
 }
 
 self.onmessage = function (event) {
-  const { type, barcode, tableData, tableScanHistory } = event.data
+  const {
+    type,
+    barcode,
+    tableData,
+    tableScanHistory
+  } = event.data
   let result
 
   switch (type) {

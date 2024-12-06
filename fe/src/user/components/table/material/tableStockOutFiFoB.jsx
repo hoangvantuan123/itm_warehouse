@@ -24,17 +24,32 @@ function TableStockOUtFiFoB({ data }) {
   })
   const columns = useMemo(
     () => [
-      { title: 'OutReqNo' },
-      { title: 'ItemName' },
+      { title: 'OutReqSeq' },
+      { title: 'OutReqItemSerl' },
+      { title: 'WorkOrderSeq' },
+      { title: 'WorkOrderSerl' },
+      { title: 'FactUnit' },
+      { title: 'FactUnitName' },
+      { title: 'InWHSeq' },
+      { title: 'InWHName' },
+      { title: 'OutWHSeq' },
+      { title: 'OutWHName' },
+      { title: 'ItemSeq' },
+      { title: 'UnitSeq' },
       { title: 'ItemNo' },
-      { title: 'Spec' },
-      { title: 'UnitName' },
-      { title: 'RemainQty' },
-      { title: 'OutQty' },
-      { title: 'Qty1' },
+      { title: 'LotNo' },
+      { title: 'Qty' },
+      { title: 'DateCode' },
+      { title: 'ReelNo' },
+      { title: 'Barcode' },
+      { title: 'StockOutDate' },
+      { title: 'LotNoFull' },
+      { title: 'ReqQty' },
+      { title: 'EmpSeq' },
     ],
     [],
   )
+
 
   const [cols, setCols] = useState(columns)
   const onColumnResize = useCallback(
@@ -53,31 +68,60 @@ function TableStockOUtFiFoB({ data }) {
     [cols],
   )
 
+  
   const getData = useCallback(
     ([col, row]) => {
       const person = gridData[row] || {}
       const {
-        OutReqNo = '',
-        ItemName = '',
+        OutReqSeq = '',
+        OutReqItemSerl = '',
+        WorkOrderSeq = '',
+        WorkOrderSerl = '',
+        FactUnit = '',
+        FactUnitName = '',
+        InWHSeq = '',
+        InWHName = '',
+        OutWHSeq = '',
+        OutWHName = '',
+        ItemSeq = '',
+        UnitSeq = '',
         ItemNo = '',
-        Spec = '',
-        UnitName = '',
-        RemainQty = '',
-        OutQty = '',
-        Qty1 = '',
+        LotNo = '',
+        Qty = '',
+        DateCode = '',
+        ReelNo = '',
+        Barcode = '',
+        StockOutDate = '',
+        LotNoFull = '',
+        ReqQty = '',
+        EmpSeq = '',
       } = person
 
       const safeString = (value) => (value != null ? String(value) : '')
 
       const columnMap = {
-        0: { kind: GridCellKind.Text, data: safeString(OutReqNo) },
-        1: { kind: GridCellKind.Text, data: safeString(ItemName) },
-        2: { kind: GridCellKind.Text, data: safeString(ItemNo) },
-        3: { kind: GridCellKind.Text, data: safeString(Spec) },
-        4: { kind: GridCellKind.Text, data: safeString(UnitName) },
-        5: { kind: GridCellKind.Text, data: safeString(RemainQty) },
-        6: { kind: GridCellKind.Text, data: safeString(OutQty) },
-        7: { kind: GridCellKind.Text, data: safeString(Qty1) },
+        0: { kind: GridCellKind.Text, data: safeString(OutReqSeq) },
+        1: { kind: GridCellKind.Text, data: safeString(OutReqItemSerl) },
+        2: { kind: GridCellKind.Text, data: safeString(WorkOrderSeq) },
+        3: { kind: GridCellKind.Text, data: safeString(WorkOrderSerl) },
+        4: { kind: GridCellKind.Text, data: safeString(FactUnit) },
+        5: { kind: GridCellKind.Text, data: safeString(FactUnitName) },
+        6: { kind: GridCellKind.Text, data: safeString(InWHSeq) },
+        7: { kind: GridCellKind.Text, data: safeString(InWHName) },
+        8: { kind: GridCellKind.Text, data: safeString(OutWHSeq) },
+        9: { kind: GridCellKind.Text, data: safeString(OutWHName) },
+        10: { kind: GridCellKind.Text, data: safeString(ItemSeq) },
+        11: { kind: GridCellKind.Text, data: safeString(UnitSeq) },
+        12: { kind: GridCellKind.Text, data: safeString(ItemNo) },
+        13: { kind: GridCellKind.Text, data: safeString(LotNo) },
+        14: { kind: GridCellKind.Text, data: safeString(Qty) },
+        15: { kind: GridCellKind.Text, data: safeString(DateCode) },
+        16: { kind: GridCellKind.Text, data: safeString(ReelNo) },
+        17: { kind: GridCellKind.Text, data: safeString(Barcode) },
+        18: { kind: GridCellKind.Text, data: safeString(StockOutDate) },
+        19: { kind: GridCellKind.Text, data: safeString(LotNoFull) },
+        20: { kind: GridCellKind.Text, data: safeString(ReqQty) },
+        21: { kind: GridCellKind.Text, data: safeString(EmpSeq) },
       }
 
       if (columnMap.hasOwnProperty(col)) {
@@ -89,6 +133,7 @@ function TableStockOUtFiFoB({ data }) {
     },
     [gridData],
   )
+
 
   const [lastActivated, setLastActivated] = useState(undefined)
 

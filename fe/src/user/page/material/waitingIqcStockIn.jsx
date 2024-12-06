@@ -12,7 +12,7 @@ import { FilterOutlined } from '@ant-design/icons'
 import WaitingIqcStockInQuery from '../../components/query/material/waitingIqcStockInQuery'
 import { ArrowIcon } from '../../components/icons'
 import CryptoJS from 'crypto-js'
-import ModalWaitingIqcStockIn from '../../components/modal/material/modalWaitingIqcStockIn'
+import ModalWaiting from '../../components/modal/material/modalWaiting'
 import { SMaterialQRCheckWeb } from '../../../features/material/postSMaterialQRCheck'
 import ErrorPage from '../../components/modal/default/errorPage'
 import { GetSUGGetActiveDeliveryItem } from '../../../features/material/getSUGGetActiveDeliveryItem'
@@ -111,7 +111,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
       const decryptedData = bytes.toString(CryptoJS.enc.Utf8)
       return JSON.parse(decryptedData)
     } catch (error) {
-      navigate(`/u/warehouse/material/stock-out-request`)
+      navigate(`/u/warehouse/material/delivery-list`)
       setModal3Open(true)
       return null
     }
@@ -653,7 +653,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
           </div>
         </div>
       </div>
-      <ModalWaitingIqcStockIn
+      <ModalWaiting
         modal2Open={modal2Open}
         setModal2Open={setModal2Open}
         error={error}

@@ -16,6 +16,8 @@ import StockOutRequestQueryFiFo from '../../components/query/material/stockOutRe
 import TableTransferStockOutFiFo from '../../components/table/material/tableTransferStockOutFifo'
 import { GetITMSPDMMOutReqItemListWEB } from '../../../features/material/GetITMSPDMMOutReqItemListWEB'
 import { SMaterialQRCheckStockOutFiFoWeb } from '../../../features/material/postCheckStockOutFiFo'
+import ModalWaiting from '../../components/modal/material/modalWaiting'
+import { CheckAllProceduresStockOutFiFo } from '../../../features/material/postCheckAllProceduresStockOutFiFo'
 
 export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const { t } = useTranslation()
@@ -29,7 +31,8 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const [loadingSave, setLoadingSave] = useState(false)
 
   const bufferRef = useRef('')
-  const dataRef = useRef()  /* DATA */
+  const [dataA, setDataA] = useState([])
+  const dataRef = useRef(dataA)  /* DATA */
   const [modal2Open, setModal2Open] = useState(false)
   const [modal3Open, setModal3Open] = useState(false)
   const [modal4Open, setModal4Open] = useState(false)
@@ -37,13 +40,14 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const [error, setError] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
   const [scanHistory, setScanHistory] = useState([])
-  const dataRefSacenHistory = useRef() /* DATA */
+  console.log('scanHistory' , scanHistory)
+  const dataRefSacenHistory = useRef(scanHistory) /* DATA */
   const [status, setStatus] = useState(false)
   const [filteredData, setFilteredData] = useState(null)
 
 
   const [loading, setLoading] = useState(false)
-  const [dataA, setDataA] = useState([])
+
 
   const [isOpenDetails, setIsOpenDetails] = useState(false)
   const secretKey = 'TEST_ACCESS_KEY'
@@ -101,6 +105,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
   useEffect(() => {
     if (id) {
       const data = decryptData(id)
+      console.log('data122', data)
       if (data) {
         setFilteredData(data)
         fetchDataA(data?.OutReqSeq)
@@ -125,7 +130,28 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
         const updatedHistory = [
           ...prevHistory,
           {
-
+            OutReqSeq: dataResSuccess?.OutReqSeq,
+            OutReqItemSerl: dataResSuccess?.OutReqItemSerl,
+            WorkOrderSeq: dataResSuccess?.WorkOrderSeq,
+            WorkOrderSerl: dataResSuccess?.WorkOrderSerl,
+            FactUnit: dataResSuccess?.FactUnit,
+            FactUnitName: dataResSuccess?.FactUnitName,
+            InWHSeq: dataResSuccess?.InWHSeq,
+            InWHName: dataResSuccess?.InWHName,
+            OutWHSeq: dataResSuccess?.OutWHSeq,
+            OutWHName: dataResSuccess?.OutWHName,
+            ItemSeq: dataResSuccess?.ItemSeq,
+            UnitSeq: dataResSuccess?.UnitSeq,
+            ItemNo: dataResSuccess?.ItemNo,
+            LotNo: dataResSuccess?.LotNo,
+            Qty: dataResSuccess?.Qty,
+            DateCode: dataResSuccess?.DateCode,
+            ReelNo: dataResSuccess?.ReelNo,
+            Barcode: dataResSuccess?.Barcode,
+            StockOutDate: dataResSuccess?.StockOutDate,
+            LotNoFull: dataResSuccess?.LotNoFull,
+            ReqQty: dataResSuccess?.ReqQty,
+            EmpSeq: dataResSuccess?.EmpSeq,
           },
         ]
         callback()
@@ -184,30 +210,29 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
       const resSuccess = await SMaterialQRCheckStockOutFiFoWeb(formData)
       if (resSuccess.success) {
         const dataResSuccess = resSuccess.data[0]
-        console.log('dataResSuccess', dataResSuccess)
         message.success(resultMessage)
         setInputBarCode(null)
         setModal2Open(false)
         setInputCode(null)
-
-        /*   addToScanHistory(dataResSuccess, () => {
-            setDataA((prevData) =>
-              prevData.map((item) =>
-                item.ItemNo === formData.itemNo
-                  ? {
-                    ...item,
-  
-                  }
-                  : item,
-              ),
-            )
-          }) */
+        addToScanHistory(dataResSuccess, () => {
+          setDataA((prevData) =>
+            prevData.map((item) =>
+              item.ItemNo === formData.ItemNo
+                ? {
+                  ...item,
+                  OutQty: item.OutQty + formData.Qty,
+                  RemainQty: item.RemainQty - formData.Qty,
+                }
+                : item,
+            ),
+          )
+        })
       } else {
         setModal2Open(true)
         setError(resSuccess?.message)
       }
     }, 100),
-    [addToScanHistory],
+    [],
   )
 
   useEffect(() => {
@@ -219,29 +244,36 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
       const { success, message: resultMessage, data: resultData } = event.data
       if (success) {
         if (resultData) {
-          const { itemNo, qty, lot, dc, reel, barcode, permitSerl, permitSeq } =
+          const { itemNo, qty, lot, dc, reel, barcode, UnitSeq, ItemSeq,
+            OutWHName, OutWHSeq, InWHName, InWHSeq, FactUnitName,
+            FactUnit, WorkOrderSerl, WorkOrderSeq, OutReqItemSerl, OutReqSeq } =
             resultData
 
           const formData = {
-            workingTag: 'A',
-            idx_no: '1',
-            status: '0',
-            dataSeq: '1',
-            selected: '1',
-            permitSeq: permitSeq,
-            permitSerl: permitSerl,
-            bizUnit: filteredData?.BizUnit,
-            bizUnitName: filteredData?.BizUnitName,
-            sMImpKind: filteredData?.ImpType,
-            sMImpKindName: filteredData?.PurchaseType,
-            itemNo: itemNo,
-            lotNo: lot,
-            qty: qty,
-            dateCode: dc,
-            reelNo: reel,
-            barcode: barcode,
+            WorkingTag: 'A',
+            Idx_no: '1',
+            Status: '0',
+            DataSeq: '1',
+            Selected: '1',
+            OutReqSeq: OutReqSeq,
+            OutReqItemSerl: OutReqItemSerl,
+            WorkOrderSeq: WorkOrderSeq,
+            WorkOrderSerl: WorkOrderSerl,
+            FactUnit: FactUnit,
+            FactUnitName: FactUnitName,
+            InWHSeq: InWHSeq,
+            InWHName: InWHName,
+            OutWHSeq: OutWHSeq,
+            OutWHName: OutWHName,
+            ItemSeq: ItemSeq,
+            UnitSeq: UnitSeq,
+            ItemNo: itemNo,
+            LotNo: lot,
+            Qty: qty,
+            DateCode: dc,
+            ReelNo: reel,
+            Barcode: barcode
           }
-
           debouncedCheckBarcode(formData, resultMessage)
         }
       } else {
@@ -249,18 +281,162 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
         setError(resultMessage)
       }
     }
-
     return () => {
       workerRef.current.terminate()
       debouncedCheckBarcode.cancel()
     }
   }, [filteredData, debouncedCheckBarcode])
 
+  useEffect(() => {
+    dataRef.current = dataA
+    dataRefSacenHistory.current = scanHistory
+  }, [dataA, scanHistory])
 
 
+  const createXmlDataCloseCheck = (data) => {
+    return `
+          <DataBlock1>
+              <WorkingTag>A</WorkingTag>
+              <IDX_NO>1</IDX_NO>
+              <Status>0</Status>
+              <DataSeq>1</DataSeq>
+              <Selected>1</Selected>
+              <TABLE_NAME>DataBlock1</TABLE_NAME>
+              <IsChangedMst>1</IsChangedMst>
+              <FactUnit>${data.FactUnit}</FactUnit>
+              <Date>${data.StockOutDate}</Date>
+              <ServiceSeq>3032</ServiceSeq>
+              <MethodSeq>2</MethodSeq>
+              <DtlUnitSeq>1</DtlUnitSeq>
+          </DataBlock1>
+      `
+  }
 
 
+  const createXmlCloseItemCheck = (row, index) => `
+  <DataBlock2>
+   <WorkingTag>A</WorkingTag>
+    <IDX_NO>${index + 1}</IDX_NO>
+    <DataSeq>${index + 1}</DataSeq>
+    <Status>0</Status>
+    <Selected>0</Selected>
+    <ItemSeq>${row.ItemSeq}</ItemSeq>
+    <FactUnit>${row.FactUnit}</FactUnit>
+    <TABLE_NAME>DataBlock2</TABLE_NAME>
+    <FactUnitOld>1</FactUnitOld>
+    <DateOld>${row.StockOutDate}</DateOld>
+    <ServiceSeq>3032</ServiceSeq>
+    <MethodSeq>2</MethodSeq>
+    <Date>${row.StockOutDate}</Date>
+  </DataBlock2>
+`
 
+  const createXmlOutProcCheck = (data) => {
+    return `
+        <DataBlock1>
+            <WorkingTag>A</WorkingTag>
+    <IDX_NO>1</IDX_NO>
+    <Status>0</Status>
+    <DataSeq>1</DataSeq>
+    <Selected>1</Selected>
+    <TABLE_NAME>DataBlock1</TABLE_NAME>
+    <IsChangedMst>1</IsChangedMst>
+    <UseType>6044001</UseType>
+    <IsOutSide>0</IsOutSide>
+    <OutWHSeq />
+    <InWHSeq>${data.InWHSeq}</InWHSeq>
+    <MatOutSeq>0</MatOutSeq>
+    <FactUnit>${data.FactUnit}</FactUnit>
+    <MatOutNo />
+    <MatOutDate>${data.StockOutDate}</MatOutDate>
+    <EmpSeq>${data.EmpSeq}</EmpSeq>
+    <MatOutType />
+    <Remark />
+        </DataBlock1>
+    `
+  }
+
+  const createXmlOutProcItemCheck = (row, index) => `
+  <DataBlock3>
+   <WorkingTag>A</WorkingTag>
+     <IDX_NO>${index + 1}</IDX_NO>
+    <DataSeq>${index + 1}</DataSeq>
+    <Status>0</Status>
+    <Selected>0</Selected>
+    <ReqQty>${row.ReqQty}</ReqQty>
+    <Qty>${row.Qty}</Qty>
+    <StdUnitQty>0</StdUnitQty>
+    <Remark />
+    <ItemLotNo>${row.LotNoFull}</ItemLotNo>
+    <SerialNoFrom />
+    <MatOutSeq></MatOutSeq>
+    <OutItemSerl>0</OutItemSerl>
+    <ItemSeq>${row.ItemSeq}</ItemSeq>
+    <OutWHSeq>${row.OutWHSeq}</OutWHSeq>
+    <InWHSeq>${row.InWHSeq}</InWHSeq>
+    <UnitSeq>${row.UnitSeq}</UnitSeq>
+    <WorkOrderSeq>${row.WorkOrderSeq}</WorkOrderSeq>
+    <ConsgnmtCustSeq>0</ConsgnmtCustSeq>
+    <OutReqSeq>${row.OutReqSeq}</OutReqSeq>
+    <OutReqItemSerl>${row.OutReqItemSerl}</OutReqItemSerl>
+    <PJTSeq>0</PJTSeq>
+    <WBSSeq>0</WBSSeq>
+    <WorkOrderSerl>${row.WorkOrderSerl}</WorkOrderSerl>
+    <AlterRate>0</AlterRate>
+    <TABLE_NAME>DataBlock3</TABLE_NAME>
+  </DataBlock3>
+`
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault()
+      setLoadingSave(true)
+      setResult(null)
+      setModal4Open(true)
+      if (scanHistory.length === 0) {
+        setLoadingSave(false)
+        setModal2Open(true)
+        setModal4Open(false)
+        setResult(null)
+        setError('Chưa có dữ liệu để gửi. Vui lòng quét dữ liệu trước khi gửi.')
+
+        return
+      }
+      const xmlSCOMCloseCheckWEB = createXmlDataCloseCheck(scanHistory[0])
+      const xmlSCOMCloseItemCheckWEB = scanHistory
+        .map(createXmlCloseItemCheck)
+        .join('\n')
+      const xmlSPDMMOutProcCheckWEB = createXmlOutProcCheck(scanHistory[0])
+      const xmlSPDMMOutProcItemCheckWEB = scanHistory.map(createXmlOutProcItemCheck).join('\n')
+
+      try {
+          const response = await CheckAllProceduresStockOutFiFo(scanHistory, {
+            xmlSCOMCloseCheckWEB: xmlSCOMCloseCheckWEB,
+            xmlSCOMCloseItemCheckWEB: xmlSCOMCloseItemCheckWEB,
+            xmlSPDMMOutProcCheckWEB: xmlSPDMMOutProcCheckWEB,
+            xmlSPDMMOutProcItemCheckWEB: xmlSPDMMOutProcItemCheckWEB,
+          })
+  
+          setResult(response)
+          if (response.success) {
+            setModal4Open(false)
+            setModal5Open(true)
+            setSuccessMessage('Tất cả các dữ liệu đã được thực thi thành công!')
+          } else {
+            setModal4Open(false)
+            setModal2Open(true)
+            setError(response.message)
+          }
+      } catch (error) {
+        setModal4Open(false)
+        setResult({ error: error.message })
+        setModal2Open(true)
+        setError(error.message)
+      } finally {
+        setLoadingSave(false)
+      }
+    },
+    [filteredData, scanHistory],
+  )
 
 
 
@@ -276,7 +452,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
               <Title level={4} className="mt-2 uppercase opacity-85 ">
                 {t('Stock Out FIFO')}
               </Title>
-              <StockOutRequestActionsDetails status={status} />
+              <StockOutRequestActionsDetails status={status} handleSubmit={handleSubmit} />
             </div>
             <details
               className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
@@ -300,9 +476,14 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
           </div>
 
           <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg">
-            <TableTransferStockOutFiFo sampleTableA={dataA} />
+            <TableTransferStockOutFiFo sampleTableA={dataA} sampleTableB={scanHistory} />
           </div>
         </div>
+        <ModalWaiting
+          modal2Open={modal2Open}
+          setModal2Open={setModal2Open}
+          error={error}
+        />
       </div>
     </>
   )

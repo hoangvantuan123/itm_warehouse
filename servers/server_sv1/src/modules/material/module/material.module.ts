@@ -20,4 +20,4 @@ import { StockOutService } from '../service/stockOut.service';
   controllers: [EmployeeController, DeliveryListController, StockOutController],
   exports: [],
 })
-export class StockInModule { }
+export class MaterialModule { }

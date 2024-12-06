@@ -1,6 +1,6 @@
 import { Modal, Button, Select, Input } from 'antd'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
-export default function ModalWaitingIqcStockIn({
+export default function ModalWaiting({
   modal2Open,
   setModal2Open,
   error,

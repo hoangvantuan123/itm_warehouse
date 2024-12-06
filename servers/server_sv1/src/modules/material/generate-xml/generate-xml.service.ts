@@ -4,9 +4,9 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class GenerateXmlService {
 
-    /* _SSLImpDelvMasterSave_WEB */
-    async generateXMLSSLImpDelvMasterSave(result: any[], SPDelvNo: any): Promise<string> {
-        return `<ROOT>${result.map((item, index) => `
+  /* _SSLImpDelvMasterSave_WEB */
+  async generateXMLSSLImpDelvMasterSave(result: any[], SPDelvNo: any): Promise<string> {
+    return `<ROOT>${result.map((item, index) => `
     <DataBlock1>
     <WorkingTag>A</WorkingTag>
     <IDX_NO>${index + 1}</IDX_NO>
@@ -34,12 +34,12 @@ export class GenerateXmlService {
     <SMImpKind>${item?.SMImpKind}</SMImpKind>
     <IsPJT>${item?.IsPJT}</IsPJT>
   </DataBlock1>`).join('')}</ROOT>`;
-    }
+  }
 
 
 
-    async generateXMLSSLImpDelvSheetSave(result: any[], SPDelvSeq: any): Promise<string> {
-        return `<ROOT>${result.map((item, index) => `
+  async generateXMLSSLImpDelvSheetSave(result: any[], SPDelvSeq: any): Promise<string> {
+    return `<ROOT>${result.map((item, index) => `
       <DataBlock2>
     <WorkingTag>A</WorkingTag>
     <IDX_NO>${index + 1}</IDX_NO> 
@@ -86,12 +86,12 @@ export class GenerateXmlService {
     <Memo7>1</Memo7>
     <Memo8>0</Memo8>
   </DataBlock2>`).join('')}</ROOT>`;
-    }
+  }
 
 
 
-    async generateXMLSLGLotNoMasterSave(result: any[]): Promise<string> {
-        return `<ROOT>${result.map(item => `
+  async generateXMLSLGLotNoMasterSave(result: any[]): Promise<string> {
+    return `<ROOT>${result.map(item => `
       <DataBlock1>
     <WorkingTag>A</WorkingTag>
     <IDX_NO>1</IDX_NO>
@@ -112,14 +112,14 @@ export class GenerateXmlService {
     <InNo>${item.InvoiceNo}</InNo>
     <SupplyCustSeq>${item.CustSeq}</SupplyCustSeq>
   </DataBlock1>`).join('')}</ROOT>`;
-    }
+  }
 
 
 
 
 
-    async generateXMLSCOMSourceDailySave(result: any[], SPDelvSeq: any): Promise<string> {
-        return `<ROOT>${result.map((item, index) => `
+  async generateXMLSCOMSourceDailySave(result: any[], SPDelvSeq: any): Promise<string> {
+    return `<ROOT>${result.map((item, index) => `
       <DataBlock1>
     <WorkingTag>A</WorkingTag>
     <IDX_NO>${index + 1}</IDX_NO>
@@ -144,12 +144,12 @@ export class GenerateXmlService {
     <ToSTDQty>${item.Qty}</ToSTDQty>
     <ToQty>${item.Qty}</ToQty>
   </DataBlock1>`).join('')}</ROOT>`;
-    }
+  }
 
 
 
-    async generateXMLSLGInOutDailyBatch(result: any[], SPDelvSeq: any): Promise<string> {
-        return `<ROOT> <DataBlock1>
+  async generateXMLSLGInOutDailyBatch(result: any[], SPDelvSeq: any): Promise<string> {
+    return `<ROOT> <DataBlock1>
     <WorkingTag>A</WorkingTag>
     <IDX_NO>1</IDX_NO>
     <DataSeq>1</DataSeq>
@@ -158,5 +158,134 @@ export class GenerateXmlService {
     <InOutSeq>${SPDelvSeq}</InOutSeq>
     <InOutType>240</InOutType>
   </DataBlock1></ROOT>`;
-    }
+  }
+
+
+
+
+
+  /* SAVE SOCK OUT FIFO
+   */
+
+  async generateXMLSPDMMOutProcSaveWEB(result: any[]): Promise<string> {
+    return `<ROOT>${result.map(item => `
+      <DataBlock1>
+      <WorkingTag>A</WorkingTag>
+    <IDX_NO>1</IDX_NO>
+    <DataSeq>1</DataSeq>
+    <Selected>1</Selected>
+    <Status>0</Status>
+    <MatOutSeq>${item.MatOutSeq}</MatOutSeq>
+    <FactUnit>${item.FactUnit}</FactUnit>
+    <MatOutNo>${item.MatOutNo}</MatOutNo>
+    <MatOutDate>${item.MatOutDate}</MatOutDate>
+    <UseType>6044001</UseType>
+    <MatOutType>0</MatOutType>
+    <IsOutSide>0</IsOutSide>
+    <OutWHSeq>0</OutWHSeq>
+    <InWHSeq>${item.InWHSeq}</InWHSeq>
+    <EmpSeq>${item.EmpSeq}</EmpSeq>
+    <Remark />
+  </DataBlock1>`).join('')}</ROOT>`;
+  }
+  async generateXMSPDMMOutProcItemSave(result: any[], MatOutSeq: any): Promise<string> {
+    return `<ROOT>${result.map((item, index) => `
+      <DataBlock3>
+       <WorkingTag>A</WorkingTag>
+     <IDX_NO>${index + 1}</IDX_NO>
+    <DataSeq>${index + 1}</DataSeq>
+    <Status>0</Status>
+    <Selected>0</Selected>
+    <TABLE_NAME>DataBlock3</TABLE_NAME>
+    <MatOutSeq>${MatOutSeq}</MatOutSeq>
+    <OutItemSerl>${index + 1}</OutItemSerl>
+    <ItemSeq>${item.ItemSeq}</ItemSeq>
+    <OutWHSeq>${item.OutWHSeq}</OutWHSeq>
+    <InWHSeq>${item.InWHSeq}</InWHSeq>
+    <UnitSeq>${item.UnitSeq}</UnitSeq>
+    <Qty>${item.Qty}</Qty>
+    <StdUnitQty>0.00000</StdUnitQty>
+    <ItemLotNo>${item.ItemLotNo}</ItemLotNo>
+    <SerialNoFrom />
+    <WorkOrderSeq>${item.WorkOrderSeq}</WorkOrderSeq>
+    <ConsgnmtCustSeq>0</ConsgnmtCustSeq>
+    <Remark />
+    <ReqQty>${item.ReqQty}</ReqQty> 
+    <OutReqSeq>${item.OutReqSeq}</OutReqSeq>
+    <OutReqItemSerl>${item.OutReqItemSerl}</OutReqItemSerl>
+    <PJTSeq>0</PJTSeq>
+    <WBSSeq>0</WBSSeq>
+    <WorkOrderSerl>${item.WorkOrderSerl}</WorkOrderSerl>
+    <AlterRate>0.00000</AlterRate>
+  </DataBlock3>`).join('')}</ROOT>`;
+  }
+
+
+  async generateXMLSLGInOutDailyBatchStockoutFiFo(result: any[], MatOutSeq: any, FactUnit: any, MatOutNo: any): Promise<string> {
+    return `<ROOT>${result.map(item => `
+      <DataBlock1>
+       <WorkingTag>A</WorkingTag>
+    <IDX_NO>1</IDX_NO>
+    <DataSeq>1</DataSeq>
+    <Selected>1</Selected>
+    <Status>0</Status>
+    <InOutSeq>${MatOutSeq}</InOutSeq>
+    <FactUnit>${FactUnit}</FactUnit>
+    <InOutNo>${MatOutNo}</InOutNo>
+    <InOutType>180</InOutType>
+  </DataBlock1>`).join('')}</ROOT>`;
+  }
+
+
+  async generateXMLSCOMSourceDailySaveStockoutFiFo(result: any[]): Promise<string> {
+    return `<ROOT>${result.map((item, index) => `
+      <DataBlock1>
+      <WorkingTag>A</WorkingTag>
+    <IDX_NO>${index + 1}</IDX_NO>
+    <DataSeq>${index + 1}</DataSeq>
+    <Status>0</Status>
+    <Selected>0</Selected>
+    <FromTableSeq>24</FromTableSeq>
+    <FromSeq>${item.OutReqSeq}</FromSeq>
+    <FromSerl>${item.OutReqSerl}</FromSerl>
+    <FromSubSerl>0</FromSubSerl>
+    <ToTableSeq>25</ToTableSeq>
+    <FromQty>${item.ReqQty}</FromQty>
+    <FromSTDQty>${item.ReqQty}</FromSTDQty>
+    <FromAmt>0</FromAmt>
+    <FromVAT>0</FromVAT>
+    <PrevFromTableSeq>0</PrevFromTableSeq>
+    <TABLE_NAME>DataBlock1</TABLE_NAME>
+    <ToSeq>${item.MatOutSeq}</ToSeq>
+    <ToSerl>${index + 1}</ToSerl>
+    <ToQty>${item.Qty}</ToQty> 
+    <ToSTDQty>${item.Qty}</ToSTDQty>
+  </DataBlock1>`).join('')}</ROOT>`;
+  }
+  async generateXMLSCOMSourceDailySaveFiFo(result: any[]): Promise<string> {
+    return `<ROOT>${result.map((item, index) => `
+      <DataBlock1>
+    <WorkingTag>A</WorkingTag>
+     <IDX_NO>${index + 1}</IDX_NO>
+    <DataSeq>${index + 1}</DataSeq>
+    <Status>0</Status>
+    <Selected>0</Selected>
+    <FromTableSeq>24</FromTableSeq>
+    <FromSeq>${item.OutReqSeq}</FromSeq>
+    <FromSerl>${item.OutReqItemSerl}</FromSerl>
+    <FromSubSerl>0</FromSubSerl>
+    <ToTableSeq>25</ToTableSeq>
+    <FromQty>${item.ReqQty}</FromQty>
+    <FromSTDQty>${item.ReqQty}</FromSTDQty>
+    <FromAmt>0</FromAmt>
+    <FromVAT>0</FromVAT>
+    <PrevFromTableSeq>0</PrevFromTableSeq>
+    <TABLE_NAME>DataBlock1</TABLE_NAME>
+    <ToSeq>${item.MatOutSeq}</ToSeq>
+    <ToSerl>${index + 1}</ToSerl>
+    <ToQty>${item.Qty}</ToQty>
+    <ToSTDQty>${item.Qty}</ToSTDQty>
+  </DataBlock1>`).join('')}</ROOT>`;
+  }
+
 }
