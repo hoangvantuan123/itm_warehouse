@@ -76,7 +76,6 @@ export class StockOutService {
                   @UserSeq = ${decodedToken.UserSeq},
                   @PgmSeq = ${pgmSeq};
             `;
-
             const result = await this.databaseService.executeQuery(query);
 
             const invalidStatuses = result.some((item: any) => item.Status !== 0);
@@ -131,7 +130,6 @@ export class StockOutService {
         dataSave: any[],
         decodedToken: any
     ): Promise<SimpleQueryResult> {
-        // Kiểm tra quyền người dùng
         const userCheck = await this.databaseService.findAuthCheckUser(
             decodedToken?.UserId,
             decodedToken?.EmpSeq,
@@ -139,17 +137,13 @@ export class StockOutService {
         );
 
         if (!userCheck || userCheck.length === 0) {
-            return {
-                success: false,
-                message: `User not found.`
-            };
+            return { success: false, message: `User not found.` };
         }
 
         const errors: string[] = [];
         const data: any[] = [];
         let masterCheckResult: any[] | null = null;
 
-        // Hàm thực thi thủ tục
         const executeProcedure = async (
             name: string,
             xmlDocument: string,
@@ -173,12 +167,13 @@ export class StockOutService {
                 }
                 return result;
             } catch (err) {
-                errors.push(`Error executing procedure ${name}: ${err.message}`);
-                throw err; // Để tiếp tục xử lý phía trên
+                const errorMessage = `Error executing procedure ${name}: ${err.message}`;
+                errors.push(errorMessage);
+                console.error(errorMessage);
+                throw err;
             }
         };
 
-        // Vòng lặp xử lý các thủ tục
         for (const { name, xmlDocument, serviceSeq } of procedureData) {
             try {
                 let result: any;
@@ -203,98 +198,81 @@ export class StockOutService {
             }
         }
 
-        // Kiểm tra lỗi
         if (errors.length > 0) {
             return { success: false, message: errors.join('; '), data };
         }
 
-        // Hàm lưu kết quả
-        const saveProcedure = async (name: string, result: any) => {
-
-            if (name === '_SPDMMOutProcCheck_WEB') {
-                try {
-                    return Promise.all([
-
-                        await this._SPDMMOutProcSave_WEB(
-                            result,
-                            xmlFlags,
-                            3033,
-                            workingTag,
-                            decodedToken.CompanySeq,
-                            languageSeq,
-                            decodedToken.UserSeq,
-                            pgmSeq
-                        ),
-                        await this._SLGInOutDailyBatch_WEB(
-                            result,
-                            xmlFlags,
-                            3033,
-                            workingTag,
-                            decodedToken.CompanySeq,
-                            languageSeq,
-                            decodedToken.UserSeq,
-                            pgmSeq,
-                            result[0].MatOutSeq,
-                            result[0].FactUnit,
-                            result[0].MatOutNo
-                        )
-
-                    ])
-
-                } catch (err) {
-                    return { success: false, message: err.message };
+        const saveProcedure = async (name: string, result: any): Promise<boolean> => {
+            try {
+                if (name === '_SPDMMOutProcCheck_WEB') {
+                    await this._SPDMMOutProcSave_WEB(
+                        result,
+                        xmlFlags,
+                        3033,
+                        workingTag,
+                        decodedToken.CompanySeq,
+                        languageSeq,
+                        decodedToken.UserSeq,
+                        pgmSeq
+                    );
                 }
-            }
-            if (name === '_SPDMMOutProcItemCheck_WEB') {
-                try {
-                    console.log('_SPDMMOutProcItemCheck_WEB' , result)
-                    return Promise.all([
-
-                        await this._SPDMMOutProcItemSave_WEB(
-                            result,
-                            xmlFlags,
-                            3033,
-                            workingTag,
-                            decodedToken.CompanySeq,
-                            languageSeq,
-                            decodedToken.UserSeq,
-                            pgmSeq,
-                            result[0].MatOutSeq
-                        ),
-                        await this._SCOMSourceDailySave(
-                            result,
-                            xmlFlags,
-                            3033,
-                            workingTag,
-                            decodedToken.CompanySeq,
-                            languageSeq,
-                            decodedToken.UserSeq,
-                            pgmSeq
-                        )
-
-                    ])
-
-                } catch (err) {
-                    return { success: false, message: err.message };
+                if (name === '_SPDMMOutProcItemCheck_WEB') {
+                    console.log('result', result)
+                    await this._SPDMMOutProcItemSave_WEB(
+                        result,
+                        xmlFlags,
+                        3033,
+                        workingTag,
+                        decodedToken.CompanySeq,
+                        languageSeq,
+                        decodedToken.UserSeq,
+                        pgmSeq,
+                        result[0].MatOutSeq
+                    );
+                    await this._SLGInOutDailyBatch_WEB(
+                        result,
+                        xmlFlags,
+                        3033,
+                        workingTag,
+                        decodedToken.CompanySeq,
+                        languageSeq,
+                        decodedToken.UserSeq,
+                        pgmSeq,
+                        result[0].MatOutSeq,
+                        dataSave[0].FactUnit,
+                        result[0].MatOutNo
+                    );
+                    await this._SCOMSourceDailySave(
+                        result,
+                        xmlFlags,
+                        3033,
+                        workingTag,
+                        decodedToken.CompanySeq,
+                        languageSeq,
+                        decodedToken.UserSeq,
+                        pgmSeq
+                    );
                 }
+                return true;
+            } catch (err) {
+                errors.push(`Error saving results for ${name}: ${err.message}`);
+                return false;
             }
-
-            return null;
         };
-
-        // Thực thi và lưu kết quả
-        const saveResults = await Promise.all(
-            data.map(async ({ name, result }) => {
-                const saveResult = await saveProcedure(name, result);
-                return saveResult;
-            })
-        );
-        if (saveResults.some((res) => res && !Array.isArray(res) && !res.success)) {
-            return { success: false, message: 'Some save procedures failed.', data };
+        for (const { name, result } of data) {
+            const success = await saveProcedure(name, result);
+            if (!success) {
+                return {
+                    success: false,
+                    message: 'Failed to save some procedure results.',
+                    data
+                };
+            }
         }
 
-        return { success: true, message: 'All procedures executed successfully.', data };
+        return { success: true, message: 'All procedures executed and saved successfully.', data };
     }
+
 
 
 
@@ -305,7 +283,7 @@ export class StockOutService {
       EXEC _SPDMMOutProcSave_WEB
         @xmlDocument = N'${xmlDocument}',
         @xmlFlags = ${xmlFlags},
-        @ServiceSeq = ${serviceSeq},
+        @ServiceSeq = 3033,
         @WorkingTag = N'${workingTag}',
         @CompanySeq = ${companySeq},
         @LanguageSeq = ${languageSeq},
@@ -313,9 +291,10 @@ export class StockOutService {
         @PgmSeq = ${pgmSeq};
     `;
         try {
-            /*  const result = await this.databaseService.executeQuery(query);
-             return { success: true, data: result }; */
+            const result = await this.databaseService.executeQuery(query);
+            return { success: true, data: result };
         } catch (error) {
+
             return { success: false, message: error.message || ERROR_MESSAGES.DATABASE_ERROR };
         }
     }
@@ -326,7 +305,7 @@ export class StockOutService {
       EXEC _SPDMMOutProcItemSave_WEB
         @xmlDocument = N'${xmlDocument}',
         @xmlFlags = ${xmlFlags},
-        @ServiceSeq = ${serviceSeq},
+        @ServiceSeq = 3033,
         @WorkingTag = N'${workingTag}',
         @CompanySeq = ${companySeq},
         @LanguageSeq = ${languageSeq},
@@ -334,19 +313,21 @@ export class StockOutService {
         @PgmSeq = ${pgmSeq};
     `;
         try {
-            /*  const result = await this.databaseService.executeQuery(query);
-             return { success: true, data: result }; */
+            const result = await this.databaseService.executeQuery(query);
+            return { success: true, data: result };
         } catch (error) {
             return { success: false, message: error.message || ERROR_MESSAGES.DATABASE_ERROR };
         }
     }
+
+
     async _SLGInOutDailyBatch_WEB(result: any[], xmlFlags: number, serviceSeq: number, workingTag: string, companySeq: number, languageSeq: number, userSeq: number, pgmSeq: number, MatOutSeq: any, FactUnit: any, MatOutNo: any): Promise<SimpleQueryResult> {
         const xmlDocument = await this.generateXmlService.generateXMLSLGInOutDailyBatchStockoutFiFo(result, MatOutSeq, FactUnit, MatOutNo);
         const query = `
       EXEC _SLGInOutDailyBatch_WEB
         @xmlDocument = N'${xmlDocument}',
         @xmlFlags = ${xmlFlags},
-        @ServiceSeq = ${serviceSeq},
+        @ServiceSeq = 2619,
         @WorkingTag = N'${workingTag}',
         @CompanySeq = ${companySeq},
         @LanguageSeq = ${languageSeq},
@@ -354,8 +335,9 @@ export class StockOutService {
         @PgmSeq = ${pgmSeq};
     `;
         try {
-            /*  const result = await this.databaseService.executeQuery(query);
-             return { success: true, data: result }; */
+            console.log('query', query)
+            const result = await this.databaseService.executeQuery(query);
+            return { success: true, data: result };
         } catch (error) {
             return { success: false, message: error.message || ERROR_MESSAGES.DATABASE_ERROR };
         }
@@ -366,7 +348,7 @@ export class StockOutService {
       EXEC _SCOMSourceDailySave
         @xmlDocument = N'${xmlDocument}',
         @xmlFlags = ${xmlFlags},
-        @ServiceSeq = ${serviceSeq},
+        @ServiceSeq = 3181,
         @WorkingTag = N'${workingTag}',
         @CompanySeq = ${companySeq},
         @LanguageSeq = ${languageSeq},
@@ -374,9 +356,9 @@ export class StockOutService {
         @PgmSeq = ${pgmSeq};
     `;
         try {
-            console.log('_SCOMSourceDailySave', query)
-            /*  const result = await this.databaseService.executeQuery(query);
-             return { success: true, data: result }; */
+            console.log('query', query)
+            const result = await this.databaseService.executeQuery(query);
+            return { success: true, data: result };
         } catch (error) {
             return { success: false, message: error.message || ERROR_MESSAGES.DATABASE_ERROR };
         }

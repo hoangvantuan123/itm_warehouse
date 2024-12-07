@@ -35,12 +35,12 @@ function checkBarcode(barcode, tableData, tableScanHistory) {
     }
   }
 
-  if (item.RemainQty < qty) {
+/*   if (item.RemainQty < qty) {
     return {
       success: false,
       message: `Số lượng quét (${qty}) vượt quá số lượng còn lại (${item.RemainQty}) của ItemNo: ${item.ItemNo}.`,
     }
-  }
+  } */
 
   return {
     success: true,

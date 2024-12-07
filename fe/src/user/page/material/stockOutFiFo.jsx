@@ -18,6 +18,9 @@ import { GetITMSPDMMOutReqItemListWEB } from '../../../features/material/GetITMS
 import { SMaterialQRCheckStockOutFiFoWeb } from '../../../features/material/postCheckStockOutFiFo'
 import ModalWaiting from '../../components/modal/material/modalWaiting'
 import { CheckAllProceduresStockOutFiFo } from '../../../features/material/postCheckAllProceduresStockOutFiFo'
+import SuccessSubmit from '../default/successSubmit'
+import LoadSubmit from '../default/loadSubmit'
+import { CompactSelection } from '@glideapps/glide-data-grid'
 
 export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const { t } = useTranslation()
@@ -40,10 +43,13 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const [error, setError] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
   const [scanHistory, setScanHistory] = useState([])
-  console.log('scanHistory' , scanHistory)
   const dataRefSacenHistory = useRef(scanHistory) /* DATA */
   const [status, setStatus] = useState(false)
   const [filteredData, setFilteredData] = useState(null)
+  const [selection, setSelection] = useState({
+    columns: CompactSelection.empty(),
+    rows: CompactSelection.empty(),
+  })
 
 
   const [loading, setLoading] = useState(false)
@@ -409,23 +415,25 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
       const xmlSPDMMOutProcItemCheckWEB = scanHistory.map(createXmlOutProcItemCheck).join('\n')
 
       try {
-          const response = await CheckAllProceduresStockOutFiFo(scanHistory, {
-            xmlSCOMCloseCheckWEB: xmlSCOMCloseCheckWEB,
-            xmlSCOMCloseItemCheckWEB: xmlSCOMCloseItemCheckWEB,
-            xmlSPDMMOutProcCheckWEB: xmlSPDMMOutProcCheckWEB,
-            xmlSPDMMOutProcItemCheckWEB: xmlSPDMMOutProcItemCheckWEB,
-          })
-  
-          setResult(response)
-          if (response.success) {
-            setModal4Open(false)
-            setModal5Open(true)
-            setSuccessMessage('Tất cả các dữ liệu đã được thực thi thành công!')
-          } else {
-            setModal4Open(false)
-            setModal2Open(true)
-            setError(response.message)
-          }
+        const response = await CheckAllProceduresStockOutFiFo(scanHistory, {
+          xmlSCOMCloseCheckWEB: xmlSCOMCloseCheckWEB,
+          xmlSCOMCloseItemCheckWEB: xmlSCOMCloseItemCheckWEB,
+          xmlSPDMMOutProcCheckWEB: xmlSPDMMOutProcCheckWEB,
+          xmlSPDMMOutProcItemCheckWEB: xmlSPDMMOutProcItemCheckWEB,
+        })
+
+        setResult(response)
+        if (response.success) {
+          setModal4Open(false)
+          setModal5Open(true)
+          setSuccessMessage('Tất cả các dữ liệu đã được thực thi thành công!')
+          handleRestFrom()
+          setScanHistory([])
+        } else {
+          setModal4Open(false)
+          setModal2Open(true)
+          setError(response.message)
+        }
       } catch (error) {
         setModal4Open(false)
         setResult({ error: error.message })
@@ -438,7 +446,62 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
     [filteredData, scanHistory],
   )
 
+  const handleRestFrom = useCallback(
+    async (e) => {
+      e.preventDefault()
+      if (scanHistory.length === 0) {
+        setModal2Open(true)
+        setError('Không có dữ liệu để reset! Vui lòng quét dữ liệu trước.')
+        return
+      }
+      setScanHistory([])
+      fetchDataA(dataA?.OutReqSeq)
+      message.success('Reset form thành công!')
+    },
+    [filteredData, scanHistory],
+  )
 
+
+  const getSelectedRowIndices = () => {
+    const selectedRows = selection.rows.items
+    let indices = []
+
+    selectedRows.forEach((range) => {
+      const start = range[0]
+      const end = range[1] - 1
+
+      for (let i = start; i <= end; i++) {
+        indices.push(i)
+      }
+    })
+
+    return indices
+  }
+
+  const handleDelete = useCallback(
+    async (e) => {
+      e.preventDefault()
+
+      const selectedRowIndices = getSelectedRowIndices()
+      if (selectedRowIndices.length === 0) {
+        setModal2Open(true)
+        setError('Vui lòng chọn ít nhất một hàng để xóa.')
+        return
+      }
+      if (scanHistory.length === 0) {
+        setModal2Open(true)
+        setError('Không có dữ liệu nào để xóa.')
+        return
+      }
+
+      const remainingRows = scanHistory.filter(
+        (row, index) => !selectedRowIndices.includes(index),
+      )
+
+      setScanHistory(remainingRows)
+    },
+    [scanHistory, selection],
+  )
 
   return (
     <>
@@ -452,7 +515,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
               <Title level={4} className="mt-2 uppercase opacity-85 ">
                 {t('Stock Out FIFO')}
               </Title>
-              <StockOutRequestActionsDetails status={status} handleSubmit={handleSubmit} />
+              <StockOutRequestActionsDetails status={status} handleSubmit={handleSubmit} handleRestFrom={handleRestFrom} handleDelete={handleDelete} />
             </div>
             <details
               className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
@@ -476,7 +539,8 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
           </div>
 
           <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg">
-            <TableTransferStockOutFiFo sampleTableA={dataA} sampleTableB={scanHistory} />
+            <TableTransferStockOutFiFo sampleTableA={dataA} sampleTableB={scanHistory}    setSelection={setSelection}
+              selection={selection}/>
           </div>
         </div>
         <ModalWaiting
@@ -484,6 +548,13 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
           setModal2Open={setModal2Open}
           error={error}
         />
+        <LoadSubmit setModal4Open={setModal4Open} modal4Open={modal4Open} />
+        <SuccessSubmit
+          setModal5Open={setModal5Open}
+          modal5Open={modal5Open}
+          successMessage={successMessage}
+        />
+
       </div>
     </>
   )

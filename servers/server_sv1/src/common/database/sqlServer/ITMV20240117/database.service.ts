@@ -29,7 +29,7 @@ export class DatabaseService {
       const result = await this.queryRunner.query(query);
       return result;
     } catch (error) {
-      throw error;
+      return { success: false, message: 'An error occurred while executing the query.' };
     }
   }
 
@@ -45,7 +45,7 @@ export class DatabaseService {
 
       return { message: 'Query executed successfully', result: result };
     } catch (error) {
-      throw error;
+      return { success: false, message: 'An error occurred while executing the query.' };
     }
   }
 
@@ -63,7 +63,7 @@ export class DatabaseService {
       return result[0];
     } catch (error) {
       console.error(`Error executing query for UserId ${UserId}:`, error);
-      throw error;
+      return { success: false, message: 'An error occurred while executing the query.' };
     }
   }
 

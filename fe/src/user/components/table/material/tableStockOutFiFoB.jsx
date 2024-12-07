@@ -9,7 +9,7 @@ const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
 
-function TableStockOUtFiFoB({ data }) {
+function TableStockOUtFiFoB({ data, selection, setSelection }) {
   const [gridData, setGridData] = useState([])
   const [showSearch, setShowSearch] = useState(false)
   const ref = (useRef < data) | (null > null)
@@ -18,10 +18,6 @@ function TableStockOUtFiFoB({ data }) {
   const [clickedRowDataList, setClickedRowDataList] = useState([])
   const [isMinusClicked, setIsMinusClicked] = useState(false)
   const [lastClickedCell, setLastClickedCell] = useState(null)
-  const [selection, setSelection] = useState({
-    columns: CompactSelection.empty(),
-    rows: CompactSelection.empty(),
-  })
   const columns = useMemo(
     () => [
       { title: 'OutReqSeq' },
@@ -68,7 +64,7 @@ function TableStockOUtFiFoB({ data }) {
     [cols],
   )
 
-  
+
   const getData = useCallback(
     ([col, row]) => {
       const person = gridData[row] || {}
@@ -182,9 +178,6 @@ function TableStockOUtFiFoB({ data }) {
     }
   }
 
-  const onGridSelectionChange = (newSelection) => {
-    console.log('Selection aborted', newSelection)
-  }
 
   return (
     <div className="w-full h-full border-t border-b overflow-hidden scroll-container ">
@@ -210,8 +203,8 @@ function TableStockOUtFiFoB({ data }) {
           i % 2 === 0
             ? undefined
             : {
-                bgCell: '#FBFBFB',
-              }
+              bgCell: '#FBFBFB',
+            }
         }
       />
     </div>
