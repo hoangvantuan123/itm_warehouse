@@ -99,7 +99,6 @@ function TabelBarcodeChange({ data, setGridData, gridData, setSelectRow}) {
         [gridData],
     )
 
-    console.log("table", data);
     useEffect(() => {
         setGridData(data)
     }, [data])

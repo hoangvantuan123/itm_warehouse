@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet';
-import { Typography, Layout, Button, message } from 'antd';
+import { Typography, Layout, Button, message, Form } from 'antd';
 const { Title } = Typography;
 const { Header, Content } = Layout;
 import 'moment/locale/vi';
@@ -10,7 +10,7 @@ import { debounce, values } from 'lodash';
 import BarcodeChangeAction from '../../components/actions/barcodePrint/barcodeChangAction';
 import TabelBarcodeChange from '../../components/table/barcodePrint/tableBarcodeChange';
 import { searchPage } from '../../../features/barcode/barcodeChangeService';
-import { searchPage2 } from '../../../features/barcode/barcodeChangeService';
+import { use } from 'react';
 
 export default function BarcodeChange({ permissions, isMobile }) {
     const [loading, setLoading] = useState(false)
@@ -18,12 +18,24 @@ export default function BarcodeChange({ permissions, isMobile }) {
     const { t } = useTranslation();
     const [dataInfo, setDataInfo] = useState([]);
     const [rowChecked, setRowChecked] = useState(null);
-    const [fromDate, setFromDate] = useState(dayjs().startOf('month'))
-    const [toDate, setToDate] = useState(dayjs().startOf('month'))
+    // const [fromDate, setFromDate] = useState(dayjs().startOf('month'))
+    // const [toDate, setToDate] = useState(dayjs().startOf('month'))
+    const formatDate = useCallback((date) => date.format('YYYYMMDDHHmmss'), [])
+
 
     const [gridData, setGridData] = useState([])
     const [selectRow, setSelectRow] = useState(null);
     const [dataAc, setDataAc] = useState({});
+    const [formChange] = Form.useForm();
+
+    const [oldQty, setOldQty] = useState();
+    const [newQty, setNewQty] = useState('');
+    const [changeQty, setChangeQty] = useState('');
+
+    const [oldBarcode, setOldBarcode] = useState('');
+    const [itemNo, setItemNo] = useState('');
+    const [lotNo, setLotNo] = useState('');
+    const [changeLotId, setChangeLotId] = useState('');
 
     const getMultiSelectedRows = () => {
         const selectedRows = selectRow.rows.items;
@@ -62,24 +74,6 @@ export default function BarcodeChange({ permissions, isMobile }) {
 
     );
 
-    const fetchItemList = async () => {
-        setLoading(true)
-        try {
-            const itemList = await searchPage2(
-
-                dataAc?.lotNo,
-                dataAc?.matID,
-                dataAc?.barcode,
-            );
-            setData(itemList?.data.data || [])
-        } catch (error) {
-            setData([])
-        } finally {
-            setLoading(false)
-        }
-    }
-
-
     const onFinish = async (e) => {
         setData([]);
         const {
@@ -89,22 +83,99 @@ export default function BarcodeChange({ permissions, isMobile }) {
             matID,
             barcode, } = e;
 
-        try{
+        try {
             const result = await searchPage(
-                fromDate,
-                toDate,
+                formatDate(fromDate),
+                formatDate(toDate),
                 lotNo,
                 matID,
                 barcode
             );
 
             setData(result.data.data || []);
-        }catch(err){
+        } catch (err) {
             setData([])
         }
-       
+
     };
 
+    const onFinishFormChange = (e) => {
+
+        const {
+            oldBarcode,
+            preQty,
+            changeQty,
+            qty,
+            remark,
+            userID,
+            barcodePosX,
+            barcodePosY,
+            barcodeSizeX,
+            barcodeSizeY,
+            qrcodePosX,
+            qrcodePosY,
+            qrcodeSizeX,
+            qrcodeSizeY
+
+        } = e;
+
+        console.log("oldBarcode", oldBarcode);
+    };
+
+
+    const onChangeBarcode = (e) => {
+        const inputValue = e.target.value; // Lấy giá trị hiện tại từ input
+        setOldBarcode(inputValue); // Cập nhật state
+
+        // if (!inputValue.includes('/')) {
+        //     message.warning("BARCODE INVALID FORMAT 1!");
+        //     return;
+        // }
+
+        const arrLot = inputValue.split('/');
+        // if (arrLot.length < 9) {
+        //     message.warning("BARCODE INVALID FORMAT 2 !");
+        //     setLotNo("");
+        //     return;
+        // }
+
+        setItemNo(arrLot[0]);
+        setLotNo(`${arrLot[1]}/${arrLot[3]}/${arrLot[4]}`);
+        setOldQty(arrLot[2]);
+        formChange.setFieldsValue({ preQty: arrLot[2] });
+
+    };
+
+    const onChangeQty = (e) => {
+        const changeQty = e.target.value;
+        const newQty = oldQty - changeQty;
+        setNewQty(newQty);
+        formChange.setFieldsValue({ qty: newQty });
+    }
+
+    const onChangeNewQty = (e) => {
+        setChangeLotId(itemNo + '/' + lotNo)
+        
+    }
+
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    const btnOpenModal = (e) => {
+        setIsModalVisible(true);
+        console.log(e);
+    }
+
+    const handleBtnConfirm = () => {
+
+        if (!port || !ip) {
+            message.error("PORT và IP không được để trống");
+            return;
+        }
+        postPrint();
+    }
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
 
     return (
         <Layout className="h-screen bg-slate-50">
@@ -119,8 +190,22 @@ export default function BarcodeChange({ permissions, isMobile }) {
                     </Title>
 
                     <BarcodeChangeAction
+                        // fromDate={fromDate}
+                        // toDate={toDate}
                         setNewDataAction={setDataAc}
                         onFinish={onFinish}
+                        onChangeBarcode={onChangeBarcode}
+                        btnOpenModal={btnOpenModal}
+                        isModalVisible={isModalVisible}
+                        handleBtnConfirm={handleBtnConfirm}
+                        handleCancel={handleCancel}
+
+                        formChange={formChange}
+
+                        onChangeQty={onChangeQty}
+                        onChangeNewQty={onChangeNewQty}
+                        oldQty={oldQty}
+                        newQty={newQty}
                     />
                 </Header>
 

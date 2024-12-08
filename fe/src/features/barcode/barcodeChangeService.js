@@ -46,43 +46,6 @@ export const searchPage = async (
     }
   }
 
-  export const searchPage2 = async ( fromDate,
-    toDate,
-    lotNo,
-    matID,
-    barcode) => {
-    try {
-      const response = await axios.get(
-        `${HOST_API_SERVER_1}/barcode-change/paginated`,
-        {
-          params: {
-            fromDate,
-            toDate,
-            lotNo,
-            matID,
-            barcode
-          },
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      )
-  
-      return {
-        success: true,
-        data: response.data,
-      }
-    } catch (error) {
-      return {
-        success: false,
-        message: error.response
-          ? error.response.data.message || 'Có lỗi xảy ra'
-          : 'Không thể kết nối tới server',
-      }
-    }
-  }
-  
-
   export const CreatePrintLabel = async (requestData) => {
 
     const dataToSend = {

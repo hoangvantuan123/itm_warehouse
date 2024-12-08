@@ -4,27 +4,24 @@ import { Card, Button, Modal, Space, Input, Typography, DatePicker, Checkbox, Ro
 import { CreatePrintLabel } from "../../../../features/barcode/printBarcodeService";
 
 export default function BarcodeChangeAction({
+    // fromDate,
+    // toDate,
     setNewDataAction,
-    onFinish
+    onFinish,
+    onChangeBarcode,
+    btnOpenModal,
+    isModalVisible,
+    handleBtnConfirm,
+    handleCancel,
+
+    formChange,
+    onChangeQty,
+    onChangeNewQty,
+    oldQty,
+    newQty,
 }) {
     const [form] = Form.useForm();
-    const [formChange] = Form.useForm();
-
-    const [sizeLabel, setSizeLabel] = useState({
-
-        barCodePosX: Number(0),
-        barCodePosY: Number(0),
-        barCodeSizeX: Number(0.8),
-        barCodeSizeY: Number(20),
-        QrPosX: Number(0),
-        QrPosY: Number(0),
-        QrSizeX: Number(40),
-        QrSizeY: Number(0),
-        paperSizeX: Number(0),
-        paperSizeY: Number(0),
-
-    });
-
+    const [formPopup] = Form.useForm();
 
     const [newLabel, setNewLabel] = useState({
 
@@ -47,16 +44,10 @@ export default function BarcodeChangeAction({
     const [port, setPort] = useState('');
 
 
-    const [isModalVisible, setIsModalVisible] = useState(false);
 
-    const handleCancel = () => {
-        setIsModalVisible(false);
-    };
 
-    const btnOpenModal = () => {
-        setIsModalVisible(true);
-        onFinish();
-    }
+
+
 
 
     const postPrint = useCallback(async () => {
@@ -76,15 +67,8 @@ export default function BarcodeChangeAction({
         }
     }, [ip, port])
 
-    const handleBtnConfirm = () => {
 
-        if (!port || !ip) {
-            message.error("PORT và IP không được để trống");
-            return;
-        }
-        postPrint();
-    }
-  
+
     const onFormLayoutChange = ({ layout }) => {
     };
 
@@ -95,6 +79,8 @@ export default function BarcodeChangeAction({
     const onFinishModal = (values) => {
 
     }
+
+    console.log("oldQty", oldQty)
 
     return (
         <div className="mt-1">
@@ -107,13 +93,13 @@ export default function BarcodeChangeAction({
                         initialValues={{
                             layout: 'inline',
                         }}
-                      
+
                         style={{
                             maxWidth: 'inline' ? 'none' : 600,
                         }}
 
                         onFinish={onFinish}
-                      
+
                         autoComplete="off"
                     >
                         <Form.Item label="From Date" name="fromDate">
@@ -134,7 +120,7 @@ export default function BarcodeChangeAction({
                             <Input placeholder="" size="small" />
                         </Form.Item>
                         <Form.Item>
-                            <Button onClick={onFinish} type="primary" size="small" htmlType="submit">SEARCH</Button>
+                            <Button type="primary" size="small" htmlType="submit">SEARCH</Button>
                         </Form.Item>
 
                         <Form.Item>
@@ -144,7 +130,7 @@ export default function BarcodeChangeAction({
 
                 </Card>
 
-              {/*   <Card className="mb-1 p-1 shadow-sm" size="small">
+                <Card className="mb-1 p-1 shadow-sm" size="small">
                     <Form
                         layout={'inline'}
                         form={formChange}
@@ -156,22 +142,40 @@ export default function BarcodeChangeAction({
                             maxWidth: 'inline' ? 'none' : 600,
                         }}
 
-                        onFinish={onFinish}
+                        // onFinish={btnOpenModal}
                         onFinishFailed={onFinishFailed}
                         autoComplete="off"
                     >
 
-                        <Form.Item label="Barcode" name="barcode2">
-                            <Input placeholder="" size="small" />
+                        <Form.Item label="Barcode" name="oldBarcode">
+                            <Input placeholder="" size="small" onChange={onChangeBarcode} />
                         </Form.Item>
                         <Form.Item label="Pre QTY" name="preQty">
-                            <Input placeholder="" size="small" type="number" min={0} />
+                            <Input 
+                            placeholder="" 
+                            size="small" 
+                            type="number" 
+                            min={0}
+                            disabled={true}
+                            />
                         </Form.Item>
                         <Form.Item label="Change QTY" name="changeQty">
-                            <Input placeholder="" size="small" type="number" min={0} />
+                            <Input 
+                            placeholder="" 
+                            size="small" 
+                            type="number" 
+                            min={0} 
+                            onChange={onChangeQty}/>
                         </Form.Item>
                         <Form.Item label="QTY" name="qty">
-                            <Input placeholder="" size="small" type="number" min={0} />
+                            <Input 
+                            placeholder="" 
+                            size="small" 
+                            type="number" 
+                            min={0} 
+                            value={newQty}
+                            disabled={true}
+                            onChange={onChangeNewQty}/>
                         </Form.Item>
 
                         <Form.Item label="Remark" name="remark">
@@ -237,7 +241,7 @@ export default function BarcodeChangeAction({
 
                     <Form
                         layout={'inline'}
-                        form={form}
+                        form={formPopup}
                         initialValues={{
                             layout: 'inline',
                         }}
@@ -250,6 +254,13 @@ export default function BarcodeChangeAction({
                         onFinishFailed={onFinishFailed}
                         autoComplete="off"
                     >
+
+                        <Form.Item label="IP" name="ip" layout={"inline"} >
+                            <Input size="small" style={{ width: 100 }} />
+                        </Form.Item>
+                        <Form.Item label="Port" name="port" layout={"inline"} >
+                            <Input size="small" style={{ width: 100 }} />
+                        </Form.Item>
 
                         <Form.Item label="Barcode" name="oldBarcode" layout={"inline"} >
                             <Input size="small" style={{ width: 100 }} />
@@ -264,7 +275,7 @@ export default function BarcodeChangeAction({
                         </Form.Item>
                     </Form>
 
-                </Modal> */}
+                </Modal>
 
             </Card>
 

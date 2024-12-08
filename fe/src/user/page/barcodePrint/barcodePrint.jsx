@@ -147,7 +147,6 @@ export default function BarcodePrint({ permissions, isMobile }) {
                                 loading={loading}
                                 selectRow={selectRow}
                                 setSelectRow={setSelectRow}
-                                handleVisibleRegionChange={handleVisibleRegionChange}
                             />
                         </div>
                     </div>
