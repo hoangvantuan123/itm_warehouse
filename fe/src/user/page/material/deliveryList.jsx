@@ -44,16 +44,6 @@ export default function DeliveryList({ permissions, isMobile }) {
 
   const fetchDeliveryData = async () => {
     setLoading(true);
-    if (loadingNotification) {
-      notification.destroy();
-    }
-  
-    loadingNotification = notification.info({
-      message: 'Đang tải dữ liệu',
-      description: 'Dữ liệu đang được tải.',
-      duration: 0,
-    });
-  
     try {
       const deliveryResponse = await GetDeliveryList(
         formData ? formatDate(formData) : '',
@@ -64,7 +54,7 @@ export default function DeliveryList({ permissions, isMobile }) {
   
       const fetchedData = deliveryResponse?.data || [];
       setData(fetchedData);
-      notification.destroy();
+      /* notification.destroy();
   
       if (fetchedData.length > 0) {
         notification.success({
@@ -77,7 +67,7 @@ export default function DeliveryList({ permissions, isMobile }) {
           description: 'Không có dữ liệu phù hợp được tìm thấy.',
 
         });
-      }
+      } */
   
     } catch (error) {
       setData([]);

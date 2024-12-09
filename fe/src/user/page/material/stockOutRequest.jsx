@@ -97,15 +97,6 @@ export default function StockOutRequest({ permissions, isMobile }) {
   const fetchSPDMMOutReqListQueryWeb = async () => {
     setLoadingA(true);
 
-    if (loadingNotification) {
-      notification.destroy();
-    }
-
-    loadingNotification = notification.info({
-      message: 'Đang tải dữ liệu',
-      description: 'Dữ liệu đang được tải.',
-      duration: 0,
-    });
 
     try {
       const formA = {
@@ -131,19 +122,19 @@ export default function StockOutRequest({ permissions, isMobile }) {
       const fetchedData = response?.data || [];
       setData(fetchedData);
 
-      notification.destroy();
-
-      if (fetchedData.length > 0) {
-        notification.success({
-          message: 'Thành công',
-          description: 'Dữ liệu đã được tải thành công.',
-        });
-      } else {
-        notification.success({
-          message: 'Thành công',
-          description: 'Không có dữ liệu phù hợp được tìm thấy.',
-        });
-      }
+      /*  notification.destroy();
+ 
+       if (fetchedData.length > 0) {
+         notification.success({
+           message: 'Thành công',
+           description: 'Dữ liệu đã được tải thành công.',
+         });
+       } else {
+         notification.success({
+           message: 'Thành công',
+           description: 'Không có dữ liệu phù hợp được tìm thấy.',
+         });
+       } */
 
     } catch (error) {
       setErrorA(true);
