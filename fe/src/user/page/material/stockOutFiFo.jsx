@@ -519,8 +519,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
             </div>
             <details
               className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
-              open={isOpenDetails}
-              onToggle={handleToggle}
+              open
 
             >
               <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
