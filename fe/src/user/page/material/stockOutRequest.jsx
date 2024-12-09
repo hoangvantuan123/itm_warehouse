@@ -20,6 +20,7 @@ import CodeHelpStockOut3 from '../../components/modal/material/codeHelpStockOut3
 import { SPDMMOutReqListQueryWeb } from '../../../features/material/postStockOutList'
 import { GetCodeHelp } from '../../../features/codeHelp/getCodeHelp'
 import { CompactSelection } from '@glideapps/glide-data-grid'
+import ModalWaiting from '../../components/modal/material/modalWaiting'
 export default function StockOutRequest({ permissions, isMobile }) {
   const { t } = useTranslation()
   const gridRef = useRef(null)
@@ -68,6 +69,8 @@ export default function StockOutRequest({ permissions, isMobile }) {
   const [workOrderNo, setWorkOrderNo] = useState('')
   const [prodReqNo, setProdReqNo] = useState('')
   const [outReqNo, setOutReqNo] = useState('')
+  const [checkIsStop, setCheckIsStop] = useState(false)
+  console.log('checkIsStop', checkIsStop)
   const [selection, setSelection] = useState({
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
@@ -121,20 +124,6 @@ export default function StockOutRequest({ permissions, isMobile }) {
       const response = await SPDMMOutReqListQueryWeb(formA);
       const fetchedData = response?.data || [];
       setData(fetchedData);
-
-      /*  notification.destroy();
- 
-       if (fetchedData.length > 0) {
-         notification.success({
-           message: 'Thành công',
-           description: 'Dữ liệu đã được tải thành công.',
-         });
-       } else {
-         notification.success({
-           message: 'Thành công',
-           description: 'Không có dữ liệu phù hợp được tìm thấy.',
-         });
-       } */
 
     } catch (error) {
       setErrorA(true);
@@ -348,6 +337,11 @@ export default function StockOutRequest({ permissions, isMobile }) {
         JSON.stringify(filteredData),
         secretKey,
       ).toString()
+      if (filteredData.IsStop === true) {
+        setCheckIsStop(true)
+      } else {
+        setCheckIsStop(false)
+      }
       const encryptedToken = encodeBase64Url(encryptedData)
       setKeyPath(encryptedToken)
       setClickedRowData(rowData)
@@ -546,6 +540,11 @@ export default function StockOutRequest({ permissions, isMobile }) {
         setSelection={setSelection3}
         selection={selection3}
         custName={custName}
+      />
+      <ModalWaiting
+        modal2Open={checkIsStop}
+        setModal2Open={setCheckIsStop}
+        error="Đơn hàng đã được hoàn thành"
       />
     </>
   )

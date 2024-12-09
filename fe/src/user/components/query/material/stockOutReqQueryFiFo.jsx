@@ -1,23 +1,23 @@
 import { useState } from 'react'
 import {
-  Button,
   Form,
   Input,
   Row,
   Col,
-  DatePicker,
-  Segmented,
-  Select,
 } from 'antd'
-import moment from 'moment'
 import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-
-const dateFormat = 'YYYY/MM/DD'
-const weekFormat = 'MM/DD'
-const monthFormat = 'YYYY/MM'
+import 'dayjs/locale/vi'
+dayjs.locale('vi')
 
 export default function StockOutRequestQueryFiFo() {
+  const [date] = useState(dayjs())
+
+  const formatDateWithWeekday = (date) => {
+    const dayOfWeek = date.format('dddd')
+    const capitalizedDay =
+      dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1)
+    return `${capitalizedDay}, ${date.format('DD/MM/YYYY')}`
+  }
   return (
     <div className="flex items-center gap-2">
       <Form
@@ -30,74 +30,33 @@ export default function StockOutRequestQueryFiFo() {
 
 
       > <Row className="gap-4 flex items-center">
-
           <Col>
             <Form.Item
-              label={
-                <span className="uppercase text-[10px]">Nơi sản xuất</span>
-              }
+              label={<span className="uppercase text-[10px]">Date</span>}
               className="mb-0"
             >
               <Input
+                value={formatDateWithWeekday(date)}
                 size="small"
-                className=" text-sm p-2 "
-
+                className="text-sm p-2"
+                readOnly
               />
             </Form.Item>
           </Col>
           <Col>
             <Form.Item
-              label={
-                <span className="uppercase text-[10px]">Số yêu cầu</span>
-              }
+              label={<span className="uppercase text-[10px]">MAT Barcode</span>}
+              tooltip="MAT Barcode"
               className="mb-0"
             >
               <Input
+                placeholder="Input Barcode"
                 size="small"
-                className=" text-sm p-2 "
-              />
-            </Form.Item>
-          </Col>
-          <Col>
-            <Form.Item
-              label={
-                <span className="uppercase text-[10px]">Ngày yêu cầu</span>
-              }
-              className="mb-0"
-            >
-              <Input
-                size="small"
-                className=" text-sm p-2 "
+                className="text-sm p-2  w-72"
               />
             </Form.Item>
           </Col>
 
-          <Col>
-            <Form.Item
-              label={
-                <span className="uppercase text-[10px]">Người yêu cầu</span>
-              }
-              className="mb-0"
-            >
-              <Input
-                size="small"
-                className=" text-sm p-2 "
-              />
-            </Form.Item>
-          </Col>
-          <Col>
-            <Form.Item
-              label={
-                <span className="uppercase text-[10px]">Bộ phận yêu cầu</span>
-              }
-              className="mb-0"
-            >
-              <Input
-                size="small"
-                className=" text-sm p-2 "
-              />
-            </Form.Item>
-          </Col>
           <Col>
             <Form.Item
               label={
@@ -111,19 +70,7 @@ export default function StockOutRequestQueryFiFo() {
               />
             </Form.Item>
           </Col>
-          <Col>
-            <Form.Item
-              label={
-                <span className="uppercase text-[10px]">Ghi chú</span>
-              }
-              className="mb-0"
-            >
-              <Input
-                size="small"
-                className=" text-sm p-2 "
-              />
-            </Form.Item>
-          </Col>
+
         </Row>
       </Form>
     </div >
