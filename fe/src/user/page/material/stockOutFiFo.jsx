@@ -428,6 +428,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
           setModal5Open(true)
           setSuccessMessage('Tất cả các dữ liệu đã được thực thi thành công!')
           handleRestFrom()
+          navigate(`/u/warehouse/material/stock-out-request`)
           setScanHistory([])
         } else {
           setModal4Open(false)
@@ -538,8 +539,8 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
           </div>
 
           <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg">
-            <TableTransferStockOutFiFo sampleTableA={dataA} sampleTableB={scanHistory}    setSelection={setSelection}
-              selection={selection}/>
+            <TableTransferStockOutFiFo sampleTableA={dataA} sampleTableB={scanHistory} setSelection={setSelection}
+              selection={selection} />
           </div>
         </div>
         <ModalWaiting

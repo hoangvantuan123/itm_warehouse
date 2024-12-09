@@ -513,6 +513,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
           setModal5Open(true)
           setSuccessMessage('Tất cả các dữ liệu đã được thực thi thành công!')
           setScanHistory([])
+          navigate(`/u/warehouse/material/delivery-list`)
           fetchDeliveryData(filteredData?.DelvNo, filteredData?.PurchaseType)
         } else {
           setModal4Open(false)
