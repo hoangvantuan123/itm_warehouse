@@ -42,7 +42,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const [modal3Open, setModal3Open] = useState(false)
   const [modal4Open, setModal4Open] = useState(false)
   const [modal5Open, setModal5Open] = useState(false)
-  
+
   const [error, setError] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
   const [scanHistory, setScanHistory] = useState([])
@@ -244,10 +244,10 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
             prevData.map((item) =>
               item.ItemNo === formData.itemNo
                 ? {
-                    ...item,
-                    OkQty: item.OkQty + formData.qty,
-                    RemainQty: item.RemainQty - formData.qty,
-                  }
+                  ...item,
+                  OkQty: item.OkQty + formData.qty,
+                  RemainQty: item.RemainQty - formData.qty,
+                }
                 : item,
             ),
           )
@@ -509,11 +509,11 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
 
         setResult(response)
         if (response.success) {
+          navigate(`/u/warehouse/material/delivery-list`)
           setModal4Open(false)
           setModal5Open(true)
           setSuccessMessage('Tất cả các dữ liệu đã được thực thi thành công!')
           setScanHistory([])
-          navigate(`/u/warehouse/material/delivery-list`)
           fetchDeliveryData(filteredData?.DelvNo, filteredData?.PurchaseType)
         } else {
           setModal4Open(false)

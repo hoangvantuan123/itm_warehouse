@@ -424,11 +424,11 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
 
         setResult(response)
         if (response.success) {
+          navigate(`/u/warehouse/material/stock-out-request`)
           setModal4Open(false)
           setModal5Open(true)
           setSuccessMessage('Tất cả các dữ liệu đã được thực thi thành công!')
           handleRestFrom()
-          navigate(`/u/warehouse/material/stock-out-request`)
           setScanHistory([])
         } else {
           setModal4Open(false)
