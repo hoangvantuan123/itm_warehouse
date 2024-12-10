@@ -46,6 +46,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const dataRefSacenHistory = useRef(scanHistory) /* DATA */
   const [status, setStatus] = useState(false)
   const [filteredData, setFilteredData] = useState(null)
+  const [checkValueIsStop, setCheckValueIsStop] = useState(filteredData?.IsStop ? 1 : 0)
   const [selection, setSelection] = useState({
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
@@ -111,7 +112,6 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
   useEffect(() => {
     if (id) {
       const data = decryptData(id)
-      console.log('data122', data)
       if (data) {
         setFilteredData(data)
         fetchDataA(data?.OutReqSeq)
@@ -404,7 +404,6 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
         setModal4Open(false)
         setResult(null)
         setError('Chưa có dữ liệu để gửi. Vui lòng quét dữ liệu trước khi gửi.')
-
         return
       }
       const xmlSCOMCloseCheckWEB = createXmlDataCloseCheck(scanHistory[0])
@@ -415,7 +414,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
       const xmlSPDMMOutProcItemCheckWEB = scanHistory.map(createXmlOutProcItemCheck).join('\n')
 
       try {
-        const response = await CheckAllProceduresStockOutFiFo(scanHistory, {
+        const response = await CheckAllProceduresStockOutFiFo(checkValueIsStop, filteredData?.OutReqSeq, scanHistory, {
           xmlSCOMCloseCheckWEB: xmlSCOMCloseCheckWEB,
           xmlSCOMCloseItemCheckWEB: xmlSCOMCloseItemCheckWEB,
           xmlSPDMMOutProcCheckWEB: xmlSPDMMOutProcCheckWEB,
@@ -449,7 +448,6 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
 
   const handleRestFrom = useCallback(
     async (e) => {
-      e.preventDefault()
       if (scanHistory.length === 0) {
         setModal2Open(true)
         setError('Không có dữ liệu để reset! Vui lòng quét dữ liệu trước.')
@@ -516,7 +514,12 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
               <Title level={4} className="mt-2 uppercase opacity-85 ">
                 {t('Stock Out FIFO')}
               </Title>
-              <StockOutRequestActionsDetails status={status} handleSubmit={handleSubmit} handleRestFrom={handleRestFrom} handleDelete={handleDelete} />
+              <StockOutRequestActionsDetails status={status} handleSubmit={handleSubmit}
+                handleRestFrom={handleRestFrom}
+                handleDelete={handleDelete}
+
+
+              />
             </div>
             <details
               className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
@@ -533,7 +536,8 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
                 </span>
               </summary>
               <div className="flex p-2 gap-4">
-                <StockOutRequestQueryFiFo />
+                <StockOutRequestQueryFiFo filteredData={filteredData} handleCheckBarcode={handleCheckBarcode} inputBarCode={inputBarCode}
+                  setInputBarCode={setInputBarCode} setCheckValueIsStop={setCheckValueIsStop} />
               </div>
             </details>
           </div>

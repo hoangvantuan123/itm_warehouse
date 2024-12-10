@@ -14,11 +14,13 @@ const DEFAULTS = {
   pgmSeq: 1036085,
 }
 
-export const CheckAllProceduresStockOutFiFo = async (dataSave, xmlDocuments) => {
+export const CheckAllProceduresStockOutFiFo = async (checkValueIsStop, outReqSeq, dataSave, xmlDocuments) => {
   try {
     const token = accessToken()
     const dataToSend = {
       ...DEFAULTS,
+      checkValueIsStop,
+      outReqSeq,
       dataSave,
       xmlDocument: {
         xmlSCOMCloseCheckWEB: xmlDocuments.xmlSCOMCloseCheckWEB,

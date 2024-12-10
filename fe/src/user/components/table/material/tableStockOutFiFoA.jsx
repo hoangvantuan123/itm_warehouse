@@ -24,14 +24,13 @@ function TableStockOUtFiFoA({ data }) {
   })
   const columns = useMemo(
     () => [
-      { title: 'OutReqNo' },
-      { title: 'ItemName' },
       { title: 'ItemNo' },
-      { title: 'Spec' },
-      { title: 'UnitName' },
       { title: 'RemainQty' },
       { title: 'OutQty' },
       { title: 'Qty1' },
+      { title: 'ItemName' },
+      { title: 'Spec' },
+      { title: 'UnitName' },
     ],
     [],
   )
@@ -57,27 +56,26 @@ function TableStockOUtFiFoA({ data }) {
     ([col, row]) => {
       const person = gridData[row] || {}
       const {
-        OutReqNo = '',
-        ItemName = '',
         ItemNo = '',
-        Spec = '',
-        UnitName = '',
         RemainQty = '',
         OutQty = '',
         Qty1 = '',
+        ItemName = '',
+        Spec = '',
+        UnitName = '',
+
       } = person
 
       const safeString = (value) => (value != null ? String(value) : '')
 
       const columnMap = {
-        0: { kind: GridCellKind.Text, data: safeString(OutReqNo) },
-        1: { kind: GridCellKind.Text, data: safeString(ItemName) },
-        2: { kind: GridCellKind.Text, data: safeString(ItemNo) },
-        3: { kind: GridCellKind.Text, data: safeString(Spec) },
-        4: { kind: GridCellKind.Text, data: safeString(UnitName) },
-        5: { kind: GridCellKind.Text, data: safeString(RemainQty) },
-        6: { kind: GridCellKind.Text, data: safeString(OutQty) },
-        7: { kind: GridCellKind.Text, data: safeString(Qty1) },
+        0: { kind: GridCellKind.Text, data: safeString(ItemNo) },
+        1: { kind: GridCellKind.Text, data: safeString(RemainQty) },
+        2: { kind: GridCellKind.Text, data: safeString(OutQty) },
+        3: { kind: GridCellKind.Text, data: safeString(Qty1) },
+        4: { kind: GridCellKind.Text, data: safeString(ItemName) },
+        5: { kind: GridCellKind.Text, data: safeString(Spec) },
+        6: { kind: GridCellKind.Text, data: safeString(UnitName) },
       }
 
       if (columnMap.hasOwnProperty(col)) {
@@ -165,8 +163,8 @@ function TableStockOUtFiFoA({ data }) {
           i % 2 === 0
             ? undefined
             : {
-                bgCell: '#FBFBFB',
-              }
+              bgCell: '#FBFBFB',
+            }
         }
       />
     </div>

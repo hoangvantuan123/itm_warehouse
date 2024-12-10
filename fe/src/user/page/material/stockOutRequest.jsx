@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Helmet } from 'react-helmet'
-import { Input, notification, Table, Typography, Alert, Spin, Layout } from 'antd'
+import { Input, notification, Table, Typography, message, Spin, Layout } from 'antd'
 const { Title, Text } = Typography
 import { FilterOutlined, LoadingOutlined } from '@ant-design/icons'
 import { ArrowIcon } from '../../components/icons'
@@ -70,7 +70,6 @@ export default function StockOutRequest({ permissions, isMobile }) {
   const [prodReqNo, setProdReqNo] = useState('')
   const [outReqNo, setOutReqNo] = useState('')
   const [checkIsStop, setCheckIsStop] = useState(false)
-  console.log('checkIsStop', checkIsStop)
   const [selection, setSelection] = useState({
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
@@ -84,6 +83,24 @@ export default function StockOutRequest({ permissions, isMobile }) {
     rows: CompactSelection.empty(),
   })
 
+  const resetTable = () => {
+    setSelection({
+      columns: CompactSelection.empty(),
+      rows: CompactSelection.empty(),
+    });
+  };
+  const resetTable2 = () => {
+    setSelection2({
+      columns: CompactSelection.empty(),
+      rows: CompactSelection.empty(),
+    });
+  };
+  const resetTable3 = () => {
+    setSelection3({
+      columns: CompactSelection.empty(),
+      rows: CompactSelection.empty(),
+    });
+  };
   useEffect(() => {
     const savedState = localStorage.getItem('detailsStateStockOut')
     setIsOpenDetails(savedState === 'open')
@@ -95,12 +112,10 @@ export default function StockOutRequest({ permissions, isMobile }) {
     localStorage.setItem('detailsStateStockOut', isOpen ? 'open' : 'closed')
   }
 
-  let loadingNotification;
-
   const fetchSPDMMOutReqListQueryWeb = async () => {
     setLoadingA(true);
 
-
+    const loadingMessage = message.loading('Đang tải dữ liệu, vui lòng chờ...', 0);
     try {
       const formA = {
         IsChangedMst: '1',
@@ -125,15 +140,14 @@ export default function StockOutRequest({ permissions, isMobile }) {
       const fetchedData = response?.data || [];
       setData(fetchedData);
 
+      loadingMessage();
+      message.success('Tải dữ liệu thành công!');
     } catch (error) {
       setErrorA(true);
 
+      loadingMessage();
       notification.destroy();
-
-      notification.error({
-        message: 'Lỗi',
-        description: 'Có lỗi xảy ra khi tải dữ liệu.',
-      });
+      message.error("Có lỗi xảy ra khi tải dữ liệu.");
     } finally {
       setLoadingA(false);
     }
@@ -341,11 +355,12 @@ export default function StockOutRequest({ permissions, isMobile }) {
         setCheckIsStop(true)
       } else {
         setCheckIsStop(false)
+        const encryptedToken = encodeBase64Url(encryptedData)
+        setKeyPath(encryptedToken)
+        setClickedRowData(rowData)
+        setLastClickedCell(cell)
       }
-      const encryptedToken = encodeBase64Url(encryptedData)
-      setKeyPath(encryptedToken)
-      setClickedRowData(rowData)
-      setLastClickedCell(cell)
+
     }
   }
 
@@ -377,24 +392,7 @@ export default function StockOutRequest({ permissions, isMobile }) {
   }, [])
 
 
-  const resetTable = () => {
-    setSelection({
-      columns: CompactSelection.empty(),
-      rows: CompactSelection.empty(),
-    });
-  };
-  const resetTable2 = () => {
-    setSelection2({
-      columns: CompactSelection.empty(),
-      rows: CompactSelection.empty(),
-    });
-  };
-  const resetTable3 = () => {
-    setSelection3({
-      columns: CompactSelection.empty(),
-      rows: CompactSelection.empty(),
-    });
-  };
+
 
   return (
     <>
@@ -544,6 +542,7 @@ export default function StockOutRequest({ permissions, isMobile }) {
       <ModalWaiting
         modal2Open={checkIsStop}
         setModal2Open={setCheckIsStop}
+        resetTable={resetTable}
         error="Đơn hàng đã được hoàn thành"
       />
     </>

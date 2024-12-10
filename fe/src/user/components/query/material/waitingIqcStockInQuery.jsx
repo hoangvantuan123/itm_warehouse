@@ -50,15 +50,15 @@ export default function WaitingIqcStockInQuery({
 
           <Col>
             <Form.Item
-              label={<span className="uppercase text-[10px]">MAT Barcode</span>}
-              tooltip="MAT Barcode"
+              label={<span className="uppercase text-[10px]">Barcode</span>}
+              tooltip="Dùng để nhập mã vạch"
               className="mb-0"
             >
               <Input
                 value={inputBarCode}
                 onChange={handleChange}
                 onPressEnter={handleEnter}
-                placeholder="Input Barcode"
+                placeholder="Barcode"
                 size="small"
                 className="text-sm p-2  w-72"
               />

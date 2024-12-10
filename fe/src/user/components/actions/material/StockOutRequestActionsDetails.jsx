@@ -13,7 +13,8 @@ export default function StockOutRequestActionsDetails({
   handleSubmit,
   handleDelete,
   handleRestFrom,
-  handleUploadExcel,
+  handleUploadExcel
+  
 }) {
   return (
     <div className="flex items-center gap-2">

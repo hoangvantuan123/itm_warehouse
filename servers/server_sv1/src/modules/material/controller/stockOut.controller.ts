@@ -112,25 +112,25 @@ export class StockOutController {
             if (!decodedToken.EmpSeq && !decodedToken.EmpSeq && !decodedToken.UserSeq && !decodedToken.CompanySeq) {
                 throw new UnauthorizedException('You do not have permission to access this API.');
             }
-
-
-            const { dataSave, xmlDocument, ...otherParams } = body;
-
+            const { checkValueIsStop, outReqSeq, dataSave, xmlDocument, ...otherParams } = body;
             const procedureData = [
                 { name: '_SCOMCloseCheck_WEB', xmlDocument: xmlDocument.xmlSCOMCloseCheckWEB, serviceSeq: 2639 },
                 { name: '_SCOMCloseItemCheck_WEB', xmlDocument: xmlDocument.xmlSCOMCloseItemCheckWEB, serviceSeq: 2639 },
                 { name: '_SPDMMOutProcCheck_WEB', xmlDocument: xmlDocument.xmlSPDMMOutProcCheckWEB, serviceSeq: 3033 },
                 { name: '_SPDMMOutProcItemCheck_WEB', xmlDocument: xmlDocument.xmlSPDMMOutProcItemCheckWEB, serviceSeq: 3033 },
             ];
-            const result = await this.stockOutService.checkAllProceduresStockOutFiFo(
-                procedureData,
-                otherParams.xmlFlags,
-                otherParams.workingTag,
-                otherParams.languageSeq,
-                otherParams.pgmSeq,
-                dataSave,
-                decodedToken
-            );
+              const result = await this.stockOutService.checkAllProceduresStockOutFiFo(
+                  procedureData,
+                  otherParams.xmlFlags,
+                  otherParams.workingTag,
+                  otherParams.languageSeq,
+                  otherParams.pgmSeq,
+                  checkValueIsStop,
+                  outReqSeq,
+                  dataSave,
+                  decodedToken
+              );
+           
             return result;
         } catch (error) {
             throw new HttpException(

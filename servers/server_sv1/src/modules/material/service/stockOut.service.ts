@@ -122,11 +122,17 @@ export class StockOutService {
     }
 
     async checkAllProceduresStockOutFiFo(
-        procedureData: { name: string; xmlDocument: string; serviceSeq: number }[],
+        procedureData: {
+            name: string;
+            xmlDocument: string;
+            serviceSeq: number
+        }[],
         xmlFlags: number,
         workingTag: string,
         languageSeq: number,
         pgmSeq: number,
+        isStop: number,
+        outReqSeq: number,
         dataSave: any[],
         decodedToken: any
     ): Promise<SimpleQueryResult> {
@@ -213,11 +219,12 @@ export class StockOutService {
                         decodedToken.CompanySeq,
                         languageSeq,
                         decodedToken.UserSeq,
-                        pgmSeq
+                        pgmSeq,
+                        isStop,
+                        outReqSeq
                     );
                 }
                 if (name === '_SPDMMOutProcItemCheck_WEB') {
-                    console.log('result', result)
                     await this._SPDMMOutProcItemSave_WEB(
                         result,
                         xmlFlags,
@@ -277,7 +284,7 @@ export class StockOutService {
 
 
     /*_SPDMMOutProcSave_WEB  */
-    async _SPDMMOutProcSave_WEB(result: any[], xmlFlags: number, serviceSeq: number, workingTag: string, companySeq: number, languageSeq: number, userSeq: number, pgmSeq: number): Promise<SimpleQueryResult> {
+    async _SPDMMOutProcSave_WEB(result: any[], xmlFlags: number, serviceSeq: number, workingTag: string, companySeq: number, languageSeq: number, userSeq: number, pgmSeq: number, isStop: number, outReqSeq: number): Promise<SimpleQueryResult> {
         const xmlDocument = await this.generateXmlService.generateXMLSPDMMOutProcSaveWEB(result);
         const query = `
       EXEC _SPDMMOutProcSave_WEB
@@ -288,9 +295,12 @@ export class StockOutService {
         @CompanySeq = ${companySeq},
         @LanguageSeq = ${languageSeq},
         @UserSeq = ${userSeq},
-        @PgmSeq = ${pgmSeq};
+        @PgmSeq = ${pgmSeq},
+        @IsStop= ${isStop},
+         @OutReqSeq = ${outReqSeq};
     `;
         try {
+            console.log('_SPDMMOutProcSave_WEB' , query)
             const result = await this.databaseService.executeQuery(query);
             return { success: true, data: result };
         } catch (error) {
@@ -335,7 +345,6 @@ export class StockOutService {
         @PgmSeq = ${pgmSeq};
     `;
         try {
-            console.log('query', query)
             const result = await this.databaseService.executeQuery(query);
             return { success: true, data: result };
         } catch (error) {
@@ -356,7 +365,6 @@ export class StockOutService {
         @PgmSeq = ${pgmSeq};
     `;
         try {
-            console.log('query', query)
             const result = await this.databaseService.executeQuery(query);
             return { success: true, data: result };
         } catch (error) {

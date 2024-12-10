@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Helmet } from 'react-helmet'
-import { Typography, notification } from 'antd'
+import { Typography, notification, message } from 'antd'
 const { Title, Text } = Typography
 import { FilterOutlined } from '@ant-design/icons'
 import { ArrowIcon } from '../../components/icons'
@@ -22,6 +22,7 @@ export default function DeliveryList({ permissions, isMobile }) {
   const gridRef = useRef(null)
   const navigate = useNavigate()
 
+  const [loadingA, setLoadingA] = useState(false)
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState([])
   const [dataUnit, setDataUnit] = useState([])
@@ -40,10 +41,10 @@ export default function DeliveryList({ permissions, isMobile }) {
   const [gridData, setGridData] = useState([])
 
 
-  let loadingNotification;
 
   const fetchDeliveryData = async () => {
-    setLoading(true);
+    setLoadingA(true);
+    const loadingMessage = message.loading('Đang tải dữ liệu, vui lòng chờ...', 0);
     try {
       const deliveryResponse = await GetDeliveryList(
         formData ? formatDate(formData) : '',
@@ -51,36 +52,22 @@ export default function DeliveryList({ permissions, isMobile }) {
         deliveryNo,
         bizUnit,
       );
-  
+
       const fetchedData = deliveryResponse?.data || [];
       setData(fetchedData);
-      /* notification.destroy();
-  
-      if (fetchedData.length > 0) {
-        notification.success({
-          message: 'Thành công',
-          description: 'Dữ liệu đã được tải thành công.',
-        });
-      } else {
-        notification.success({
-          message: 'Thành công',
-          description: 'Không có dữ liệu phù hợp được tìm thấy.',
 
-        });
-      } */
-  
+      loadingMessage();
+      message.success('Tải dữ liệu thành công!');
     } catch (error) {
       setData([]);
+      loadingMessage();
       notification.destroy();
-      notification.error({
-        message: 'Lỗi',
-        description: 'Có lỗi xảy ra khi tải dữ liệu.',
-      });
+      message.error("Có lỗi xảy ra khi tải dữ liệu.");
     } finally {
-      setLoading(false);
+      setLoadingA(false);
     }
   };
-  
+
   const fetchCodeHelpData = useCallback(async () => {
     setLoading(true)
     try {
