@@ -51,7 +51,6 @@ const UserRouter = () => {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [menuTransForm, setMenuTransForm] = useState([])
-
   const [rootMenuItems, setRootMenuItems] = useState([])
   const [errorMenu, setErrorMenu] = useState(false)
   const [userPermissions, setUserPermissions] = useState([])

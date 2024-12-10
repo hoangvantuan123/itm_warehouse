@@ -70,6 +70,9 @@ export default function StockOutRequest({ permissions, isMobile }) {
   const [prodReqNo, setProdReqNo] = useState('')
   const [outReqNo, setOutReqNo] = useState('')
   const [checkIsStop, setCheckIsStop] = useState(false)
+  const [checkIsConfirm, setCheckIsConfirm] = useState(false)
+  const [isAPISuccess, setIsAPISuccess] = useState(true);
+
   const [selection, setSelection] = useState({
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
@@ -113,8 +116,12 @@ export default function StockOutRequest({ permissions, isMobile }) {
   }
 
   const fetchSPDMMOutReqListQueryWeb = async () => {
+    if (isAPISuccess === false) {
+      message.warning('Không thể thực hiện, vui lòng kiểm tra trạng thái.');
+      return;
+    }
+    setIsAPISuccess(false)
     setLoadingA(true);
-
     const loadingMessage = message.loading('Đang tải dữ liệu, vui lòng chờ...', 0);
     try {
       const formA = {
@@ -139,7 +146,7 @@ export default function StockOutRequest({ permissions, isMobile }) {
       const response = await SPDMMOutReqListQueryWeb(formA);
       const fetchedData = response?.data || [];
       setData(fetchedData);
-
+      setIsAPISuccess(true)
       loadingMessage();
       message.success('Tải dữ liệu thành công!');
     } catch (error) {
@@ -351,15 +358,22 @@ export default function StockOutRequest({ permissions, isMobile }) {
         JSON.stringify(filteredData),
         secretKey,
       ).toString()
-      if (filteredData.IsStop === true) {
-        setCheckIsStop(true)
+      if (filteredData.IsStop === true || filteredData.IsConfirm === false) {
+        if (filteredData.IsStop === true) {
+          setCheckIsStop(true);
+        }
+        if (filteredData.IsConfirm === false) {
+          setCheckIsConfirm(true);
+        }
+        setKeyPath(null);
       } else {
-        setCheckIsStop(false)
-        const encryptedToken = encodeBase64Url(encryptedData)
-        setKeyPath(encryptedToken)
-        setClickedRowData(rowData)
-        setLastClickedCell(cell)
+        const encryptedToken = encodeBase64Url(encryptedData);
+        setKeyPath(encryptedToken);
+        setClickedRowData(rowData);
+        setLastClickedCell(cell);
       }
+
+
 
     }
   }
@@ -543,7 +557,18 @@ export default function StockOutRequest({ permissions, isMobile }) {
         modal2Open={checkIsStop}
         setModal2Open={setCheckIsStop}
         resetTable={resetTable}
-        error="Đơn hàng đã được hoàn thành"
+        error="Đơn hàng đã được hoàn thành!"
+        setKeyPath={setKeyPath}
+      />
+
+
+      
+      <ModalWaiting
+        modal2Open={checkIsConfirm}
+        setModal2Open={setCheckIsConfirm}
+        resetTable={resetTable}
+        error="Đơn hàng chưa được xác nhận!"
+        setKeyPath={setKeyPath}
       />
     </>
   )

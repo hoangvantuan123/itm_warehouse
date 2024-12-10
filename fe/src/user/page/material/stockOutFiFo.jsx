@@ -43,7 +43,6 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const [error, setError] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
   const [scanHistory, setScanHistory] = useState([])
-  console.log('scanHistory' , scanHistory)
   const dataRefSacenHistory = useRef(scanHistory) /* DATA */
   const [status, setStatus] = useState(false)
   const [filteredData, setFilteredData] = useState(null)

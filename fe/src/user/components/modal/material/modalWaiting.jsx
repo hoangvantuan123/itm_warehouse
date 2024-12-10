@@ -4,13 +4,20 @@ export default function ModalWaiting({
   modal2Open,
   setModal2Open,
   error,
+  resetTable, 
+  setKeyPath
 }) {
+  const handelOnCancel = () => {
+    setModal2Open(false)
+    resetTable()
+    setKeyPath(null)
+  }
   return (
     <Modal
       centered
       open={modal2Open}
       onOk={() => setModal2Open(false)}
-      onCancel={() => setModal2Open(false)}
+      onCancel={handelOnCancel}
       closable={false}
       footer={false}
     >

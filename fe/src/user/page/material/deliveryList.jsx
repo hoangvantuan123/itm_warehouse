@@ -39,11 +39,15 @@ export default function DeliveryList({ permissions, isMobile }) {
   const [clickedRowData, setClickedRowData] = useState(null)
   const [clickedRowDataList, setClickedRowDataList] = useState([])
   const [gridData, setGridData] = useState([])
-
-
+  const [isAPISuccess, setIsAPISuccess] = useState(true);
 
   const fetchDeliveryData = async () => {
+    if (isAPISuccess === false) {
+      message.warning('Không thể thực hiện, vui lòng kiểm tra trạng thái.');
+      return;
+    }
     setLoadingA(true);
+    setIsAPISuccess(false)
     const loadingMessage = message.loading('Đang tải dữ liệu, vui lòng chờ...', 0);
     try {
       const deliveryResponse = await GetDeliveryList(
@@ -55,7 +59,7 @@ export default function DeliveryList({ permissions, isMobile }) {
 
       const fetchedData = deliveryResponse?.data || [];
       setData(fetchedData);
-
+      setIsAPISuccess(true)
       loadingMessage();
       message.success('Tải dữ liệu thành công!');
     } catch (error) {
@@ -67,6 +71,11 @@ export default function DeliveryList({ permissions, isMobile }) {
       setLoadingA(false);
     }
   };
+
+
+  useEffect(() => {
+    fetchDeliveryData()
+  }, [])
 
   const fetchCodeHelpData = useCallback(async () => {
     setLoading(true)
@@ -166,10 +175,6 @@ export default function DeliveryList({ permissions, isMobile }) {
   }
 
   useEffect(() => {
-    fetchDeliveryData()
-  }, [])
-
-  useEffect(() => {
     debouncedFetchCodeHelpData()
     return () => {
       debouncedFetchCodeHelpData.cancel()
@@ -190,6 +195,7 @@ export default function DeliveryList({ permissions, isMobile }) {
               <DeliveryActions
                 fetchData={fetchDeliveryData}
                 nextPageStockIn={nextPageStockIn}
+                isAPISuccess={isAPISuccess}
               />
             </div>
             <details

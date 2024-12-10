@@ -271,6 +271,8 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
       tableScanHistory: currentScanHistory,
     })
   }, [])
+
+  
   useEffect(() => {
     workerRef.current = new Worker(
       new URL('../../../workers/workerWatingIqcStockIn.js', import.meta.url),

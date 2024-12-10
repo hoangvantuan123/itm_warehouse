@@ -7,7 +7,7 @@ import {
   SearchOutlined,
 } from '@ant-design/icons'
 
-export default function DeliveryActions({ fetchData, nextPageStockIn }) {
+export default function DeliveryActions({ fetchData, nextPageStockIn, isAPISuccess }) {
   return (
     <div className="flex items-center gap-2">
       <Button

@@ -110,4 +110,8 @@ export class TCAUserWEB {
     Status: string;
     @Column({ default: false })
     Active: boolean;
+
+
+    @Column({ default: false })
+    LanguageSeq: number;
 }
