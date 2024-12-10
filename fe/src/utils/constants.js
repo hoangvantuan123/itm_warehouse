@@ -47,11 +47,18 @@ export const BARCODE_ERR_MESSAGE = {
   BARCODEID_NOT_EXISTS: 'Barcode ID Not Exists.',
   NEW_BARCODEID_NOT_EXISTS: 'New Barcode ID Not Exists.',
   DUPLICATE_ROW: 'Duplicate Row Data',
-  BARCODE_NOT_CONFIRM: 'Barcode not confirm.'
+  BARCODE_NOT_CONFIRM: 'Barcode not confirm.',
+  PRINTER_ERROR: 'Error Printing.',
+
+  BARCODE_NOT_NULL: 'Barcode not null.',
+  QTY_NOT_NULL: 'Change QTY not null.',
+  
+
 }
 
 
 export const BARCODE_SUCCESS_MESSAGE = {
   BARCODE_CONFIRM_SUCCESS: 'Barcode Confirm Succesfull.',
+  PRINTER_SUCCESS: 'Printer Successfull.',
 
 }

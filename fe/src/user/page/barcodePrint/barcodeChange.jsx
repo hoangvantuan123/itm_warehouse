@@ -10,7 +10,7 @@ import BarcodeChangeAction from '../../components/actions/barcodePrint/barcodeCh
 import TabelBarcodeChange from '../../components/table/barcodePrint/tableBarcodeChange';
 import { createChangeBarcode, isExistBarcode, searchPage } from '../../../features/barcode/barcodeChangeService';
 import { use } from 'react';
-import { BARCODE_ERR_MESSAGE, ERROR_MESSAGES } from '../../../utils/constants';
+import { BARCODE_ERR_MESSAGE, BARCODE_SUCCESS_MESSAGE, ERROR_MESSAGES } from '../../../utils/constants';
 
 export default function BarcodeChange({ permissions, isMobile }) {
     const [loading, setLoading] = useState(false)
@@ -149,19 +149,20 @@ export default function BarcodeChange({ permissions, isMobile }) {
 
         try {
             const result = await isExistBarcode(
-               param
+                param
             );
 
-            if (result == false){
-                
+            console.log(result.result.length)
+            if (result.result.length == 0) {
+                message.info(BARCODE_ERR_MESSAGE.BARCODEID_NOT_EXISTS);
+            } else {
+                formChange.setFieldsValue({ preQty: arrLot[2] });
+                changeQtyRef.current.focus();
             }
-
-
         } catch (err) {
-            
+            message.error(err);
         }
-        formChange.setFieldsValue({ preQty: arrLot[2] });
-        changeQtyRef.current.focus();
+
 
     };
 
@@ -180,8 +181,15 @@ export default function BarcodeChange({ permissions, isMobile }) {
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     const btnOpenModal = useCallback(async () => {
-        const listSelected = getMultiSelectedRows();
 
+        const validBody = (body) => {
+            if (!body.ItemNo.includes('/')) {
+                message.warning(BARCODE_ERR_MESSAGE.INVALID_BARCODE_FORMAT);
+                return ;
+            }
+        }
+
+        const listSelected = getMultiSelectedRows();
         const createPayload = (isConfirm, rows) => ({
             isConfirm,
             listSelected: rows,
@@ -190,18 +198,29 @@ export default function BarcodeChange({ permissions, isMobile }) {
         const handleCreateChangeBarcode = async (body) => {
             try {
                 const result = await createChangeBarcode(body);
-                setData(result.data || []);
+                if (result && result.result.status) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
             } catch (err) {
                 console.error('Error creating barcode change:', err);
-                setData([]);
+                message.error(BARCODE_ERR_MESSAGE.PRINTER_ERROR);
             }
         };
 
         if (listSelected.length >= 1) {
             const body = createPayload(false, listSelected);
-            await handleCreateChangeBarcode(body);
+            const isSucces = await handleCreateChangeBarcode(body);
+            if (isSucces) {
+                message.info(BARCODE_SUCCESS_MESSAGE.PRINTER_SUCCESS);
+                return;
+            } else {
+                message.error(BARCODE_ERR_MESSAGE.PRINTER_ERROR);
+                return;
+            }
         } else {
-            setIsModalVisible(true);
 
             const singleRow = {
                 ItemNo,
@@ -218,7 +237,17 @@ export default function BarcodeChange({ permissions, isMobile }) {
             };
 
             const body = createPayload(true, [singleRow]);
-            await handleCreateChangeBarcode(body);
+            const isSucces = await handleCreateChangeBarcode(body);
+            resetAllData();
+            if (isSucces) {
+                message.info(BARCODE_SUCCESS_MESSAGE.PRINTER_SUCCESS);
+                setIsModalVisible(true);
+                return;
+            }
+            else {
+                message.error(BARCODE_ERR_MESSAGE.PRINTER_ERROR);
+                return;
+            }
         }
     }, [getMultiSelectedRows, createChangeBarcode, setData, setIsModalVisible]);
 
@@ -234,8 +263,20 @@ export default function BarcodeChange({ permissions, isMobile }) {
             onChangeQty(e);
             remarkRef.current.focus();
         }
-    }
+    };
 
+    const resetAllData = () => {
+        setItemNo('');
+        setLotNo('');
+        setNewQty('');
+        setOldQty('');
+        setDateCode('');
+        setReelNo('');
+        setBarcodeID('');
+        setNewBarCodeId('');
+        setRemark('');
+        setUserID('');
+    }
 
     return (
         <Layout className="h-screen bg-slate-50">
@@ -252,7 +293,6 @@ export default function BarcodeChange({ permissions, isMobile }) {
                     <BarcodeChangeAction
                         fromDate={fromDate}
                         toDate={toDate}
-                        setNewDataAction={setDataAc}
                         onFinish={onFinish}
                         handleEnter={onKeyDownBarcode}
                         btnOpenModal={btnOpenModal}

@@ -13,7 +13,6 @@ import ModalWaiting from "../../modal/material/modalWaiting";
 export default function BarcodeChangeAction({
     fromDate,
     toDate,
-    setNewDataAction,
     onFinish,
     handleEnter,
     btnOpenModal,
@@ -247,7 +246,7 @@ export default function BarcodeChangeAction({
                         message.info(BARCODE_ERR_MESSAGE.DUPLICATE_ROW);
                     }
 
-                }else{
+                } else {
                     setError(BARCODE_ERR_MESSAGE.BARCODEID_NOT_EXISTS);
                     setModal2Open(true);
                     formPopup.resetFields(newBarcode);
@@ -379,8 +378,20 @@ export default function BarcodeChangeAction({
                         autoComplete="off"
                     >
 
-                        <Form.Item label="Barcode" name="oldBarcode">
-                            <Input placeholder="" size="small" onKeyDown={handleEnter} />
+                        <Form.Item
+                            label="Barcode"
+                            name="oldBarcode"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: BARCODE_ERR_MESSAGE.BARCODE_NOT_NULL,
+                                },
+                            ]}>
+                            <Input
+                                placeholder=""
+                                size="small"
+                                onKeyDown={handleEnter}
+                            />
                         </Form.Item>
                         <Form.Item label="Pre QTY" name="preQty">
                             <Input
@@ -391,14 +402,23 @@ export default function BarcodeChangeAction({
                                 disabled={true}
                             />
                         </Form.Item>
-                        <Form.Item label="Change QTY" name="changeQty">
+                        <Form.Item
+                            label="Change QTY"
+                            name="changeQty"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: BARCODE_ERR_MESSAGE.QTY_NOT_NULL,
+                                },
+                            ]}>
                             <Input
                                 placeholder=""
                                 size="small"
                                 type="number"
                                 min={0}
                                 onKeyDown={onKeyDownChangeQty}
-                                ref={changeQtyRef} />
+                                ref={changeQtyRef}
+                            />
                         </Form.Item>
                         <Form.Item label="QTY" name="qty">
                             <Input

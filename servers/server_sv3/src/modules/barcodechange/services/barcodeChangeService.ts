@@ -113,6 +113,11 @@ export class BarcodeChangeService {
                     client.on('error', (err) => {
                         error('Error connecting to printer:', err);
                         reject(err);
+                        return {
+                            status: false,
+                            message: err,
+                            data: dataCode
+                        }
                     });
                 });
 
@@ -126,6 +131,11 @@ export class BarcodeChangeService {
 
             } catch (err) {
                 error('Error connecting to printer:', err);
+                return {
+                    status: false,
+                    message: err,
+                    data: dataCode
+                }
             } 
         }
 
@@ -224,7 +234,7 @@ export class BarcodeChangeService {
 
     async isExistBarcode(barcode: any): Promise<any> {
 
-        this.validBarcodeCheck(barcode.oldBarcode);
+        this.validBarcodeCheck(barcode.lotNo);
         const query = ` EXEC ITM_CheckItemLotExistsOrNot 
                @ItemNo = '${barcode.itemNo}',
                @Lotno = '${barcode.lotNo}'
