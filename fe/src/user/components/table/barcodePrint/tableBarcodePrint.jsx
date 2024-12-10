@@ -6,18 +6,21 @@ import {
 } from '@glideapps/glide-data-grid'
 import '@glideapps/glide-data-grid/dist/index.css'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react';
 function TableBarcodePrint({
   data,
   setGridData,
   gridData,
-  selectRow,
   setSelectRow,
-  handleVisibleRegionChange,
+  onCellClicked,
 }) {
-  const [isMinusClicked, setIsMinusClicked] = useState(false)
-  const [lastClickedCell, setLastClickedCell] = useState(null)
-  const [clickedRowData, setClickedRowData] = useState(null)
+
+
+  const [selection, setSelection] = useState({
+    columns: CompactSelection.empty(),
+    rows: CompactSelection.empty(),
+  });
+  
 
   const columns = useMemo(
     () => [
@@ -102,74 +105,22 @@ function TableBarcodePrint({
   )
 
   useEffect(() => {
-    setGridData(data)
-  }, [data])
-
-  const [selection, setSelection] = useState({
-    columns: CompactSelection.empty(),
-    rows: CompactSelection.empty(),
-  })
-  setSelectRow(selection)
-
-  const onCellClicked = (cell, event) => {
-    let rowIndex
-
-    if (cell[0] !== -1) {
-      return
-    }
-
-    if (cell[0] === -1) {
-      rowIndex = cell[1]
-      setIsMinusClicked(true)
-    } else {
-      rowIndex = cell[0]
-      setIsMinusClicked(false)
-    }
-
-    if (
-      lastClickedCell &&
-      lastClickedCell[0] === cell[0] &&
-      lastClickedCell[1] === cell[1]
-    ) {
-      setKeyPath(null)
-      setLastClickedCell(null)
-      setClickedRowData(null)
-      return
-    }
-
-    if (rowIndex >= 0 && rowIndex < gridData.length) {
-      const rowData = gridData[rowIndex]
-
-      const filteredData = {
-        TRAN_CODE: rowData.TRAN_CODE,
-        TRAN_SEQ: rowData.TRAN_SEQ,
-        ITEMCD: rowData.ITEMCD,
-        LOTNO: rowData.LOTNO,
-        QTY: rowData.QTY,
-        DATECODE: rowData.DATECODE,
-        REELNO: rowData.REELNO,
-        LOT_ID: rowData.LOT_ID,
-        USER_ID: rowData.USER_ID,
-      }
-      setClickedRowData(rowData)
-      // setLastClickedCell(cell)
-    }
-  }
+    setGridData(data);
+    setSelectRow(selection);
+  }, [data, setSelectRow, selection])
 
   return (
+
     <div className="w-full gap-1 h-full flex items-center justify-center pb-8">
       <div className="w-full h-full flex flex-col border bg-white rounded-lg overflow-hidden ">
         <DataEditor
           columns={cols}
           getCellContent={getData}
           rows={gridData.length}
-          // showSearch={showSearch}
           getCellsForSelection={true}
-          // onSearchClose={onSearchClose}
           width="100%"
           height="100%"
           rowMarkers={('checkbox-visible', 'both')}
-          // useRef={useRef}
           onColumnResize={onColumnResize}
           smoothScrollY={true}
           smoothScrollX={true}
@@ -177,11 +128,11 @@ function TableBarcodePrint({
           rowSelect="multi"
           gridSelection={selection}
           onGridSelectionChange={setSelection}
-          onVisibleRegionChanged={handleVisibleRegionChange}
         />
       </div>
     </div>
-  )
+
+  );
 }
 
 export default TableBarcodePrint

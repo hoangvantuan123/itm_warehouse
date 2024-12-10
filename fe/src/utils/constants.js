@@ -44,11 +44,34 @@ export const BARCODE_ERR_MESSAGE = {
   INVALID_BARCODE_FORMAT: 'Invalid barcode format.',
   NEW_BARCODE_NOT_MATCH: 'New Barcode Not Match.',
   NEW_BARCODE_NOT_MATCH: 'New Barcode Not Match.',
-  NO_DATA_BARCODEID: 'No data barcode ID',
+  BARCODEID_NOT_EXISTS: 'Barcode ID Not Exists.',
+  NEW_BARCODEID_NOT_EXISTS: 'New Barcode ID Not Exists.',
   DUPLICATE_ROW: 'Duplicate Row Data',
   BARCODE_NOT_CONFIRM: 'Barcode not confirm.',
+  PRINTER_ERROR: 'Error Printing, Checking Printer or Data',
+
+  BARCODE_NOT_NULL: 'Barcode not null.',
+  QTY_NOT_NULL: 'Change QTY not null.',
+  NO_DATA_PRINTER: 'No data printer.',
+  NOT_LANGER_THAN_PRE_QTY: 'Not Langer Than Pre Qty.',
+
+  VENDOR_NOT_SELECT: 'Vendor Not Selected.',
+  
 }
 
 export const BARCODE_SUCCESS_MESSAGE = {
   BARCODE_CONFIRM_SUCCESS: 'Barcode Confirm Succesfull.',
+  PRINTER_SUCCESS: 'Printer Successfull.',
+  CHECK_OLD_BARCODE_OK: 'Check Old Barcode: OK',
+
 }
+
+export const VENDOR_ERR_MESSAGE = {
+  PANASONIC_NOT_FIT : "PANASONIC Part Code doesn't fit the format.",
+  ALPHA_OMEGA_NOT_FIT : "ALPHA OMEGA Part Code doesn't fit the format.",
+  TEXAS_INSTRUMENT_NOT_FIT:  "TEXAS INSTRUMENT Part Code doesn't fit the format.",
+  ABLIC_NOT_FIT: "ABLIC LOT Code doesn't fit the format.",
+  SMK_NOT_FIT: "SMK LOT Code doesn't fit the format.",
+  NISSHINBO_NOT_FIT: "NISSHINBO LOT Code doesn't fit the format.",
+}
+

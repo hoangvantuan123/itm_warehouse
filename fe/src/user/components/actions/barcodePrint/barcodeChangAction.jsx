@@ -3,82 +3,69 @@ import {
   Card,
   Button,
   Modal,
-  Space,
   Input,
-  Typography,
   DatePicker,
-  Checkbox,
-  Row,
-  Col,
   Select,
   message,
   Form,
-  Radio,
 } from 'antd'
 
-import { CreatePrintLabel } from '../../../../features/barcode/printBarcodeService'
-import { DataEditor, GridCellKind } from '@glideapps/glide-data-grid'
-import '@glideapps/glide-data-grid/dist/index.css'
-import {
-  checkConfirmBarcode,
-  checkConfirmNewBarcode,
-  confirmBarcode,
-} from '../../../../features/barcode/barcodeChangeService'
-import {
-  BARCODE_ERR_MESSAGE,
-  BARCODE_SUCCESS_MESSAGE,
-} from '../../../../utils/constants'
+import { DataEditor, GridCellKind } from "@glideapps/glide-data-grid";
+import '@glideapps/glide-data-grid/dist/index.css';
+import { checkConfirmBarcode, checkConfirmNewBarcode, confirmBarcode } from "../../../../features/barcode/barcodeChangeService";
+import { BARCODE_ERR_MESSAGE, BARCODE_SUCCESS_MESSAGE } from "../../../../utils/constants";
+import ModalWaiting from "../../modal/material/modalWaiting";
+
+
 
 export default function BarcodeChangeAction({
   fromDate,
   toDate,
-  setNewDataAction,
   onFinish,
-  onChangeBarcode,
   handleEnter,
   btnOpenModal,
   isModalVisible,
   setIsModalVisible,
 
+  modal2Open,
+  setModal2Open,
+  error,
+  setError,
+
   formChange,
-  onChangeQty,
+  onKeyDownChangeQty,
+  changeQtyRef,
+  remarkRef,
   onChangeNewQty,
   oldQty,
   newQty,
   setRemark,
   setUserId,
+  onDropDownChange,
+  optionDevices,
   clickedRowData,
+  handleOnchangeDevice,
+
 }) {
-  const [form] = Form.useForm()
-  const [formPopup] = Form.useForm()
-  const [data, setData] = useState([])
+  const [form] = Form.useForm();
+  const [formPopup] = Form.useForm();
+  const [data, setData] = useState([]);
 
-  const [oldBarcode, setOldBarcode] = useState('')
-  const [newBarcode, setNewBarcode] = useState('')
-  const [cfBarcode, setCfBarcode] = useState('')
-  const [dataConfirm, setDataConfirm] = useState({})
+  const [oldBarcode, setOldBarcode] = useState('');
+  const [newBarcode, setNewBarcode] = useState('');
+  const [cfBarcode, setCfBarcode] = useState('');
+  const [dataConfirm, setDataConfirm] = useState({});
   const formatDate = useCallback((date) => date.format('YYYYMMDDHHmmss'), [])
-  form.setFieldsValue({ toDate: toDate })
-  form.setFieldsValue({ fromDate: fromDate })
-  const oldBarcodeRef = useRef(null)
-  const newBarcodeRef = useRef(null)
+  form.setFieldsValue({ toDate: toDate });
+  form.setFieldsValue({ fromDate: fromDate });
+  const oldBarcodeRef = useRef(null);
+  const newBarcodeRef = useRef(null);
+  const userIdModalRef = useRef(null);
+  const userIDRef = useRef(null);
 
-  const [newLabel, setNewLabel] = useState({
-    VENDOR: '',
-    PARTNO: '',
-    ITEMCD: '',
-    LOTTOTALCNT: Number(0),
-    LOTNO: '',
-    QTY: Number(0),
-    DATECODE: Number(),
-    REELNO: '',
-    USER_ID: '',
-    REMARK: '',
-    ISSUENO: '',
-    LOTID: '',
-  })
 
-  const onFormLayoutChange = ({ layout }) => {}
+  const onFormLayoutChange = ({ layout }) => {
+  };
 
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo)
@@ -132,12 +119,19 @@ export default function BarcodeChangeAction({
     [data],
   )
 
-  const onChangeRemark = (e) => {
-    setRemark(e.target.value)
+
+  const onKeyDownRemark = (e) => {
+    if (e.key === 'Enter') {
+      setRemark(e.target.value);
+      userIDRef.current.focus();
+    }
+
   }
 
-  const onChangeUserId = (e) => {
-    setUserId(e.target.value)
+  const onKeyDownUserId = (e) => {
+    if (e.key === 'Enter') {
+      setUserId(e.target.value);
+    }
   }
 
   const handleKeyDownOldBarcode = async (e) => {
@@ -166,14 +160,18 @@ export default function BarcodeChangeAction({
         const result = await checkConfirmBarcode(dataConfirm)
 
         if (result.result[0] != null) {
-          setNewBarcode(result.result[0].NewBarcodeID)
+          setNewBarcode(result.result[0].NewBarcodeID);
+          message.info(BARCODE_SUCCESS_MESSAGE.CHECK_OLD_BARCODE_OK)
         } else {
-          message.info(BARCODE_ERR_MESSAGE.NO_DATA_BARCODEID)
+          setError(BARCODE_ERR_MESSAGE.BARCODEID_NOT_EXISTS);
+          setModal2Open(true);
+          resetValueModal();
         }
+
       } catch (err) {
         console.log(err)
       }
-      newBarcodeRef.current.focus()
+      newBarcodeRef.current.focus();
     }
   }
 
@@ -192,9 +190,10 @@ export default function BarcodeChangeAction({
       }
 
       if (INewBarcode != newBarcode) {
-        console.log(newBarcode)
-        message.info(BARCODE_ERR_MESSAGE.NEW_BARCODE_NOT_MATCH)
-        return
+        setError(BARCODE_ERR_MESSAGE.NEW_BARCODEID_NOT_EXISTS);
+        formPopup.resetFields(["newBarcode"]);
+        setModal2Open(true);
+        return;
       }
 
       const dataConfirm = {
@@ -207,16 +206,17 @@ export default function BarcodeChangeAction({
         const result = await checkConfirmNewBarcode(dataConfirm)
 
         if (result != null) {
-          formPopup.setFieldsValue({ cfBarcode: result.result[0].NewBarcodeID })
-          formPopup.setFieldsValue({ userid: result.result[0].UserID })
-          formPopup.setFieldsValue({ status: 'OK' })
+
+          formPopup.setFieldsValue({ cfBarcode: result.data[0].NewBarcodeID });
+          formPopup.setFieldsValue({ userid: result.data[0].UserID });
+          formPopup.setFieldsValue({ status: "OK" });
           // formPopup.setFieldsValue({ time: result.result[0].LastDateTime});
 
           const newRow = {
             oldBarcode: dataConfirm.oldBarcode,
-            newBarcode: result.result[0].NewBarcodeID,
-            isconfirm: 'OK',
-          }
+            newBarcode: result.data[0].NewBarcodeID,
+            isconfirm: "OK"
+          };
 
           const isDuplicate = data.some(
             (row) =>
@@ -225,11 +225,19 @@ export default function BarcodeChangeAction({
           )
 
           if (!isDuplicate) {
-            setData([...data, newRow])
+            setData([...data, newRow]);
+            userIdModalRef.current.focus();
           } else {
-            message.info(BARCODE_ERR_MESSAGE.DUPLICATE_ROW)
+            message.info(BARCODE_ERR_MESSAGE.DUPLICATE_ROW);
           }
+
+        } else {
+          setError(BARCODE_ERR_MESSAGE.BARCODEID_NOT_EXISTS);
+          setModal2Open(true);
+          formPopup.resetFields(newBarcode);
+          resetValueModal();
         }
+
       } catch (err) {
         console.log(err)
       }
@@ -237,20 +245,31 @@ export default function BarcodeChangeAction({
   }
 
   const handleBtnConfirm = async () => {
-    const body = data
+
+    const body = data;
     try {
-      const result = await confirmBarcode(body)
-      resetValueModal()
-      setIsModalVisible(false)
+      const result = await confirmBarcode(
+        body
+      );
+
+      setIsModalVisible(false);
+
       if (result.status) {
-        message.info(BARCODE_SUCCESS_MESSAGE.BARCODE_CONFIRM_SUCCESS)
+        setModal2Open(true);
+        setError(BARCODE_SUCCESS_MESSAGE.BARCODE_CONFIRM_SUCCESS);
+        resetValueModal();
       } else {
-        message.info(BARCODE_ERR_MESSAGE.BARCODE_NOT_CONFIRM)
+        setError(BARCODE_ERR_MESSAGE.BARCODE_NOT_CONFIRM);
+        setModal2Open(true);
+        resetValueModal();
       }
+
     } catch (err) {
-      message.error(err)
-      resetValueModal()
-      setIsModalVisible(false)
+      message.error(err);
+      resetValueModal();
+      setError(err);
+      setModal2Open(true);
+      setIsModalVisible(false);
     }
   }
 
@@ -339,11 +358,27 @@ export default function BarcodeChangeAction({
             style={{
               maxWidth: 'inline' ? 'none' : 600,
             }}
+
             onFinishFailed={onFinishFailed}
             autoComplete="off"
           >
-            <Form.Item label="Barcode" name="oldBarcode">
-              <Input placeholder="" size="small" onKeyDown={handleEnter} />
+
+            <Form.Item
+              label="Barcode"
+              name="oldBarcode"
+              rules={[
+                {
+                  required: true,
+                  message: BARCODE_ERR_MESSAGE.BARCODE_NOT_NULL,
+                },
+              ]}
+            >
+              <Input
+                placeholder=""
+                size="small"
+                onKeyDown={handleEnter}
+                className='w-[300px]'
+              />
             </Form.Item>
             <Form.Item label="Pre QTY" name="preQty">
               <Input
@@ -354,13 +389,22 @@ export default function BarcodeChangeAction({
                 disabled={true}
               />
             </Form.Item>
-            <Form.Item label="Change QTY" name="changeQty">
+            <Form.Item
+              label="Change QTY"
+              name="changeQty"
+              rules={[
+                {
+                  required: true,
+                  message: BARCODE_ERR_MESSAGE.QTY_NOT_NULL,
+                },
+              ]}>
               <Input
                 placeholder=""
                 size="small"
                 type="number"
                 min={0}
-                onChange={onChangeQty}
+                onKeyDown={onKeyDownChangeQty}
+                ref={changeQtyRef}
               />
             </Form.Item>
             <Form.Item label="QTY" name="qty">
@@ -371,61 +415,68 @@ export default function BarcodeChangeAction({
                 min={0}
                 value={newQty}
                 disabled={true}
-                onChange={onChangeNewQty}
-              />
+                onChange={onChangeNewQty} />
             </Form.Item>
 
             <Form.Item label="Remark" name="remark">
-              <Input placeholder="" size="small" onChange={onChangeRemark} />
+              <Input placeholder="" size="small" onKeyDown={onKeyDownRemark} ref={remarkRef} />
             </Form.Item>
             <Form.Item label=" User ID" name="userID">
-              <Input placeholder="" size="small" onChange={onChangeUserId} />
+              <Input placeholder="" size="small" onKeyDown={onKeyDownUserId} ref={userIDRef} />
             </Form.Item>
 
             <Form.Item label="1D Position" layout={'inline'}>
-              <Form.Item name="barcodePosX" layout={'inline'}>
-                <Input
-                  placeholder="X"
-                  size="small"
-                  style={{ width: 50 }}
-                  type="number"
-                  min={0}
-                />
-              </Form.Item>
-              <Form.Item name="barcodePosY" layout={'inline'}>
-                <Input
-                  placeholder="Y"
-                  size="small"
-                  style={{ width: 50 }}
-                  type="number"
-                  min={0}
-                />
-              </Form.Item>
+              <div className="flex gap-0">
+                <Form.Item name="barcodePosX" layout={'inline'}>
+                  <Input
+                    placeholder="X"
+                    size="small"
+                    style={{ width: 50 }}
+                    type="number"
+                    min={0}
+                  />
+                </Form.Item>
+                <Form.Item name="barcodePosY" layout={'inline'}>
+                  <Input
+                    placeholder="Y"
+                    size="small"
+                    style={{ width: 50 }}
+                    type="number"
+                    min={0}
+                  />
+                </Form.Item>
+              </div>
+
             </Form.Item>
+
 
             <Form.Item label="1D Size" layout={'inline'}>
-              <Form.Item name="barcodeSizeX" layout={'inline'}>
-                <Input
-                  placeholder="X"
-                  size="small"
-                  style={{ width: 50 }}
-                  type="number"
-                  min={0}
-                />
-              </Form.Item>
+              <div className="flex gap-0">
+                <Form.Item name="barcodeSizeX" layout={'inline'}>
+                  <Input
+                    placeholder="X"
+                    size="small"
+                    style={{ width: 50 }}
+                    type="number"
+                    min={0}
+                  />
+                </Form.Item>
 
-              <Form.Item name="barcodeSizeY" layout={'inline'}>
-                <Input
-                  placeholder="Y"
-                  size="small"
-                  style={{ width: 50 }}
-                  type="number"
-                  min={0}
-                />
-              </Form.Item>
+                <Form.Item name="barcodeSizeY" layout={'inline'}>
+                  <Input
+                    placeholder="Y"
+                    size="small"
+                    style={{ width: 50 }}
+                    type="number"
+                    min={0}
+                  />
+                </Form.Item>
+              </div>
             </Form.Item>
 
+
             <Form.Item label="2D Position" layout={'inline'}>
+            <div className="flex gap-0">
               <Form.Item name="qrcodePosX" layout={'inline'}>
                 <Input
                   placeholder="X"
@@ -445,38 +496,51 @@ export default function BarcodeChangeAction({
                   min={0}
                 />
               </Form.Item>
+              </div>
             </Form.Item>
 
-            <Form.Item label="2D Size" layout={'inline'}>
-              <Form.Item name="qrcodeSizeX" layout={'inline'}>
-                <Input
-                  placeholder="X"
-                  size="small"
-                  style={{ width: 50 }}
-                  type="number"
-                  min={0}
-                />
+            <Form.Item label="2D Size" layout={"inline"}>
+            <div className="flex gap-0">
+              <Form.Item name="qrcodeSizeX" layout={"inline"} >
+                <Input placeholder="X" size="small" style={{ width: 50 }} type="number" min={0} />
               </Form.Item>
-              <Form.Item name="qrcodeSizeY" layout={'inline'}>
-                <Input
-                  placeholder="Y"
-                  size="small"
-                  style={{ width: 50 }}
-                  type="number"
-                  min={0}
-                />
+              <Form.Item name="qrcodeSizeY" layout={"inline"} >
+                <Input placeholder="Y" size="small" style={{ width: 50 }} type="number" min={0} />
               </Form.Item>
+              </div>
             </Form.Item>
+
+
+            <Form.Item label="Device Printer" name="device">
+              <Select
+                labelInValue
+                id="typeSelect"
+                defaultValue=""
+                size="small"
+                style={{
+                  width: 150,
+                }}
+                allowClear
+                options={optionDevices}
+                onDropdownVisibleChange={onDropDownChange}
+                onChange={handleOnchangeDevice}
+              />
+            </Form.Item>
+
+
           </Form>
+
         </Card>
 
         <Modal
           title="Print Label Confirmation"
           visible={isModalVisible}
           onOk={handleBtnConfirm}
-          onCancel={handleCancel}
+          maskClosable={false}
+          closable={false}
           width={800}
         >
+
           <Form
             layout={'inline'}
             form={formPopup}
@@ -487,15 +551,14 @@ export default function BarcodeChangeAction({
             style={{
               maxWidth: 'inline' ? 'none' : 600,
             }}
+
             onFinishFailed={onFinishFailed}
             autoComplete="off"
           >
-            <Form.Item label="Barcode" name="oldBarcode" layout={'inline'}>
-              <Input
-                size="small"
-                style={{ width: 350 }}
-                onKeyDown={handleKeyDownOldBarcode}
-              />
+
+            <Form.Item label="Barcode" name="oldBarcode" layout={"inline"} >
+              <Input size="small" style={{ width: 350 }}
+                onKeyDown={handleKeyDownOldBarcode} />
             </Form.Item>
 
             <Form.Item label="New Barcode" name="newBarcode" layout={'inline'}>
@@ -520,7 +583,7 @@ export default function BarcodeChangeAction({
             </Form.Item>
 
             <Form.Item label="User ID" name="userid">
-              <Input size="small" style={{ width: 100 }} />
+              <Input size="small" style={{ width: 100 }} ref={userIdModalRef} />
             </Form.Item>
 
             <Form.Item label="Status" name="status">
@@ -545,8 +608,17 @@ export default function BarcodeChangeAction({
               />
             </div>
           </div>
+
         </Modal>
+        <ModalWaiting
+          modal2Open={modal2Open}
+          setModal2Open={setModal2Open}
+          error={error}
+        />
+
       </Card>
+
     </div>
-  )
+
+  );
 }
