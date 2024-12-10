@@ -222,8 +222,7 @@ export class GenerateXmlService {
 
 
   async generateXMLSLGInOutDailyBatchStockoutFiFo(result: any[], MatOutSeq: any, FactUnit: any, MatOutNo: any): Promise<string> {
-    return `<ROOT>${result.map(item => `
-      <DataBlock1>
+    return `<ROOT><DataBlock1>
        <WorkingTag>A</WorkingTag>
     <IDX_NO>1</IDX_NO>
     <DataSeq>1</DataSeq>
@@ -233,7 +232,7 @@ export class GenerateXmlService {
     <FactUnit>${FactUnit}</FactUnit>
     <InOutNo>${MatOutNo}</InOutNo>
     <InOutType>180</InOutType>
-  </DataBlock1>`).join('')}</ROOT>`;
+  </DataBlock1></ROOT>`;
   }
 
 

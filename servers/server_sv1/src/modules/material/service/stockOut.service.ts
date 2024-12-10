@@ -175,7 +175,6 @@ export class StockOutService {
             } catch (err) {
                 const errorMessage = `Error executing procedure ${name}: ${err.message}`;
                 errors.push(errorMessage);
-                console.error(errorMessage);
                 throw err;
             }
         };
@@ -210,6 +209,7 @@ export class StockOutService {
 
         const saveProcedure = async (name: string, result: any): Promise<boolean> => {
             try {
+                let spdmmOutProcCheckResult: any = null;
                 if (name === '_SPDMMOutProcCheck_WEB') {
                     await this._SPDMMOutProcSave_WEB(
                         result,
@@ -223,6 +223,7 @@ export class StockOutService {
                         isStop,
                         outReqSeq
                     );
+
                 }
                 if (name === '_SPDMMOutProcItemCheck_WEB') {
                     await this._SPDMMOutProcItemSave_WEB(
@@ -245,10 +246,11 @@ export class StockOutService {
                         languageSeq,
                         decodedToken.UserSeq,
                         pgmSeq,
-                        result[0].MatOutSeq,
-                        dataSave[0].FactUnit,
-                        result[0].MatOutNo
+                        masterCheckResult[0].MatOutSeq,
+                        masterCheckResult[0].FactUnit,
+                        masterCheckResult[0].MatOutNo
                     );
+
                     await this._SCOMSourceDailySave(
                         result,
                         xmlFlags,
@@ -300,7 +302,6 @@ export class StockOutService {
          @OutReqSeq = ${outReqSeq};
     `;
         try {
-            console.log('_SPDMMOutProcSave_WEB' , query)
             const result = await this.databaseService.executeQuery(query);
             return { success: true, data: result };
         } catch (error) {

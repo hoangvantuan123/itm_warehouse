@@ -119,18 +119,18 @@ export class StockOutController {
                 { name: '_SPDMMOutProcCheck_WEB', xmlDocument: xmlDocument.xmlSPDMMOutProcCheckWEB, serviceSeq: 3033 },
                 { name: '_SPDMMOutProcItemCheck_WEB', xmlDocument: xmlDocument.xmlSPDMMOutProcItemCheckWEB, serviceSeq: 3033 },
             ];
-              const result = await this.stockOutService.checkAllProceduresStockOutFiFo(
-                  procedureData,
-                  otherParams.xmlFlags,
-                  otherParams.workingTag,
-                  otherParams.languageSeq,
-                  otherParams.pgmSeq,
-                  checkValueIsStop,
-                  outReqSeq,
-                  dataSave,
-                  decodedToken
-              );
-           
+            const result = await this.stockOutService.checkAllProceduresStockOutFiFo(
+                procedureData,
+                otherParams.xmlFlags,
+                otherParams.workingTag,
+                otherParams.languageSeq,
+                otherParams.pgmSeq,
+                checkValueIsStop,
+                outReqSeq,
+                dataSave,
+                decodedToken
+            );
+
             return result;
         } catch (error) {
             throw new HttpException(

@@ -23,7 +23,6 @@ export const databaseConfig1: TypeOrmModuleOptions = {
 };
 
 
-
 export const sqlServerITMV20240117: TypeOrmModuleOptions = {
   type: 'mssql',
   host: '192.168.35.150',
@@ -33,15 +32,15 @@ export const sqlServerITMV20240117: TypeOrmModuleOptions = {
   database: 'ITMV20240117',
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   synchronize: false,
-  logging: true,
-  cache: true,
+  logging: false,  // Chuyển sang false để tăng hiệu suất trong môi trường sản xuất
+  cache: true,  // Bật cache
   extra: {
     trustServerCertificate: true,
-    encrypt: false,
-    connectionTimeout: 5000,
-    max: 100,
-    min: 10,
-    idleTimeoutMillis: 30000,
+    encrypt: false,  // Tắt mã hóa nếu không cần thiết, có thể cải thiện hiệu suất
+    connectionTimeout: 10000000,
+    max: 10000000,  // Số kết nối tối đa
+    min: 10,  // Số kết nối tối thiểu
+    idleTimeoutMillis: 3000000,  // Thời gian chờ cho kết nối nhàn rỗi
   },
-  maxQueryExecutionTime: 1000
-}
+  maxQueryExecutionTime: 10000,  // Giới hạn thời gian thực thi query là 10 giây
+};

@@ -5,7 +5,7 @@ module.exports = {
             instances: 1,
             exec_mode: 'cluster',
             watch: false,
-            max_memory_restart: '2G',
+            max_memory_restart: '3G',
             env: {
                 PORT: 8083,
                 NODE_ENV: 'development',
@@ -28,6 +28,22 @@ module.exports = {
             },
             env_production: {
                 PORT: 8086,
+                NODE_ENV: 'production',
+            },
+        },
+        {
+            name: 'erp-barcode',
+            script: './server_sv3/dist/main.js',
+            instances: 1,
+            exec_mode: 'cluster',
+            watch: false,
+            max_memory_restart: '5G',
+            env: {
+                PORT: 8386,
+                NODE_ENV: 'development',
+            },
+            env_production: {
+                PORT: 8386,
                 NODE_ENV: 'production',
             },
         },

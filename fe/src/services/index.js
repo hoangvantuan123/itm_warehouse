@@ -10,6 +10,7 @@ const baseUrl = `${currentHost}${currentPort ? ':' + currentPort : ''}`
 if (baseUrl === '192.168.60.50:3030') {
   HOST_API_SERVER_1 = 'http://192.168.60.50:8086/api/v1'
   HOST_API_SERVER_2 = 'http://192.168.60.50:8083/api/v2'
+    HOST_API_SERVER_3 = 'http://192.168.60.50:8386/api/v3'
 } else if (baseUrl === '192.168.68.26:3000') {
   HOST_API_SERVER_1 = ''
 } else {
