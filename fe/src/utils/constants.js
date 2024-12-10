@@ -37,3 +37,20 @@ export const SUCCESS_MESSAGES = {
 export const WARNING_MESSAGES = {
   DATA_WARNING: 'Warning: Data may not be accurate or complete.',
 }
+
+export const BARCODE_ERR_MESSAGE = {
+  ITEM_NO_IS_NULL: 'Item no is null.',
+  LOT_NO_IS_NULL: 'Record updated successfully.',
+  INVALID_BARCODE_FORMAT: 'Invalid barcode format.',
+  NEW_BARCODE_NOT_MATCH: 'New Barcode Not Match.',
+  NEW_BARCODE_NOT_MATCH: 'New Barcode Not Match.',
+  NO_DATA_BARCODEID: 'No data barcode ID',
+  DUPLICATE_ROW: 'Duplicate Row Data',
+  BARCODE_NOT_CONFIRM: 'Barcode not confirm.'
+}
+
+
+export const BARCODE_SUCCESS_MESSAGE = {
+  BARCODE_CONFIRM_SUCCESS: 'Barcode Confirm Succesfull.',
+
+}

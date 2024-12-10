@@ -153,6 +153,11 @@ export const menuSettingItems = [
         label: 'MATERIAL STOCK IN (BULKID)',
         link: '/u/warehouse/material/material-stock-in-bulkid',
       },
+      {
+        key: 'material-1-9',
+        label: 'LABEL DESIGN',
+        link: '/u/material/label-design',
+      },
     ],
   },
   {

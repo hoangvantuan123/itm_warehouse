@@ -39,9 +39,10 @@ export class AppModule implements OnModuleInit {
   async onModuleInit() {
 
 
-    if (this.connection2.isConnected) {
-      console.log('ITMV20240117 connected');
-    } else {
+    if ( this.connection2.isConnected){
+      console.log('ITMBARCODE connected');
+    } 
+    else {
       console.error('Failed to connect to the second database');
     }
   }

@@ -3,6 +3,7 @@ const currentPort = window.location.port
 
 export let HOST_API_SERVER_1
 export let HOST_API_SERVER_2
+export let HOST_API_SERVER_3
 
 const baseUrl = `${currentHost}${currentPort ? ':' + currentPort : ''}`
 
@@ -14,4 +15,5 @@ if (baseUrl === '192.168.60.50:3030') {
 } else {
   HOST_API_SERVER_1 = 'http://localhost:8086/api/v1'
   HOST_API_SERVER_2 = 'http://localhost:8083/api/v2'
+  HOST_API_SERVER_3 = 'http://localhost:8386/api/v3'
 }
