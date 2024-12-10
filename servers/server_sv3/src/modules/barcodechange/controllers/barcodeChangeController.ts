@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Put, Delete, Body, Query, Param, Header, StreamableFile } from '@nestjs/common';
-import { SUCCESS_MESSAGES, ERROR_MESSAGES } from 'src/common/utils/constants';
+import { SUCCESS_MESSAGES, ERROR_MESSAGES, BARCODE_SUCCESS_MESSAGES } from 'src/common/utils/constants';
 import { BarcodeChangeService } from '../services/barcodeChangeService';
 import { BarcodeChange, BaseDto } from '../models/baseDto';
 
@@ -50,7 +50,7 @@ export class BarcodeChangeController {
     @Post('check-old-barcode')
     async checkConfirm(
         @Body() barcode: any
-    ) : Promise<any> {
+    ): Promise<any> {
         try {
             const result = await this.barcodeChangeService.checkConfirmBarcode(barcode);
             return { result };
@@ -66,10 +66,14 @@ export class BarcodeChangeController {
     @Post('check-new-barcode')
     async checkNewBarcode(
         @Body() barcode: any
-    ) : Promise<any> {
+    ): Promise<any> {
         try {
             const result = await this.barcodeChangeService.checkConfirmNewBarcode(barcode);
-            return { result };
+            return {
+                status: true,
+                message: BARCODE_SUCCESS_MESSAGES.BARCODE_CONFIRM_SUCCESSFULL,
+                data: null,
+            };
         } catch (error) {
             return {
                 status: false,
@@ -81,7 +85,7 @@ export class BarcodeChangeController {
 
     @Post('confirm')
     async confirmBarcode(
-        @Body() dataBarcode: any []
+        @Body() dataBarcode: any[]
     ) {
         try {
             const result = await this.barcodeChangeService.confirmBarcode(dataBarcode);

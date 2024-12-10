@@ -1,4 +1,4 @@
-import 'tui-grid/dist/tui-grid.css'
+
 import '../../../../static/css/customTabe.css'
 import { CompactSelection, DataEditor, GridCellKind } from '@glideapps/glide-data-grid';
 import '@glideapps/glide-data-grid/dist/index.css'

@@ -5,7 +5,7 @@ import { CreatePrintLabel } from "../../../../features/barcode/printBarcodeServi
 import { DataEditor, GridCellKind } from "@glideapps/glide-data-grid";
 import '@glideapps/glide-data-grid/dist/index.css';
 import { checkConfirmBarcode, checkConfirmNewBarcode, confirmBarcode } from "../../../../features/barcode/barcodeChangeService";
-import { BARCODE_ERR_MESSAGE } from "../../../../utils/constants";
+import { BARCODE_ERR_MESSAGE, BARCODE_SUCCESS_MESSAGE } from "../../../../utils/constants";
 
 
 
@@ -252,6 +252,11 @@ export default function BarcodeChangeAction({
             );
             resetValueModal();
             setIsModalVisible(false);
+            if(result.status){
+                message.info(BARCODE_SUCCESS_MESSAGE.BARCODE_CONFIRM_SUCCESS);
+            }else{
+                message.info(BARCODE_ERR_MESSAGE.BARCODE_NOT_CONFIRM);
+            }
 
         } catch (err) {
             message.error(err);

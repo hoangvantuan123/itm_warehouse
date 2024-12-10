@@ -46,5 +46,8 @@ export const SUCCESS_MESSAGES = {
   BATCHES_INSERTED: 'Batch inserted successfully',
   SUCCESS_ITMV20240117: 'Successfully connected to the database ITMV20240117.',
   SUCCESS_ITMBARCODE: 'Successfully connected to the database ITMBARCODE.'
+};
 
+export const BARCODE_SUCCESS_MESSAGES = {
+  BARCODE_CONFIRM_SUCCESSFULL: 'Barcode confirm successfull', 
 };
