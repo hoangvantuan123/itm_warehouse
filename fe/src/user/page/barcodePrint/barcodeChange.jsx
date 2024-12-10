@@ -4,11 +4,11 @@ import { Typography, Layout, Button, message, Form } from 'antd';
 const { Title } = Typography;
 const { Header, Content } = Layout;
 import 'moment/locale/vi';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import BarcodeChangeAction from '../../components/actions/barcodePrint/barcodeChangAction';
 import TabelBarcodeChange from '../../components/table/barcodePrint/tableBarcodeChange';
-import { createChangeBarcode, searchPage } from '../../../features/barcode/barcodeChangeService';
+import { createChangeBarcode, isExistBarcode, searchPage } from '../../../features/barcode/barcodeChangeService';
 import { use } from 'react';
 import { BARCODE_ERR_MESSAGE, ERROR_MESSAGES } from '../../../utils/constants';
 
@@ -41,6 +41,8 @@ export default function BarcodeChange({ permissions, isMobile }) {
     const [NewBarcodeID, setNewBarCodeId] = useState('');
     const [Remark, setRemark] = useState('');
     const [UserID, setUserID] = useState('');
+    const changeQtyRef = useRef(null);
+    const remarkRef = useRef(null);
 
     const getMultiSelectedRows = () => {
         const selectedRows = selectRow.rows.items;
@@ -119,7 +121,7 @@ export default function BarcodeChange({ permissions, isMobile }) {
 
     };
 
-    const onChangeBarcode = (e) => {
+    const onChangeBarcode = async (e) => {
         const inputValue = e.target.value;
         setBarcodeID(inputValue);
 
@@ -139,7 +141,27 @@ export default function BarcodeChange({ permissions, isMobile }) {
         setOldQty(arrLot[2]);
         setDateCode(arrLot[3]);
         setReelNo(arrLot[4]);
+
+        const param = {
+            itemNo: arrLot[0],
+            lotNo: arrLot[1] + '/' + arrLot[3] + '/' + arrLot[4],
+        }
+
+        try {
+            const result = await isExistBarcode(
+               param
+            );
+
+            if (result == false){
+                
+            }
+
+
+        } catch (err) {
+            
+        }
         formChange.setFieldsValue({ preQty: arrLot[2] });
+        changeQtyRef.current.focus();
 
     };
 
@@ -157,30 +179,31 @@ export default function BarcodeChange({ permissions, isMobile }) {
 
     const [isModalVisible, setIsModalVisible] = useState(false);
 
-    const btnOpenModal = async (e) => {
-
+    const btnOpenModal = useCallback(async () => {
         const listSelected = getMultiSelectedRows();
-        
-        if (listSelected.length >= 1) {
-            const body = {
-                isConfirm: false,
-                listSelected,
-            }
 
+        const createPayload = (isConfirm, rows) => ({
+            isConfirm,
+            listSelected: rows,
+        });
+
+        const handleCreateChangeBarcode = async (body) => {
             try {
-                const result = await createChangeBarcode(
-                    body
-                );
-
+                const result = await createChangeBarcode(body);
                 setData(result.data || []);
             } catch (err) {
-                setData([])
+                console.error('Error creating barcode change:', err);
+                setData([]);
             }
+        };
 
+        if (listSelected.length >= 1) {
+            const body = createPayload(false, listSelected);
+            await handleCreateChangeBarcode(body);
         } else {
             setIsModalVisible(true);
-            const listSelected = [];
-            listSelected.push({
+
+            const singleRow = {
                 ItemNo,
                 LotNo,
                 NewQty,
@@ -192,32 +215,26 @@ export default function BarcodeChange({ permissions, isMobile }) {
                 Remark,
                 UserID,
                 NewStatus: '',
-            });
-
-            const body = {
-                isConfirm: true,
-                listSelected,
             };
 
-            try {
-                const result = await createChangeBarcode(
-                    body
-                );
-
-                setData(result.data || []);
-            } catch (err) {
-                setData([])
-            }
+            const body = createPayload(true, [singleRow]);
+            await handleCreateChangeBarcode(body);
         }
+    }, [getMultiSelectedRows, createChangeBarcode, setData, setIsModalVisible]);
 
-    };
 
-    const handleEnter = (e) => {
+    const onKeyDownBarcode = (e) => {
         if (e.key === 'Enter') {
             onChangeBarcode(e);
-            
         }
     };
+
+    const onKeyDownChangeQty = (e) => {
+        if (e.key === 'Enter') {
+            onChangeQty(e);
+            remarkRef.current.focus();
+        }
+    }
 
 
     return (
@@ -237,21 +254,22 @@ export default function BarcodeChange({ permissions, isMobile }) {
                         toDate={toDate}
                         setNewDataAction={setDataAc}
                         onFinish={onFinish}
-                        onChangeBarcode={onChangeBarcode}
-                        handleEnter={handleEnter}
+                        handleEnter={onKeyDownBarcode}
                         btnOpenModal={btnOpenModal}
                         isModalVisible={isModalVisible}
                         setIsModalVisible={setIsModalVisible}
 
                         formChange={formChange}
-
-                        onChangeQty={onChangeQty}
+                        onKeyDownChangeQty={onKeyDownChangeQty}
+                        changeQtyRef={changeQtyRef}
+                        remarkRef={remarkRef}
                         onChangeNewQty={onChangeNewQty}
                         oldQty={oldQty}
                         newQty={NewBarcodeID}
                         setRemark={setRemark}
                         setUserId={setUserID}
-                        clickedRowData= {clickedRowData}
+                        clickedRowData={clickedRowData}
+
                     />
                 </Header>
 

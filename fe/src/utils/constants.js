@@ -44,7 +44,8 @@ export const BARCODE_ERR_MESSAGE = {
   INVALID_BARCODE_FORMAT: 'Invalid barcode format.',
   NEW_BARCODE_NOT_MATCH: 'New Barcode Not Match.',
   NEW_BARCODE_NOT_MATCH: 'New Barcode Not Match.',
-  NO_DATA_BARCODEID: 'No data barcode ID',
+  BARCODEID_NOT_EXISTS: 'Barcode ID Not Exists.',
+  NEW_BARCODEID_NOT_EXISTS: 'New Barcode ID Not Exists.',
   DUPLICATE_ROW: 'Duplicate Row Data',
   BARCODE_NOT_CONFIRM: 'Barcode not confirm.'
 }

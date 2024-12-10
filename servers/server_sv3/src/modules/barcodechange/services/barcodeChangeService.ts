@@ -222,4 +222,25 @@ export class BarcodeChangeService {
         return result;
     };
 
+    async isExistBarcode(barcode: any): Promise<any> {
+
+        this.validBarcodeCheck(barcode.oldBarcode);
+        const query = ` EXEC ITM_CheckItemLotExistsOrNot 
+               @ItemNo = '${barcode.itemNo}',
+               @Lotno = '${barcode.lotNo}'
+         `.trim();
+        const result = await this.databaseService.executeQuery(
+            query
+        );
+        return result;
+    };
+
+    async getPrinter(name: any): Promise<any []> {
+        const query = ` SELECT ip, port FROM Printer WHERE (1=1) `.trim();
+        const result = await this.databaseService.executeQuery(
+            query
+        );
+        return result;
+    };
+
 }

@@ -6,6 +6,7 @@ import { DataEditor, GridCellKind } from "@glideapps/glide-data-grid";
 import '@glideapps/glide-data-grid/dist/index.css';
 import { checkConfirmBarcode, checkConfirmNewBarcode, confirmBarcode } from "../../../../features/barcode/barcodeChangeService";
 import { BARCODE_ERR_MESSAGE, BARCODE_SUCCESS_MESSAGE } from "../../../../utils/constants";
+import ModalWaiting from "../../modal/material/modalWaiting";
 
 
 
@@ -14,14 +15,15 @@ export default function BarcodeChangeAction({
     toDate,
     setNewDataAction,
     onFinish,
-    onChangeBarcode,
     handleEnter,
     btnOpenModal,
     isModalVisible,
     setIsModalVisible,
 
     formChange,
-    onChangeQty,
+    onKeyDownChangeQty,
+    changeQtyRef,
+    remarkRef,
     onChangeNewQty,
     oldQty,
     newQty,
@@ -44,8 +46,9 @@ export default function BarcodeChangeAction({
     const oldBarcodeRef = useRef(null);
     const newBarcodeRef = useRef(null);
 
-
-
+    const userIDRef = useRef(null);
+    const [modal2Open, setModal2Open] = useState(false);
+    const [error, setError] = useState('');
 
     const [newLabel, setNewLabel] = useState({
 
@@ -128,13 +131,20 @@ export default function BarcodeChangeAction({
         [data],
     );
 
-    const onChangeRemark = (e) => {
-        setRemark(e.target.value);
-    };
 
-    const onChangeUserId = (e) => {
-        setUserId(e.target.value);
-    };
+    const onKeyDownRemark = (e) => {
+        if (e.key === 'Enter') {
+            setRemark(e.target.value);
+            userIDRef.current.focus();
+        }
+
+    }
+
+    const onKeyDownUserId = (e) => {
+        if (e.key === 'Enter') {
+            setUserId(e.target.value);
+        }
+    }
 
     const handleKeyDownOldBarcode = async (e) => {
         if (e.key === 'Enter') {
@@ -167,7 +177,9 @@ export default function BarcodeChangeAction({
                 if (result.result[0] != null) {
                     setNewBarcode(result.result[0].NewBarcodeID);
                 } else {
-                    message.info(BARCODE_ERR_MESSAGE.NO_DATA_BARCODEID);
+                    setError(BARCODE_ERR_MESSAGE.BARCODEID_NOT_EXISTS);
+                    setModal2Open(true);
+                    resetValueModal();
                 }
 
             } catch (err) {
@@ -176,8 +188,6 @@ export default function BarcodeChangeAction({
             newBarcodeRef.current.focus();
         }
     }
-
-
 
     const onKeyDownNewBarcode = async (e) => {
         if (e.key === 'Enter') {
@@ -196,7 +206,9 @@ export default function BarcodeChangeAction({
 
             if (INewBarcode != newBarcode) {
                 console.log(newBarcode);
-                message.info(BARCODE_ERR_MESSAGE.NEW_BARCODE_NOT_MATCH)
+                setError(BARCODE_ERR_MESSAGE.NEW_BARCODEID_NOT_EXISTS);
+                formPopup.resetFields(["newBarcode"]);
+                setModal2Open(true);
                 return;
             }
 
@@ -214,14 +226,14 @@ export default function BarcodeChangeAction({
 
                 if (result != null) {
 
-                    formPopup.setFieldsValue({ cfBarcode: result.result[0].NewBarcodeID });
-                    formPopup.setFieldsValue({ userid: result.result[0].UserID });
+                    formPopup.setFieldsValue({ cfBarcode: result.data[0].NewBarcodeID });
+                    formPopup.setFieldsValue({ userid: result.data[0].UserID });
                     formPopup.setFieldsValue({ status: "OK" });
                     // formPopup.setFieldsValue({ time: result.result[0].LastDateTime});
 
                     const newRow = {
                         oldBarcode: dataConfirm.oldBarcode,
-                        newBarcode: result.result[0].NewBarcodeID,
+                        newBarcode: result.data[0].NewBarcodeID,
                         isconfirm: "OK"
                     };
 
@@ -235,6 +247,11 @@ export default function BarcodeChangeAction({
                         message.info(BARCODE_ERR_MESSAGE.DUPLICATE_ROW);
                     }
 
+                }else{
+                    setError(BARCODE_ERR_MESSAGE.BARCODEID_NOT_EXISTS);
+                    setModal2Open(true);
+                    formPopup.resetFields(newBarcode);
+                    resetValueModal();
                 }
 
             } catch (err) {
@@ -252,9 +269,9 @@ export default function BarcodeChangeAction({
             );
             resetValueModal();
             setIsModalVisible(false);
-            if(result.status){
+            if (result.status) {
                 message.info(BARCODE_SUCCESS_MESSAGE.BARCODE_CONFIRM_SUCCESS);
-            }else{
+            } else {
                 message.info(BARCODE_ERR_MESSAGE.BARCODE_NOT_CONFIRM);
             }
 
@@ -380,7 +397,8 @@ export default function BarcodeChangeAction({
                                 size="small"
                                 type="number"
                                 min={0}
-                                onChange={onChangeQty} />
+                                onKeyDown={onKeyDownChangeQty}
+                                ref={changeQtyRef} />
                         </Form.Item>
                         <Form.Item label="QTY" name="qty">
                             <Input
@@ -394,10 +412,10 @@ export default function BarcodeChangeAction({
                         </Form.Item>
 
                         <Form.Item label="Remark" name="remark">
-                            <Input placeholder="" size="small" onChange={onChangeRemark} />
+                            <Input placeholder="" size="small" onKeyDown={onKeyDownRemark} ref={remarkRef} />
                         </Form.Item>
                         <Form.Item label=" User ID" name="userID">
-                            <Input placeholder="" size="small" onChange={onChangeUserId} />
+                            <Input placeholder="" size="small" onKeyDown={onKeyDownUserId} ref={userIDRef} />
                         </Form.Item>
 
                         <Form.Item label="1D Position" layout={"inline"}>
@@ -512,8 +530,12 @@ export default function BarcodeChangeAction({
                         </div>
                     </div>
 
-
                 </Modal>
+                <ModalWaiting
+                    modal2Open={modal2Open}
+                    setModal2Open={setModal2Open}
+                    error={error}
+                />
 
             </Card>
 
