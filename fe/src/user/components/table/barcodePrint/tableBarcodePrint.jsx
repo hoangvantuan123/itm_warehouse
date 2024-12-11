@@ -104,7 +104,7 @@ function TableBarcodePrint({ data, setGridData, gridData, selectRow, setSelectRo
         columns: CompactSelection.empty(),
         rows: CompactSelection.empty(),
     });
-    setSelectRow(selection);
+    // setSelectRow(selection);
 
     const onCellClicked = (cell, event) => {
         let rowIndex;

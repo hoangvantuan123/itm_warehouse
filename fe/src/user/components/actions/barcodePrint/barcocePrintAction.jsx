@@ -4,27 +4,32 @@ import { SaveFilled } from '@ant-design/icons';
 
 import LabelItem from "./labeldesign";
 import { CreatePrintLabel } from "../../../../features/barcode/printBarcodeService";
-import { useForm } from "antd/es/form/Form";
-
-
 
 export default function BarcodePrintAction({
     fromDate,
     toDate,
     onFinish,
-    onChangeVendor,
     btnPrinter,
     rowSelects,
     setRowChecked,
+
+    optionDevices,
+    onDropDownChange,
+    handleOnchangeDevice,
+
+    onChangeVendor,
+    onKeyDownPartNo,
+
 }) {
 
     const [formSearch] = Form.useForm();
     const [formQuery] = Form.useForm();
-    formSearch.setFieldsValue({ fromDate: fromDate });
-    formSearch.setFieldsValue({ toDate: toDate });
+
 
 
     useEffect(() => {
+        formSearch.setFieldsValue({ fromDate: fromDate });
+        formSearch.setFieldsValue({ toDate: toDate });
     }, [fromDate, toDate])
 
     const [sizeLabel, setSizeLabel] = useState({
@@ -67,7 +72,7 @@ export default function BarcodePrintAction({
         }));
     };
 
-    
+
 
     const handleInputChange = (e, field) => {
         setSizeLabel(prevState => ({
@@ -86,7 +91,6 @@ export default function BarcodePrintAction({
     vendorList.push({ label: "ABLIC", value: "ABLIC" });
     vendorList.push({ label: "SMK", value: "SMK" });
     vendorList.push({ label: "NISSHINBO", value: "NISSHINBO" });
-
 
     const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -146,7 +150,7 @@ export default function BarcodePrintAction({
 
                     <Form
                         layout={"inline"}
-                        initialValues={{
+                        defaultValue={{
                             layout: 'inline',
                         }}
                         form={formSearch}
@@ -179,14 +183,12 @@ export default function BarcodePrintAction({
                             <Select
                                 labelInValue
                                 allowClear
-                                id="typeSelect"
                                 defaultValue="All"
                                 size="small"
 
                                 style={{
                                     width: 150,
                                 }}
-                                onChange={onChangeVendor}
                                 options={vendorList?.map((item) => ({
                                     label: item?.label,
                                     value: item?.value,
@@ -212,11 +214,11 @@ export default function BarcodePrintAction({
                         </Form.Item>
 
                         <Form.Item>
-                            <Button onClick={btnOpenModal} type="primary" size="small">PRINT</Button>
+                            <Button type="primary" size="small" htmlType="submit">SEARCH</Button>
                         </Form.Item>
 
                         <Form.Item>
-                            <Button type="primary" size="small" htmlType="submit">SEARCH</Button>
+                            <Button onClick={btnOpenModal} type="primary" size="small">PRINT</Button>
                         </Form.Item>
 
                     </Form>
@@ -226,11 +228,10 @@ export default function BarcodePrintAction({
 
                     <Form
                         layout={"inline"}
-                        initialValues={{
+                        defaultValue={{
                             layout: 'inline',
                         }}
                         form={formQuery}
-
                         style={{
                             maxWidth: 'inline' ? 'none' : 600,
                         }}
@@ -247,11 +248,11 @@ export default function BarcodePrintAction({
                                 id="vendorSelect"
                                 defaultValue="All"
                                 size="small"
+                                onChange={onChangeVendor}
 
                                 style={{
                                     width: 150,
                                 }}
-                                onChange={onChangeVendor}
                                 options={vendorList?.map((item) => ({
                                     label: item?.label,
                                     value: item?.value,
@@ -265,16 +266,10 @@ export default function BarcodePrintAction({
                             name={"partNo"}
                             size="small"
                         >
-                            <Input placeholder="" size="small" />
-
-                        </Form.Item>
-
-                        <Form.Item
-                            label="Part No"
-                            name={"partNo"}
+                            <Input 
+                            placeholder="" 
                             size="small"
-                        >
-                            <Input placeholder="" size="small" />
+                            onKeyDown={onKeyDownPartNo} />
 
                         </Form.Item>
 
@@ -388,6 +383,21 @@ export default function BarcodePrintAction({
                             <Form.Item name="qrcodeSizeY" layout={"inline"} >
                                 <Input placeholder="Y" size="small" style={{ width: 50 }} type="number" min={0} />
                             </Form.Item>
+                        </Form.Item>
+                        <Form.Item label="Device Printer" name="device">
+                            <Select
+                                labelInValue
+                                id="typeSelect"
+                                defaultValue=""
+                                size="small"
+                                style={{
+                                    width: 150,
+                                }}
+                                allowClear
+                                options={optionDevices}
+                                onDropdownVisibleChange={onDropDownChange}
+                                onChange={handleOnchangeDevice}
+                            />
                         </Form.Item>
 
                         <Form.Item>

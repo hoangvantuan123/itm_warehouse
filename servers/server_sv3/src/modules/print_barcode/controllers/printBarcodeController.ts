@@ -46,4 +46,20 @@ export class PrintBarcodeController {
         }
     }
 
+    @Get('get-matid')
+    async getMatIdByVendor(
+        @Body() barcodeDto : any
+    ) : Promise<any>{
+        try {
+            const result = await this.printBarcodeService.getMatIdByVendor(barcodeDto);
+            return {result};
+        } catch (error) {
+            return {
+                status: false,
+                message: error.message || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+                data: null,
+            };
+        }
+    }
+
 }

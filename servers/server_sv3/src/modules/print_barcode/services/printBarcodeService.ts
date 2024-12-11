@@ -57,13 +57,13 @@ export class PrintBarcodeService {
         if (dateTo != null) {
           query += ` AND DATETIME <= '` + dateTo + `'`;
         }
-        if (vendor != '') {
+        if (vendor != null && vendor != 'ALL') {
             query += ` AND VENDOR LIKE '` + vendor + `'`;
         }
-        if (matID != '') {
+        if (matID != null) {
             query += ` AND ITEMCD LIKE '` + matID + `'`;
         }
-        if (lotNo != '') {
+        if (lotNo != null) {
             query += ` AND LOTNO LIKE '` + lotNo + `'`;
         }
 
@@ -342,5 +342,94 @@ export class PrintBarcodeService {
         }
         return true;
     };
+
+    async getMatIdByVendor(dto : any) : Promise<any>{
+        const sql = `
+            SELECT mat_code FROM ERP_MST_ITEM  
+            WHERE plant = '${dto.plant}}' 
+                  AND customer_part_no = '${dto.partNo}' 
+                  AND mat_code NOT LIKE 'N-%'
+        `;
+
+        this.logger.log('GET MAT ID BY ALPHA OMEGA ', sql);
+
+        try {
+            const result = await this.databaseService.executeQuery(sql);
+
+            if (!result || result.length === 0) {
+                return {
+                    status: false,
+                    data: null,
+                }
+            }
+            return  {
+                status: true,
+                data: result[0],
+            }
+        } catch (error) {
+            console.error('Error checking stock:', error);
+            throw new Error('Failed to check stock');
+        }
+    }
+
+    async getReelSeq(dto : any) : Promise<any>{
+        let vSeq = '2-';
+        const sql = `
+            SELECT 
+                MAX(CONVERT(REPLACE(ReelNo, '2-', ''), int)) +1 AS ReelNo 
+            FROM EWIPRMTBCI WHERE (1=1)
+                AND plant = '${dto.plant}' 
+                AND lotno = '${dto.lotNo}' 
+        `;
+
+        this.logger.log('GET REEL SEQ ', sql);
+
+        try {
+            const result = await this.databaseService.executeQuery(sql);
+
+            if (!result || result.length === 0) {
+                return '2-1';
+            }else{
+                const vMaxNo = result[0];
+                if (vMaxNo == ''){
+                    return '2-1';
+                }
+                vSeq = vSeq + vMaxNo;
+            }
+            return  vSeq;
+        } catch (error) {
+            console.error('Error checking stock:', error);
+            throw new Error('Failed to check stock');
+        }
+    }
+
+    async getLotCount(dto : any) : Promise<any>{
+        const sql = `
+            SELECT mat_code FROM ERP_MST_ITEM  
+            WHERE plant = '${dto.plant}}' 
+                  AND customer_part_no = '${dto.partNo}' 
+                  AND mat_code NOT LIKE 'N-%'
+        `;
+
+        this.logger.log('GET MAT ID BY ALPHA OMEGA ', sql);
+
+        try {
+            const result = await this.databaseService.executeQuery(sql);
+
+            if (!result || result.length === 0) {
+                return {
+                    status: false,
+                    data: null,
+                }
+            }
+            return  {
+                status: true,
+                data: result[0],
+            }
+        } catch (error) {
+            console.error('Error checking stock:', error);
+            throw new Error('Failed to check stock');
+        }
+    }
 
 }
