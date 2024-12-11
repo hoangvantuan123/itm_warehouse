@@ -17,11 +17,9 @@ import {
 import { Layout, Spin } from 'antd'
 import Sidebar from '../components/sildebar/sidebar'
 import Cookies from 'js-cookie'
-import { useTranslation } from 'react-i18next'
 import { checkActionPermission } from '../../permissions'
 import BreadcrumbRouter from '../components/sildebar/breadcrumb'
 import Spinner from '../page/default/load'
-import ViewTest from '../page/test/viewTest'
 import Home from '../page/home/home'
 import Login from '../auth/login'
 import decodeJWT from '../../utils/decode-JWT'
@@ -45,10 +43,8 @@ const StockOutRequestFiFo = lazy(() => import('../page/material/stockOutFiFo'))
 const { Content } = Layout
 
 const UserRouter = () => {
-  const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
-
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [menuTransForm, setMenuTransForm] = useState([])
   const [rootMenuItems, setRootMenuItems] = useState([])
@@ -58,7 +54,6 @@ const UserRouter = () => {
   const [error, setError] = useState(null)
   const [showSpinner, setShowSpinner] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-
   const rolesMenu = localStorage.getItem('roles_menu')
 
   const processRolesMenu = useCallback(async () => {

@@ -56,10 +56,8 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
   })
-
-
   const [isOpenDetails, setIsOpenDetails] = useState(false)
-
+  const [isAPISuccess, setIsAPISuccess] = useState(true);
   useEffect(() => {
     const savedState = localStorage.getItem('detailsStateIqc')
     setIsOpenDetails(savedState === 'open')
@@ -272,7 +270,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     })
   }, [])
 
-  
+
   useEffect(() => {
     workerRef.current = new Worker(
       new URL('../../../workers/workerWatingIqcStockIn.js', import.meta.url),
@@ -477,17 +475,21 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
 
   const handleSubmit = useCallback(
     async (e) => {
+      if (!isAPISuccess) {
+        return;
+      }
+      setIsAPISuccess(false);
       e.preventDefault()
       setLoadingSave(true)
       setResult(null)
       setModal4Open(true)
+
       if (scanHistory.length === 0) {
         setLoadingSave(false)
         setModal2Open(true)
         setModal4Open(false)
         setResult(null)
         setError('Chưa có dữ liệu để gửi. Vui lòng quét dữ liệu trước khi gửi.')
-
         return
       }
       const xmlForCloseCheck = createXmlDataCloseCheck(filteredData)
@@ -508,27 +510,28 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
           sheetCheckXML: xmlForSheetCheck,
           sheetLotNoMasterCheckXML: xmlForLotNoMasterCheck,
         })
-
         setResult(response)
         if (response.success) {
           navigate(`/u/warehouse/material/delivery-list`)
           setModal4Open(false)
-          setModal5Open(true)
-          setSuccessMessage('Tất cả các dữ liệu đã được thực thi thành công!')
           setScanHistory([])
+          setIsAPISuccess(true);
           fetchDeliveryData(filteredData?.DelvNo, filteredData?.PurchaseType)
         } else {
           setModal4Open(false)
           setModal2Open(true)
           setError(response.message)
+          setIsAPISuccess(true);
         }
       } catch (error) {
         setModal4Open(false)
         setResult({ error: error.message })
         setModal2Open(true)
         setError(error.message)
+        setIsAPISuccess(true);
       } finally {
         setLoadingSave(false)
+        setIsAPISuccess(true);
       }
     },
     [filteredData, scanHistory],

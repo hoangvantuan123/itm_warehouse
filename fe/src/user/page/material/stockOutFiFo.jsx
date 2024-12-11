@@ -54,7 +54,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
 
 
   const [loading, setLoading] = useState(false)
-
+  const [isAPISuccess, setIsAPISuccess] = useState(true);
 
   const [isOpenDetails, setIsOpenDetails] = useState(false)
   const secretKey = 'TEST_ACCESS_KEY'
@@ -394,10 +394,14 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
 `
   const handleSubmit = useCallback(
     async (e) => {
+      if (!isAPISuccess) {
+        return;
+      }
       e.preventDefault()
       setLoadingSave(true)
       setResult(null)
       setModal4Open(true)
+      setIsAPISuccess(false);
       if (scanHistory.length === 0) {
         setLoadingSave(false)
         setModal2Open(true)
@@ -464,7 +468,6 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const getSelectedRowIndices = () => {
     const selectedRows = selection.rows.items
     let indices = []
-
     selectedRows.forEach((range) => {
       const start = range[0]
       const end = range[1] - 1

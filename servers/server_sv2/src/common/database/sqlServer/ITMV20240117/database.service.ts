@@ -60,21 +60,31 @@ export class DatabaseService {
   }
 
 
- async findAuthByEmpID(UserId: string): Promise<any> {
-  const query = `SELECT * FROM "_TCAUser_WEB" WHERE "UserId" = '${UserId}'`;
+  async findAuthByEmpID(UserId: string): Promise<any> {
+    const query = `SELECT * FROM "_TCAUser_WEB" WHERE "UserId" = '${UserId}'`;
 
-  try {
-    const result = await this.queryRunner.query(query);
+    try {
+      const result = await this.queryRunner.query(query);
 
-    if (!result || result.length === 0) {
-      throw new NotFoundException(`UserId ${UserId} not found in the system`);
+      if (!result || result.length === 0) {
+        throw new NotFoundException(`UserId ${UserId} not found in the system`);
+      }
+
+      return result[0];
+    } catch (error) {
+      throw error;
     }
-
-    return result[0];
-  } catch (error) {
-    throw error;
   }
-}
+  async findLanguageSeq(languageSeq: string): Promise<any> {
+    const query = `SELECT IdSeq  , WordSeq , Word FROM _TCADictionary_WEB where LanguageSeq ='${languageSeq}'`;
+    try {
+      const result = await this.queryRunner.query(query);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
 
 
 }

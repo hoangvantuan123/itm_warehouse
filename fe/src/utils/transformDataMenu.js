@@ -46,6 +46,5 @@ export function transformDataMenu(data, rootMenu) {
     }
   });
 
-  console.log('Final result:', result);
   return result;
 }

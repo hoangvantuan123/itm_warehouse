@@ -15,10 +15,8 @@ import { debounce } from 'lodash'
 import { useNavigate } from 'react-router-dom'
 import { encodeBase64Url } from '../../../utils/decode-JWT'
 import CryptoJS from 'crypto-js'
-import NoneData from '../default/noneData'
 
 export default function DeliveryList({ permissions, isMobile }) {
-  const { t } = useTranslation()
   const gridRef = useRef(null)
   const navigate = useNavigate()
 
@@ -40,38 +38,43 @@ export default function DeliveryList({ permissions, isMobile }) {
   const [clickedRowDataList, setClickedRowDataList] = useState([])
   const [gridData, setGridData] = useState([])
   const [isAPISuccess, setIsAPISuccess] = useState(true);
+  const { t } = useTranslation()
 
   const fetchDeliveryData = async () => {
-    if (isAPISuccess === false) {
-      message.warning('Không thể thực hiện, vui lòng kiểm tra trạng thái.');
+    if (!isAPISuccess) {
       return;
     }
     setLoadingA(true);
-    setIsAPISuccess(false)
-    const loadingMessage = message.loading('Đang tải dữ liệu, vui lòng chờ...', 0);
+    setIsAPISuccess(false);
+
+    let hideLoadingMessage;
     try {
+      hideLoadingMessage = message.loading('Đang tải dữ liệu, vui lòng chờ...', 0);
       const deliveryResponse = await GetDeliveryList(
         formData ? formatDate(formData) : '',
         toDate ? formatDate(toDate) : '',
         deliveryNo,
         bizUnit,
       );
-
-      const fetchedData = deliveryResponse?.data || [];
-      setData(fetchedData);
-      setIsAPISuccess(true)
-      loadingMessage();
-      message.success('Tải dữ liệu thành công!');
+      if (deliveryResponse?.success) {
+        setData(deliveryResponse.data || []);
+        message.success('Tải dữ liệu thành công!');
+        setIsAPISuccess(true);
+      } else {
+        setData([]);
+        setIsAPISuccess(true);
+        message.error('Có lỗi xảy ra khi tải dữ liệu.');
+      }
     } catch (error) {
       setData([]);
-      loadingMessage();
-      notification.destroy();
-      message.error("Có lỗi xảy ra khi tải dữ liệu.");
+      setIsAPISuccess(true);
+      message.error('Có lỗi xảy ra khi tải dữ liệu.');
     } finally {
+      if (hideLoadingMessage) hideLoadingMessage();
+      setIsAPISuccess(true);
       setLoadingA(false);
     }
   };
-
 
   useEffect(() => {
     fetchDeliveryData()
@@ -167,10 +170,13 @@ export default function DeliveryList({ permissions, isMobile }) {
         JSON.stringify(filteredData),
         secretKey,
       ).toString()
-      const encryptedToken = encodeBase64Url(encryptedData)
-      setKeyPath(encryptedToken)
-      setClickedRowData(rowData)
-      setLastClickedCell(cell)
+
+      if (isAPISuccess) {
+        const encryptedToken = encodeBase64Url(encryptedData)
+        setKeyPath(encryptedToken)
+        setClickedRowData(rowData)
+        setLastClickedCell(cell)
+      }
     }
   }
 

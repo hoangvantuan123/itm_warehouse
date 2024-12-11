@@ -93,8 +93,6 @@ AND r.Type IN ('rootmenu', 'menu');
         }
     }
 
-
-
     private mergePermissions(data: any[]): { menu: any[], rootMenu: any[] } {
         const mergedData = data.reduce((acc, item) => {
             const { Id, View, Edit, Create, Delete, MenuId, GroupId, UserId, RootMenuId, Type, Name
@@ -156,7 +154,6 @@ AND r.Type IN ('rootmenu', 'menu');
                     acc.rootMenu[RootMenuId].Delete = acc.rootMenu[RootMenuId].Delete && Delete;
                 }
             }
-
             return acc;
         }, { menu: {}, rootMenu: {} });
 
@@ -170,7 +167,7 @@ AND r.Type IN ('rootmenu', 'menu');
         loginData: LoginDto,
     ): Promise<{
         success: boolean;
-        data?: { user: Partial<TCAUserWEB>; token: string; tokenRolesUserMenu: string };
+        data?: { user: Partial<TCAUserWEB>; token: string; tokenRolesUserMenu: string, typeLanguage: number, languageData: any[] };
         error?: { message: string; code: string };
     }> {
         const { login, password } = loginData;
@@ -224,6 +221,7 @@ AND r.Type IN ('rootmenu', 'menu');
                     UserSeq: user.UserSeq,
                     EmpSeq: user.EmpSeq,
                     Remark: user.Remark,
+
                     CompanySeq: user.CompanySeq
                 },
                 jwtConstants.secret,
@@ -239,7 +237,8 @@ AND r.Type IN ('rootmenu', 'menu');
                 jwtConstants.secret,
                 { expiresIn: '24h' }
             );
-
+            const languageSeq = user.LanguageSeq || 6;
+            const languageDataUser = await this.databaseService.findLanguageSeq(languageSeq);
 
             const userResponse: Partial<any> = {
                 UserId: user.UserId,
@@ -256,7 +255,9 @@ AND r.Type IN ('rootmenu', 'menu');
                 data: {
                     user: userResponse,
                     token,
-                    tokenRolesUserMenu
+                    tokenRolesUserMenu,
+                    typeLanguage: languageSeq,
+                    languageData: languageDataUser
                 },
             };
         } catch (error) {

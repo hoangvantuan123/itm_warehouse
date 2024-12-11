@@ -144,18 +144,24 @@ export default function StockOutRequest({ permissions, isMobile }) {
       };
 
       const response = await SPDMMOutReqListQueryWeb(formA);
-      const fetchedData = response?.data || [];
-      setData(fetchedData);
-      setIsAPISuccess(true)
-      loadingMessage();
-      message.success('Tải dữ liệu thành công!');
+      if (response?.success) {
+        message.success('Tải dữ liệu thành công!');
+        const fetchedData = response?.data || [];
+        setData(fetchedData);
+        setIsAPISuccess(true)
+        loadingMessage();
+      } else {
+        setData([]);
+        message.error('Có lỗi xảy ra khi tải dữ liệu.');
+      }
     } catch (error) {
       setErrorA(true);
-
+      setIsAPISuccess(true)
       loadingMessage();
       notification.destroy();
       message.error("Có lỗi xảy ra khi tải dữ liệu.");
     } finally {
+      setIsAPISuccess(true)
       setLoadingA(false);
     }
   };
@@ -358,23 +364,22 @@ export default function StockOutRequest({ permissions, isMobile }) {
         JSON.stringify(filteredData),
         secretKey,
       ).toString()
-      if (filteredData.IsStop === true || filteredData.IsConfirm === false) {
-        if (filteredData.IsStop === true) {
-          setCheckIsStop(true);
+      if (isAPISuccess === true) {
+        if (filteredData.IsStop === true || filteredData.IsConfirm === false) {
+          if (filteredData.IsStop === true) {
+            setCheckIsStop(true);
+          }
+          if (filteredData.IsConfirm === false) {
+            setCheckIsConfirm(true);
+          }
+          setKeyPath(null);
+        } else {
+          const encryptedToken = encodeBase64Url(encryptedData);
+          setKeyPath(encryptedToken);
+          setClickedRowData(rowData);
+          setLastClickedCell(cell);
         }
-        if (filteredData.IsConfirm === false) {
-          setCheckIsConfirm(true);
-        }
-        setKeyPath(null);
-      } else {
-        const encryptedToken = encodeBase64Url(encryptedData);
-        setKeyPath(encryptedToken);
-        setClickedRowData(rowData);
-        setLastClickedCell(cell);
       }
-
-
-
     }
   }
 
@@ -404,10 +409,6 @@ export default function StockOutRequest({ permissions, isMobile }) {
   useEffect(() => {
     fetchSPDMMOutReqListQueryWeb()
   }, [])
-
-
-
-
   return (
     <>
       <Helmet>
@@ -562,7 +563,7 @@ export default function StockOutRequest({ permissions, isMobile }) {
       />
 
 
-      
+
       <ModalWaiting
         modal2Open={checkIsConfirm}
         setModal2Open={setCheckIsConfirm}

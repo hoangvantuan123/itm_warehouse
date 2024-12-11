@@ -1,0 +1,111 @@
+import{j as t,B as R,r as n,e as Se,F as ee,b as Xe,c as re,I as me,a9 as de,C as te,G as p,D as fe,H as le,a as ae,E as he,f as ze,u as Ge,i as Ye,l as Ke,s as pe,g as Ve,T as Je}from"./index-BJY6kUZk.js";import{a as Ze,A as Re}from"./index-BSunLTxl.js";import{C as ge}from"./index-UYRHXWUs.js";import{R as ke}from"./SaveOutlined-NpHgz8zD.js";import{R as et}from"./DeleteOutlined-D8TP0-eG.js";import{R as tt,L as nt,S as ot}from"./successSubmit-0pdw1pBZ.js";import"./index-BK9ir7VS.js";import{a as xe}from"./tokenService-B6vw-C2R.js";import{M as rt}from"./modalWaiting-FhgELYWI.js";import{R as lt}from"./FileTextOutlined-Brd8YWSi.js";function at({status:o,handleSubmit:a,handleDelete:m,handleRestFrom:d,handleUploadExcel:h}){return t.jsxs("div",{className:"flex items-center gap-2",children:[o?t.jsx(t.Fragment,{children:t.jsx("span",{className:"inline-flex items-center justify-center rounded-lg w-20 bg-emerald-100 px-5 py-[6px] text-emerald-700",children:t.jsx("p",{className:"whitespace-nowrap text-sm",children:"LIVE"})})}):t.jsx(t.Fragment,{children:t.jsx("span",{className:"inline-flex items-center justify-center rounded-lg w-20 bg-red-100 px-5 py-[6px] text-red-700",children:t.jsx("p",{className:"whitespace-nowrap text-sm",children:"OFF"})})}),t.jsx(R,{type:"primary",icon:t.jsx(ke,{}),size:"middle",className:"uppercase",onClick:a,style:{backgroundColor:"#52c41a",borderColor:"#52c41a"},children:"Save"},"Save"),t.jsx(R,{type:"primary",icon:t.jsx(et,{}),size:"middle",onClick:m,className:"uppercase text-white",style:{backgroundColor:"#ff4d4f",borderColor:"#ff4d4f"},children:"Row Delete"},"Row Delete"),t.jsx(R,{type:"default",icon:t.jsx(ke,{}),size:"middle",className:"uppercase",color:"default",variant:"filled",onClick:d,style:{backgroundColor:"#f0f0f0",borderColor:"#d9d9d9"},children:"Reset"},"Reset"),t.jsx(R,{type:"default",icon:t.jsx(tt,{}),size:"middle",className:"uppercase",color:"default",variant:"filled",onClick:h,style:{backgroundColor:"#ffa500",borderColor:"#ffa500"},children:"Excel Upload"},"Excel Upload")]})}Se.locale("vi");function st({filteredData:o,handleCheckBarcode:a,inputBarCode:m,setInputBarCode:d,setCheckValueIsStop:h}){const[s]=n.useState(Se()),[w,T]=n.useState(o==null?void 0:o.IsStop),Q=S=>{const I=S.format("dddd");return`${I.charAt(0).toUpperCase()+I.slice(1)}, ${S.format("DD/MM/YYYY")}`},j=S=>{d(S.target.value)},B=()=>{m&&a(m)},N=S=>{T(S.target.checked);const I=S.target.checked?1:0;h(I)};return t.jsx("div",{className:"flex items-center gap-2",children:t.jsxs(ee,{layout:"vertical",onKeyDown:S=>{S.key==="Enter"&&S.preventDefault()},children:[" ",t.jsxs(Xe,{className:"gap-4 flex items-center",children:[t.jsx(re,{children:t.jsx(ee.Item,{label:t.jsx("span",{className:"uppercase text-[10px]",children:"Date"}),className:"mb-0",children:t.jsx(me,{value:Q(s),size:"small",className:"text-sm p-2",readOnly:!0})})}),t.jsx(re,{children:t.jsx(ee.Item,{label:t.jsx("span",{className:"uppercase text-[10px]",children:"Barcode"}),tooltip:"Dùng để nhập mã vạch",className:"mb-0",children:t.jsx(me,{value:m,onChange:j,onPressEnter:B,placeholder:"Barcode",size:"small",className:"text-sm p-2  w-80"})})}),t.jsx(re,{children:t.jsx(ee.Item,{label:t.jsx("span",{className:"uppercase text-[10px]",children:"Trạng thái Y/N"}),className:"mb-0",children:(o==null?void 0:o.IsStop)===!0?t.jsx(t.Fragment,{children:t.jsx(de,{onChange:N,children:t.jsx("span",{className:"uppercase",children:"Đơn hàng hoàn thành"})})}):t.jsxs(t.Fragment,{children:["   ",t.jsx(de,{onChange:N,children:w?t.jsx("span",{className:" uppercase",children:"Đơn hàng hoàn thành"}):t.jsx("span",{className:"uppercase",children:"Đơn hàng chưa hoàn thành"})})]})})})]})]})})}function it({data:o}){const[a,m]=n.useState([]),[d,h]=n.useState(!1),s=n.useCallback(()=>h(!1),[]),[w,T]=n.useState(null);n.useState([]);const[Q,j]=n.useState(!1),[B,N]=n.useState(null),[S,I]=n.useState({columns:te.empty(),rows:te.empty()}),F=n.useMemo(()=>[{title:"ItemNo"},{title:"RemainQty"},{title:"OutQty"},{title:"Qty1"},{title:"ItemName"},{title:"Spec"},{title:"UnitName"}],[]),[f,A]=n.useState(F),U=n.useCallback((r,E)=>{const i=f.indexOf(r);if(i!==-1){const g={...r,width:E},W=[...f];W.splice(i,1,g),A(W)}},[f]),_=n.useCallback(([r,E])=>{const i=a[E]||{},{ItemNo:g="",RemainQty:W="",OutQty:X="",Qty1:k="",ItemName:v="",Spec:$="",UnitName:z=""}=i,y=M=>M!=null?String(M):"",C={0:{kind:p.Text,data:y(g)},1:{kind:p.Text,data:y(W)},2:{kind:p.Text,data:y(X)},3:{kind:p.Text,data:y(k)},4:{kind:p.Text,data:y(v)},5:{kind:p.Text,data:y($)},6:{kind:p.Text,data:y(z)}};if(C.hasOwnProperty(r)){const{kind:M,data:L}=C[r];return{kind:M,data:L,displayData:L}}return{kind:p.Text,data:"",displayData:""}},[a]),[D,P]=n.useState(void 0);n.useCallback(r=>{console.log("cell",r),P(r)},[]),n.useEffect(()=>{m(o)},[o]);const b=(r,E)=>{let i;if(r[0]!==-1){console.log("Ignoring click on cell, cell[0] is neither -1 nor 1");return}if(r[0]===-1?(i=r[1],j(!0)):(i=r[0],j(!1)),B&&B[0]===r[0]&&B[1]===r[1]){console.log("Click again on the same cell, deactivating."),N(null),T(null);return}if(i>=0&&i<a.length){const g=a[i];T(g),N(r)}else console.log("Invalid row index:",i)};return t.jsx("div",{className:"w-full h-full border-t border-b overflow-hidden scroll-container ",children:t.jsx(fe,{columns:f,getCellContent:_,rows:a.length,showSearch:d,getCellsForSelection:!0,onSearchClose:s,width:"100%",height:"100%",rowMarkers:"both",useRef:n.useRef,onColumnResize:U,smoothScrollY:!0,smoothScrollX:!0,onCellClicked:b,rowSelect:"single",gridSelection:S,onGridSelectionChange:I,getRowThemeOverride:r=>r%2===0?void 0:{bgCell:"#FBFBFB"}})})}function ct({data:o,selection:a,setSelection:m}){const[d,h]=n.useState([]),[s,w]=n.useState(!1),T=n.useCallback(()=>w(!1),[]),[Q,j]=n.useState(null);n.useState([]);const[B,N]=n.useState(!1),[S,I]=n.useState(null),F=n.useMemo(()=>[{title:"FactUnitName"},{title:"InWHName"},{title:"OutWHName"},{title:"Qty"},{title:"ReqQty"},{title:"DateCode"},{title:"ReelNo"},{title:"StockOutDate"},{title:"LotNo"},{title:"LotNoFull"},{title:"Barcode"}],[]),[f,A]=n.useState(F),U=n.useCallback((r,E)=>{const i=f.indexOf(r);if(i!==-1){const g={...r,width:E},W=[...f];W.splice(i,1,g),A(W)}},[f]),_=n.useCallback(([r,E])=>{const i=d[E]||{},{FactUnitName:g="",InWHName:W="",OutWHName:X="",ItemNo:k="",Qty:v="",ReqQty:$="",DateCode:z="",ReelNo:y="",StockOutDate:C="",LotNo:M="",LotNoFull:L="",Barcode:ne=""}=i,x=G=>G!=null?String(G):"",V={0:{kind:p.Text,data:x(g)},1:{kind:p.Text,data:x(W)},2:{kind:p.Text,data:x(X)},3:{kind:p.Text,data:x(k)},4:{kind:p.Text,data:x(v)},5:{kind:p.Text,data:x($)},6:{kind:p.Text,data:x(z)},7:{kind:p.Text,data:x(y)},8:{kind:p.Text,data:x(C)},9:{kind:p.Text,data:x(M)},10:{kind:p.Text,data:x(L)},11:{kind:p.Text,data:x(ne)}};if(V.hasOwnProperty(r)){const{kind:G,data:Y}=V[r];return{kind:G,data:Y,displayData:Y}}return{kind:p.Text,data:"",displayData:""}},[d]),[D,P]=n.useState(void 0);n.useCallback(r=>{console.log("cell",r),P(r)},[]),n.useEffect(()=>{h(o)},[o]);const b=(r,E)=>{let i;if(r[0]!==-1){console.log("Ignoring click on cell, cell[0] is neither -1 nor 1");return}if(r[0]===-1?(i=r[1],N(!0)):(i=r[0],N(!1)),S&&S[0]===r[0]&&S[1]===r[1]){console.log("Click again on the same cell, deactivating."),I(null),j(null);return}if(i>=0&&i<d.length){const g=d[i];j(g),I(r)}else console.log("Invalid row index:",i)};return t.jsx("div",{className:"w-full h-full border-t border-b overflow-hidden scroll-container ",children:t.jsx(fe,{columns:f,getCellContent:_,rows:d.length,showSearch:s,getCellsForSelection:!0,onSearchClose:T,width:"100%",height:"100%",rowMarkers:"both",useRef:n.useRef,onColumnResize:U,smoothScrollY:!0,smoothScrollX:!0,onCellClicked:b,rowSelect:"single",gridSelection:a,onGridSelectionChange:m,getRowThemeOverride:r=>r%2===0?void 0:{bgCell:"#FBFBFB"}})})}function ut({sampleTableA:o,sampleTableB:a,setSelection:m,selection:d}){return t.jsxs("div",{className:"w-full gap-1 h-full flex items-center justify-center",children:[t.jsxs("div",{className:"w-[55%] h-full flex flex-col border bg-white rounded-lg overflow-hidden pb-7",children:[t.jsx("div",{className:" text-xs font-medium flex items-center gap-2 p-2 text-blue-600 uppercase ",children:"B"}),t.jsx(ct,{data:a,setSelection:m,selection:d})]}),t.jsx("div",{className:"px-4 flex flex-col p-3  bg-[#eee] rounded-lg items-center justify-center",children:t.jsx(Ze,{})}),t.jsxs("div",{className:"w-[45%] h-full flex flex-col border bg-white rounded-lg overflow-hidden pb-7",children:[t.jsx("div",{className:" text-xs font-medium flex items-center gap-2 p-2 text-blue-600 uppercase ",children:"A"}),t.jsx(it,{data:o})]})]})}const mt=async o=>{try{const a=`${le}/mssql/stock-out/itm-spd-mm-out-req-item-list`,m=await ae.get(a,{params:{outReqSeq:o},headers:{"Content-Type":"application/json"}});return m.status===200?{success:!0,data:m.data.data}:{success:!1,message:he.ERROR}}catch(a){return{success:!1,message:a.response?a.response.data.message:he.ERROR}}},dt=o=>`
+        <DataBlock1>
+          <WorkingTag>${o.WorkingTag}</WorkingTag>
+          <IDX_NO>1</IDX_NO>
+          <Status>0</Status>
+          <DataSeq>1</DataSeq>
+          <Selected>1</Selected>
+          <TABLE_NAME>DataBlock1</TABLE_NAME>
+          <OutReqSeq>${o.OutReqSeq}</OutReqSeq>
+          <OutReqItemSerl>${o.OutReqItemSerl}</OutReqItemSerl>
+          <WorkOrderSeq>${o.WorkOrderSeq}</WorkOrderSeq>
+          <WorkOrderSerl>${o.WorkOrderSerl}</WorkOrderSerl>
+          <FactUnit>${o.FactUnit}</FactUnit>
+          <FactUnitName>${o.FactUnitName}</FactUnitName>
+          <InWHSeq>${o.InWHSeq}</InWHSeq>
+          <InWHName>${o.InWHName}</InWHName>>
+          <OutWHSeq>${o.OutWHSeq}</OutWHSeq>
+          <OutWHName>${o.OutWHName}</OutWHName>
+          <ItemSeq>${o.ItemSeq}</ItemSeq>
+          <UnitSeq>${o.UnitSeq}</UnitSeq>
+          <ItemNo>${o.ItemNo}</ItemNo>
+          <LotNo>${o.LotNo}</LotNo>
+          <Qty>${o.Qty}</Qty>
+          <DateCode>${o.DateCode}</DateCode>
+          <ReelNo>${o.ReelNo}</ReelNo>
+          <Barcode>${o.Barcode}</Barcode>
+        </DataBlock1>
+    `,ht={xmlFlags:2,serviceSeq:60010002,workingTag:"",languageSeq:6,pgmSeq:1036085},pt=o=>{const a={...ht,...o},m=xe(),h={xmlDocument:dt(a),xmlFlags:a.xmlFlags,serviceSeq:a.serviceSeq,workingTag:a.workingTag,languageSeq:a.languageSeq,pgmSeq:a.pgmSeq};return ae.post(`${le}/mssql/stock-out/smaterial-qr-check-stock-out-web`,h,{headers:{Authorization:`Bearer ${m}`,"Content-Type":"application/json"}}).then(s=>{if(s.status===200||s.status===201)return s.data;throw new Error("Error from API: "+s.data.message)}).catch(s=>{const w=s.response?s.response.data.message||"Error from API":"Unknown error occurred";throw new Error(w)})},gt={xmlFlags:2,serviceSeq:2639,workingTag:"",languageSeq:6,pgmSeq:1036085},kt=async(o,a,m,d)=>{try{const h=xe(),s={...gt,checkValueIsStop:o,outReqSeq:a,dataSave:m,xmlDocument:{xmlSCOMCloseCheckWEB:d.xmlSCOMCloseCheckWEB,xmlSCOMCloseItemCheckWEB:d.xmlSCOMCloseItemCheckWEB,xmlSPDMMOutProcCheckWEB:d.xmlSPDMMOutProcCheckWEB,xmlSPDMMOutProcItemCheckWEB:d.xmlSPDMMOutProcItemCheckWEB}},w=await ae.post(`${le}/mssql/stock-out/check-all-procedures-stock-out-fifo`,s,{headers:{Authorization:`Bearer ${h}`,"Content-Type":"application/json"}});if(w.status>=200&&w.status<300)return w.data;throw new Error("Unexpected response status: "+w.status)}catch(h){let s="Unknown error occurred";throw h.response?s=h.response.data.message||`API error with status ${h.response.status}`:h.request?s="No response received from the server":s=h.message,new Error(s)}},{Title:St,Text:jt}=Je;function bt({permissions:o,isMobile:a}){const{t:m}=ze(),d=Ge(),{id:h}=Ye(),s=n.useRef(null),[w,T]=n.useState(null),[Q,j]=n.useState(null),[B,N]=n.useState(null),[S,I]=n.useState(!1),F=n.useRef(""),[f,A]=n.useState([]),U=n.useRef(f),[_,D]=n.useState(!1);n.useState(!1);const[P,b]=n.useState(!1),[r,E]=n.useState(!1),[i,g]=n.useState(null),[W,X]=n.useState(null),[k,v]=n.useState([]),$=n.useRef(k),[z,y]=n.useState(!1),[C,M]=n.useState(null),[L,ne]=n.useState(C!=null&&C.IsStop?1:0),[x,V]=n.useState({columns:te.empty(),rows:te.empty()}),[G,Y]=n.useState(!1),[qe,Oe]=n.useState(!0),[ft,Ce]=n.useState(!1),Ne="TEST_ACCESS_KEY";n.useEffect(()=>{const e=localStorage.getItem("detailsStateStockOutFiFo");Ce(e==="open")},[]);const Ie=e=>{try{let l=e.replace(/-/g,"+").replace(/_/g,"/");const c=l.length%4===0?"":"=".repeat(4-l.length%4);return l+c}catch{throw new Error("Invalid Base64 URL")}},ye=e=>{try{const l=Ie(e),q=ge.AES.decrypt(l,Ne).toString(ge.enc.Utf8);return JSON.parse(q)}catch{return d("/u/warehouse/material/stock-out-request"),null}},se=async e=>{try{Y(!0);const l=await mt(e);A((l==null?void 0:l.data)||[])}catch{A([])}finally{Y(!1)}};n.useEffect(()=>{if(h){const e=ye(h);e&&(M(e),se(e==null?void 0:e.OutReqSeq))}},[h]);const we=n.useCallback((e,l)=>{var O,u;const c=(O=e==null?void 0:e.LotNoFull)==null?void 0:O.trim().toLowerCase(),q=(u=e==null?void 0:e.Barcode)==null?void 0:u.trim().toLowerCase();v(K=>{if(!K.some(H=>{var J,Z;return((J=H.LotNoFull)==null?void 0:J.trim().toLowerCase())===c&&((Z=H.Barcode)==null?void 0:Z.trim().toLowerCase())===q})){const H=[...K,{OutReqSeq:e==null?void 0:e.OutReqSeq,OutReqItemSerl:e==null?void 0:e.OutReqItemSerl,WorkOrderSeq:e==null?void 0:e.WorkOrderSeq,WorkOrderSerl:e==null?void 0:e.WorkOrderSerl,FactUnit:e==null?void 0:e.FactUnit,FactUnitName:e==null?void 0:e.FactUnitName,InWHSeq:e==null?void 0:e.InWHSeq,InWHName:e==null?void 0:e.InWHName,OutWHSeq:e==null?void 0:e.OutWHSeq,OutWHName:e==null?void 0:e.OutWHName,ItemSeq:e==null?void 0:e.ItemSeq,UnitSeq:e==null?void 0:e.UnitSeq,ItemNo:e==null?void 0:e.ItemNo,LotNo:e==null?void 0:e.LotNo,Qty:e==null?void 0:e.Qty,DateCode:e==null?void 0:e.DateCode,ReelNo:e==null?void 0:e.ReelNo,Barcode:e==null?void 0:e.Barcode,StockOutDate:e==null?void 0:e.StockOutDate,LotNoFull:e==null?void 0:e.LotNoFull,ReqQty:e==null?void 0:e.ReqQty,EmpSeq:e==null?void 0:e.EmpSeq}];return l(),H}return K})},[]),ie=n.useCallback(e=>{const l=U.current,c=$.current;s.current.postMessage({type:"CHECK_BARCODE",barcode:e,tableData:l,tableScanHistory:c})},[]);n.useEffect(()=>{const e=O=>{if(O.key==="Enter"&&F.current.trim()){const u=F.current.trim();ie(u),T(u),F.current=""}else O.key.length===1&&(F.current+=O.key)},l=()=>y(!0),c=()=>y(!1),q=()=>y(!0);return window.addEventListener("keypress",e),window.addEventListener("focus",l),window.addEventListener("blur",c),document.addEventListener("click",q),()=>{window.removeEventListener("keypress",e),window.removeEventListener("focus",l),window.removeEventListener("blur",c),document.removeEventListener("click",q)}},[]);const oe=n.useCallback(Ke.debounce(async(e,l)=>{const c=await pt(e);if(c.success){const q=c.data[0];pe.success(l),j(null),D(!1),T(null),we(q,()=>{A(O=>O.map(u=>u.ItemNo===e.ItemNo?{...u,OutQty:u.OutQty+e.Qty,RemainQty:u.RemainQty-e.Qty}:u))})}else D(!0),g(c==null?void 0:c.message)},100),[]);n.useEffect(()=>(s.current=new Worker(new URL("/assets/workeStockOutFiFo-DVmTYmS-.js",import.meta.url)),s.current.onmessage=async e=>{const{success:l,message:c,data:q}=e.data;if(l){if(q){const{itemNo:O,qty:u,lot:K,dc:ue,reel:H,barcode:J,UnitSeq:Z,ItemSeq:ve,OutWHName:Me,OutWHSeq:Be,InWHName:Ae,InWHSeq:Ue,FactUnitName:$e,FactUnit:Le,WorkOrderSerl:He,WorkOrderSeq:Qe,OutReqItemSerl:_e,OutReqSeq:Pe}=q;oe({WorkingTag:"A",Idx_no:"1",Status:"0",DataSeq:"1",Selected:"1",OutReqSeq:Pe,OutReqItemSerl:_e,WorkOrderSeq:Qe,WorkOrderSerl:He,FactUnit:Le,FactUnitName:$e,InWHSeq:Ue,InWHName:Ae,OutWHSeq:Be,OutWHName:Me,ItemSeq:ve,UnitSeq:Z,ItemNo:O,LotNo:K,Qty:u,DateCode:ue,ReelNo:H,Barcode:J},c)}}else D(!0),g(c)},()=>{s.current.terminate(),oe.cancel()}),[C,oe]),n.useEffect(()=>{U.current=f,$.current=k},[f,k]);const De=e=>`
+          <DataBlock1>
+              <WorkingTag>A</WorkingTag>
+              <IDX_NO>1</IDX_NO>
+              <Status>0</Status>
+              <DataSeq>1</DataSeq>
+              <Selected>1</Selected>
+              <TABLE_NAME>DataBlock1</TABLE_NAME>
+              <IsChangedMst>1</IsChangedMst>
+              <FactUnit>${e.FactUnit}</FactUnit>
+              <Date>${e.StockOutDate}</Date>
+              <ServiceSeq>3032</ServiceSeq>
+              <MethodSeq>2</MethodSeq>
+              <DtlUnitSeq>1</DtlUnitSeq>
+          </DataBlock1>
+      `,Ee=(e,l)=>`
+  <DataBlock2>
+   <WorkingTag>A</WorkingTag>
+    <IDX_NO>${l+1}</IDX_NO>
+    <DataSeq>${l+1}</DataSeq>
+    <Status>0</Status>
+    <Selected>0</Selected>
+    <ItemSeq>${e.ItemSeq}</ItemSeq>
+    <FactUnit>${e.FactUnit}</FactUnit>
+    <TABLE_NAME>DataBlock2</TABLE_NAME>
+    <FactUnitOld>1</FactUnitOld>
+    <DateOld>${e.StockOutDate}</DateOld>
+    <ServiceSeq>3032</ServiceSeq>
+    <MethodSeq>2</MethodSeq>
+    <Date>${e.StockOutDate}</Date>
+  </DataBlock2>
+`,We=e=>`
+        <DataBlock1>
+            <WorkingTag>A</WorkingTag>
+    <IDX_NO>1</IDX_NO>
+    <Status>0</Status>
+    <DataSeq>1</DataSeq>
+    <Selected>1</Selected>
+    <TABLE_NAME>DataBlock1</TABLE_NAME>
+    <IsChangedMst>1</IsChangedMst>
+    <UseType>6044001</UseType>
+    <IsOutSide>0</IsOutSide>
+    <OutWHSeq />
+    <InWHSeq>${e.InWHSeq}</InWHSeq>
+    <MatOutSeq>0</MatOutSeq>
+    <FactUnit>${e.FactUnit}</FactUnit>
+    <MatOutNo />
+    <MatOutDate>${e.StockOutDate}</MatOutDate>
+    <EmpSeq>${e.EmpSeq}</EmpSeq>
+    <MatOutType />
+    <Remark />
+        </DataBlock1>
+    `,je=(e,l)=>`
+  <DataBlock3>
+   <WorkingTag>A</WorkingTag>
+     <IDX_NO>${l+1}</IDX_NO>
+    <DataSeq>${l+1}</DataSeq>
+    <Status>0</Status>
+    <Selected>0</Selected>
+    <ReqQty>${e.ReqQty}</ReqQty>
+    <Qty>${e.Qty}</Qty>
+    <StdUnitQty>0</StdUnitQty>
+    <Remark />
+    <ItemLotNo>${e.LotNoFull}</ItemLotNo>
+    <SerialNoFrom />
+    <MatOutSeq></MatOutSeq>
+    <OutItemSerl>0</OutItemSerl>
+    <ItemSeq>${e.ItemSeq}</ItemSeq>
+    <OutWHSeq>${e.OutWHSeq}</OutWHSeq>
+    <InWHSeq>${e.InWHSeq}</InWHSeq>
+    <UnitSeq>${e.UnitSeq}</UnitSeq>
+    <WorkOrderSeq>${e.WorkOrderSeq}</WorkOrderSeq>
+    <ConsgnmtCustSeq>0</ConsgnmtCustSeq>
+    <OutReqSeq>${e.OutReqSeq}</OutReqSeq>
+    <OutReqItemSerl>${e.OutReqItemSerl}</OutReqItemSerl>
+    <PJTSeq>0</PJTSeq>
+    <WBSSeq>0</WBSSeq>
+    <WorkOrderSerl>${e.WorkOrderSerl}</WorkOrderSerl>
+    <AlterRate>0</AlterRate>
+    <TABLE_NAME>DataBlock3</TABLE_NAME>
+  </DataBlock3>
+`,be=n.useCallback(async e=>{if(!qe)return;if(e.preventDefault(),I(!0),N(null),b(!0),Oe(!1),k.length===0){I(!1),D(!0),b(!1),N(null),g("Chưa có dữ liệu để gửi. Vui lòng quét dữ liệu trước khi gửi.");return}const l=De(k[0]),c=k.map(Ee).join(`
+`),q=We(k[0]),O=k.map(je).join(`
+`);try{const u=await kt(L,C==null?void 0:C.OutReqSeq,k,{xmlSCOMCloseCheckWEB:l,xmlSCOMCloseItemCheckWEB:c,xmlSPDMMOutProcCheckWEB:q,xmlSPDMMOutProcItemCheckWEB:O});N(u),u.success?(d("/u/warehouse/material/stock-out-request"),b(!1),E(!0),X("Tất cả các dữ liệu đã được thực thi thành công!"),ce(),v([])):(b(!1),D(!0),g(u.message))}catch(u){b(!1),N({error:u.message}),D(!0),g(u.message)}finally{I(!1)}},[C,k]),ce=n.useCallback(async e=>{if(k.length===0){D(!0),g("Không có dữ liệu để reset! Vui lòng quét dữ liệu trước.");return}v([]),se(f==null?void 0:f.OutReqSeq),pe.success("Reset form thành công!")},[C,k]),Te=()=>{const e=x.rows.items;let l=[];return e.forEach(c=>{const q=c[0],O=c[1]-1;for(let u=q;u<=O;u++)l.push(u)}),l},Fe=n.useCallback(async e=>{e.preventDefault();const l=Te();if(l.length===0){D(!0),g("Vui lòng chọn ít nhất một hàng để xóa.");return}if(k.length===0){D(!0),g("Không có dữ liệu nào để xóa.");return}const c=k.filter((q,O)=>!l.includes(O));v(c)},[k,x]);return t.jsxs(t.Fragment,{children:[t.jsx(Ve,{children:t.jsxs("title",{children:["ITM - ",m("Stock Out Request")]})}),t.jsxs("div",{className:"bg-slate-50 p-3 h-screen overflow-hidden",children:[t.jsxs("div",{className:"flex flex-col gap-4 md:grid md:grid-cols-4 md:grid-rows-[auto_1fr] md:gap-4 h-full",children:[t.jsxs("div",{className:"col-start-1 col-end-5 row-start-1 w-full rounded-lg ",children:[t.jsxs("div",{className:"flex items-center justify-between mb-2",children:[t.jsx(St,{level:4,className:"mt-2 uppercase opacity-85 ",children:m("Stock Out FIFO")}),t.jsx(at,{status:z,handleSubmit:be,handleRestFrom:ce,handleDelete:Fe})]}),t.jsxs("details",{className:"group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white",open:!0,children:[t.jsxs("summary",{className:"flex cursor-pointer items-center justify-between gap-1.5 text-gray-900",children:[t.jsxs("h2",{className:"text-xs font-medium flex items-center gap-2 text-blue-600 uppercase",children:[t.jsx(lt,{}),m("Giá trị")]}),t.jsx("span",{className:"relative size-5 shrink-0",children:t.jsx(Re,{})})]}),t.jsx("div",{className:"flex p-2 gap-4",children:t.jsx(st,{filteredData:C,handleCheckBarcode:ie,inputBarCode:Q,setInputBarCode:j,setCheckValueIsStop:ne})})]})]}),t.jsx("div",{className:"col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg",children:t.jsx(ut,{sampleTableA:f,sampleTableB:k,setSelection:V,selection:x})})]}),t.jsx(rt,{modal2Open:_,setModal2Open:D,error:i}),t.jsx(nt,{setModal4Open:b,modal4Open:P}),t.jsx(ot,{setModal5Open:E,modal5Open:r,successMessage:W})]})]})}export{bt as default};

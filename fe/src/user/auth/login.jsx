@@ -11,11 +11,8 @@ import BgCarousel from '../components/carousel/bgCarousel'
 import { ChangePassword } from '../../features/auth/changePassword'
 import Logo from '../../assets/ItmLogo.png'
 const { Title, Text } = Typography
-const languages = [
-  { key: 'vi', label: 'Tiếng Việt' },
-  { key: 'en', label: 'English' },
-  { key: 'ko', label: '한국어' },
-]
+import { saveLanguageData } from '../../IndexedDB/saveLanguageData'
+
 export default function Login({ fetchPermissions, processRolesMenu }) {
   const navigate = useNavigate()
   const { t } = useTranslation()
@@ -45,7 +42,14 @@ export default function Login({ fetchPermissions, processRolesMenu }) {
       if (response.success) {
         localStorage.setItem('userInfo', JSON.stringify(response.data.user))
         localStorage.setItem('roles_menu', response.data.tokenRolesUserMenu)
+        localStorage.setItem('language_user', JSON.stringify(response.data.typeLanguage));
+
         Cookies.set('a_a', response.data.token)
+        saveLanguageData({
+          typeLanguage: response.data.typeLanguage,
+          languageData: response.data.languageData
+        });
+
         processRolesMenu()
         navigate('/u/home')
       } else {

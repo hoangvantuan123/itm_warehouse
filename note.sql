@@ -27,5 +27,4 @@ masterCheckResult [
     FactUnitName: null,
     Consignee: null,
     SupplyContCustName: null
-  }
-]
+  

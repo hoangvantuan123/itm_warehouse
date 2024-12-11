@@ -5,6 +5,7 @@ import '@glideapps/glide-data-grid/dist/index.css'
 import { useNavigate } from 'react-router-dom'
 import { CompactSelection } from '@glideapps/glide-data-grid'
 import { TableOutlined } from '@ant-design/icons'
+import { useTranslation } from 'react-i18next'
 const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
@@ -18,14 +19,14 @@ function TableDeliveryList({
   const [showSearch, setShowSearch] = useState(false)
   const ref = (useRef < data) | (null > null)
   const onSearchClose = useCallback(() => setShowSearch(false), [])
-
+  const { t } = useTranslation()
   const [selection, setSelection] = useState({
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
   })
   const columns = useMemo(
     () => [
-      { title: 'DelvNo' },
+      { title: t('4179') },
       { title: 'DelvMngNo' },
       { title: 'ImpType' },
       { title: 'TotalQty' },

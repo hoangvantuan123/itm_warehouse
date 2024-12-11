@@ -9,6 +9,7 @@ import { sqlServerITMV20240117 } from './config/database.config';
 import { APP_FILTER } from '@nestjs/core';
 import { AuthsModule } from './modules/auth/module/auths.module';
 import { RolesUsersModule } from './modules/rolesGuard/module/rolesUsers.module';
+import { LanguageModule } from './modules/language/module/language.module';
 
 @Module({
   imports: [
@@ -29,6 +30,8 @@ import { RolesUsersModule } from './modules/rolesGuard/module/rolesUsers.module'
   }],
   controllers: [HealthController],
 })
+
+
 export class AppModule implements OnModuleInit {
   constructor(
     @InjectConnection('ITMV20240117') private readonly connection2: Connection,
