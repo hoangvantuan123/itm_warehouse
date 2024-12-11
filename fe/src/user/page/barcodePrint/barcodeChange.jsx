@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import BarcodeChangeAction from '../../components/actions/barcodePrint/barcodeChangAction';
 import TabelBarcodeChange from '../../components/table/barcodePrint/tableBarcodeChange';
-import { createChangeBarcode, isExistBarcode, searchPage } from '../../../features/barcode/barcodeChangeService';
+import { createChangeBarcode, getPrinterDevice, isExistBarcode, searchPage } from '../../../features/barcode/barcodeChangeService';
 import { use } from 'react';
 import { BARCODE_ERR_MESSAGE, BARCODE_SUCCESS_MESSAGE, ERROR_MESSAGES } from '../../../utils/constants';
 
@@ -30,7 +30,7 @@ export default function BarcodeChange({ permissions, isMobile }) {
     const [formChange] = Form.useForm();
 
     const [oldQty, setOldQty] = useState();
-    const [NewQty, setNewQty] = useState('');
+    const [NewQty, setNewQty] = useState();
     const [changeQty, setChangeQty] = useState('');
 
     const [BarcodeID, setBarcodeID] = useState('');
@@ -41,8 +41,10 @@ export default function BarcodeChange({ permissions, isMobile }) {
     const [NewBarcodeID, setNewBarCodeId] = useState('');
     const [Remark, setRemark] = useState('');
     const [UserID, setUserID] = useState('');
+    const [device, setDevice] = useState('');
     const changeQtyRef = useRef(null);
     const remarkRef = useRef(null);
+    const [optionDevices, setOptionDevices] = useState([]);
 
     const getMultiSelectedRows = () => {
         const selectedRows = selectRow.rows.items;
@@ -77,8 +79,6 @@ export default function BarcodeChange({ permissions, isMobile }) {
 
         return () => unsubscribe;
     }, [formChange]);
-
-
 
     const listSelect = useCallback(
 
@@ -123,7 +123,6 @@ export default function BarcodeChange({ permissions, isMobile }) {
 
     const onChangeBarcode = async (e) => {
         const inputValue = e.target.value;
-        setBarcodeID(inputValue);
 
         if (!inputValue.includes('/')) {
             message.warning(BARCODE_ERR_MESSAGE.INVALID_BARCODE_FORMAT);
@@ -136,13 +135,8 @@ export default function BarcodeChange({ permissions, isMobile }) {
             return;
         }
 
-        setItemNo(arrLot[0]);
-        setLotNo(arrLot[1]);
-        setOldQty(arrLot[2]);
-        setDateCode(arrLot[3]);
-        setReelNo(arrLot[4]);
-
         const param = {
+            barcodeID: inputValue,
             itemNo: arrLot[0],
             lotNo: arrLot[1] + '/' + arrLot[3] + '/' + arrLot[4],
         }
@@ -152,11 +146,16 @@ export default function BarcodeChange({ permissions, isMobile }) {
                 param
             );
 
-            console.log(result.result.length)
-            if (result.result.length == 0) {
-                message.info(BARCODE_ERR_MESSAGE.BARCODEID_NOT_EXISTS);
+            if (!result.status) {
+                message.error(result.message +': '+ result.data);
             } else {
-                formChange.setFieldsValue({ preQty: arrLot[2] });
+                setBarcodeID(inputValue);
+                setItemNo(arrLot[0]);
+                setLotNo(arrLot[1]);
+                setOldQty(Number(arrLot[2]));
+                setDateCode(arrLot[3]);
+                setReelNo(arrLot[4]);
+                formChange.setFieldsValue({ preQty: oldQty });
                 changeQtyRef.current.focus();
             }
         } catch (err) {
@@ -165,14 +164,6 @@ export default function BarcodeChange({ permissions, isMobile }) {
 
 
     };
-
-    const onChangeQty = (e) => {
-        const changeQty = e.target.value;
-        const newQty = oldQty - changeQty;
-        setNewQty(newQty);
-        formChange.setFieldsValue({ qty: newQty });
-        setNewBarCodeId(ItemNo + "/" + LotNo + "/" + newQty + "/" + DateCode + "/" + ReelNo)
-    }
 
     const onChangeNewQty = (e) => {
 
@@ -185,14 +176,15 @@ export default function BarcodeChange({ permissions, isMobile }) {
         const validBody = (body) => {
             if (!body.ItemNo.includes('/')) {
                 message.warning(BARCODE_ERR_MESSAGE.INVALID_BARCODE_FORMAT);
-                return ;
+                return;
             }
         }
 
         const listSelected = getMultiSelectedRows();
-        const createPayload = (isConfirm, rows) => ({
+        const createPayload = (isConfirm, rows, device) => ({
             isConfirm,
             listSelected: rows,
+            device: device,
         });
 
         const handleCreateChangeBarcode = async (body) => {
@@ -211,7 +203,7 @@ export default function BarcodeChange({ permissions, isMobile }) {
         };
 
         if (listSelected.length >= 1) {
-            const body = createPayload(false, listSelected);
+            const body = createPayload(false, listSelected, device);
             const isSucces = await handleCreateChangeBarcode(body);
             if (isSucces) {
                 message.info(BARCODE_SUCCESS_MESSAGE.PRINTER_SUCCESS);
@@ -236,12 +228,13 @@ export default function BarcodeChange({ permissions, isMobile }) {
                 NewStatus: '',
             };
 
-            const body = createPayload(true, [singleRow]);
+            const body = createPayload(true, [singleRow], device);
             const isSucces = await handleCreateChangeBarcode(body);
-            resetAllData();
+
             if (isSucces) {
                 message.info(BARCODE_SUCCESS_MESSAGE.PRINTER_SUCCESS);
                 setIsModalVisible(true);
+                resetAllData();
                 return;
             }
             else {
@@ -259,11 +252,64 @@ export default function BarcodeChange({ permissions, isMobile }) {
     };
 
     const onKeyDownChangeQty = (e) => {
-        if (e.key === 'Enter') {
-            onChangeQty(e);
+        const value = Number(e.target.value);
+        console.log("NewQty", NewQty)
+        if (value > oldQty) {
+            message.error(BARCODE_ERR_MESSAGE.NOT_LANGER_THAN_PRE_QTY);
+            setNewQty(null);
+            formChange.setFieldsValue({ qty: 0 });
+            setNewBarCodeId(null);
+            return;
+        }
+
+        if (e.key == 'Enter') {
+
+            const newQty = oldQty - value;
+            setNewQty(newQty);
+            formChange.setFieldsValue({ qty: newQty });
+            setNewBarCodeId(ItemNo + "/" + LotNo + "/" + newQty + "/" + DateCode + "/" + ReelNo);
             remarkRef.current.focus();
         }
     };
+
+    const onDropDownChange = (e) => {
+
+        const getDeviceOptions = async (body) => {
+            try {
+                const result = await getPrinterDevice(body);
+                if (result?.result) {
+                    const data = result.result;
+
+
+                    const formattedOptions = data.map((item) => ({
+                        label: item.ip,
+                        value: `${item.ip}:${item.port}`,
+                        key: item.userid,
+                    }));
+
+                    setOptionDevices([...formattedOptions]);
+
+                }
+                else {
+                    message.error(BARCODE_ERR_MESSAGE.NO_DATA_PRINTER);
+                    return;
+                }
+            } catch (err) {
+                console.error('Error creating barcode change:', err);
+                message.error(BARCODE_ERR_MESSAGE.NO_DATA_PRINTER);
+            }
+        };
+
+        if (e) {
+            getDeviceOptions();
+        }
+
+    }
+
+    const handleOnchangeDevice = (e) => {
+        setDevice(e.value);
+
+    }
 
     const resetAllData = () => {
         setItemNo('');
@@ -276,6 +322,7 @@ export default function BarcodeChange({ permissions, isMobile }) {
         setNewBarCodeId('');
         setRemark('');
         setUserID('');
+        setDevice('');
     }
 
     return (
@@ -308,7 +355,10 @@ export default function BarcodeChange({ permissions, isMobile }) {
                         newQty={NewBarcodeID}
                         setRemark={setRemark}
                         setUserId={setUserID}
+                        onDropDownChange={onDropDownChange}
+                        optionDevices={optionDevices}
                         clickedRowData={clickedRowData}
+                        handleOnchangeDevice={handleOnchangeDevice}
 
                     />
                 </Header>

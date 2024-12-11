@@ -106,6 +106,7 @@ export const searchPage = async (
         throw new Error(errorMessage)
       })
   }
+  
 
   export const checkConfirmBarcode = async (requestData) => {
   
@@ -190,6 +191,32 @@ export const searchPage = async (
     return axios
       .post(
         `${HOST_API_SERVER_3}/barcode-change/exist-barcode`,
+        requestData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+      .then((response) => {
+        if (response.status === 200 || response.status === 201) {
+          return response.data
+        }
+        throw new Error('Error from API: ' + response.data.message)
+      })
+      .catch((error) => {
+        const errorMessage = error.response
+          ? error.response.data.message || 'Error from API'
+          : 'Unknown error occurred'
+        throw new Error(errorMessage)
+      })
+  }
+
+  export const getPrinterDevice = async (requestData) => {
+  
+    return axios
+      .get(
+        `${HOST_API_SERVER_3}/barcode-change/device-printer`,
         requestData,
         {
           headers: {

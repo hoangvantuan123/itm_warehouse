@@ -28,7 +28,10 @@ export default function BarcodeChangeAction({
     newQty,
     setRemark,
     setUserId,
+    onDropDownChange,
+    optionDevices,
     clickedRowData,
+    handleOnchangeDevice,
 
 }) {
     const [form] = Form.useForm();
@@ -44,27 +47,11 @@ export default function BarcodeChangeAction({
     form.setFieldsValue({ fromDate: fromDate });
     const oldBarcodeRef = useRef(null);
     const newBarcodeRef = useRef(null);
-
+    const userIdModalRef = useRef(null);
     const userIDRef = useRef(null);
     const [modal2Open, setModal2Open] = useState(false);
     const [error, setError] = useState('');
 
-    const [newLabel, setNewLabel] = useState({
-
-        VENDOR: '',
-        PARTNO: '',
-        ITEMCD: '',
-        LOTTOTALCNT: Number(0),
-        LOTNO: '',
-        QTY: Number(0),
-        DATECODE: Number(),
-        REELNO: '',
-        USER_ID: '',
-        REMARK: '',
-        ISSUENO: '',
-        LOTID: ''
-
-    });
 
     const onFormLayoutChange = ({ layout }) => {
     };
@@ -242,6 +229,7 @@ export default function BarcodeChangeAction({
 
                     if (!isDuplicate) {
                         setData([...data, newRow]);
+                        userIdModalRef.current.focus();
                     } else {
                         message.info(BARCODE_ERR_MESSAGE.DUPLICATE_ROW);
                     }
@@ -266,17 +254,25 @@ export default function BarcodeChangeAction({
             const result = await confirmBarcode(
                 body
             );
-            resetValueModal();
+
             setIsModalVisible(false);
+
+            console.log("result", result);
             if (result.status) {
-                message.info(BARCODE_SUCCESS_MESSAGE.BARCODE_CONFIRM_SUCCESS);
+                setModal2Open(true);
+                setError(BARCODE_SUCCESS_MESSAGE.BARCODE_CONFIRM_SUCCESS);
+                resetValueModal();
             } else {
-                message.info(BARCODE_ERR_MESSAGE.BARCODE_NOT_CONFIRM);
+                setError(BARCODE_ERR_MESSAGE.BARCODE_NOT_CONFIRM);
+                setModal2Open(true);
+                resetValueModal();
             }
 
         } catch (err) {
             message.error(err);
             resetValueModal();
+            setError(err);
+            setModal2Open(true);
             setIsModalVisible(false);
         }
     }
@@ -478,6 +474,24 @@ export default function BarcodeChangeAction({
                             </Form.Item>
                         </Form.Item>
 
+
+                        <Form.Item label="Device Printer" name="device">
+                            <Select
+                                labelInValue
+                                id="typeSelect"
+                                defaultValue=""
+                                size="small"
+                                style={{
+                                    width: 150,
+                                }}
+                                allowClear
+                                options={optionDevices}
+                                onDropdownVisibleChange={onDropDownChange}
+                                onChange={handleOnchangeDevice}
+                            />
+                        </Form.Item>
+
+
                     </Form>
 
                 </Card>
@@ -486,7 +500,9 @@ export default function BarcodeChangeAction({
                     title="Print Label Confirmation"
                     visible={isModalVisible}
                     onOk={handleBtnConfirm}
-                    onCancel={handleCancel}
+                    // onCancel={handleCancel}
+                    maskClosable={false}
+                    closable={false}
                     width={800}
                 >
 
@@ -523,7 +539,7 @@ export default function BarcodeChangeAction({
                         </Form.Item>
 
                         <Form.Item label="User ID" name="userid">
-                            <Input size="small" style={{ width: 100 }} />
+                            <Input size="small" style={{ width: 100 }} ref={userIdModalRef} />
                         </Form.Item>
 
                         <Form.Item label="Status" name="status">

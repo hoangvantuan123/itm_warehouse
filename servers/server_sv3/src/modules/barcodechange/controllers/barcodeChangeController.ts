@@ -86,10 +86,10 @@ export class BarcodeChangeController {
     @Post('confirm')
     async confirmBarcode(
         @Body() dataBarcode: any[]
-    ) {
+    ): Promise<any> {
         try {
             const result = await this.barcodeChangeService.confirmBarcode(dataBarcode);
-            return { result };
+            return result ;  
         } catch (error) {
             return {
                 status: false,
@@ -105,7 +105,7 @@ export class BarcodeChangeController {
     ) {
         try {
             const result = await this.barcodeChangeService.isExistBarcode(dataBarcode);
-            return { result };
+            return result;
         } catch (error) {
             return {
                 status: false,

@@ -49,5 +49,13 @@ export const SUCCESS_MESSAGES = {
 };
 
 export const BARCODE_SUCCESS_MESSAGES = {
-  BARCODE_CONFIRM_SUCCESSFULL: 'Barcode confirm successfull', 
+  BARCODE_CONFIRM_SUCCESSFULL: 'Barcode confirm successfull',
+  BARCODE_VERIFY_SUCCESFULL: 'Barcode verify successfull.', 
+};
+
+
+export const BARCODE_ERR_MESSAGES = {
+  IP_OR_PORT_IS_NULL: 'IP or PORT is null.',
+  BARCODE_ID_NOT_EXIST: 'Barcode ID is not exist',
+  BARCODE_ID_HAS_ALREADY_CHANGE: 'Barcode has already change.'
 };

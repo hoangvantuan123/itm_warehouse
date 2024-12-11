@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { ERROR_MESSAGES, SUCCESS_MESSAGES } from 'src/common/utils/constants';
+import { Injectable, Logger } from '@nestjs/common';
+import { BARCODE_ERR_MESSAGES, BARCODE_SUCCESS_MESSAGES, ERROR_MESSAGES, SUCCESS_MESSAGES } from 'src/common/utils/constants';
 
 import * as net from 'net';
 import { error, info, log } from 'console';
@@ -10,8 +10,11 @@ import { BarcodeChange } from '../models/baseDto';
 @Injectable()
 export class BarcodeChangeService {
     constructor(
-        private readonly databaseService: DatabaseService
+        private readonly databaseService: DatabaseService,
+    
     ) { }
+
+    private readonly logger = new Logger(BarcodeChangeService.name, { timestamp: true })
 
     async searchBy(
         dateFr: string,
@@ -55,6 +58,7 @@ export class BarcodeChangeService {
               @pItemNo = N'${matID}',
               @pLotNo = N'${lotNo}'
         `.trim();
+        this.logger.log('Search', query);
         const result = await this.databaseService.executeQuery(
             query
         );
@@ -68,14 +72,17 @@ export class BarcodeChangeService {
         const listDataLabel = [];
         listDataLabel.push(...barcodeDto.listSelected)
 
-        const userID = barcodeDto.listSelected[0].UserID;
-
         const dataCode = [];
 
-        const query = ` SELECT ip, port FROM Printer WHERE (1=1) AND userId like '${userID}'`.trim();
-        const result = await this.databaseService.executeQuery(
-            query
-        );
+        if (!barcodeDto?.device) {
+            return {
+                status: false,
+                message: BARCODE_ERR_MESSAGES.IP_OR_PORT_IS_NULL,
+            }
+        }
+        const device = barcodeDto.device.split(':');
+        const ip = device[0] || '';
+        const port = device[1] || 0;
 
         const qTemplateLabel = ` SELECT label, value FROM tbl_zplcode WHERE (1=1) AND label LIKE 'barcode-change'`.trim();
         const rTemplateLabel = await this.databaseService.executeQuery(
@@ -103,29 +110,28 @@ export class BarcodeChangeService {
                 const client = new net.Socket();
 
                 const printResult = await new Promise((resolve, reject) => {
-                    client.connect(result[0].port, result[0].ip, () => {
+                    client.connect(port, ip, () => {
                         client.write(zpl);
                         client.end();
                         resolve(true);
-                        log("Print succesfull", zpl);
+                        this.logger.log('Print label succesfull', zpl);
                     });
 
                     client.on('error', (err) => {
-                        error('Error connecting to printer:', err);
+                        this.logger.error('Error connecting to printer:', err)
                         reject(err);
                         return {
                             status: false,
                             message: err,
-                            data: dataCode
                         }
                     });
                 });
 
                 if (barcodeDto.isConfirm && data.NewStatus == '' && printResult == true) {
                     try {
-                        const execChangeBarcode = await this.createBarcodeChange(barcodeDto.listSelected[0]);
+                         await this.createBarcodeChange(barcodeDto.listSelected[0]);
                     } catch (err) {
-                        error('Error execute query: ', err);
+                        this.logger.error('Error execute query: ', err);
                     }
                 }
 
@@ -134,9 +140,8 @@ export class BarcodeChangeService {
                 return {
                     status: false,
                     message: err,
-                    data: dataCode
                 }
-            } 
+            }
         }
 
         return {
@@ -163,6 +168,7 @@ export class BarcodeChangeService {
               @pUserID = N'${barcodeChangeDto.UserID}'
 
         `.trim();
+        this.logger.log('CREATE BARCODE', query)
         const result = await this.databaseService.executeQuery(
             query
         );
@@ -203,19 +209,34 @@ export class BarcodeChangeService {
         }
     }
 
-    async confirmBarcode(dataBarcode: any[]) {
+    async confirmBarcode(dataBarcode: any[]) : Promise<any> {
+        const res = [];
 
         for (const data of dataBarcode) {
             const query = ` EXEC ITM_SBarcodeUpdate 
             @pBarcode = '${data.oldBarcode}',
             @pNewBarcode = '${data.newBarcode}',
-            @pStatus = N'${data.isconfirm}'   
-      `.trim();
-            const result = await this.databaseService.executeQuery(
-                query
-            );
-            return result;
+            @pStatus = N'${data.isconfirm}' `.trim();
+
+            try {
+                await this.databaseService.executeQuery(
+                    query
+                );
+                this.logger.log('Confirm barcode', query);  
+            } catch (error) {
+                return {
+                    status: false,
+                    message: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+                    data: null,
+                };
+            }
         }
+
+        return {
+            status: true,
+            message: BARCODE_SUCCESS_MESSAGES.BARCODE_CONFIRM_SUCCESSFULL,
+            data: res,
+        };
     };
 
     async checkConfirmNewBarcode(barcode: any): Promise<any> {
@@ -226,6 +247,7 @@ export class BarcodeChangeService {
                @pBarcode = '${barcode.oldBarcode}',
                @pNewBarcode = '${barcode.newBarcode}'
          `.trim();
+         this.logger.log('Check new barcode', query);
         const result = await this.databaseService.executeQuery(
             query
         );
@@ -242,11 +264,47 @@ export class BarcodeChangeService {
         const result = await this.databaseService.executeQuery(
             query
         );
-        return result;
+        this.logger.log('Check is exist barcode', query);
+
+        const qDuplicate = ` SELECT 
+                                COUNT(*) AS cBarcode
+                            FROM _TPDBarcodeConfirm 
+                            WHERE (1=1) 
+                                AND BarcodeID LIKE '${barcode.barcodeID}' 
+                                AND NewStatus LIKE 'OK'; `;
+
+        this.logger.log('Check Duplicate', qDuplicate);
+        const rDuplicate = await this.databaseService.executeQuery(
+            qDuplicate
+        );
+
+        if(!result){
+            return {
+                status: false,
+                message: BARCODE_ERR_MESSAGES.BARCODE_ID_NOT_EXIST,
+                data: barcode.barcodeID,
+            }
+        }
+
+        console.log(rDuplicate[0].cBarcode)
+
+        if (rDuplicate[0].cBarcode > 0){
+            return {
+                status: false,
+                message: BARCODE_ERR_MESSAGES.BARCODE_ID_HAS_ALREADY_CHANGE,
+                data: barcode.barcodeID,
+            }
+        }
+
+        return {
+            status: true,
+            message: BARCODE_SUCCESS_MESSAGES.BARCODE_VERIFY_SUCCESFULL,
+            data: barcode.barcodeID,
+        }
     };
 
-    async getPrinter(name: any): Promise<any []> {
-        const query = ` SELECT ip, port FROM Printer WHERE (1=1) `.trim();
+    async getPrinter(name: any): Promise<any[]> {
+        const query = ` SELECT userid, ip, port FROM Printer WHERE (1=1) `.trim();
         const result = await this.databaseService.executeQuery(
             query
         );

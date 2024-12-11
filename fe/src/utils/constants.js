@@ -52,6 +52,8 @@ export const BARCODE_ERR_MESSAGE = {
 
   BARCODE_NOT_NULL: 'Barcode not null.',
   QTY_NOT_NULL: 'Change QTY not null.',
+  NO_DATA_PRINTER: 'No data printer.',
+  NOT_LANGER_THAN_PRE_QTY: 'Not Langer Than Pre Qty.',
   
 
 }
