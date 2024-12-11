@@ -162,6 +162,7 @@ export default function BarcodeChangeAction({
 
                 if (result.result[0] != null) {
                     setNewBarcode(result.result[0].NewBarcodeID);
+                    message.info(BARCODE_SUCCESS_MESSAGE.CHECK_OLD_BARCODE_OK)
                 } else {
                     setError(BARCODE_ERR_MESSAGE.BARCODEID_NOT_EXISTS);
                     setModal2Open(true);
@@ -500,7 +501,6 @@ export default function BarcodeChangeAction({
                     title="Print Label Confirmation"
                     visible={isModalVisible}
                     onOk={handleBtnConfirm}
-                    // onCancel={handleCancel}
                     maskClosable={false}
                     closable={false}
                     width={800}

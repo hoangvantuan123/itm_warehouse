@@ -62,5 +62,6 @@ export const BARCODE_ERR_MESSAGE = {
 export const BARCODE_SUCCESS_MESSAGE = {
   BARCODE_CONFIRM_SUCCESS: 'Barcode Confirm Succesfull.',
   PRINTER_SUCCESS: 'Printer Successfull.',
+  CHECK_OLD_BARCODE_OK: 'Check Old Barcode: OK',
 
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from 'src/common/utils/constants';
 
 import * as net from 'net';
@@ -14,6 +14,7 @@ export class PrintBarcodeService {
         private readonly databaseService: DatabaseService
     ) { }
 
+    private readonly logger = new Logger(PrintBarcodeService.name, { timestamp: true })
     async getPaginatedData(
         matID: string,
         lotNo: string,
@@ -36,9 +37,12 @@ export class PrintBarcodeService {
         let query = ` SELECT PLANT, TRAN_CODE, TRAN_SEQ, TRAN_TYPE, VENDOR, ITEMCD, LOTNO, QTY, DATECODE, REELNO, DATETIME, LOT_ID, USER_ID   FROM EWIPRMTBCI WHERE (1=1) `;
         query += await this.genWhereClause(matID, lotNo, vendor, dateFr, dateTo);
         query += ` ORDER BY DATETIME DESC `;
+
+        this.logger.log('SEARCH PAGE', query);
         const result = await this.databaseService.executeQuery(
             query
         );
+
         return result;
     }
 

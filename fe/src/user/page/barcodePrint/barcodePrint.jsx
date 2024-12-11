@@ -17,8 +17,8 @@ export default function BarcodePrint({ permissions, isMobile }) {
     const { t } = useTranslation();
     const [dataInfo, setDataInfo] = useState([]);
     const [rowChecked, setRowChecked] = useState(null);
-    const [fromDate, setFromDate] = useState(dayjs().startOf('month'))
-    const [toDate, setToDate] = useState(dayjs().startOf('month'))
+    const [fromDate, setFromDate] = useState(dayjs().startOf('week'))
+    const [toDate, setToDate] = useState(dayjs().startOf('week'))
     const formatDate = useCallback((date) => date.format('YYYYMMDDHHmmss'), [])
 
     const [vendor, setVendor] = useState('')
@@ -33,13 +33,21 @@ export default function BarcodePrint({ permissions, isMobile }) {
         setData(varData);
     };
 
-    const fetchItemList = useCallback(async () => {
+    const fetchItemList = useCallback(async (e) => {
+        setData([]);
+        const {
+            fromDate,
+            toDate,
+            vendor,
+            matID,
+            lotNo,
+        } = e;
         setLoading(true)
         try {
             const itemList = await GetPageItem(
                 formatDate(fromDate),
                 formatDate(toDate),
-                vendor,
+                vendor.value,
                 matID,
                 lotNo,
             );
@@ -49,23 +57,15 @@ export default function BarcodePrint({ permissions, isMobile }) {
         } finally {
             setLoading(false)
         }
-    }, [fromDate, toDate, vendor, matID, lotNo])
+    }, [])
 
-    const debouncedFetchItemData = useMemo(
-        () => debounce(fetchItemList, 300),
-        [fetchItemList],
-    )
+    const onFinish = async (e) => {
+        fetchItemList(e);
+    }
 
     useEffect(() => {
-        debouncedFetchItemData()
-        return () => {
-            debouncedFetchItemData.cancel()
-        }
-    }, [debouncedFetchItemData])
+    }, [])
 
-    const btnSearch = () => {
-        debouncedFetchItemData();
-    }
 
 
     const getMultiSelectedRows = () => {
@@ -82,11 +82,9 @@ export default function BarcodePrint({ permissions, isMobile }) {
                 setDataInfo(data[i]);
             }
         });
-        
+
         return rows;
     };
-
-
 
     const handleBtnPrinter = useCallback(
 
@@ -105,6 +103,11 @@ export default function BarcodePrint({ permissions, isMobile }) {
 
     );
 
+    const onChangeVendor = (value) => {
+        console.log("value.value",value.value )
+        setVendor(value.value)
+    };
+
     return (
         <Layout className="h-screen bg-slate-50">
             <Helmet>
@@ -119,21 +122,20 @@ export default function BarcodePrint({ permissions, isMobile }) {
 
                     <BarcodePrintAction
                         fromDate={fromDate}
-                        setFromDate={setFromDate}
                         toDate={toDate}
-                        setToDate={setToDate}
+
+                        onFinish={onFinish}
+                        onChangeVendor= {onChangeVendor}
                         vendor={vendor}
-                        setVendor={setVendor}
                         matID={matID}
                         setMatID={setMatID}
                         lotNo={lotNo}
                         setLotNo={setLotNo}
                         dataSearch={onHandleData}
-                        btnSearch={btnSearch}
                         dataInfo={dataInfo}
                         btnPrinter={handleBtnPrinter}
                         rowSelects={rowChecked}
-                        setRowChecked= {setRowChecked}
+                        setRowChecked={setRowChecked}
                     />
                 </Header>
 
