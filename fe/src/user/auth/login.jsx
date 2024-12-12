@@ -11,9 +11,8 @@ import BgCarousel from '../components/carousel/bgCarousel'
 import { ChangePassword } from '../../features/auth/changePassword'
 import Logo from '../../assets/ItmLogo.png'
 const { Title, Text } = Typography
-import { saveLanguageData } from '../../IndexedDB/saveLanguageData'
 
-export default function Login({ fetchPermissions, processRolesMenu }) {
+export default function Login({ fetchPermissions, processRolesMenu, setKeyLanguage }) {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const [form] = Form.useForm()
@@ -43,12 +42,8 @@ export default function Login({ fetchPermissions, processRolesMenu }) {
         localStorage.setItem('userInfo', JSON.stringify(response.data.user))
         localStorage.setItem('roles_menu', response.data.tokenRolesUserMenu)
         localStorage.setItem('language_user', JSON.stringify(response.data.typeLanguage));
-
+        setKeyLanguage(response.data.typeLanguage)
         Cookies.set('a_a', response.data.token)
-        saveLanguageData({
-          typeLanguage: response.data.typeLanguage,
-          languageData: response.data.languageData
-        });
 
         processRolesMenu()
         navigate('/u/home')

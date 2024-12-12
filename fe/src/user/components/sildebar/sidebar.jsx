@@ -23,7 +23,7 @@ import {
   FolderOpenOutlined,
   FolderOutlined
 } from '@ant-design/icons'
-
+import { deleteDatabase } from '../../../IndexedDB/deleteIndexDB'
 import { SettingIcon, FileMenuIcon, LogoutIcon } from './icon'
 import { iconMapping } from './dataMenu'
 import Cookies from 'js-cookie'
@@ -144,6 +144,7 @@ const Sidebar = ({ permissions, rootMenu, menuTransForm }) => {
     localStorage.removeItem('userInfo')
     localStorage.removeItem('rolesMenu')
     navigate('/u/login')
+    deleteDatabase()
   }, [])
 
   const shortcutMenu = (

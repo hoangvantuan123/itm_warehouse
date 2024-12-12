@@ -1,4 +1,5 @@
-import { HOST_API_SERVER_2 } from '../../services'
+import { HOST_API_SERVER_2 } from '../../services';
+import { saveLanguageData } from '../../IndexedDB/saveLanguageData';
 
 export const LoginAuth = async ({ login, password }) => {
   try {
@@ -12,12 +13,23 @@ export const LoginAuth = async ({ login, password }) => {
         password,
       }),
       credentials: 'same-origin',
-    })
+    });
 
-    const data = await response.json()
+    const data = await response.json();
 
-    return data
+    if (data.success) {
+      const saveSuccess = await saveLanguageData({
+        typeLanguage: data.data.typeLanguage,
+        languageData: data.data.languageData,
+      });
+
+      if (!saveSuccess) {
+        throw new Error('Failed to save language data.'); 
+      }
+    }
+
+    return data;
   } catch (error) {
-    throw new Error(error.message)
+    throw new Error(error.message);
   }
-}
+};

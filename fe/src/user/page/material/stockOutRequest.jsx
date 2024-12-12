@@ -145,7 +145,6 @@ export default function StockOutRequest({ permissions, isMobile }) {
 
       const response = await SPDMMOutReqListQueryWeb(formA);
       if (response?.success) {
-        message.success('Tải dữ liệu thành công!');
         const fetchedData = response?.data || [];
         setData(fetchedData);
         setIsAPISuccess(true)

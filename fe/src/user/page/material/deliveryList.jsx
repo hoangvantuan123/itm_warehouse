@@ -58,7 +58,6 @@ export default function DeliveryList({ permissions, isMobile }) {
       );
       if (deliveryResponse?.success) {
         setData(deliveryResponse.data || []);
-        message.success('Tải dữ liệu thành công!');
         setIsAPISuccess(true);
       } else {
         setData([]);
