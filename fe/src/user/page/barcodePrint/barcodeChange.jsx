@@ -57,7 +57,6 @@ export default function BarcodeChange({ permissions, isMobile }) {
 
             for (let i = start; i <= end; i++) {
                 rows.push(data[i]);
-                setDataInfo(data[i]);
             }
         });
 
@@ -79,22 +78,6 @@ export default function BarcodeChange({ permissions, isMobile }) {
 
         return () => unsubscribe;
     }, [formChange]);
-
-    const listSelect = useCallback(
-
-        async (e) => {
-            setRowChecked(null);
-
-            const selectedRows = getMultiSelectedRows();
-            if (selectedRows.length === 0) {
-                message.warning('Vui lòng chọn ít nhất một hàng.');
-                return;
-            }
-
-            setRowChecked(selectedRows);
-        },
-        [data, selectRow]
-    );
 
     const onFinish = async (e) => {
         setData([]);

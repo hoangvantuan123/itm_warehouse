@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Card, Button, Modal, Space, Input, Typography, DatePicker, Checkbox, Row, Col, Select, message, Form, Radio } from 'antd';
 
-import { CreatePrintLabel } from "../../../../features/barcode/printBarcodeService";
 import { DataEditor, GridCellKind } from "@glideapps/glide-data-grid";
 import '@glideapps/glide-data-grid/dist/index.css';
 import { checkConfirmBarcode, checkConfirmNewBarcode, confirmBarcode } from "../../../../features/barcode/barcodeChangeService";

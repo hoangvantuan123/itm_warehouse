@@ -3,13 +3,16 @@ import { Card, Button, Modal, Space, Input, Typography, DatePicker, Select, mess
 import { SaveFilled } from '@ant-design/icons';
 
 import LabelItem from "./labeldesign";
-import { CreatePrintLabel } from "../../../../features/barcode/printBarcodeService";
 
 export default function BarcodePrintAction({
+
+    formQuery,
     fromDate,
     toDate,
+
     onFinish,
-    btnPrinter,
+    onClickPrint,
+
     rowSelects,
     setRowChecked,
 
@@ -18,12 +21,20 @@ export default function BarcodePrintAction({
     handleOnchangeDevice,
 
     onChangeVendor,
+    onClearVendorValue,
     onKeyDownPartNo,
+    onKeyDownMatId,
+    onKeyDownLotTotalCnt,
+    onKeyDownLotNo,
+    onKeyDownQty,
+    onKeyDownDateCode,
+    onKeyDownReelNo,
+    onKeyDownUserId,
+
 
 }) {
 
     const [formSearch] = Form.useForm();
-    const [formQuery] = Form.useForm();
 
 
 
@@ -72,8 +83,6 @@ export default function BarcodePrintAction({
         }));
     };
 
-
-
     const handleInputChange = (e, field) => {
         setSizeLabel(prevState => ({
             ...prevState,
@@ -98,11 +107,6 @@ export default function BarcodePrintAction({
         setIsModalVisible(false);
     };
 
-    const btnOpenModal = () => {
-        setIsModalVisible(true);
-        btnPrinter();
-    }
-
     const btnOpenModalPreview = () => {
         setIsModalVisible(true);
         setRowChecked(null);
@@ -122,26 +126,7 @@ export default function BarcodePrintAction({
     };
 
 
-    const postPrint = useCallback(async () => {
-
-        const dataPost = {
-            data: rowSelects,
-            newLabel: newLabel
-        }
-
-        try {
-            const itemList = await CreatePrintLabel(
-                dataPost
-            );
-        } catch (error) {
-            message.error("Kiểm tra kết nối máy in !");
-        }
-    }, [rowSelects])
-
-    const handleBtnConfirm = () => {
-        postPrint();
-    }
-
+    
     return (
         <div className="mt-1">
             <Card className="mb-1 p-1 shadow-sm" size="small">
@@ -218,7 +203,7 @@ export default function BarcodePrintAction({
                         </Form.Item>
 
                         <Form.Item>
-                            <Button onClick={btnOpenModal} type="primary" size="small">PRINT</Button>
+                            <Button onClick={onClickPrint} type="primary" size="small">PRINT</Button>
                         </Form.Item>
 
                     </Form>
@@ -257,6 +242,7 @@ export default function BarcodePrintAction({
                                     label: item?.label,
                                     value: item?.value,
                                 }))}
+                                onClear={onClearVendorValue}
                             />
 
                         </Form.Item>
@@ -278,7 +264,10 @@ export default function BarcodePrintAction({
                             name={"matID"}
                             size="small"
                         >
-                            <Input placeholder="" size="small" />
+                            <Input 
+                            placeholder="" 
+                            size="small" 
+                            onKeyDown={onKeyDownMatId}/>
 
                         </Form.Item>
 
@@ -287,7 +276,10 @@ export default function BarcodePrintAction({
                             name={"lotTotalCNT"}
                             size="small"
                         >
-                            <Input placeholder="" size="small" />
+                            <Input 
+                            placeholder="" 
+                            size="small" 
+                            onKeyDown={onKeyDownLotTotalCnt}/>
                         </Form.Item>
 
                         <Form.Item
@@ -295,7 +287,11 @@ export default function BarcodePrintAction({
                             name={"lotNo"}
                             size="small"
                         >
-                            <Input placeholder="" size="small" />
+                            <Input 
+                            placeholder="" 
+                            size="small" 
+                            onKeyDown={onKeyDownLotNo}
+                            />
                         </Form.Item>
 
                         <Form.Item
@@ -303,7 +299,10 @@ export default function BarcodePrintAction({
                             name={"qty"}
                             size="small"
                         >
-                            <Input placeholder="" size="small" />
+                            <Input 
+                            placeholder="" 
+                            size="small" 
+                            onKeyDown={onKeyDownQty}/>
                         </Form.Item>
 
                         <Form.Item
@@ -311,7 +310,10 @@ export default function BarcodePrintAction({
                             name={"dateCode"}
                             size="small"
                         >
-                            <Input placeholder="" size="small" />
+                            <Input 
+                            placeholder="" 
+                            size="small" 
+                            onKeyDown={onKeyDownDateCode}/>
                         </Form.Item>
 
                         <Form.Item
@@ -319,7 +321,10 @@ export default function BarcodePrintAction({
                             name={"reelNo"}
                             size="small"
                         >
-                            <Input placeholder="" size="small" />
+                            <Input 
+                            placeholder="" 
+                            size="small"
+                            onKeyDown={onKeyDownReelNo} />
                         </Form.Item>
 
                         <Form.Item
@@ -327,7 +332,10 @@ export default function BarcodePrintAction({
                             name={"userID"}
                             size="small"
                         >
-                            <Input placeholder="" size="small" />
+                            <Input 
+                            placeholder="" 
+                            size="small" 
+                            onKeyDown={onKeyDownUserId} />
                         </Form.Item>
 
                         <Form.Item
@@ -335,7 +343,9 @@ export default function BarcodePrintAction({
                             name={"issueNo"}
                             size="small"
                         >
-                            <Input placeholder="" size="small" />
+                            <Input 
+                            placeholder="" 
+                            size="small" />
                         </Form.Item>
                         <Form.Item
                             label="Remark"
@@ -397,6 +407,7 @@ export default function BarcodePrintAction({
                                 options={optionDevices}
                                 onDropdownVisibleChange={onDropDownChange}
                                 onChange={handleOnchangeDevice}
+                                
                             />
                         </Form.Item>
 
@@ -418,7 +429,7 @@ export default function BarcodePrintAction({
                 <Modal
                     title="Print Label Confirmation"
                     visible={isModalVisible}
-                    onOk={handleBtnConfirm}
+                    // onOk={handleBtnConfirm}
                     onCancel={handleCancel}
                     className="w-3"
                 >

@@ -54,6 +54,8 @@ export const BARCODE_ERR_MESSAGE = {
   QTY_NOT_NULL: 'Change QTY not null.',
   NO_DATA_PRINTER: 'No data printer.',
   NOT_LANGER_THAN_PRE_QTY: 'Not Langer Than Pre Qty.',
+
+  VENDOR_NOT_SELECT: 'Vendor not select.'
   
 
 }
@@ -65,3 +67,4 @@ export const BARCODE_SUCCESS_MESSAGE = {
   CHECK_OLD_BARCODE_OK: 'Check Old Barcode: OK',
 
 }
+

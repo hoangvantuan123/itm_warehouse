@@ -32,10 +32,10 @@ export class PrintBarcodeController {
 
     @Post('printer')
     async checkPrinter(
-        @Body() barcodeDto : BarcodeDto
+        @Body() barcodeDto : any
     ) {
         try {
-            const result = await this.printBarcodeService.printByZplCode(barcodeDto);
+            const result = await this.printBarcodeService.printBarcode(barcodeDto);
             return {result};
         } catch (error) {
             return {
@@ -48,10 +48,44 @@ export class PrintBarcodeController {
 
     @Get('get-matid')
     async getMatIdByVendor(
+        @Query("plant") plant? : any,
+        @Query("partNo") partNo? : any,
+    ) : Promise<any>{
+        try {
+            const result = await this.printBarcodeService.getMatIdByVendor(plant, partNo);
+            return {result};
+        } catch (error) {
+            return {
+                status: false,
+                message: error.message || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+                data: null,
+            };
+        }
+    }
+
+    @Get('get-reel-no')
+    async getReelNo(
         @Body() barcodeDto : any
     ) : Promise<any>{
         try {
-            const result = await this.printBarcodeService.getMatIdByVendor(barcodeDto);
+            const result = await this.printBarcodeService.getReelSeq(barcodeDto);
+            return {result};
+        } catch (error) {
+            return {
+                status: false,
+                message: error.message || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+                data: null,
+            };
+        }
+    }
+
+    @Get('get-lot-count')
+    async getLotCount(
+        @Query('plant') plant? : string,
+        @Query('lotNo') lotNo? : string,
+    ) : Promise<any>{
+        try {
+            const result = await this.printBarcodeService.getLotCount(plant, lotNo);
             return {result};
         } catch (error) {
             return {
