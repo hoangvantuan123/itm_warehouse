@@ -21,9 +21,9 @@ export default function WaitingIqcStockInQuery({
       dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1)
     return `${capitalizedDay}, ${date.format('DD/MM/YYYY')}`
   }
-  const handleChange = debounce((e) => {
+  const handleChange = (e) => {
     setInputBarCode(e.target.value)
-  }, 100)
+  }
 
   const handleEnter = () => {
     if (inputBarCode) {

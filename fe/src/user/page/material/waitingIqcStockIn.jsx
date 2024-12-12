@@ -130,13 +130,21 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     const handleKeyPress = (e) => {
       if (e.key === 'Enter' && bufferRef.current.trim()) {
         const barcode = bufferRef.current.trim()
-        handleCheckBarcode(barcode)
-        setInputCode(barcode)
-        bufferRef.current = ''
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')  
+          .replace(/[^a-zA-Z0-9/-]/g, '');
+        handleCheckBarcode(barcode);
+        setInputCode(barcode);
+
+        bufferRef.current = '';
       } else if (e.key.length === 1) {
-        bufferRef.current += e.key
+        const normalizedKey = e.key.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        if (/^[a-zA-Z0-9/-]$/.test(normalizedKey)) {
+          bufferRef.current += normalizedKey;
+        }
       }
     }
+
 
     const handleFocus = () => setStatus(true)
 

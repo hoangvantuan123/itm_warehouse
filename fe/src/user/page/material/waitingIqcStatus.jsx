@@ -30,7 +30,7 @@ export default function IQCStatus({ permissions, isMobile }) {
   const [blNo, setBLNo] = useState('')
   const [itemNo, setItemNo] = useState('')
   const [itemName, setItemName] = useState('')
-  const [bizUnit, setBizUnit] = useState(4)
+  const [bizUnit, setBizUnit] = useState(0)
   const [checkedRowKey, setCheckedRowKey] = useState(null)
   const [keyPath, setKeyPath] = useState(null)
   const [checkedPath, setCheckedPath] = useState(false)

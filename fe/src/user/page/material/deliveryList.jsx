@@ -27,7 +27,7 @@ export default function DeliveryList({ permissions, isMobile }) {
   const [formData, setFormData] = useState(dayjs().startOf('month'))
   const [toDate, setToDate] = useState(dayjs())
   const [deliveryNo, setDeliveryNo] = useState('')
-  const [bizUnit, setBizUnit] = useState(4)
+  const [bizUnit, setBizUnit] = useState(0)
   const [checkedRowKey, setCheckedRowKey] = useState(null)
   const [keyPath, setKeyPath] = useState(null)
   const [checkedPath, setCheckedPath] = useState(false)
