@@ -136,7 +136,8 @@ const UserRouter = () => {
             <Layout>
               <Content className="bg-slate-50">
                 <Suspense fallback={<Spinner />}>
-                  <BreadcrumbRouter />
+                  <BreadcrumbRouter rootMenu={rootMenuItems}
+                    menuTransForm={menuTransForm} />
                   <Routes>
                     <Route
                       path="u/warehouse/material/delivery-list"

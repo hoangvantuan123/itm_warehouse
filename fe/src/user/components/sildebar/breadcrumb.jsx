@@ -1,45 +1,41 @@
-import { useLocation } from 'react-router-dom'
-import { Dropdown, Menu } from 'antd'
-import { menuItems, menuSettingItems } from './dataMenu'
+import { useLocation } from 'react-router-dom';
+import { Dropdown, Menu } from 'antd';
 
-export default function BreadcrumbRouter() {
-  const location = useLocation()
-  const currentPath = location.pathname
+export default function BreadcrumbRouter({ menuTransForm, rootMenu }) {
+  const location = useLocation();
+  const currentPath = location.pathname;
 
   const findRoute = (path, menus) => {
     for (const menu of menus) {
-      if (menu.link === path) {
-        return [menu]
+      if (menu.MenuLink === path) {
+        return [menu];
       }
       if (menu.subMenu) {
-        const subRoute = findRoute(path, menu.subMenu)
+        const subRoute = findRoute(path, menu.subMenu);
         if (subRoute) {
-          return [menu, ...subRoute]
+          return [menu, ...subRoute];
         }
       }
     }
-    return null
-  }
+    return null;
+  };
 
   const breadcrumbItems = currentPath
     .split('/')
     .filter((part) => part)
     .reduce((breadcrumbs, part, index, array) => {
-      const path = '/' + array.slice(0, index + 1).join('/')
-      const matchedRoute =
-        findRoute(path, menuItems) || findRoute(path, menuSettingItems)
+      const path = '/' + array.slice(0, index + 1).join('/');
+      const matchedRoute = findRoute(path, rootMenu) || findRoute(path, menuTransForm);
 
       if (matchedRoute) {
-        const lastRoute = matchedRoute[matchedRoute.length - 1]
         breadcrumbs.push({
-          path: lastRoute.link,
-          breadcrumbName: lastRoute.label,
-          type: lastRoute.type,
-          subMenu: lastRoute.subMenu || null,
-        })
+          path: matchedRoute[matchedRoute.length - 1].MenuLink,
+          breadcrumbName: matchedRoute[matchedRoute.length - 1].MenuLabel,
+          subMenu: matchedRoute[matchedRoute.length - 1].subMenu || null,
+        });
       }
-      return breadcrumbs
-    }, [])
+      return breadcrumbs;
+    }, []);
 
   breadcrumbItems.unshift({
     path: '/u/home',
@@ -48,23 +44,22 @@ export default function BreadcrumbRouter() {
         <span>HOME</span>
       </>
     ),
-    type: null,
     subMenu: null,
-  })
+  });
 
   const renderSubMenu = (subMenu) => {
-    if (!subMenu) return null
+    if (!subMenu) return null;
 
     return (
       <Menu>
         {subMenu.map((item) => (
-          <Menu.Item key={item.key}>
-            <a href={item.link}>{item.label}</a>
+          <Menu.Item key={item.MenuKey}>
+            <a href={item.MenuLink}>{item.MenuLabel}</a>
           </Menu.Item>
         ))}
       </Menu>
-    )
-  }
+    );
+  };
 
   return (
     <div className="breadcrumb bg-slate-50 p-2 uppercase text-xs">
@@ -72,10 +67,7 @@ export default function BreadcrumbRouter() {
         <span key={item.path}>
           {index > 0 && <span> / </span>}
           {item.subMenu ? (
-            <Dropdown
-              overlay={renderSubMenu(item.subMenu)}
-              trigger={['click', 'hover']}
-            >
+            <Dropdown overlay={renderSubMenu(item.subMenu)} trigger={['click', 'hover']}>
               <a href={item.path}>{item.breadcrumbName}</a>
             </Dropdown>
           ) : (
@@ -84,5 +76,5 @@ export default function BreadcrumbRouter() {
         </span>
       ))}
     </div>
-  )
+  );
 }
