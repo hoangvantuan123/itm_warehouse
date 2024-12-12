@@ -33,7 +33,10 @@ const DeliveryList = lazy(() => import('../page/material/deliveryList'))
 const WaitingIqcStockIn = lazy(
   () => import('../page/material/waitingIqcStockIn'),
 )
-
+const IQCStatus = lazy(() => import('../page/material/waitingIqcStatus'))
+const MatWHStockIn = lazy(
+  () => import('../page/material/matWHStockIn'),
+)
 const StockOutRequest = lazy(() => import('../page/material/stockOutRequest'))
 const UserManagement = lazy(() => import('../page/system/userManagement'))
 const RoleManagement = lazy(() => import('../page/system/roleManagement'))
@@ -231,6 +234,36 @@ const UserRouter = () => {
                             )
                           }
                         />
+                         <Route
+                      path="u/warehouse/material/waiting-iqc-status"
+                      element={
+                        checkActionPermission(userPermissions, 'material-1-3', 'View') ? (
+                          <IQCStatus
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
+                        ) : (
+                          <ErrorPage
+
+                          />
+                        )
+                      }
+                    />
+                    <Route
+                      path="u/warehouse/material/material-wh-stock-in/:id"
+                      element={
+                        checkActionPermission(userPermissions, 'material-1-3', 'View') ? (
+                          <MatWHStockIn
+                            permissions={userPermissions}
+                            isMobile={isMobile}
+                          />
+                        ) : (
+                          <ErrorPage
+
+                          />
+                        )
+                      }
+                    />
                         <Route
                           path="u/warehouse/material/stock-out-request"
                           element={
