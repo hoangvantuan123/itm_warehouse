@@ -7,6 +7,10 @@ import { DeliveryListService } from '../service/deliveryList.service';
 import { DeliveryListController } from '../controller/deliveryList.controller';
 import { StockOutController } from '../controller/stockOut.controller';
 import { StockOutService } from '../service/stockOut.service';
+import { IQCStatusController } from '../controller/iqcStatus.controller';
+import { IQCStatusService } from './../service/iqcStatus.service';
+import { MatWHStockInController }  from '../controller/matWHStockIn.controller';
+import { MatWHStockInService } from './../service/matWHStockIn.service';
 
 @Module({
   imports: [],
@@ -15,9 +19,11 @@ import { StockOutService } from '../service/stockOut.service';
     StockInService,
     GenerateXmlService,
     DeliveryListService,
-    StockOutService
+    StockOutService,
+    IQCStatusService,
+    MatWHStockInService
   ],
-  controllers: [EmployeeController, DeliveryListController, StockOutController],
+  controllers: [EmployeeController, DeliveryListController, StockOutController, IQCStatusController, MatWHStockInController],
   exports: [],
 })
 export class MaterialModule { }

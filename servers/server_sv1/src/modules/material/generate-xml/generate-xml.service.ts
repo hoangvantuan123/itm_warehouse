@@ -287,4 +287,85 @@ export class GenerateXmlService {
   </DataBlock1>`).join('')}</ROOT>`;
   }
 
+  /* _SSLImpDelvMasterSave_WEB Mat stockin*/
+ async generateXMLSLGInOutDailySave_WEB(result: any[], SPInOutNo: any): Promise<string> {
+  return `<ROOT>${result.map((item, index) => `
+<DataBlock1>
+<WorkingTag>A</WorkingTag>
+<IDX_NO>${index + 1}</IDX_NO>
+<Status>0</Status>
+<DataSeq>${index + 1}</DataSeq>
+<Selected>1</Selected>
+<TABLE_NAME>DataBlock1</TABLE_NAME>
+<IsChangedMst>0</IsChangedMst>
+<InOutSeq>${item?.InOutSeq}</InOutSeq>
+<InOutNo>${SPInOutNo}</InOutNo>
+<InOutType>82</InOutType>
+<InOutDetailType>0</InOutDetailType>
+<IsTrans>0</IsTrans>
+<IsCompleted>1</IsCompleted>
+<CompleteDeptSeq>${item?.DeptSeq}</CompleteDeptSeq>
+<CompleteEmpSeq>${item?.EmpSeq}</CompleteEmpSeq>
+<CompleteDate>${item?.InOutDate}</CompleteDate>
+<ReqBizUnit>${item?.BizUnit}</ReqBizUnit>
+<ReqBizUnitName>${item?.BizUnitName}</ReqBizUnitName>
+<InWHSeq>${item?.InWHSeq}</InWHSeq>
+<InWHName>${item?.InWHName}</InWHName>
+<InOutDate>${item?.InOutDate}</InOutDate>
+<BizUnit>${item?.BizUnit}</BizUnit>
+<BizUnitName>${item?.BizUnitName}</BizUnitName>
+<OutWHSeq>${item?.OutWHSeq}</OutWHSeq>
+<OutWHName>${item?.OutWHName}</OutWHName>
+<DeptSeq>${item?.DeptSeq}</DeptSeq>
+<DeptName>${item?.DeptName}</DeptName>
+<EmpSeq>${item?.EmpSeq}</EmpSeq>
+<EmpName>${item?.EmpName}</EmpName>
+<Remark />
+<Memo />
+</DataBlock1>`).join('')}</ROOT>`;
+}
+
+async generateXMLSLGInOutDailyItemSave_WEB(result: any[], SPInOutSeq: any): Promise<string> {
+return `<ROOT>${result.map((item, index) => `
+<DataBlock2>
+<WorkingTag>A</WorkingTag>
+<IDX_NO>${index + 1}</IDX_NO> 
+<DataSeq>${index + 1}</DataSeq>
+<Status>0</Status>
+<Selected>0</Selected>
+<TABLE_NAME>DataBlock2</TABLE_NAME>
+<InOutSeq>${SPInOutSeq}</InOutSeq>
+<InOutSerl>${index + 1}</InOutSerl>
+<InOutType>82</InOutType>
+<ItemSeq>${item?.ItemSeq}</ItemSeq>
+<InOutRemark>WEB</InOutRemark>
+<InWHSeq>${item?.MatWhSeq}</InWHSeq>
+<OutWHSeq>${item?.WaitWhSeq}</OutWHSeq>
+<UnitSeq>${item?.UnitSeq}</UnitSeq>
+<Qty>${item?.Qty}</Qty>
+<STDQty>${item?.Qty}</STDQty>
+<Amt>0.00000</Amt>
+<EtcOutAmt>0.00000</EtcOutAmt>
+<EtcOutVAT>0.00000</EtcOutVAT>
+<InOutKind>8023008</InOutKind>
+<InOutDetailKind>8012001</InOutDetailKind>
+<LotNo>${item?.LotNo}</LotNo>
+<SerialNo />
+<OriQty>0.00000</OriQty>
+<OriSTDQty>0.00000</OriSTDQty>
+<ItemName>${item?.ItemName}</ItemName>
+<InWHName>${item?.MatWhName}</InWHName>
+<OutWHName>${item?.WaitWhName}</OutWHName>
+<UnitName>${item?.UnitName}</UnitName>
+<InOutDetailKindName>Sản phẩm bình thường</InOutDetailKindName>
+<ItemNo>${item?.ItemNo}</ItemNo>
+<Spec>${item?.Spec}</Spec>
+<Price>0.00000</Price>
+<STDUnitName>${item?.UnitName}</STDUnitName>
+</DataBlock2>`).join('')}</ROOT>`;
+}
+
+
+
+
 }
