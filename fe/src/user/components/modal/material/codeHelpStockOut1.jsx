@@ -16,14 +16,15 @@ export default function CodeHelpStockOut1({
   setSubConditionSql,
   setDeptName,
   setDeptSeq,
-  deptName, 
-  selection, setSelection, 
-  resetTable
+  deptName,
+  selection,
+  setSelection,
+  resetTable,
 }) {
   const [isMinusClicked, setIsMinusClicked] = useState(false)
   const [lastClickedCell, setLastClickedCell] = useState(null)
   const [clickedRowData, setClickedRowData] = useState(null)
- 
+
   const [keyPath, setKeyPath] = useState(null)
   const handleConditionSeq = (e) => {
     setConditionSeq(e)
@@ -66,7 +67,7 @@ export default function CodeHelpStockOut1({
       setLastClickedCell(cell)
     }
   }
- 
+
   const handleClose = () => {
     setModalVisible(false)
     setDeptName('')
@@ -168,12 +169,15 @@ export default function CodeHelpStockOut1({
             </div>
           </details>
 
-          <TableCodeHelpStockOut1 data={data} onCellClicked={onCellClicked} setSelection={setSelection} selection={selection}  />
+          <TableCodeHelpStockOut1
+            data={data}
+            onCellClicked={onCellClicked}
+            setSelection={setSelection}
+            selection={selection}
+          />
         </div>
         <div className="flex justify-end gap-4 ">
-          <Button onClick={handleClose}>
-            Cancel
-          </Button>
+          <Button onClick={handleClose}>Cancel</Button>
           <Button type="primary" onClick={() => setModalVisible(false)}>
             Save
           </Button>

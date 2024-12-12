@@ -1,7 +1,15 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Helmet } from 'react-helmet'
-import { Input, notification, Table, Typography, message, Spin, Layout } from 'antd'
+import {
+  Input,
+  notification,
+  Table,
+  Typography,
+  message,
+  Spin,
+  Layout,
+} from 'antd'
 const { Title, Text } = Typography
 import { FilterOutlined, LoadingOutlined } from '@ant-design/icons'
 import { ArrowIcon } from '../../components/icons'
@@ -42,7 +50,8 @@ export default function StockOutRequest({ permissions, isMobile }) {
   const [progStatus, setProgStatus] = useState('')
   const [useType, setUseType] = useState('')
   const [keyPath, setKeyPath] = useState(null)
-  const formatDate = useCallback((date) => date.format('YYYYMMDD'), '')
+  const formatDate = (date) => date.format('YYYYMMDD');
+
   const [isMinusClicked, setIsMinusClicked] = useState(false)
   const [lastClickedCell, setLastClickedCell] = useState(null)
   const [clickedRowData, setClickedRowData] = useState(null)
@@ -71,7 +80,7 @@ export default function StockOutRequest({ permissions, isMobile }) {
   const [outReqNo, setOutReqNo] = useState('')
   const [checkIsStop, setCheckIsStop] = useState(false)
   const [checkIsConfirm, setCheckIsConfirm] = useState(false)
-  const [isAPISuccess, setIsAPISuccess] = useState(true);
+  const [isAPISuccess, setIsAPISuccess] = useState(true)
 
   const [selection, setSelection] = useState({
     columns: CompactSelection.empty(),
@@ -90,20 +99,20 @@ export default function StockOutRequest({ permissions, isMobile }) {
     setSelection({
       columns: CompactSelection.empty(),
       rows: CompactSelection.empty(),
-    });
-  };
+    })
+  }
   const resetTable2 = () => {
     setSelection2({
       columns: CompactSelection.empty(),
       rows: CompactSelection.empty(),
-    });
-  };
+    })
+  }
   const resetTable3 = () => {
     setSelection3({
       columns: CompactSelection.empty(),
       rows: CompactSelection.empty(),
-    });
-  };
+    })
+  }
   useEffect(() => {
     const savedState = localStorage.getItem('detailsStateStockOut')
     setIsOpenDetails(savedState === 'open')
@@ -117,12 +126,15 @@ export default function StockOutRequest({ permissions, isMobile }) {
 
   const fetchSPDMMOutReqListQueryWeb = async () => {
     if (isAPISuccess === false) {
-      message.warning('Không thể thực hiện, vui lòng kiểm tra trạng thái.');
-      return;
+      message.warning('Không thể thực hiện, vui lòng kiểm tra trạng thái.')
+      return
     }
     setIsAPISuccess(false)
-    setLoadingA(true);
-    const loadingMessage = message.loading('Đang tải dữ liệu, vui lòng chờ...', 0);
+    setLoadingA(true)
+    const loadingMessage = message.loading(
+      'Đang tải dữ liệu, vui lòng chờ...',
+      0,
+    )
     try {
       const formA = {
         IsChangedMst: '1',
@@ -141,30 +153,29 @@ export default function StockOutRequest({ permissions, isMobile }) {
         ProdPlanNo: prodPlanNo,
         WorkOrderNo: workOrderNo,
         ProdReqNo: prodReqNo,
-      };
+      }
 
-      const response = await SPDMMOutReqListQueryWeb(formA);
+      const response = await SPDMMOutReqListQueryWeb(formA)
       if (response?.success) {
-        const fetchedData = response?.data || [];
-        setData(fetchedData);
+        const fetchedData = response?.data || []
+        setData(fetchedData)
         setIsAPISuccess(true)
-        loadingMessage();
+        loadingMessage()
       } else {
-        setData([]);
-        message.error('Có lỗi xảy ra khi tải dữ liệu.');
+        setData([])
+        message.error('Có lỗi xảy ra khi tải dữ liệu.')
       }
     } catch (error) {
-      setErrorA(true);
+      setErrorA(true)
       setIsAPISuccess(true)
-      loadingMessage();
-      notification.destroy();
-      message.error("Có lỗi xảy ra khi tải dữ liệu.");
+      loadingMessage()
+      notification.destroy()
+      message.error('Có lỗi xảy ra khi tải dữ liệu.')
     } finally {
       setIsAPISuccess(true)
-      setLoadingA(false);
+      setLoadingA(false)
     }
-  };
-
+  }
 
   const fetchCodehelpData1 = useCallback(async () => {
     setLoading(true)
@@ -285,12 +296,10 @@ export default function StockOutRequest({ permissions, isMobile }) {
     }
   }, [])
 
-
   const debouncedFetchCodeHelpData = useMemo(
     () => debounce(fetchCodeHelpData, 100),
     [fetchCodeHelpData],
   )
-
 
   const nextPage = useCallback(() => {
     if (keyPath) {
@@ -366,17 +375,17 @@ export default function StockOutRequest({ permissions, isMobile }) {
       if (isAPISuccess === true) {
         if (filteredData.IsStop === true || filteredData.IsConfirm === false) {
           if (filteredData.IsStop === true) {
-            setCheckIsStop(true);
+            setCheckIsStop(true)
           }
           if (filteredData.IsConfirm === false) {
-            setCheckIsConfirm(true);
+            setCheckIsConfirm(true)
           }
-          setKeyPath(null);
+          setKeyPath(null)
         } else {
-          const encryptedToken = encodeBase64Url(encryptedData);
-          setKeyPath(encryptedToken);
-          setClickedRowData(rowData);
-          setLastClickedCell(cell);
+          const encryptedToken = encodeBase64Url(encryptedData)
+          setKeyPath(encryptedToken)
+          setClickedRowData(rowData)
+          setLastClickedCell(cell)
         }
       }
     }
@@ -560,8 +569,6 @@ export default function StockOutRequest({ permissions, isMobile }) {
         error="Đơn hàng đã được hoàn thành!"
         setKeyPath={setKeyPath}
       />
-
-
 
       <ModalWaiting
         modal2Open={checkIsConfirm}

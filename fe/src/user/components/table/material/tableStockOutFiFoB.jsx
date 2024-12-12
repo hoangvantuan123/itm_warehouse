@@ -30,11 +30,10 @@ function TableStockOUtFiFoB({ data, selection, setSelection }) {
       { title: 'StockOutDate' },
       { title: 'LotNo' },
       { title: 'LotNoFull' },
-      { title: 'Barcode' }
+      { title: 'Barcode' },
     ],
     [],
   )
-
 
   const [cols, setCols] = useState(columns)
   const onColumnResize = useCallback(
@@ -52,7 +51,6 @@ function TableStockOUtFiFoB({ data, selection, setSelection }) {
     },
     [cols],
   )
-
 
   const getData = useCallback(
     ([col, row]) => {
@@ -98,7 +96,6 @@ function TableStockOUtFiFoB({ data, selection, setSelection }) {
     },
     [gridData],
   )
-
 
   const [lastActivated, setLastActivated] = useState(undefined)
 
@@ -147,7 +144,6 @@ function TableStockOUtFiFoB({ data, selection, setSelection }) {
     }
   }
 
-
   return (
     <div className="w-full h-full border-t border-b overflow-hidden scroll-container ">
       <DataEditor
@@ -172,8 +168,8 @@ function TableStockOUtFiFoB({ data, selection, setSelection }) {
           i % 2 === 0
             ? undefined
             : {
-              bgCell: '#FBFBFB',
-            }
+                bgCell: '#FBFBFB',
+              }
         }
       />
     </div>

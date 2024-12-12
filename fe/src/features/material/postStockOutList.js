@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { HOST_API_SERVER_1 } from '../../services'
-
+import { accessToken } from '../../services/tokenService'
 const generateXml = (data) => {
   return `
        <DataBlock1>
@@ -36,11 +36,12 @@ const DEFAULTS = {
   workingTag: '',
   companySeq: 1,
   languageSeq: 6,
-  userSeq: 3106,
+  userSeq: 0,
   pgmSeq: 1036085,
 }
 
 export const SPDMMOutReqListQueryWeb = (requestData) => {
+  const token = accessToken()
   const requestParams = {
     ...DEFAULTS,
     ...requestData,
@@ -63,6 +64,7 @@ export const SPDMMOutReqListQueryWeb = (requestData) => {
       dataToSend,
       {
         headers: {
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       },

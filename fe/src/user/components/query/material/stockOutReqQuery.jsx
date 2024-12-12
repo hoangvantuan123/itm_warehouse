@@ -51,7 +51,7 @@ export default function StockOutRequestQuery({
   resetTable2,
   setCustSeq,
   setCustName,
-  resetTable3
+  resetTable3,
 }) {
   const handleFormDate = (date) => {
     setFormData(date)
@@ -83,7 +83,6 @@ export default function StockOutRequestQuery({
     setCustSeq('')
     resetTable3()
   }
-
 
   return (
     <div className="flex items-center gap-2">
@@ -143,14 +142,13 @@ export default function StockOutRequestQuery({
                 allowClear
                 onChange={handleChange}
                 options={[
-                  { label: "All", value: "" },
+                  { label: 'All', value: '' },
                   ...(dataUnit?.map((item) => ({
                     label: item?.AccUnitName,
                     value: item?.FactUnit,
                   })) || []),
                 ]}
               />
-
             </Form.Item>
           </Col>
           <Col>
@@ -189,7 +187,6 @@ export default function StockOutRequestQuery({
                     handleSearch2()
                   }
                 }}
-
                 value={empName}
                 onChange={handleOnChangeEmpName}
                 onDoubleClick={handleSearch2}
@@ -291,7 +288,7 @@ export default function StockOutRequestQuery({
                 allowClear
                 onChange={handleChangeMinorName2}
                 options={[
-                  { label: "All", value: "" },
+                  { label: 'All', value: '' },
                   ...(minorName2?.map((item) => ({
                     label: item?.MinorName,
                     value: item?.Value,
@@ -315,7 +312,7 @@ export default function StockOutRequestQuery({
                 allowClear
                 onChange={handleChangeMinorName}
                 options={[
-                  { label: "All", value: "" },
+                  { label: 'All', value: '' },
                   ...(minorName?.map((item) => ({
                     label: item?.MinorName,
                     value: item?.Value,

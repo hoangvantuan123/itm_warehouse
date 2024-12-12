@@ -11,35 +11,79 @@ export class StockOutController {
 
 
     @Post('sp-dmm-out-req-list')
-    async processSPDMMOutReqListQueryWeb(@Body() body: any): Promise<SimpleQueryResult> {
-        const {
-            xmlDocument,
-            xmlFlags,
-            serviceSeq,
-            workingTag,
-            companySeq,
-            languageSeq,
-            userSeq,
-            pgmSeq,
-        } = body;
-        return this.stockOutService._SPDMMOutReqListQuery_Web(
-            xmlDocument,
-            xmlFlags,
-            serviceSeq,
-            workingTag,
-            companySeq,
-            languageSeq,
-            userSeq,
-            pgmSeq,
-        );
+    async processSPDMMOutReqListQueryWeb(@Body() body: any, @Req() req: Request): Promise<SimpleQueryResult> {
+
+
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader) {
+            throw new UnauthorizedException('You do not have permission to access this API.');
+        }
+
+        const token = authHeader.split(' ')[1];
+
+        if (!token) {
+            throw new UnauthorizedException('You do not have permission to access this API.');
+        }
+
+
+        try {
+            const decodedToken = jwt.verify(token, jwtConstants.secret) as { UserId: any, EmpSeq: any, UserSeq: any, CompanySeq: any };
+            if (!decodedToken.EmpSeq && !decodedToken.EmpSeq && !decodedToken.UserSeq && !decodedToken.CompanySeq) {
+                throw new UnauthorizedException('You do not have permission to access this API.');
+            }
+            const {
+                xmlDocument,
+                xmlFlags,
+                serviceSeq,
+                workingTag,
+                languageSeq,
+                pgmSeq,
+            } = body;
+            return this.stockOutService._SPDMMOutReqListQuery_Web(
+                xmlDocument,
+                xmlFlags,
+                serviceSeq,
+                workingTag,
+                decodedToken.CompanySeq,
+                languageSeq,
+                decodedToken.UserSeq,
+                pgmSeq,
+            );
+        } catch (error) {
+            throw new UnauthorizedException('You do not have permission to access this API.');
+        }
+
     }
 
     @Get('itm-spd-mm-out-req-item-list')
     async processITMSPDMMOutReqItemListWEB(
         @Query('outReqSeq') outReqSeq: string,
+        @Req() req: Request
     ): Promise<SimpleQueryResult> {
-        const result = await this.stockOutService.ITM_SPDMMOutReqItemList_WEB(outReqSeq);
-        return result;
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader) {
+            throw new UnauthorizedException('You do not have permission to access this API.');
+        }
+
+        const token = authHeader.split(' ')[1];
+
+        if (!token) {
+            throw new UnauthorizedException('You do not have permission to access this API.');
+        }
+
+        try {
+            const decodedToken = jwt.verify(token, jwtConstants.secret) as { UserId: any, EmpSeq: any, UserSeq: any, CompanySeq: any };
+            if (!decodedToken.EmpSeq && !decodedToken.EmpSeq && !decodedToken.UserSeq && !decodedToken.CompanySeq) {
+                throw new UnauthorizedException('You do not have permission to access this API.');
+            }
+            const result = await this.stockOutService.ITM_SPDMMOutReqItemList_WEB(outReqSeq);
+            return result;
+        } catch (error) {
+            throw new UnauthorizedException('You do not have permission to access this API.');
+        }
+
     }
 
 

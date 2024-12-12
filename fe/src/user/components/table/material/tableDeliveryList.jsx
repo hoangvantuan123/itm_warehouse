@@ -10,12 +10,7 @@ const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
 
-function TableDeliveryList({
-  data,
-  onCellClicked,
-  gridData,
-  setGridData,
-}) {
+function TableDeliveryList({ data, onCellClicked, gridData, setGridData }) {
   const [showSearch, setShowSearch] = useState(false)
   const ref = (useRef < data) | (null > null)
   const onSearchClose = useCallback(() => setShowSearch(false), [])
@@ -144,7 +139,6 @@ function TableDeliveryList({
   }
 
   return (
-
     <div className="w-full gap-1 h-full flex items-center justify-center pb-8">
       <div className="w-full h-full flex flex-col border bg-white rounded-lg overflow-hidden ">
         <h2 className="text-xs font-medium flex items-center gap-2 p-2 text-blue-600 uppercase">
@@ -173,8 +167,8 @@ function TableDeliveryList({
             i % 2 === 0
               ? undefined
               : {
-                bgCell: '#FBFBFB',
-              }
+                  bgCell: '#FBFBFB',
+                }
           }
         />
       </div>

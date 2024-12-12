@@ -1,17 +1,19 @@
 import axios from 'axios'
 import { HOST_API_SERVER_1 } from '../../services'
 import { ERROR_MESSAGES } from '../../utils/constants'
+import { accessToken } from '../../services/tokenService'
 
 export const GetCheckIQCHold = async (itemNo, lotno) => {
   try {
     const url = `${HOST_API_SERVER_1}/mssql/stock-in/check-iqc-hold`
-
+    const token = accessToken()
     const response = await axios.get(url, {
       params: {
         itemNo: `'${itemNo}'`,
         lotno: `'${lotno}'`,
       },
       headers: {
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
     })

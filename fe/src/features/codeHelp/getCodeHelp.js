@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { HOST_API_SERVER_1 } from '../../services'
 import { ERROR_MESSAGES } from '../../utils/constants'
+import { accessToken } from '../../services/tokenService'
 
 export const GetCodeHelp = async (
   workingTag,
@@ -26,7 +27,7 @@ export const GetCodeHelp = async (
 ) => {
   try {
     const url = `${HOST_API_SERVER_1}/mssql/code-help-query`
-
+    const token = accessToken()
     const response = await axios.get(url, {
       params: {
         workingTag,
@@ -51,6 +52,7 @@ export const GetCodeHelp = async (
         userSeq,
       },
       headers: {
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
     })

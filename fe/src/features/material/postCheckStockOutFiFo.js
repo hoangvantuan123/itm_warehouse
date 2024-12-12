@@ -1,7 +1,5 @@
 import axios from 'axios'
-import {
-  HOST_API_SERVER_1
-} from '../../services'
+import { HOST_API_SERVER_1 } from '../../services'
 import { accessToken } from '../../services/tokenService'
 
 const generateXml = (data) => {
@@ -62,7 +60,8 @@ export const SMaterialQRCheckStockOutFiFoWeb = (requestData) => {
   return axios
     .post(
       `${HOST_API_SERVER_1}/mssql/stock-out/smaterial-qr-check-stock-out-web`,
-      dataToSend, {
+      dataToSend,
+      {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -76,9 +75,9 @@ export const SMaterialQRCheckStockOutFiFoWeb = (requestData) => {
       throw new Error('Error from API: ' + response.data.message)
     })
     .catch((error) => {
-      const errorMessage = error.response ?
-        error.response.data.message || 'Error from API' :
-        'Unknown error occurred'
+      const errorMessage = error.response
+        ? error.response.data.message || 'Error from API'
+        : 'Unknown error occurred'
       throw new Error(errorMessage)
     })
 }

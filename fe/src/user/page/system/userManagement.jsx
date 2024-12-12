@@ -39,7 +39,7 @@ export default function UserManagement({ permissions, isMobile }) {
   })
   const [showSearch, setShowSearch] = useState(false)
   const formatDate = useCallback((date) => date.format('YYYYMMDD'), [])
-
+  const [isAPISuccess, setIsAPISuccess] = useState(true)
   const fetchSystemUsersData = useCallback(async () => {
     setLoading(true)
     try {
@@ -89,25 +89,30 @@ export default function UserManagement({ permissions, isMobile }) {
 
     return indices
   }
-  const handleUpdatePassUsers = useCallback(async () => {
-    setLoadingUpadtePass(true)
-    const loadingMessage = message.loading('Updating passwords...', 0)
-
-    try {
-      const selectedRowIndices = getSelectedRowIndices()
-
-      const selectedIds = selectedRowIndices.map((index) => data[index].UserId)
-
-      await UpdatePass2(selectedIds)
-
-      loadingMessage()
-      message.success('Passwords updated successfully!')
-    } catch (error) {
-      message.error('Failed to update passwords. Please try again.')
-    } finally {
-      setLoadingUpadtePass(false)
+  const handleUpdatePassUsers = async () => {
+    if (!isAPISuccess) {
+      return;
     }
-  }, [data, selection])
+    setIsAPISuccess(false);
+    setLoadingUpadtePass(true);
+    const loadingMessage = message.loading('Updating passwords...', 0);
+    try {
+      const selectedRowIndices = getSelectedRowIndices();
+      const selectedIds = selectedRowIndices.map((index) => data[index].UserId);
+      await UpdatePass2(selectedIds);
+      loadingMessage();
+      message.success('Passwords updated successfully!');
+    } catch (error) {
+      loadingMessage();
+      message.error('Failed to update passwords. Please try again.');
+    } finally {
+      setIsAPISuccess(true);
+      setLoadingUpadtePass(false);
+    }
+  };
+
+
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
@@ -136,6 +141,7 @@ export default function UserManagement({ permissions, isMobile }) {
                 handleSearch={handleSearch}
                 handleUpdatePassUsers={handleUpdatePassUsers}
                 data={data}
+                isAPISuccess={isAPISuccess}
               />
             </div>
             <details

@@ -6,10 +6,8 @@ import { Input, Space, Table, Typography, message, Tabs, Layout } from 'antd'
 const { Title, Text } = Typography
 import { FileTextOutlined } from '@ant-design/icons'
 import { ArrowIcon } from '../../components/icons'
-import dayjs from 'dayjs'
 import { debounce } from 'lodash'
 import { useNavigate } from 'react-router-dom'
-import { encodeBase64Url } from '../../../utils/decode-JWT'
 import CryptoJS from 'crypto-js'
 import StockOutRequestActionsDetails from '../../components/actions/material/StockOutRequestActionsDetails'
 import StockOutRequestQueryFiFo from '../../components/query/material/stockOutReqQueryFiFo'
@@ -35,7 +33,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
 
   const bufferRef = useRef('')
   const [dataA, setDataA] = useState([])
-  const dataRef = useRef(dataA)  /* DATA */
+  const dataRef = useRef(dataA) /* DATA */
   const [modal2Open, setModal2Open] = useState(false)
   const [modal3Open, setModal3Open] = useState(false)
   const [modal4Open, setModal4Open] = useState(false)
@@ -46,15 +44,16 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const dataRefSacenHistory = useRef(scanHistory) /* DATA */
   const [status, setStatus] = useState(false)
   const [filteredData, setFilteredData] = useState(null)
-  const [checkValueIsStop, setCheckValueIsStop] = useState(filteredData?.IsStop ? 1 : 0)
+  const [checkValueIsStop, setCheckValueIsStop] = useState(
+    filteredData?.IsStop ? 1 : 0,
+  )
   const [selection, setSelection] = useState({
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
   })
 
-
   const [loading, setLoading] = useState(false)
-  const [isAPISuccess, setIsAPISuccess] = useState(true);
+  const [isAPISuccess, setIsAPISuccess] = useState(true)
 
   const [isOpenDetails, setIsOpenDetails] = useState(false)
   const secretKey = 'TEST_ACCESS_KEY'
@@ -68,12 +67,8 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const handleToggle = (event) => {
     const isOpen = event.target.open
     setIsOpenDetails(isOpen)
-    localStorage.setItem(
-      'detailsStateStockOutFiFo',
-      isOpen ? 'open' : 'closed',
-    )
+    localStorage.setItem('detailsStateStockOutFiFo', isOpen ? 'open' : 'closed')
   }
-
 
   const decodeBase64Url = (base64Url) => {
     try {
@@ -118,7 +113,6 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
       }
     }
   }, [id])
-
 
   /* SOS 2 */
   const addToScanHistory = useCallback((dataResSuccess, callback) => {
@@ -178,7 +172,6 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
       tableScanHistory: currentScanHistory,
     })
   }, [])
-
 
   useEffect(() => {
     const handleKeyPress = (e) => {
@@ -250,10 +243,26 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
       const { success, message: resultMessage, data: resultData } = event.data
       if (success) {
         if (resultData) {
-          const { itemNo, qty, lot, dc, reel, barcode, UnitSeq, ItemSeq,
-            OutWHName, OutWHSeq, InWHName, InWHSeq, FactUnitName,
-            FactUnit, WorkOrderSerl, WorkOrderSeq, OutReqItemSerl, OutReqSeq } =
-            resultData
+          const {
+            itemNo,
+            qty,
+            lot,
+            dc,
+            reel,
+            barcode,
+            UnitSeq,
+            ItemSeq,
+            OutWHName,
+            OutWHSeq,
+            InWHName,
+            InWHSeq,
+            FactUnitName,
+            FactUnit,
+            WorkOrderSerl,
+            WorkOrderSeq,
+            OutReqItemSerl,
+            OutReqSeq,
+          } = resultData
 
           const formData = {
             WorkingTag: 'A',
@@ -278,7 +287,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
             Qty: qty,
             DateCode: dc,
             ReelNo: reel,
-            Barcode: barcode
+            Barcode: barcode,
           }
           debouncedCheckBarcode(formData, resultMessage)
         }
@@ -298,7 +307,6 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
     dataRefSacenHistory.current = scanHistory
   }, [dataA, scanHistory])
 
-
   const createXmlDataCloseCheck = (data) => {
     return `
           <DataBlock1>
@@ -317,7 +325,6 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
           </DataBlock1>
       `
   }
-
 
   const createXmlCloseItemCheck = (row, index) => `
   <DataBlock2>
@@ -395,13 +402,13 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const handleSubmit = useCallback(
     async (e) => {
       if (!isAPISuccess) {
-        return;
+        return
       }
       e.preventDefault()
       setLoadingSave(true)
       setResult(null)
       setModal4Open(true)
-      setIsAPISuccess(false);
+      setIsAPISuccess(false)
       if (scanHistory.length === 0) {
         setLoadingSave(false)
         setModal2Open(true)
@@ -415,15 +422,22 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
         .map(createXmlCloseItemCheck)
         .join('\n')
       const xmlSPDMMOutProcCheckWEB = createXmlOutProcCheck(scanHistory[0])
-      const xmlSPDMMOutProcItemCheckWEB = scanHistory.map(createXmlOutProcItemCheck).join('\n')
+      const xmlSPDMMOutProcItemCheckWEB = scanHistory
+        .map(createXmlOutProcItemCheck)
+        .join('\n')
 
       try {
-        const response = await CheckAllProceduresStockOutFiFo(checkValueIsStop, filteredData?.OutReqSeq, scanHistory, {
-          xmlSCOMCloseCheckWEB: xmlSCOMCloseCheckWEB,
-          xmlSCOMCloseItemCheckWEB: xmlSCOMCloseItemCheckWEB,
-          xmlSPDMMOutProcCheckWEB: xmlSPDMMOutProcCheckWEB,
-          xmlSPDMMOutProcItemCheckWEB: xmlSPDMMOutProcItemCheckWEB,
-        })
+        const response = await CheckAllProceduresStockOutFiFo(
+          checkValueIsStop,
+          filteredData?.OutReqSeq,
+          scanHistory,
+          {
+            xmlSCOMCloseCheckWEB: xmlSCOMCloseCheckWEB,
+            xmlSCOMCloseItemCheckWEB: xmlSCOMCloseItemCheckWEB,
+            xmlSPDMMOutProcCheckWEB: xmlSPDMMOutProcCheckWEB,
+            xmlSPDMMOutProcItemCheckWEB: xmlSPDMMOutProcItemCheckWEB,
+          },
+        )
 
         setResult(response)
         if (response.success) {
@@ -447,7 +461,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
         setLoadingSave(false)
       }
     },
-    [filteredData, scanHistory],
+    [filteredData, scanHistory, checkValueIsStop],
   )
 
   const handleRestFrom = useCallback(
@@ -463,7 +477,6 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
     },
     [filteredData, scanHistory],
   )
-
 
   const getSelectedRowIndices = () => {
     const selectedRows = selection.rows.items
@@ -482,28 +495,48 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
 
   const handleDelete = useCallback(
     async (e) => {
-      e.preventDefault()
+      e.preventDefault();
 
-      const selectedRowIndices = getSelectedRowIndices()
+      const selectedRowIndices = getSelectedRowIndices();
       if (selectedRowIndices.length === 0) {
-        setModal2Open(true)
-        setError('Vui lòng chọn ít nhất một hàng để xóa.')
-        return
+        setModal2Open(true);
+        setError('Vui lòng chọn ít nhất một hàng để xóa.');
+        return;
       }
       if (scanHistory.length === 0) {
-        setModal2Open(true)
-        setError('Không có dữ liệu nào để xóa.')
-        return
+        setModal2Open(true);
+        setError('Không có dữ liệu nào để xóa.');
+        return;
       }
+
+      const selectedItems = selectedRowIndices.map((index) => ({
+        ItemNo: scanHistory[index]?.ItemNo,
+        Qty: scanHistory[index]?.Qty,
+      }));
 
       const remainingRows = scanHistory.filter(
         (row, index) => !selectedRowIndices.includes(index),
-      )
+      );
 
-      setScanHistory(remainingRows)
+      setScanHistory(remainingRows);
+
+      setDataA((prevData) =>
+        prevData.map((item) => {
+          const selectedItem = selectedItems.find((selected) => selected.ItemNo === item.ItemNo);
+          if (selectedItem) {
+            return {
+              ...item,
+              OutQty: item.OutQty - selectedItem.Qty, 
+              RemainQty: item.RemainQty + selectedItem.Qty, 
+            };
+          }
+          return item;
+        })
+      );
     },
-    [scanHistory, selection],
-  )
+    [scanHistory, selection, setDataA],
+  );
+
 
   return (
     <>
@@ -517,17 +550,16 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
               <Title level={4} className="mt-2 uppercase opacity-85 ">
                 {t('Stock Out FIFO')}
               </Title>
-              <StockOutRequestActionsDetails status={status} handleSubmit={handleSubmit}
+              <StockOutRequestActionsDetails
+                status={status}
+                handleSubmit={handleSubmit}
                 handleRestFrom={handleRestFrom}
                 handleDelete={handleDelete}
-
-
               />
             </div>
             <details
               className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
               open
-
             >
               <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
                 <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600 uppercase">
@@ -539,15 +571,24 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
                 </span>
               </summary>
               <div className="flex p-2 gap-4">
-                <StockOutRequestQueryFiFo filteredData={filteredData} handleCheckBarcode={handleCheckBarcode} inputBarCode={inputBarCode}
-                  setInputBarCode={setInputBarCode} setCheckValueIsStop={setCheckValueIsStop} />
+                <StockOutRequestQueryFiFo
+                  filteredData={filteredData}
+                  handleCheckBarcode={handleCheckBarcode}
+                  inputBarCode={inputBarCode}
+                  setInputBarCode={setInputBarCode}
+                  setCheckValueIsStop={setCheckValueIsStop}
+                />
               </div>
             </details>
           </div>
 
           <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg">
-            <TableTransferStockOutFiFo sampleTableA={dataA} sampleTableB={scanHistory} setSelection={setSelection}
-              selection={selection} />
+            <TableTransferStockOutFiFo
+              sampleTableA={dataA}
+              sampleTableB={scanHistory}
+              setSelection={setSelection}
+              selection={selection}
+            />
           </div>
         </div>
         <ModalWaiting
@@ -561,7 +602,6 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
           modal5Open={modal5Open}
           successMessage={successMessage}
         />
-
       </div>
     </>
   )

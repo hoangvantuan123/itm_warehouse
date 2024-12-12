@@ -21,18 +21,14 @@ function TableUserManagement({
   const [clickedRowDataList, setClickedRowDataList] = useState([])
   const [isMinusClicked, setIsMinusClicked] = useState(false)
   const [lastClickedCell, setLastClickedCell] = useState(null)
- 
-  const onCellActivated = useCallback((cell) => {
-   
-  }, []);
+
+  const onCellActivated = useCallback((cell) => {}, [])
   const lastClickRef = useRef({
     cell: null,
     time: 0,
-  });
+  })
 
-  const doubleClickTimeout = 300; // Thời gian tối đa giữa hai lần click (ms)
-
-
+  const doubleClickTimeout = 300 // Thời gian tối đa giữa hai lần click (ms)
 
   const columns = useMemo(
     () => [
@@ -76,32 +72,70 @@ function TableUserManagement({
         LoginDate = '',
         LoginStatus,
       } = person
-  
+
       const safeString = (value) => (value != null ? String(value) : '')
-  
+
       const columnMap = {
-        0: { kind: GridCellKind.Text, data: safeString(UserSeq), readonly: false },
-        1: { kind: GridCellKind.Text, data: safeString(UserName), readonly: false },
-        2: { kind: GridCellKind.Text, data: safeString(UserId), readonly: false },
-        3: { kind: GridCellKind.Text, data: safeString(DeptSeq), readonly: false },
-        4: { kind: GridCellKind.Text, data: safeString(Remark), readonly: false },
-        5: { kind: GridCellKind.Text, data: safeString(LoginDate), readonly: false },
-        6: { kind: GridCellKind.Text, data: safeString(LoginStatus), readonly: true }, // Assuming LoginStatus is non-editable
+        0: {
+          kind: GridCellKind.Text,
+          data: safeString(UserSeq),
+          readonly: false,
+        },
+        1: {
+          kind: GridCellKind.Text,
+          data: safeString(UserName),
+          readonly: false,
+        },
+        2: {
+          kind: GridCellKind.Text,
+          data: safeString(UserId),
+          readonly: false,
+        },
+        3: {
+          kind: GridCellKind.Text,
+          data: safeString(DeptSeq),
+          readonly: false,
+        },
+        4: {
+          kind: GridCellKind.Text,
+          data: safeString(Remark),
+          readonly: false,
+        },
+        5: {
+          kind: GridCellKind.Text,
+          data: safeString(LoginDate),
+          readonly: false,
+        },
+        6: {
+          kind: GridCellKind.Text,
+          data: safeString(LoginStatus),
+          readonly: true,
+        }, // Assuming LoginStatus is non-editable
       }
-  
+
       if (columnMap.hasOwnProperty(col)) {
         const { kind, data, readonly } = columnMap[col]
-        return { kind, data, displayData: data, readonly, allowOverlay: !readonly } // Show overlay for editable cells
+        return {
+          kind,
+          data,
+          displayData: data,
+          readonly,
+          allowOverlay: !readonly,
+        } // Show overlay for editable cells
       }
-  
-      return { kind: GridCellKind.Text, data: '', displayData: '', readonly: true, allowOverlay: false }
+
+      return {
+        kind: GridCellKind.Text,
+        data: '',
+        displayData: '',
+        readonly: true,
+        allowOverlay: false,
+      }
     },
     [gridData],
   )
 
   const [lastActivated, setLastActivated] = useState(undefined)
-
- 
 
   useEffect(() => {
     setGridData(data)
@@ -135,22 +169,27 @@ function TableUserManagement({
     lastClickRef.current = { cell: { col, row }, time: now };
   }; */
 
-
-
   const onCellEdited = useCallback((cell, newValue) => {
     if (newValue.kind !== 'Text') {
-        return;
+      return
     }
 
-    const indexes = ["UserSeq", "UserName", "UserId", "DeptSeq" , "Remark","LoginDate", "LoginStatus"];
-    const [col, row] = cell;
-    const key = indexes[col];
+    const indexes = [
+      'UserSeq',
+      'UserName',
+      'UserId',
+      'DeptSeq',
+      'Remark',
+      'LoginDate',
+      'LoginStatus',
+    ]
+    const [col, row] = cell
+    const key = indexes[col]
 
-    gridData[row][key] = newValue.gridData;
+    gridData[row][key] = newValue.gridData
     console.log('key', key)
-}, []);
+  }, [])
 
-  
   return (
     <div className="w-full gap-1 h-full flex items-center justify-center pb-8">
       <div className="w-full h-full flex flex-col border bg-white rounded-lg overflow-hidden ">
@@ -186,16 +225,16 @@ function TableUserManagement({
                 }
           }
           onPaste={true}
-          fillHandle={true} keybindings={{
+          fillHandle={true}
+          keybindings={{
             downFill: true,
-            rightFill: true
-          }} 
+            rightFill: true,
+          }}
           trailingRowOptions={{
             sticky: true,
             tint: true,
-            hint: "New row..."
-          }} 
-
+            hint: 'New row...',
+          }}
         />
       </div>
     </div>

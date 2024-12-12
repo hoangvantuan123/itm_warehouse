@@ -18,7 +18,7 @@ export default function CodeHelpStockOut2({
   setEmpName,
   setSelection,
   selection,
-  resetTable
+  resetTable,
 }) {
   const [isMinusClicked, setIsMinusClicked] = useState(false)
   const [lastClickedCell, setLastClickedCell] = useState(null)
@@ -148,12 +148,15 @@ export default function CodeHelpStockOut2({
             </div>
           </details>
 
-          <TableCodeHelpStockOut2 data={data} onCellClicked={onCellClicked} setSelection={setSelection} selection={selection} />
+          <TableCodeHelpStockOut2
+            data={data}
+            onCellClicked={onCellClicked}
+            setSelection={setSelection}
+            selection={selection}
+          />
         </div>
         <div className="flex justify-end gap-4 ">
-          <Button onClick={handleClose}>
-            Cancel
-          </Button>
+          <Button onClick={handleClose}>Cancel</Button>
           <Button type="primary" onClick={() => setModalVisible(false)}>
             Save
           </Button>

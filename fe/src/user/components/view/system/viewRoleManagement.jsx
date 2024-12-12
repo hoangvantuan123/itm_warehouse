@@ -488,7 +488,6 @@ function ViewRoleManagement({
         ) : (
           <>
             {' '}
-
             <Content className="flex flex-col  justify-center items-center px-4">
               <div className="text-center  justify-center">
                 <img

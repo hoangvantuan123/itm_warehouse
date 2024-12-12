@@ -4,13 +4,17 @@ export default function ModalWaiting({
   modal2Open,
   setModal2Open,
   error,
-  resetTable, 
+  resetTable,
   setKeyPath
 }) {
   const handelOnCancel = () => {
     setModal2Open(false)
-    resetTable()
-    setKeyPath(null)
+    if (typeof resetTable === 'function') {
+      resetTable();
+    }
+    if (typeof setKeyPath === 'function') {
+      setKeyPath(null);
+    }
   }
   return (
     <Modal

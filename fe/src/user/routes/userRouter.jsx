@@ -14,8 +14,8 @@ import {
   useLocation,
   Navigate,
 } from 'react-router-dom'
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
+import i18n from 'i18next'
+import { initReactI18next } from 'react-i18next'
 import { Layout, Spin } from 'antd'
 import Sidebar from '../components/sildebar/sidebar'
 import Cookies from 'js-cookie'
@@ -45,37 +45,36 @@ const MenuTechnique = lazy(() => import('../page/system/menuTechnique'))
 const RootMenuTechnique = lazy(() => import('../page/system/rootMenuTechnique'))
 const StockOutRequestFiFo = lazy(() => import('../page/material/stockOutFiFo'))
 const { Content } = Layout
-import { openDB } from 'idb';
-
-
+import { openDB } from 'idb'
 
 const getLanguageData = async (typeLanguage) => {
-  const db = await openDB('languageDatabase', 1);
-  const data = await db.get('languages', typeLanguage);
-  return data ? data.languageData : null;
-};
+  const db = await openDB('languageDatabase', 1)
+  const data = await db.get('languages', typeLanguage)
+  return data ? data.languageData : null
+}
 
 const LanguageProvider = ({ children, keyLanguage }) => {
-  const [isReady, setIsReady] = useState(false);
-  const [languageUser, setLanguageUser] = useState(null);
+  const [isReady, setIsReady] = useState(false)
+  const [languageUser, setLanguageUser] = useState(null)
 
   useEffect(() => {
-    const languageFromStorage = Number(localStorage.getItem('language_user')) || 6;
-    setLanguageUser(languageFromStorage);
-  }, []);
+    const languageFromStorage =
+      Number(localStorage.getItem('language_user')) || 6
+    setLanguageUser(languageFromStorage)
+  }, [])
 
   useEffect(() => {
     const initializeI18n = async () => {
       try {
-        const languageData = await getLanguageData(6);
+        const languageData = await getLanguageData(6)
         if (!languageData) {
-          setIsReady(true);
-          return;
+          setIsReady(true)
+          return
         }
         const translations = languageData.reduce((acc, item) => {
-          acc[item.WordSeq] = item.Word;
-          return acc;
-        }, {});
+          acc[item.WordSeq] = item.Word
+          return acc
+        }, {})
 
         i18n.use(initReactI18next).init({
           resources: {
@@ -88,20 +87,20 @@ const LanguageProvider = ({ children, keyLanguage }) => {
           interpolation: {
             escapeValue: false,
           },
-        });
+        })
 
-        setIsReady(true);
+        setIsReady(true)
       } catch (error) {
-        setIsReady(true);
+        setIsReady(true)
       }
-    };
+    }
 
-    initializeI18n();
-  }, []);
-  if (!isReady) return null;
+    initializeI18n()
+  }, [])
+  if (!isReady) return null
 
-  return children;
-};
+  return children
+}
 
 const UserRouter = () => {
   const navigate = useNavigate()
@@ -181,7 +180,12 @@ const UserRouter = () => {
     <Routes>
       <Route
         path="u/login"
-        element={<Login processRolesMenu={processRolesMenu} setKeyLanguage={setKeyLanguage} />}
+        element={
+          <Login
+            processRolesMenu={processRolesMenu}
+            setKeyLanguage={setKeyLanguage}
+          />
+        }
       />
       <Route
         path="/*"
@@ -197,8 +201,10 @@ const UserRouter = () => {
                 <Layout>
                   <Content className="bg-slate-50">
                     <Suspense fallback={<Spinner />}>
-                      <BreadcrumbRouter rootMenu={rootMenuItems}
-                        menuTransForm={menuTransForm} />
+                      <BreadcrumbRouter
+                        rootMenu={rootMenuItems}
+                        menuTransForm={menuTransForm}
+                      />
                       <Routes>
                         <Route
                           path="u/warehouse/material/delivery-list"
@@ -446,7 +452,6 @@ const UserRouter = () => {
           </Suspense>
         }
       />
-
     </Routes>
   )
 }

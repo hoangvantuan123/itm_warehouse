@@ -21,7 +21,7 @@ import {
   UserOutlined,
   PlusOutlined,
   FolderOpenOutlined,
-  FolderOutlined
+  FolderOutlined,
 } from '@ant-design/icons'
 import { deleteDatabase } from '../../../IndexedDB/deleteIndexDB'
 import { SettingIcon, FileMenuIcon, LogoutIcon } from './icon'
@@ -305,8 +305,9 @@ const Sidebar = ({ permissions, rootMenu, menuTransForm }) => {
               collapsed={collapsed}
               collapsedWidth={0}
               onCollapse={toggleSidebar}
-              className={`${collapsed ? 'p-0 border-none' : 'p-2 border-r'
-                } h-screen overflow-auto scroll-container transition-all duration-300 ease-in-out`}
+              className={`${
+                collapsed ? 'p-0 border-none' : 'p-2 border-r'
+              } h-screen overflow-auto scroll-container transition-all duration-300 ease-in-out`}
             >
               <SidebarContent
                 collapsed={collapsed}

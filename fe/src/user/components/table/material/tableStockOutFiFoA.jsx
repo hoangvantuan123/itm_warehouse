@@ -63,7 +63,6 @@ function TableStockOUtFiFoA({ data }) {
         ItemName = '',
         Spec = '',
         UnitName = '',
-
       } = person
 
       const safeString = (value) => (value != null ? String(value) : '')
@@ -163,8 +162,8 @@ function TableStockOUtFiFoA({ data }) {
           i % 2 === 0
             ? undefined
             : {
-              bgCell: '#FBFBFB',
-            }
+                bgCell: '#FBFBFB',
+              }
         }
       />
     </div>

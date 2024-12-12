@@ -12,7 +12,11 @@ import { ChangePassword } from '../../features/auth/changePassword'
 import Logo from '../../assets/ItmLogo.png'
 const { Title, Text } = Typography
 
-export default function Login({ fetchPermissions, processRolesMenu, setKeyLanguage }) {
+export default function Login({
+  fetchPermissions,
+  processRolesMenu,
+  setKeyLanguage,
+}) {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const [form] = Form.useForm()
@@ -41,7 +45,10 @@ export default function Login({ fetchPermissions, processRolesMenu, setKeyLangua
       if (response.success) {
         localStorage.setItem('userInfo', JSON.stringify(response.data.user))
         localStorage.setItem('roles_menu', response.data.tokenRolesUserMenu)
-        localStorage.setItem('language_user', JSON.stringify(response.data.typeLanguage));
+        localStorage.setItem(
+          'language_user',
+          JSON.stringify(response.data.typeLanguage),
+        )
         setKeyLanguage(response.data.typeLanguage)
         Cookies.set('a_a', response.data.token)
 

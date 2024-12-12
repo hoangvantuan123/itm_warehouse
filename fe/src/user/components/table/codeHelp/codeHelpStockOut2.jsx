@@ -8,7 +8,12 @@ const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
 
-function TableCodeHelpStockOut2({ data, onCellClicked, setSelection, selection }) {
+function TableCodeHelpStockOut2({
+  data,
+  onCellClicked,
+  setSelection,
+  selection,
+}) {
   const [gridData, setGridData] = useState([])
   const [showSearch, setShowSearch] = useState(false)
   const ref = (useRef < data) | (null > null)
@@ -90,7 +95,6 @@ function TableCodeHelpStockOut2({ data, onCellClicked, setSelection, selection }
   const [lastActivated, setLastActivated] = useState(undefined)
 
   const onCellActivated = useCallback((cell) => {
-    console.log('cell', cell)
     setLastActivated(cell)
   }, [])
 

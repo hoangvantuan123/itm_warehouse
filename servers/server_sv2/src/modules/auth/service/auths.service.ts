@@ -277,20 +277,25 @@ AND r.Type IN ('rootmenu', 'menu');
     }> {
         try {
             const updatePromises = userIds.map(async (userId) => {
-                const userIdStr = userId.toString();
-                const newPassword = `@${userIdStr}`;
-                const hashedPassword = await this.hashPassword(newPassword);
-
-                await this.userWEBRepository.update(
-                    { UserId: userIdStr },
-                    { Password2: hashedPassword },
-                );
+                try {
+                    const userIdStr = userId.toString();
+                    const newPassword = `@${userIdStr}`;
+                    const hashedPassword = await this.hashPassword(newPassword);
+                    
+                    await this.userWEBRepository.update(
+                        { UserId: userIdStr },
+                        { Password2: hashedPassword, CheckPass1: false }
+                    );
+                } catch (error) {
+                    throw new Error(`Failed to update password for user ${userId}`);
+                }
             });
-
+    
             await Promise.all(updatePromises);
+    
             return {
                 success: true,
-                message: 'Passwords updated successfully.',
+                message: 'Passwords  updated successfully.',
             };
         } catch (error) {
             return {
@@ -299,7 +304,7 @@ AND r.Type IN ('rootmenu', 'menu');
             };
         }
     }
-
+    
 
     async changePassword2(
         employeeId: string,

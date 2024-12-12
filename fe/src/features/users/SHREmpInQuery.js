@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { HOST_API_SERVER_1 } from '../../services'
-
+accessToken
 const generateXml = (data) => {
   return `
     <ROOT>
@@ -31,6 +31,7 @@ const DEFAULTS = {
 }
 
 export const SHREmpInQuery = (requestData) => {
+  const token = accessToken()
   const requestParams = {
     ...DEFAULTS,
     ...requestData,
@@ -50,6 +51,7 @@ export const SHREmpInQuery = (requestData) => {
   return axios
     .post(`${HOST_API_SERVER_1}/mssql/users/SHREmpInQuery`, dataToSend, {
       headers: {
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
     })

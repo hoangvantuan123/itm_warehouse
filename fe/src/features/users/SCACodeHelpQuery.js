@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { HOST_API_SERVER_1 } from '../../services'
-
+import { accessToken } from '../../services/tokenService'
 const DEFAULTS = {
   workingTag: 'Q',
   companySeq: 1,
@@ -25,6 +25,7 @@ const DEFAULTS = {
 }
 
 export const SCACodeHelpQuery = (keyword, conditionSeq, subConditionSql) => {
+  const token = accessToken()
   const requestParams = {
     ...DEFAULTS,
     keyword,
@@ -58,6 +59,7 @@ export const SCACodeHelpQuery = (keyword, conditionSeq, subConditionSql) => {
   return axios
     .post(`${HOST_API_SERVER_1}/mssql/users/SCACodeHelpQuery`, dataToSend, {
       headers: {
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
     })

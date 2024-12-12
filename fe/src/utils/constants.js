@@ -46,11 +46,9 @@ export const BARCODE_ERR_MESSAGE = {
   NEW_BARCODE_NOT_MATCH: 'New Barcode Not Match.',
   NO_DATA_BARCODEID: 'No data barcode ID',
   DUPLICATE_ROW: 'Duplicate Row Data',
-  BARCODE_NOT_CONFIRM: 'Barcode not confirm.'
+  BARCODE_NOT_CONFIRM: 'Barcode not confirm.',
 }
-
 
 export const BARCODE_SUCCESS_MESSAGE = {
   BARCODE_CONFIRM_SUCCESS: 'Barcode Confirm Succesfull.',
-
 }

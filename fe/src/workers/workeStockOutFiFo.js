@@ -35,7 +35,7 @@ function checkBarcode(barcode, tableData, tableScanHistory) {
     }
   }
 
-/*   if (item.RemainQty < qty) {
+  /*   if (item.RemainQty < qty) {
     return {
       success: false,
       message: `Số lượng quét (${qty}) vượt quá số lượng còn lại (${item.RemainQty}) của ItemNo: ${item.ItemNo}.`,
@@ -63,19 +63,13 @@ function checkBarcode(barcode, tableData, tableScanHistory) {
       WorkOrderSerl: item.WorkOrderSerl,
       WorkOrderSeq: item.WorkOrderSeq,
       OutReqItemSerl: item.OutReqItemSerl,
-      OutReqSeq: item.OutReqSeq
-
+      OutReqSeq: item.OutReqSeq,
     },
   }
 }
 
 self.onmessage = function (event) {
-  const {
-    type,
-    barcode,
-    tableData,
-    tableScanHistory
-  } = event.data
+  const { type, barcode, tableData, tableScanHistory } = event.data
   let result
 
   switch (type) {

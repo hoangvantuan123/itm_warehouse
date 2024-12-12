@@ -207,7 +207,6 @@ export class MatWHStockInService {
         @PgmSeq = ${pgmSeq};
     `;
     try {
-    //console.log('save',result)
       const result = await this.databaseService.executeQuery(query);
       return { success: true, data: query };
     } catch (error) {
@@ -231,7 +230,6 @@ export class MatWHStockInService {
         @pBLSerl = ${result[0]?.BLSerl};
     `;
     try {
-      //console.log('savesheet',query)
       const result = await this.databaseService.executeQuery(query);
       return { success: true, data: query };
     } catch (error) {

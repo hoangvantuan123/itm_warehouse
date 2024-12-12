@@ -19,7 +19,6 @@ export class IQCStatusService {
     `;
 
         try {
-            console.log('sp',query)
             const result = await this.databaseService.executeQuery(query);
             return { success: true, data: result };
         } catch (error) {

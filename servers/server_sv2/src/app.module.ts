@@ -41,7 +41,7 @@ export class AppModule implements OnModuleInit {
 
 
     if (this.connection2.isConnected) {
-      console.log('ITMV20240117 connected');
+      console.log('ITMV connected');
     } else {
       console.error('Failed to connect to the second database');
     }

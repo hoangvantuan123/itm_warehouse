@@ -1,11 +1,6 @@
 import axios from 'axios'
-import {
-  HOST_API_SERVER_1
-} from '../../services'
-import {
-  accessToken
-} from '../../services/tokenService'
-
+import { HOST_API_SERVER_1 } from '../../services'
+import { accessToken } from '../../services/tokenService'
 const DEFAULTS = {
   xmlFlags: 2,
   serviceSeq: 2639,
@@ -14,7 +9,12 @@ const DEFAULTS = {
   pgmSeq: 1036085,
 }
 
-export const CheckAllProceduresStockOutFiFo = async (checkValueIsStop, outReqSeq, dataSave, xmlDocuments) => {
+export const CheckAllProceduresStockOutFiFo = async (
+  checkValueIsStop,
+  outReqSeq,
+  dataSave,
+  xmlDocuments,
+) => {
   try {
     const token = accessToken()
     const dataToSend = {
@@ -32,7 +32,8 @@ export const CheckAllProceduresStockOutFiFo = async (checkValueIsStop, outReqSeq
 
     const response = await axios.post(
       `${HOST_API_SERVER_1}/mssql/stock-out/check-all-procedures-stock-out-fifo`,
-      dataToSend, {
+      dataToSend,
+      {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',

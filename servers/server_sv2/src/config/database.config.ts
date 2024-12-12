@@ -29,7 +29,7 @@ export const sqlServerITMV20240117: TypeOrmModuleOptions = {
   port: 14233,
   username: 'genuine',
   password: 'Itmv209#',
-  database: 'ITMV20240117',
+  database: 'ITMV',
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   synchronize: false,
   logging: false,  // Chuyển sang false để tăng hiệu suất trong môi trường sản xuất

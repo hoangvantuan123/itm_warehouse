@@ -60,6 +60,7 @@ export class StockInService {
         @PgmSeq = ${pgmSeq};
     `;
     try {
+    
       const result = await this.databaseService.executeQuery(query);
       const invalidStatuses = result.some((item: any) => item.Status !== 0);
       if (invalidStatuses) {
@@ -419,6 +420,7 @@ export class StockInService {
     pgmSeq: number,
     dataSave: any[]
   ): Promise<SimpleQueryResult> {
+    console.log('userSeq', userSeq)
     try {
       const errors: string[] = [];
       const data: any[] = [];
@@ -451,6 +453,7 @@ export class StockInService {
         let result: any;
         if (name === '_SSLImpDelvMasterCheck_WEB') {
           result = await executeProcedure(name, xmlDocument, serviceSeq);
+
           masterCheckResult = result;
         } else if (name === '_SSLImpDelvSheetCheck_WEB' && masterCheckResult) {
           const delvSeq = masterCheckResult[0]?.DelvSeq;
@@ -472,6 +475,7 @@ export class StockInService {
       const saveProcedure = async (name: string, result: any) => {
         switch (name) {
           case '_SSLImpDelvMasterCheck_WEB':
+            console.log('_SSLImpDelvMasterCheck_WEB', result)
             return this._SSLImpDelvMasterSaveWEB(
               result,
               xmlFlags,
@@ -571,6 +575,7 @@ export class StockInService {
         @PgmSeq = ${pgmSeq};
     `;
     try {
+      console.log('_SSLImpDelvMasterSave_WEB', query)
       const result = await this.databaseService.executeQuery(query);
       return { success: true, data: result };
     } catch (error) {

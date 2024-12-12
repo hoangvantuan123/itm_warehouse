@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { HOST_API_SERVER_1 } from '../../services'
-
+import { accessToken } from '../../services/tokenService'
 const generateXml = (data) => {
   return `
         <DataBlock1>
@@ -32,6 +32,7 @@ const DEFAULTS = {
 }
 
 export const SCOMCloseCheckWEB = (requestData) => {
+  const token = accessToken()
   const requestParams = {
     ...DEFAULTS,
     ...requestData,
@@ -54,6 +55,7 @@ export const SCOMCloseCheckWEB = (requestData) => {
       dataToSend,
       {
         headers: {
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       },

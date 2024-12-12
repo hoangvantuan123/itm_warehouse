@@ -37,43 +37,46 @@ export default function DeliveryList({ permissions, isMobile }) {
   const [clickedRowData, setClickedRowData] = useState(null)
   const [clickedRowDataList, setClickedRowDataList] = useState([])
   const [gridData, setGridData] = useState([])
-  const [isAPISuccess, setIsAPISuccess] = useState(true);
+  const [isAPISuccess, setIsAPISuccess] = useState(true)
   const { t } = useTranslation()
 
   const fetchDeliveryData = async () => {
     if (!isAPISuccess) {
-      return;
+      return
     }
-    setLoadingA(true);
-    setIsAPISuccess(false);
+    setLoadingA(true)
+    setIsAPISuccess(false)
 
-    let hideLoadingMessage;
+    let hideLoadingMessage
     try {
-      hideLoadingMessage = message.loading('Đang tải dữ liệu, vui lòng chờ...', 0);
+      hideLoadingMessage = message.loading(
+        'Đang tải dữ liệu, vui lòng chờ...',
+        0,
+      )
       const deliveryResponse = await GetDeliveryList(
         formData ? formatDate(formData) : '',
         toDate ? formatDate(toDate) : '',
         deliveryNo,
         bizUnit,
-      );
+      )
       if (deliveryResponse?.success) {
-        setData(deliveryResponse.data || []);
-        setIsAPISuccess(true);
+        setData(deliveryResponse.data || [])
+        setIsAPISuccess(true)
       } else {
-        setData([]);
-        setIsAPISuccess(true);
-        message.error('Có lỗi xảy ra khi tải dữ liệu.');
+        setData([])
+        setIsAPISuccess(true)
+        message.error('Có lỗi xảy ra khi tải dữ liệu.')
       }
     } catch (error) {
-      setData([]);
-      setIsAPISuccess(true);
-      message.error('Có lỗi xảy ra khi tải dữ liệu.');
+      setData([])
+      setIsAPISuccess(true)
+      message.error('Có lỗi xảy ra khi tải dữ liệu.')
     } finally {
-      if (hideLoadingMessage) hideLoadingMessage();
-      setIsAPISuccess(true);
-      setLoadingA(false);
+      if (hideLoadingMessage) hideLoadingMessage()
+      setIsAPISuccess(true)
+      setLoadingA(false)
     }
-  };
+  }
 
   useEffect(() => {
     fetchDeliveryData()
@@ -100,7 +103,6 @@ export default function DeliveryList({ permissions, isMobile }) {
       setLoading(false)
     }
   }, [])
-
 
   const debouncedFetchCodeHelpData = useMemo(
     () => debounce(fetchCodeHelpData, 100),
@@ -233,7 +235,6 @@ export default function DeliveryList({ permissions, isMobile }) {
           </div>
 
           <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg  overflow-auto">
-
             <TableDeliveryList
               data={data}
               setCheckedPath={setCheckedPath}

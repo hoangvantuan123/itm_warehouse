@@ -8,12 +8,17 @@ const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
 
-function TableCodeHelpStockOut3({ data, onCellClicked, selection , setSelection}) {
+function TableCodeHelpStockOut3({
+  data,
+  onCellClicked,
+  selection,
+  setSelection,
+}) {
   const [gridData, setGridData] = useState([])
   const [showSearch, setShowSearch] = useState(false)
   const ref = (useRef < data) | (null > null)
   const onSearchClose = useCallback(() => setShowSearch(false), [])
-  
+
   const columns = useMemo(
     () => [
       { title: 'CustSeq' },
@@ -76,7 +81,6 @@ function TableCodeHelpStockOut3({ data, onCellClicked, selection , setSelection}
   const [lastActivated, setLastActivated] = useState(undefined)
 
   const onCellActivated = useCallback((cell) => {
-    console.log('cell', cell)
     setLastActivated(cell)
   }, [])
 

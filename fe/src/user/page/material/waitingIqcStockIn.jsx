@@ -57,7 +57,8 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     rows: CompactSelection.empty(),
   })
   const [isOpenDetails, setIsOpenDetails] = useState(false)
-  const [isAPISuccess, setIsAPISuccess] = useState(true);
+  const [isAPISuccess, setIsAPISuccess] = useState(true)
+  const [isCheckSaveSuccess, setIsCheckSaveSuccess] = useState(true)
   useEffect(() => {
     const savedState = localStorage.getItem('detailsStateIqc')
     setIsOpenDetails(savedState === 'open')
@@ -270,7 +271,6 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     })
   }, [])
 
-
   useEffect(() => {
     workerRef.current = new Worker(
       new URL('../../../workers/workerWatingIqcStockIn.js', import.meta.url),
@@ -476,9 +476,9 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const handleSubmit = useCallback(
     async (e) => {
       if (!isAPISuccess) {
-        return;
+        return
       }
-      setIsAPISuccess(false);
+      setIsAPISuccess(false)
       e.preventDefault()
       setLoadingSave(true)
       setResult(null)
@@ -515,23 +515,23 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
           navigate(`/u/warehouse/material/delivery-list`)
           setModal4Open(false)
           setScanHistory([])
-          setIsAPISuccess(true);
+          setIsAPISuccess(true)
           fetchDeliveryData(filteredData?.DelvNo, filteredData?.PurchaseType)
         } else {
           setModal4Open(false)
           setModal2Open(true)
           setError(response.message)
-          setIsAPISuccess(true);
+          setIsAPISuccess(true)
         }
       } catch (error) {
         setModal4Open(false)
         setResult({ error: error.message })
         setModal2Open(true)
         setError(error.message)
-        setIsAPISuccess(true);
+        setIsAPISuccess(true)
       } finally {
         setLoadingSave(false)
-        setIsAPISuccess(true);
+        setIsAPISuccess(true)
       }
     },
     [filteredData, scanHistory],
@@ -662,6 +662,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
         modal2Open={modal2Open}
         setModal2Open={setModal2Open}
         error={error}
+
       />
       <LoadSubmit setModal4Open={setModal4Open} modal4Open={modal4Open} />
       <SuccessSubmit

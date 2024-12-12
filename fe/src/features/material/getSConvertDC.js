@@ -1,11 +1,12 @@
 import axios from 'axios'
 import { HOST_API_SERVER_1 } from '../../services'
 import { ERROR_MESSAGES } from '../../utils/constants'
+import { accessToken } from '../../services/tokenService'
 
 export const GetSConvertDC = async (itemNo, prodDate1, inDate1) => {
   try {
     const url = `${HOST_API_SERVER_1}/mssql/stock-in/convert-dc`
-
+    const token = accessToken()
     const response = await axios.get(url, {
       params: {
         itemNo: `'${itemNo}'`,
@@ -13,6 +14,7 @@ export const GetSConvertDC = async (itemNo, prodDate1, inDate1) => {
         inDate1: `'${inDate1}'`,
       },
       headers: {
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
     })

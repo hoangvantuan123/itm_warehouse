@@ -10,7 +10,13 @@ const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
 
-function TableStockOutRequest({ data, onCellClicked, gridData, setGridData, loading }) {
+function TableStockOutRequest({
+  data,
+  onCellClicked,
+  gridData,
+  setGridData,
+  loading,
+}) {
   const [showSearch, setShowSearch] = useState(false)
   const ref = (useRef < data) | (null > null)
   const onSearchClose = useCallback(() => setShowSearch(false), [])
@@ -174,8 +180,8 @@ function TableStockOutRequest({ data, onCellClicked, gridData, setGridData, load
             i % 2 === 0
               ? undefined
               : {
-                bgCell: '#FBFBFB',
-              }
+                  bgCell: '#FBFBFB',
+                }
           }
         />
       </div>

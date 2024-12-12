@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { HOST_API_SERVER_1 } from '../../services'
 import { ERROR_MESSAGES } from '../../utils/constants'
+import { accessToken } from '../../services/tokenService'
 
 export const GetMatWHStockInList = async (
   blSeq,

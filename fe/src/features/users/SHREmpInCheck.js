@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { HOST_API_SERVER_1 } from '../../services'
-
+import { accessToken } from '../../services/tokenService'
 const DEFAULTS = {
   xmlFlags: 2,
   serviceSeq: 1613,
@@ -13,6 +13,7 @@ const DEFAULTS = {
 
 export const SHREmpInCheck = async (xmlDocument, workingTag) => {
   try {
+    const token = accessToken()
     const dataToSend = {
       ...DEFAULTS,
       xmlDocument,
@@ -24,6 +25,7 @@ export const SHREmpInCheck = async (xmlDocument, workingTag) => {
       dataToSend,
       {
         headers: {
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       },

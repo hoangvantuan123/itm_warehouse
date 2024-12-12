@@ -1,18 +1,19 @@
 import axios from 'axios'
 import { HOST_API_SERVER_1 } from '../../services'
-
+import { accessToken } from '../../services/tokenService'
 const DEFAULTS = {
   xmlFlags: 2,
   serviceSeq: 2639,
   workingTag: '',
   companySeq: 1,
   languageSeq: 6,
-  userSeq: 3106,
+  userSeq: 0,
   pgmSeq: 1036085,
 }
 
 export const CheckAllProceduresStockIn = async (dataSave, xmlDocuments) => {
   try {
+    const token = accessToken()
     const dataToSend = {
       ...DEFAULTS,
       dataSave,
@@ -30,6 +31,7 @@ export const CheckAllProceduresStockIn = async (dataSave, xmlDocuments) => {
       dataToSend,
       {
         headers: {
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       },

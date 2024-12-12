@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { HOST_API_SERVER_1 } from '../../services'
 import { ERROR_MESSAGES } from '../../utils/constants'
+import { accessToken } from '../../services/tokenService'
 
 export const GetDeliveryList = async (
   fromDate,
@@ -10,7 +11,7 @@ export const GetDeliveryList = async (
 ) => {
   try {
     const url = `${HOST_API_SERVER_1}/mssql/deliverry-list/itm-sug-get-active-delivery-web`
-
+    const token = accessToken()
     const response = await axios.get(url, {
       params: {
         fromDate,
@@ -19,6 +20,7 @@ export const GetDeliveryList = async (
         delivbizUniteryNo,
       },
       headers: {
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
     })

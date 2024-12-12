@@ -9,7 +9,12 @@ const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
 
-function TableCodeHelpStockOut1({ data, onCellClicked, setSelection, selection }) {
+function TableCodeHelpStockOut1({
+  data,
+  onCellClicked,
+  setSelection,
+  selection,
+}) {
   const [gridData, setGridData] = useState([])
   const [showSearch, setShowSearch] = useState(false)
   const ref = (useRef < data) | (null > null)
@@ -80,7 +85,7 @@ function TableCodeHelpStockOut1({ data, onCellClicked, setSelection, selection }
   useEffect(() => {
     setGridData(data)
   }, [data])
-  
+
   return (
     <div className="w-full gap-1 h-full flex items-center justify-center pb-8">
       <div className="w-full h-full flex flex-col border bg-white rounded-lg overflow-hidden ">
