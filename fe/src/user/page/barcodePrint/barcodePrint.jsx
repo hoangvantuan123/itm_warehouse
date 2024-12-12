@@ -11,7 +11,7 @@ import dayjs from 'dayjs';
 import { CreatePrintLabel, getLotCount, getMatIdByVendor, GetPageItem, getReelNo } from '../../../features/barcode/printBarcodeService';
 import { getPrinterDevice } from '../../../features/barcode/barcodeChangeService';
 import ModalWaiting from '../../components/modal/material/modalWaiting';
-import { BARCODE_ERR_MESSAGE } from '../../../utils/constants';
+import { BARCODE_ERR_MESSAGE, BARCODE_SUCCESS_MESSAGE } from '../../../utils/constants';
 
 export default function BarcodePrint({ permissions, isMobile }) {
     const [formQuery] = Form.useForm();
@@ -20,14 +20,13 @@ export default function BarcodePrint({ permissions, isMobile }) {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
     const { t } = useTranslation();
-    const [rowChecked, setRowChecked] = useState(null);
     const [fromDate, setFromDate] = useState(dayjs().startOf('week'))
     const [toDate, setToDate] = useState(dayjs().endOf('week'))
     const formatDate = useCallback((date) => date.format('YYYYMMDDHHmmss'), [])
 
     const [gridData, setGridData] = useState([])
 
-    const [selectRow, setSelectRow] = useState(null);
+    const [selectRow, setSelectRow] = useState([]);
     const [clickedRowData, setClickedRowData] = useState(null);
 
     const [optionDevices, setOptionDevices] = useState([]);
@@ -53,8 +52,7 @@ export default function BarcodePrint({ permissions, isMobile }) {
     const reelNoRef = useRef(null);
     const userIdRef = useRef(null);
 
-
-    const fetchItemList = useCallback(async (e) => {
+    const onFinish = async (e) => {
         setData([]);
         const {
             fromDate,
@@ -78,15 +76,9 @@ export default function BarcodePrint({ permissions, isMobile }) {
         } finally {
             setLoading(false)
         }
-    }, [])
-
-    const onFinish = async (e) => {
-        fetchItemList(e);
     }
- 
+
     const getMultiSelectedRows = () => {
-
-
         const selectedRows = selectRow.rows.items;
 
         let rows = [];
@@ -101,9 +93,9 @@ export default function BarcodePrint({ permissions, isMobile }) {
         });
 
         return rows;
-    }; 
+    };
 
-    
+
 
     const onDropDownChange = (e) => {
 
@@ -135,8 +127,8 @@ export default function BarcodePrint({ permissions, isMobile }) {
     }
 
     const handleOnchangeDevice = (e) => {
-        setDevice(e.value); 
-        
+        setDevice(e.value);
+
     }
 
     const onChangeVendor = (e) => {
@@ -474,49 +466,68 @@ export default function BarcodePrint({ permissions, isMobile }) {
     }
 
     const onClickPrint = useCallback(
-
-        async () => {
+        async ()=> {
             const createPayload = (isMulti, rows, device) => ({
                 isMulti,
                 listSelected: rows,
                 device
             });
-
+    
             const singleRow = {
-                acVendor,
-                acPartNoVendor,
-                acMatId,
-                acLotTotalCnt,
-                acLotNo,
-                acQty,
-                acReelNo,
-                acUserId,
-                acIssueNo,
-                acRemark,
-
+                VENDOR: acVendor,
+                PARTNO: acPartNoVendor,
+                ITEMCD: acMatId,
+                LOTNOCNT: acLotTotalCnt,
+                LOTNO: acLotNo,
+                QTY: acQty,
+                REELNO: acReelNo,
+                USER_ID: acUserId,
+                ISSUENO: acIssueNo,
+                REMARK: acRemark,
+                DATECODE: acDateCode,
+                REMARK: acRemark,
+                LOT_ID : acMatId + '/' + acLotNo + "/" + acQty + "/" + acDateCode + "/" + acReelNo,
+    
             };
             let payLoad;
-
-            if(singleRow){
-                payLoad = createPayload(true, getMultiSelectedRows(), device);
-            }else{
+            const multi = getMultiSelectedRows();
+    
+            if (multi && multi.length >= 1) {
+                payLoad = createPayload(true, multi, device);
+            } else {
                 payLoad = createPayload(false, [singleRow], device);
             }
+                                
+            try {
+                const result = await CreatePrintLabel(
+                    payLoad
+                );
+                if(result.result.status){
+                    setModal2Open(true);
+                    setError(BARCODE_SUCCESS_MESSAGE.PRINTER_SUCCESS);
+                }
+                else{
+                    setModal2Open(true);
+                    setError(BARCODE_ERR_MESSAGE.PRINTER_ERROR);
+                }
+    
+            } catch (error) {
+    
+            }
+        
+        }, [getMultiSelectedRows] 
+    ) 
 
+    const [isModalVisible, setIsModalVisible] = useState(false);
 
-            console.log("payLoad", payLoad)
-            
-            // try {
-            //     await CreatePrintLabel(
-            //         payLoad
-            //     );
+    const onClickCancel = () => {
+        setIsModalVisible(false);
+    };
 
-            // } catch (error) {
-
-            // }
-        }, []
-
-    )
+    const onClickPreview = () => {
+        setIsModalVisible(true);
+        let LOTID = newLabel.ITEMCD + '/' + newLabel.LOTNO + '/' + newLabel.QTY + '/' + newLabel.DATECODE + '/' + newLabel.REELNO;
+    };
 
 
     const resetAllState = () => {
@@ -559,9 +570,9 @@ export default function BarcodePrint({ permissions, isMobile }) {
 
                         onFinish={onFinish}
                         onClickPrint={onClickPrint}
-
-                        rowSelects={rowChecked}
-                        setRowChecked={setRowChecked}
+                        onClickPreview={onClickPreview}
+                        isModalVisible={isModalVisible}
+                        onClickCancel={onClickCancel}
 
                         onDropDownChange={onDropDownChange}
                         optionDevices={optionDevices}

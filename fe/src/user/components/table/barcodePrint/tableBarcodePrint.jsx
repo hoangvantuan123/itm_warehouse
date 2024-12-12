@@ -4,10 +4,20 @@ import { CompactSelection, DataEditor, GridCellKind } from '@glideapps/glide-dat
 import '@glideapps/glide-data-grid/dist/index.css'
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-function TableBarcodePrint({ data, setGridData, gridData, setSelectRow, setClickedRowData }) {
+function TableBarcodePrint({ 
+    data, 
+    setGridData, 
+    gridData, 
+    setSelectRow, 
+    setClickedRowData }) {
 
     const [isMinusClicked, setIsMinusClicked] = useState(false)
     const [lastClickedCell, setLastClickedCell] = useState(null)
+    const [selection, setSelection] = useState({
+        columns: CompactSelection.empty(),
+        rows: CompactSelection.empty(),
+    });
+    setSelectRow(selection);
 
     const columns = useMemo(
         () => [
@@ -99,12 +109,6 @@ function TableBarcodePrint({ data, setGridData, gridData, setSelectRow, setClick
     }, [data])
 
 
-    const [selection, setSelection] = useState({
-        columns: CompactSelection.empty(),
-        rows: CompactSelection.empty(),
-    });
-    setSelectRow(selection);
-
     const onCellClicked = (cell) => {
         const [colIndex, rowIndex] = cell;
 
@@ -133,7 +137,7 @@ function TableBarcodePrint({ data, setGridData, gridData, setSelectRow, setClick
         if (rowIndex >= 0 && rowIndex < gridData.length) {
             const rowData = gridData[rowIndex];
             setClickedRowData(rowData);
-            console.log("rowData", rowData);
+            
         }
 
     };
@@ -150,7 +154,7 @@ function TableBarcodePrint({ data, setGridData, gridData, setSelectRow, setClick
                     getCellsForSelection={true}
                     width="100%"
                     height="100%"
-                    rowMarkers={('checkbox-visible', 'both')}
+                    rowMarkers={('checkbox-visible', 'checkbox')}
                     onColumnResize={onColumnResize}
                     smoothScrollY={true}
                     smoothScrollX={true}

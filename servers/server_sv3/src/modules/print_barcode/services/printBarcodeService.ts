@@ -95,44 +95,46 @@ export class PrintBarcodeService {
         );
 
         for (const data of listDataLabel) {
-            console.log(data)
-
             let zplCode = rTemplateLabel[0].value;
 
+            console.log("data", data)
+
             const zpl = zplCode
-                .replace('{BARCODE_DATA}', data.NewBarcodeID)
-                .replace('{CODE}', data.ItemNo)
-                .replace('{LOT}', data.LotNo)
-                .replace('{QTY}', data.NewQty)
-                .replace('{DC}', data.DateCode)
-                .replace('{REEL}', data.ReelNo)
-                .replace('{USER_ID}', data.UserID)
-                .replace('{QR_DATA}', data.NewBarcodeID);
+                .replace('{BARCODE_DATA}', data.LOT_ID)
+                .replace('{CODE}', data.ITEMCD)
+                .replace('{LOT}', data.LOTNO)
+                .replace('{QTY}', data.QTY)
+                .replace('{DC}', data.DATECODE)
+                .replace('{REEL}', data.REELNO)
+                .replace('{USER_ID}', data.USER_ID)
+                .replace('{QR_DATA}', data.LOT_ID);
 
             dataCode.push(zpl);
+
+            console.log(zpl);
 
             try {
                 const client = new net.Socket();
 
-                const printResult = await new Promise((resolve, reject) => {
-                    client.connect(port, ip, () => {
-                        client.write(zpl);
-                        client.end();
-                        resolve(true);
-                        this.logger.log('Print label succesfull', zpl);
-                    });
+                // const printResult = await new Promise((resolve, reject) => {
+                //     client.connect(port, ip, () => {
+                //         client.write(zpl);
+                //         client.end();
+                //         resolve(true);
+                //         this.logger.log('Print label succesfull', zpl);
+                //     });
 
-                    client.on('error', (err) => {
-                        this.logger.error('Error connecting to printer:', err)
-                        reject(err);
-                        return {
-                            status: false,
-                            message: err,
-                        }
-                    });
-                });
-
-                if (barcodeDto.isConfirm && data.NewStatus == '' && printResult == true) {
+                //     client.on('error', (err) => {
+                //         this.logger.error('Error connecting to printer:', err)
+                //         reject(err);
+                //         return {
+                //             status: false,
+                //             message: err,
+                //         }
+                //     });
+                // });
+                const printResult = true;
+                if (barcodeDto.isMulti == false && printResult == true) {
                     try {
                          await this.createBarcode(barcodeDto.listSelected[0]);
                     } catch (err) {
@@ -169,17 +171,13 @@ export class PrintBarcodeService {
         // Todo : check is exist label 
     };
 
-    async createLabel(barcodeDto: BarcodeDto) {
-
-    };
-
-    async createBarcode(itemLabel: ItemLabelDto): Promise<any> {
+    async createBarcode(itemLabel: any): Promise<any> {
 
         const tranNo = await this.GetBarcodeInNo();
         const tranSeq = this.getBarcodeInSeq(tranNo);
         const tranTime = new Date().toISOString().replace(/[-T:.Z]/g, '').slice(0, 14);
 
-        let lotID = itemLabel.matID + '/' + itemLabel.lotNo + '/' + itemLabel.qty + '/' + itemLabel.date + '/' + itemLabel.reelNo;
+        let lotID = itemLabel.ITEMCD + '/' + itemLabel.LOTNO + '/' + itemLabel.QTY + '/' + itemLabel.DATECODE + '/' + itemLabel.REELNO;
 
         let query = ` INSERT INTO insert into EWIPRMTBCI (
                                 plant, 
@@ -201,31 +199,32 @@ export class PrintBarcodeService {
                                  ${tranNo}, 
                                  ${tranSeq}, 
                                  N'', 
-                                 ${itemLabel.vendor}, 
-                                 ${itemLabel.matID}, 
-                                 ${itemLabel.lotNo}, 
-                                 ${itemLabel.qty}, 
-                                 ${itemLabel.reelNo}, 
-                                 ${itemLabel.date}, 
+                                 ${itemLabel.VENDOR}, 
+                                 ${itemLabel.ITEMCD}, 
+                                 ${itemLabel.LOTNO}, 
+                                 ${itemLabel.QTY}, 
+                                 ${itemLabel.REELNO}, 
+                                 ${itemLabel.DATECODE}, 
                                  ${tranTime}, 
                                  ${lotID}, 
-                                 ${itemLabel.remark}, 
-                                 ${itemLabel.userId} 
+                                 ${itemLabel.REMARK}, 
+                                 ${itemLabel.USER_ID} 
                         ) ;`;
 
-        if (this.chkStock("ITMVPSG", "1000", itemLabel.matID)) {
-            query += ` UPDATE EWIPRMTSTS SET stock_qty = stock_qty + ${itemLabel.qty} 
-                where plant = 'ITMVPSG' and wh_code = '1000' and mat_id = '${itemLabel.matID}';  `;
+        if (this.chkStock("ITMVPSG", "1000", itemLabel.ITEMCD)) {
+            query += ` UPDATE EWIPRMTSTS SET stock_qty = stock_qty + ${itemLabel.QTY} 
+                where plant = 'ITMVPSG' and wh_code = '1000' and mat_id = '${itemLabel.ITEMCD}';  `;
         }
         else {
             query += ` insert into EWIPRMTSTS ( plant,  wh_code,  mat_id,  stock_qty,  hold_qty,  wit_qty,  qm_wit_qty,  lock_qty, loss_qty )
-                             values ( 'ITMVPSG', '1000', '${itemLabel.matID}', ${itemLabel.qty} , 0, 0, 0, 0, 0 ); `;
+                             values ( 'ITMVPSG', '1000', '${itemLabel.ITEMCD}', ${itemLabel.QTY} , 0, 0, 0, 0, 0 ); `;
         }
         query += ` insert into EWIPLOTSTS ( plant, lot_id, lot_gubun, wh_code,  product_type, mat_id, oper_code, lot_status, qty, good_flag, lock_flag, hold_flag )
-             values ( 'ITMVPSG', '${lotID}', '양산', '1000', '양산', '${itemLabel.matID}', '', '', ${itemLabel.qty}, 'G', 'N', 'N'); `;
+             values ( 'ITMVPSG', '${lotID}', '양산', '1000', '양산', '${itemLabel.ITEMCD}', '', '', ${itemLabel.QTY}, 'G', 'N', 'N'); `;
 
         try {
-            await this.databaseService.executeQuery(query);
+            this.logger.log("CREATE LABEL", query);
+            // await this.databaseService.executeQuery(query);
             return {
                 LOT_ID: lotID,
                 ITEMCD: itemLabel?.matID,

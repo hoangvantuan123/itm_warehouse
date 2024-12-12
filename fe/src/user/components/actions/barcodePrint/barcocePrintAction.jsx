@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Card, Button, Modal, Space, Input, Typography, DatePicker, Select, message, Form } from 'antd';
+import { useEffect, useState } from "react";
+import { Card, Button, Modal, Space, Input, Typography, DatePicker, Select, Form } from 'antd';
 import { SaveFilled } from '@ant-design/icons';
 
 import LabelItem from "./labeldesign";
@@ -12,9 +12,9 @@ export default function BarcodePrintAction({
 
     onFinish,
     onClickPrint,
-
-    rowSelects,
-    setRowChecked,
+    onClickPreview,
+    isModalVisible,
+    onClickCancel,
 
     optionDevices,
     onDropDownChange,
@@ -31,12 +31,9 @@ export default function BarcodePrintAction({
     onKeyDownReelNo,
     onKeyDownUserId,
 
-
 }) {
 
     const [formSearch] = Form.useForm();
-
-
 
     useEffect(() => {
         formSearch.setFieldsValue({ fromDate: fromDate });
@@ -58,38 +55,6 @@ export default function BarcodePrintAction({
 
     });
 
-
-    const [newLabel, setNewLabel] = useState({
-
-        VENDOR: '',
-        PARTNO: '',
-        ITEMCD: '',
-        LOTTOTALCNT: Number(0),
-        LOTNO: '',
-        QTY: Number(0),
-        DATECODE: Number(),
-        REELNO: '',
-        USER_ID: '',
-        REMARK: '',
-        ISSUENO: '',
-        LOTID: ''
-
-    });
-
-    const handleInputNewLabel = (e, field) => {
-        setNewLabel(prevState => ({
-            ...prevState,
-            [field]: e.target.value
-        }));
-    };
-
-    const handleInputChange = (e, field) => {
-        setSizeLabel(prevState => ({
-            ...prevState,
-            [field]: e.target.value
-        }));
-    };
-
     const vendorList = [];
     vendorList.push({ label: "NEXPERIA", value: "NEXPERIA" });
     vendorList.push({ label: "PANASONIC", value: "PANASONIC" });
@@ -100,32 +65,6 @@ export default function BarcodePrintAction({
     vendorList.push({ label: "ABLIC", value: "ABLIC" });
     vendorList.push({ label: "SMK", value: "SMK" });
     vendorList.push({ label: "NISSHINBO", value: "NISSHINBO" });
-
-    const [isModalVisible, setIsModalVisible] = useState(false);
-
-    const handleCancel = () => {
-        setIsModalVisible(false);
-    };
-
-    const btnOpenModalPreview = () => {
-        setIsModalVisible(true);
-        setRowChecked(null);
-        let LOTID = newLabel.ITEMCD + '/' + newLabel.LOTNO + '/' + newLabel.QTY + '/' + newLabel.DATECODE + '/' + newLabel.REELNO;
-
-        setNewLabel(prevState => {
-            const updatedLabel = {
-                ...prevState,
-                LOT_ID: LOTID,
-            };
-
-            setRowChecked([updatedLabel]);
-
-            return updatedLabel;
-        });
-
-    };
-
-
     
     return (
         <div className="mt-1">
@@ -416,7 +355,7 @@ export default function BarcodePrintAction({
                                 icon={<SaveFilled />}
                                 size="small"
                                 className="uppercase"
-                                onClick={btnOpenModalPreview}
+                                onClick={onClickPreview}
                             >
                                 Preview
                             </Button>
@@ -429,8 +368,7 @@ export default function BarcodePrintAction({
                 <Modal
                     title="Print Label Confirmation"
                     visible={isModalVisible}
-                    // onOk={handleBtnConfirm}
-                    onCancel={handleCancel}
+                    onCancel={onClickCancel}
                     className="w-3"
                 >
                     <Space direction="horizontal" size={6}>
@@ -439,11 +377,11 @@ export default function BarcodePrintAction({
                         <Input className="w-50 bg-blue-50" placeholder="IP" required={true} onChange={(e) => setIP(e.target.value)} />
                     </Space>
 
-                    {rowSelects?.map((item, index) => (
+                    {/* {rowSelects?.map((item, index) => (
                         <div key={index}>
                             <LabelItem label={item} dataSize={sizeLabel} />
                         </div>
-                    ))}
+                    ))} */}
                 </Modal>
 
             </Card>
