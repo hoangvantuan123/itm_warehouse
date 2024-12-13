@@ -69,7 +69,7 @@ export class StockOutService {
                 EXEC _SMaterialQRStockOutCheck_WEB 
                   @xmlDocument = N'<ROOT>${escapedXmlDocument}</ROOT>',
                   @xmlFlags = ${xmlFlags},
-                  @ServiceSeq = ${serviceSeq},
+                  @ServiceSeq = ${serviceSeq},  
                   @WorkingTag = N'${workingTag}',
                   @CompanySeq = ${decodedToken.CompanySeq},
                   @LanguageSeq = ${languageSeq},

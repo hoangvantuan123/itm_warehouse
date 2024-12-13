@@ -196,6 +196,7 @@ export default function DrawerAddMenu({
                 placeholder="Nhập Menu Sub Root"
                 optionFilterProp="children"
                 filterOption={(input, option) =>
+                  option?.value?.toString().toLowerCase().includes(input.toLowerCase()) ||
                   option?.children?.toLowerCase().includes(input.toLowerCase())
                 }
                 size="large"

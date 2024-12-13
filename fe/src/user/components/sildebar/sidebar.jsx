@@ -261,7 +261,7 @@ const Sidebar = ({ permissions, rootMenu, menuTransForm }) => {
           </div>
           {menu && (
             <Sider
-              width={250}
+              width={280}
               theme="light"
               className="p-1 border-r h-screen overflow-auto scroll-container"
             >

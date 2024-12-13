@@ -501,7 +501,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
         return;
       }
 
-      const selectedItems = scanHistory.map(item => ({
+      const selectedItems = scanHistory.map(item => ({ 
         ItemSeq: item?.ItemSeq,
         ItemLotNo: item?.LotNoFull
       }));
@@ -516,7 +516,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
           message.error('Đã xảy ra lỗi khi reset form!');
         });
     },
-    [scanHistory, dataA?.OutReqSeq]
+    [scanHistory, dataA]
   );
 
 
