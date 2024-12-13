@@ -14,7 +14,7 @@ import { jwtConstants } from 'src/config/security.config';
 import * as crypto from 'crypto';
 import { LoginDto } from '../dto/login.dto';
 import * as bcrypt from 'bcrypt';
-import { DatabaseService } from 'src/common/database/sqlServer/ITMV20240117/database.service';
+import { DatabaseService } from 'src/common/database/sqlServer/ITMV/database.service';
 
 interface RoleMenuData {
     menu: any[];

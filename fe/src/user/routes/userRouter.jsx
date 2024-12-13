@@ -240,36 +240,37 @@ const UserRouter = () => {
                             )
                           }
                         />
-                         <Route
-                      path="u/warehouse/material/waiting-iqc-status"
-                      element={
-                        checkActionPermission(userPermissions, 'material-1-3', 'View') ? (
-                          <IQCStatus
-                            permissions={userPermissions}
-                            isMobile={isMobile}
-                          />
-                        ) : (
-                          <ErrorPage
+                        <Route
+                          path="u/warehouse/material/waiting-iqc-status"
+                          element={
+                            checkActionPermission(userPermissions, 'material-1-3', 'View') ? (
+                              <IQCStatus
+                                permissions={userPermissions}
+                                isMobile={isMobile}
+                              />
+                            ) : (
+                              <ErrorPage
 
-                          />
-                        )
-                      }
-                    />
-                    <Route
-                      path="u/warehouse/material/material-wh-stock-in/:id"
-                      element={
-                        checkActionPermission(userPermissions, 'material-1-3', 'View') ? (
-                          <MatWHStockIn
-                            permissions={userPermissions}
-                            isMobile={isMobile}
-                          />
-                        ) : (
-                          <ErrorPage
+                              />
+                            )
+                          }
+                        />
+                        <Route
+                          path="u/warehouse/material/material-wh-stock-in/:id"
+                          element={
+                            checkActionPermission(userPermissions, 'material-1-3', 'View') ? (
+                              <MatWHStockIn
+                                permissions={userPermissions}
+                                isMobile={isMobile}
 
-                          />
-                        )
-                      }
-                    />
+                              />
+                            ) : (
+                              <ErrorPage
+
+                              />
+                            )
+                          }
+                        />
                         <Route
                           path="u/warehouse/material/stock-out-request"
                           element={

@@ -5,7 +5,7 @@ import { Connection } from 'typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { HealthController } from './health.controller';
-import { sqlServerITMV20240117 } from './config/database.config';
+import { sqlServerITMV } from './config/database.config';
 import { APP_FILTER } from '@nestjs/core';
 import { AuthsModule } from './modules/auth/module/auths.module';
 import { RolesUsersModule } from './modules/rolesGuard/module/rolesUsers.module';
@@ -18,8 +18,8 @@ import { LanguageModule } from './modules/language/module/language.module';
     }),
     /*  TypeOrmModule.forRoot(databaseConfig1), */
     TypeOrmModule.forRoot({
-      ...sqlServerITMV20240117,
-      name: 'ITMV20240117',
+      ...sqlServerITMV,
+      name: 'ITMV',
     }),
     AuthsModule,
     RolesUsersModule
@@ -34,7 +34,7 @@ import { LanguageModule } from './modules/language/module/language.module';
 
 export class AppModule implements OnModuleInit {
   constructor(
-    @InjectConnection('ITMV20240117') private readonly connection2: Connection,
+    @InjectConnection('ITMV') private readonly connection2: Connection,
   ) { }
 
   async onModuleInit() {

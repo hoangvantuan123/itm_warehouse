@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { DatabaseService } from 'src/common/database/sqlServer/ITMV20240117/database.service';
+import { DatabaseService } from 'src/common/database/sqlServer/ITMV/database.service';
 import { StockInService } from '../service/stockIn.service';
 import { GenerateXmlService } from '../generate-xml/generate-xml.service';
 import { EmployeeController } from '../controller/stockIn.controller';

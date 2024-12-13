@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SimpleQueryResult } from 'src/common/interfaces/simple-query-result.interface';
-import { DatabaseService } from 'src/common/database/sqlServer/ITMV20240117/database.service';
+import { DatabaseService } from 'src/common/database/sqlServer/ITMV/database.service';
 import { ERROR_MESSAGES } from 'src/common/utils/constants';
 import { GenerateXmlService } from '../generate-xml/generate-xml.service';
 

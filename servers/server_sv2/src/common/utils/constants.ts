@@ -28,6 +28,7 @@ export const ERROR_MESSAGES = {
   EXECUTING_QUERY: "Error executing query",
   DATABASE_ERROR: "Error executing database",
   ERROR_ITMV20240117: "Failed to connect to the database ITMV20240117.",
+  ERROR_ITMV: "Failed to connect to the database ITMV.",
   ERROR_DUP: "An error occurred, please review the data.",
   WARNING_BARCODE_DATABASE: "Barcode Exists on Database , Warning!!!",
   WARNING_HOLD_BARCODE: "Material barcode HOLD!!! , Warning!!!"
@@ -44,5 +45,6 @@ export const SUCCESS_MESSAGES = {
   RECORD_UPDATED: 'Record updated successfully',
   RECORD_DELETED: 'Record deleted successfully',
   BATCHES_INSERTED: 'Batch inserted successfully',
-  SUCCESS_ITMV20240117: 'Successfully connected to the database ITMV20240117.'
+  SUCCESS_ITMV20240117: 'Successfully connected to the database ITMV20240117.',
+  SUCCESS_ITMV: 'Successfully connected to the database ITMV.'
 };

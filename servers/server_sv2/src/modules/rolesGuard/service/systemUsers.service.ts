@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, InternalServerErrorException } from '@ne
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository , In} from 'typeorm';
 import { SimpleQueryResult } from 'src/common/interfaces/simple-query-result.interface';
-import { DatabaseService } from 'src/common/database/sqlServer/ITMV20240117/database.service';
+import { DatabaseService } from 'src/common/database/sqlServer/ITMV/database.service';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from 'src/common/utils/constants';
 import { TCAGroupsWEB } from '../entities/groups.entity';
 import { TCAMenusWEB } from '../entities/menus.entity';

@@ -1,13 +1,12 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useParams } from 'react-router-dom'
+import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet'
 import { Input, Space, Table, Typography, message, Tabs, Layout } from 'antd'
 const { Title, Text } = Typography
 import { FileTextOutlined } from '@ant-design/icons'
 import { ArrowIcon } from '../../components/icons'
 import { debounce } from 'lodash'
-import { useNavigate } from 'react-router-dom'
 import CryptoJS from 'crypto-js'
 import StockOutRequestActionsDetails from '../../components/actions/material/StockOutRequestActionsDetails'
 import StockOutRequestQueryFiFo from '../../components/query/material/stockOutReqQueryFiFo'
@@ -16,10 +15,10 @@ import { GetITMSPDMMOutReqItemListWEB } from '../../../features/material/GetITMS
 import { SMaterialQRCheckStockOutFiFoWeb } from '../../../features/material/postCheckStockOutFiFo'
 import ModalWaiting from '../../components/modal/material/modalWaiting'
 import { CheckAllProceduresStockOutFiFo } from '../../../features/material/postCheckAllProceduresStockOutFiFo'
+import { DeleteTFIFOListTemp } from '../../../features/material/deleteTFIFOListTemp'
 import SuccessSubmit from '../default/successSubmit'
 import LoadSubmit from '../default/loadSubmit'
 import { CompactSelection } from '@glideapps/glide-data-grid'
-
 export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -36,6 +35,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const dataRef = useRef(dataA) /* DATA */
   const [modal2Open, setModal2Open] = useState(false)
   const [modal3Open, setModal3Open] = useState(false)
+
   const [modal4Open, setModal4Open] = useState(false)
   const [modal5Open, setModal5Open] = useState(false)
   const [error, setError] = useState(null)
@@ -54,10 +54,19 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
 
   const [loading, setLoading] = useState(false)
   const [isAPISuccess, setIsAPISuccess] = useState(true)
-
   const [isOpenDetails, setIsOpenDetails] = useState(false)
+  const [isFormDirty, setIsFormDirty] = useState(false);
+  const location = useLocation();
   const secretKey = 'TEST_ACCESS_KEY'
-  /*  */
+
+
+ 
+
+
+
+  const handleChange = () => {
+    setHasUnsavedChanges(true);
+  };
 
   useEffect(() => {
     const savedState = localStorage.getItem('detailsStateStockOutFiFo')
@@ -184,7 +193,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
         bufferRef.current += e.key
       }
     }
- */
+  */
     const handleKeyPress = (e) => {
       if (e.key === 'Enter' && bufferRef.current.trim()) {
         const barcode = bufferRef.current.trim()
@@ -487,16 +496,29 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const handleRestFrom = useCallback(
     async (e) => {
       if (scanHistory.length === 0) {
-        setModal2Open(true)
-        setError('Không có dữ liệu để reset! Vui lòng quét dữ liệu trước.')
-        return
+        setModal2Open(true);
+        setError('Không có dữ liệu để reset! Vui lòng quét dữ liệu trước.');
+        return;
       }
-      setScanHistory([])
-      fetchDataA(dataA?.OutReqSeq)
-      message.success('Reset form thành công!')
+
+      const selectedItems = scanHistory.map(item => ({
+        ItemSeq: item?.ItemSeq,
+        ItemLotNo: item?.LotNoFull
+      }));
+
+      DeleteTFIFOListTemp(selectedItems)
+        .then(() => {
+          setScanHistory([]);
+          fetchDataA(dataA?.OutReqSeq);
+          message.success('Reset form thành công!');
+        })
+        .catch((error) => {
+          message.error('Đã xảy ra lỗi khi reset form!');
+        });
     },
-    [filteredData, scanHistory],
-  )
+    [scanHistory, dataA?.OutReqSeq]
+  );
+
 
   const getSelectedRowIndices = () => {
     const selectedRows = selection.rows.items
@@ -534,10 +556,14 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
         Qty: scanHistory[index]?.Qty,
       }));
 
+      const selectedItemsDelete = selectedRowIndices.map((index) => ({
+        ItemSeq: scanHistory[index]?.ItemSeq,
+        ItemLotNo: scanHistory[index]?.LotNoFull,
+      }));
       const remainingRows = scanHistory.filter(
         (row, index) => !selectedRowIndices.includes(index),
       );
-
+      DeleteTFIFOListTemp(selectedItemsDelete)
       setScanHistory(remainingRows);
 
       setDataA((prevData) =>
@@ -577,6 +603,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
                 handleDelete={handleDelete}
               />
             </div>
+
             <details
               className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
               open

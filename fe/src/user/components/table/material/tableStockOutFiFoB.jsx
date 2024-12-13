@@ -15,7 +15,6 @@ function TableStockOUtFiFoB({ data, selection, setSelection }) {
   const ref = (useRef < data) | (null > null)
   const onSearchClose = useCallback(() => setShowSearch(false), [])
   const [clickedRowData, setClickedRowData] = useState(null)
-  const [clickedRowDataList, setClickedRowDataList] = useState([])
   const [isMinusClicked, setIsMinusClicked] = useState(false)
   const [lastClickedCell, setLastClickedCell] = useState(null)
   const columns = useMemo(
@@ -59,7 +58,6 @@ function TableStockOUtFiFoB({ data, selection, setSelection }) {
         FactUnitName = '',
         InWHName = '',
         OutWHName = '',
-        ItemNo = '',
         Qty = '',
         ReqQty = '',
         DateCode = '',
@@ -71,20 +69,18 @@ function TableStockOUtFiFoB({ data, selection, setSelection }) {
       } = person
 
       const safeString = (value) => (value != null ? String(value) : '')
-
       const columnMap = {
         0: { kind: GridCellKind.Text, data: safeString(FactUnitName) },
         1: { kind: GridCellKind.Text, data: safeString(InWHName) },
         2: { kind: GridCellKind.Text, data: safeString(OutWHName) },
-        3: { kind: GridCellKind.Text, data: safeString(ItemNo) },
-        4: { kind: GridCellKind.Text, data: safeString(Qty) },
-        5: { kind: GridCellKind.Text, data: safeString(ReqQty) },
-        6: { kind: GridCellKind.Text, data: safeString(DateCode) },
-        7: { kind: GridCellKind.Text, data: safeString(ReelNo) },
-        8: { kind: GridCellKind.Text, data: safeString(StockOutDate) },
-        9: { kind: GridCellKind.Text, data: safeString(LotNo) },
-        10: { kind: GridCellKind.Text, data: safeString(LotNoFull) },
-        11: { kind: GridCellKind.Text, data: safeString(Barcode) },
+        3: { kind: GridCellKind.Text, data: safeString(Qty) },
+        4: { kind: GridCellKind.Text, data: safeString(ReqQty) },
+        5: { kind: GridCellKind.Text, data: safeString(DateCode) },
+        6: { kind: GridCellKind.Text, data: safeString(ReelNo) },
+        7: { kind: GridCellKind.Text, data: safeString(StockOutDate) },
+        8: { kind: GridCellKind.Text, data: safeString(LotNo) },
+        9: { kind: GridCellKind.Text, data: safeString(LotNoFull) },
+        10: { kind: GridCellKind.Text, data: safeString(Barcode) },
       }
 
       if (columnMap.hasOwnProperty(col)) {
@@ -100,7 +96,6 @@ function TableStockOUtFiFoB({ data, selection, setSelection }) {
   const [lastActivated, setLastActivated] = useState(undefined)
 
   const onCellActivated = useCallback((cell) => {
-    console.log('cell', cell)
     setLastActivated(cell)
   }, [])
 
@@ -168,8 +163,8 @@ function TableStockOUtFiFoB({ data, selection, setSelection }) {
           i % 2 === 0
             ? undefined
             : {
-                bgCell: '#FBFBFB',
-              }
+              bgCell: '#FBFBFB',
+            }
         }
       />
     </div>

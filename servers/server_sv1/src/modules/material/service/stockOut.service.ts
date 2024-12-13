@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SimpleQueryResult } from 'src/common/interfaces/simple-query-result.interface';
-import { DatabaseService } from 'src/common/database/sqlServer/ITMV20240117/database.service';
+import { DatabaseService } from 'src/common/database/sqlServer/ITMV/database.service';
 import { ERROR_MESSAGES } from 'src/common/utils/constants';
 import { GenerateXmlService } from '../generate-xml/generate-xml.service';
 
@@ -373,5 +373,38 @@ export class StockOutService {
         }
     }
 
+
+
+    async executeDeleteQuery(query: string): Promise<void> {
+        try {
+            const result = await this.databaseService.executeQuery(query);
+            console.log('Delete results:', result);
+            if (!result.success) {
+                throw new Error(result.message);
+            }
+        } catch (error) {
+            console.error('Error executing delete query:', error);
+            throw error;
+        }
+    }
+
+    async deleteTFIFOListTemp(items: { ItemSeq: string; ItemLotNo: string }[]): Promise<void> {
+        if (items.length === 0) return;
+        try {
+            const conditions = items
+                .map(({ ItemSeq, ItemLotNo }) => `(A.ItemSeq = '${ItemSeq}' AND A.ItemLotNo = '${ItemLotNo}')`)
+                .join(' OR ');
+
+            const query = `
+                DELETE A 
+                FROM _TFIFOListTemp_WEB A
+                WHERE ${conditions}
+            `;
+
+            return await this.databaseService.executeQuery(query);
+        } catch (error) {
+            throw error;
+        }
+    }
 
 }

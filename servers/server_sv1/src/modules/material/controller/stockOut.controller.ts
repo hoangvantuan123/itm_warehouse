@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Post, Body, Req, UnauthorizedException, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Query, Post, Body, Req, UnauthorizedException, HttpException, HttpStatus, Delete } from '@nestjs/common';
 import { SimpleQueryResult } from 'src/common/interfaces/simple-query-result.interface';
 import { StockOutService } from '../service/stockOut.service';
 import { jwtConstants } from 'src/config/security.config';
@@ -183,5 +183,22 @@ export class StockOutController {
             );
         }
     }
+
+
+
+
+
+    @Delete('items-tfifo-list-temp')
+    async deleteItems(@Body() data: { items: { ItemSeq: string; ItemLotNo: string }[] }): Promise<{ success: boolean }> {
+        try {
+            await this.stockOutService.deleteTFIFOListTemp(data.items);
+            return { success: true };
+        } catch (error) {
+            console.error('Error during delete operation:', error);
+            return { success: false };
+        }
+    }
+
+
 
 }
