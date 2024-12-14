@@ -1,15 +1,17 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { DataEditor, GridCellKind } from '@glideapps/glide-data-grid'
-import { Button } from 'antd'
 import '@glideapps/glide-data-grid/dist/index.css'
 import { useNavigate } from 'react-router-dom'
 import { CompactSelection } from '@glideapps/glide-data-grid'
-
+import { Button, Input } from "antd";
 const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
 
-function TableTransferWaitingIqcStockInOrder({ data }) {
+
+
+
+function TableTransferWaitingIqcStockInOrder({ data , setInputItemNo, inputItemNo}) {
   const [gridData, setGridData] = useState([])
   const [showSearch, setShowSearch] = useState(false)
   const ref = (useRef < data) | (null > null)
@@ -18,6 +20,7 @@ function TableTransferWaitingIqcStockInOrder({ data }) {
   const [clickedRowDataList, setClickedRowDataList] = useState([])
   const [isMinusClicked, setIsMinusClicked] = useState(false)
   const [lastClickedCell, setLastClickedCell] = useState(null)
+  const [highlightRegions, setHighlightRegions] = useState([]);
   const [selection, setSelection] = useState({
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
@@ -84,6 +87,8 @@ function TableTransferWaitingIqcStockInOrder({ data }) {
     setGridData(data)
   }, [data])
 
+
+  
   const onCellClicked = (cell, event) => {
     let rowIndex
 
@@ -121,11 +126,33 @@ function TableTransferWaitingIqcStockInOrder({ data }) {
   }
 
   const onGridSelectionChange = (newSelection) => {
-    console.log('Selection aborted', newSelection)
+    
   }
+  const findRowByItemNo = useCallback(
+    (itemNo) => gridData.findIndex((row) => row.ItemNo === itemNo),
+    [gridData]
+  );
 
-  return (
+  const highlightRowByItemNo = useCallback(
+    (itemNo) => {
+      const rowIndex = findRowByItemNo(itemNo);
+      if (rowIndex !== null && rowIndex >= 0) {
+        const highlightRegionB = {
+          color: "#ff00ff33", 
+          range: { x: 0, y: rowIndex, width: columns.length, height: 1 },
+        };
+        setHighlightRegions([highlightRegionB]);
+      }
+    },
+    [findRowByItemNo, columns.length]
+  );
+
+  useEffect(() => {
+    highlightRowByItemNo(inputItemNo);
+  }, [inputItemNo])
+  return ( 
     <div className="w-full h-full border-t border-b overflow-hidden scroll-container ">
+       
       <DataEditor
         columns={cols}
         getCellContent={getData}
@@ -151,6 +178,7 @@ function TableTransferWaitingIqcStockInOrder({ data }) {
                 bgCell: '#FBFBFB',
               }
         }
+        highlightRegions={highlightRegions} 
       />
     </div>
   )

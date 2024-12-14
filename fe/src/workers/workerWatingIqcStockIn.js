@@ -10,7 +10,7 @@ function checkBarcode(barcode, tableData, tableScanHistory) {
 
   const code = parts[0]
   const lot = parts[1] // Lot
-  const qty = parseInt(parts[2], 10) // Số lượng quét
+  const qty = parseInt(parts[2], 10) // Số lượng quét chueyern doi so nguyen
   const dc = parts[3] // Date Code
   const reel = parts[4] // Reel
 

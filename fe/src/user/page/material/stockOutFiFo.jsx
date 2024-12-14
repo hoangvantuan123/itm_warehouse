@@ -19,6 +19,7 @@ import { DeleteTFIFOListTemp } from '../../../features/material/deleteTFIFOListT
 import SuccessSubmit from '../default/successSubmit'
 import LoadSubmit from '../default/loadSubmit'
 import { CompactSelection } from '@glideapps/glide-data-grid'
+import ModalFocus from '../default/focus'
 export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -44,6 +45,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const dataRefSacenHistory = useRef(scanHistory) /* DATA */
   const [status, setStatus] = useState(false)
   const [filteredData, setFilteredData] = useState(null)
+  const [inputItemNo, setInputItemNo] = useState(""); 
   const [checkValueIsStop, setCheckValueIsStop] = useState(
     filteredData?.IsStop ? 1 : 0,
   )
@@ -58,7 +60,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const [isFormDirty, setIsFormDirty] = useState(false);
   const location = useLocation();
   const secretKey = 'TEST_ACCESS_KEY'
-
+  const nameFrom = 'From STOCK OUT FIFO'; 
 
  
 
@@ -318,6 +320,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
             ReelNo: reel,
             Barcode: barcode,
           }
+          setInputItemNo(itemNo)
           debouncedCheckBarcode(formData, resultMessage)
         }
       } else {
@@ -635,6 +638,8 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
               sampleTableB={scanHistory}
               setSelection={setSelection}
               selection={selection}
+              setInputItemNo={setInputItemNo}
+              inputItemNo={inputItemNo}
             />
           </div>
         </div>
@@ -649,6 +654,10 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
           modal5Open={modal5Open}
           successMessage={successMessage}
         />
+          <ModalFocus  
+       status={status}
+        setStatus={setStatus}
+        nameFrom={nameFrom}/>
       </div>
     </>
   )

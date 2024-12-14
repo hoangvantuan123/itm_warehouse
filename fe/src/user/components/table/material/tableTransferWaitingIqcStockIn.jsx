@@ -7,6 +7,8 @@ function TableTransferWaitingIqcStockIn({
   sampleTableB,
   setSelection,
   selection,
+  setInputItemNo, 
+  inputItemNo
 }) {
   return (
     <div className="w-full gap-1 h-full flex items-center justify-center">
@@ -27,7 +29,7 @@ function TableTransferWaitingIqcStockIn({
         <div className="text-xs font-medium flex items-center gap-2 p-2 text-blue-600 uppercase">
           THÔNG ĐƠN HÀNG
         </div>
-        <TableTransferWaitingIqcStockInOrder data={sampleTableA} />
+        <TableTransferWaitingIqcStockInOrder data={sampleTableA} setInputItemNo={setInputItemNo}  inputItemNo={inputItemNo}/>
       </div>
     </div>
   )

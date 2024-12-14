@@ -22,6 +22,9 @@ import { CheckAllProceduresStockIn } from '../../../features/material/postCheckA
 import LoadSubmit from '../default/loadSubmit'
 import SuccessSubmit from '../default/successSubmit'
 import { CompactSelection } from '@glideapps/glide-data-grid'
+import ModalFocus from '../default/focus'
+
+
 
 export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const { t } = useTranslation()
@@ -59,6 +62,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const [isOpenDetails, setIsOpenDetails] = useState(false)
   const [isAPISuccess, setIsAPISuccess] = useState(true)
   const [isCheckSaveSuccess, setIsCheckSaveSuccess] = useState(true)
+  const [inputItemNo, setInputItemNo] = useState(""); 
   useEffect(() => {
     const savedState = localStorage.getItem('detailsStateIqc')
     setIsOpenDetails(savedState === 'open')
@@ -69,6 +73,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     setIsOpenDetails(isOpen)
     localStorage.setItem('detailsStateIqc', isOpen ? 'open' : 'closed')
   }
+  const nameFrom = 'From Waiting IQC STOCK IN'; 
 
   const Format = useCallback((date) => {
     const d = new Date(date)
@@ -310,7 +315,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
             reelNo: reel,
             barcode: barcode,
           }
-
+          setInputItemNo(itemNo)
           debouncedCheckBarcode(formData, resultMessage)
         }
       } else {
@@ -576,14 +581,33 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
         setError('Không có dữ liệu nào để xóa.')
         return
       }
+      const selectedItems = selectedRowIndices.map((index) => ({
+        ItemNo: scanHistory[index]?.ItemNo,
+        Qty: scanHistory[index]?.Qty,
+      }));
 
+  
       const remainingRows = scanHistory.filter(
         (row, index) => !selectedRowIndices.includes(index),
       )
 
       setScanHistory(remainingRows)
+
+      setData((prevData) =>
+        prevData.map((item) => {
+          const selectedItem = selectedItems.find((selected) => selected.ItemNo === item.ItemNo);
+          if (selectedItem) {
+            return {
+              ...item,
+              OkQty: item.OutQty - selectedItem.Qty,
+              RemainQty: item.RemainQty + selectedItem.Qty,
+            };
+          }
+          return item;
+        })
+      );
     },
-    [scanHistory, selection],
+    [scanHistory, selection, setData],
   )
 
   const handleRestFrom = useCallback(
@@ -662,6 +686,8 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
               sampleTableB={scanHistory}
               setSelection={setSelection}
               selection={selection}
+              setInputItemNo={setInputItemNo}
+              inputItemNo={inputItemNo}
             />
           </div>
         </div>
@@ -683,6 +709,10 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
         setModal3Open={setModal3Open}
         pathRouter="/u/warehouse/material/delivery-list"
       />
+      <ModalFocus  
+       status={status}
+        setStatus={setStatus}
+        nameFrom={nameFrom}/>
     </>
   )
 }

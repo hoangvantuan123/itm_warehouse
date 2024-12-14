@@ -11,7 +11,6 @@ export default function ModalLogout({
       open={modalOpen}
       onOk={() => setModalOpen(false)}
       onCancel={() => setModalOpen(false)}
-      closable={false}
       footer={false}
     >
       <div className="flex flex-col items-center justify-center">
@@ -24,7 +23,7 @@ export default function ModalLogout({
         </p>
 
         <div className="flex w-full gap-4">
-          <Button type="default" size="large" className="w-full">
+          <Button    onClick={() => setModalOpen(false)} type="default" size="large" className="w-full">
             Hủy
           </Button>
           <Button
