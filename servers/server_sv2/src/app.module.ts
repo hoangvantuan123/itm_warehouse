@@ -22,7 +22,8 @@ import { LanguageModule } from './modules/language/module/language.module';
       name: 'ITMV',
     }),
     AuthsModule,
-    RolesUsersModule
+    RolesUsersModule,
+    LanguageModule
   ],
   providers: [{
     provide: APP_FILTER,

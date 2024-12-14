@@ -42,7 +42,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const [modal3Open, setModal3Open] = useState(false)
   const [modal4Open, setModal4Open] = useState(false)
   const [modal5Open, setModal5Open] = useState(false)
-
+  const [highlightRegions, setHighlightRegions] = useState([]);
   const [error, setError] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
   const [scanHistory, setScanHistory] = useState([])

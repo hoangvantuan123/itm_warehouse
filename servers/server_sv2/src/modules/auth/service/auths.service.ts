@@ -167,7 +167,7 @@ AND r.Type IN ('rootmenu', 'menu');
         loginData: LoginDto,
     ): Promise<{
         success: boolean;
-        data?: { user: Partial<TCAUserWEB>; token: string; tokenRolesUserMenu: string, typeLanguage: number, languageData: any[] };
+        data?: { user: Partial<TCAUserWEB>; token: string; tokenRolesUserMenu: string, typeLanguage: number };
         error?: { message: string; code: string };
     }> {
         const { login, password } = loginData;
@@ -238,7 +238,6 @@ AND r.Type IN ('rootmenu', 'menu');
                 { expiresIn: '24h' }
             );
             const languageSeq = user.LanguageSeq || 6;
-            const languageDataUser = await this.databaseService.findLanguageSeq(languageSeq);
 
             const userResponse: Partial<any> = {
                 UserId: user.UserId,
@@ -257,7 +256,6 @@ AND r.Type IN ('rootmenu', 'menu');
                     token,
                     tokenRolesUserMenu,
                     typeLanguage: languageSeq,
-                    languageData: languageDataUser
                 },
             };
         } catch (error) {
@@ -281,7 +279,7 @@ AND r.Type IN ('rootmenu', 'menu');
                     const userIdStr = userId.toString();
                     const newPassword = `@${userIdStr}`;
                     const hashedPassword = await this.hashPassword(newPassword);
-                    
+
                     await this.userWEBRepository.update(
                         { UserId: userIdStr },
                         { Password2: hashedPassword, CheckPass1: false }
@@ -290,9 +288,9 @@ AND r.Type IN ('rootmenu', 'menu');
                     throw new Error(`Failed to update password for user ${userId}`);
                 }
             });
-    
+
             await Promise.all(updatePromises);
-    
+
             return {
                 success: true,
                 message: 'Passwords  updated successfully.',
@@ -304,7 +302,7 @@ AND r.Type IN ('rootmenu', 'menu');
             };
         }
     }
-    
+
 
     async changePassword2(
         employeeId: string,

@@ -10,7 +10,9 @@ import Cookies from 'js-cookie'
 import BgCarousel from '../components/carousel/bgCarousel'
 import { ChangePassword } from '../../features/auth/changePassword'
 import Logo from '../../assets/ItmLogo.png'
-const { Title, Text } = Typography
+import { GetLangSeq } from '../../features/lang/getLangSeq'
+import { saveLanguageData } from '../../IndexedDB/saveLanguageData'
+import { deleteDatabase } from '../../IndexedDB/deleteIndexDB'
 
 export default function Login({
   fetchPermissions,
@@ -23,6 +25,7 @@ export default function Login({
   const location = useLocation()
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [loadingLang, setLoadingLang] = useState(false)
   const [changingPassword, setChangingPassword] = useState(false)
   const [newPassword, setNewPassword] = useState('')
   const [confirmNewPassword, setConfirmNewPassword] = useState('')
@@ -32,6 +35,32 @@ export default function Login({
   const [currentView, setCurrentView] = useState('login')
   const [username, setUsername] = useState(null)
 
+
+
+  const fetchLangSeq = async () => {
+    setLoadingLang(true)
+    try {
+      const response = await GetLangSeq(6)
+      if (response.success) {
+        const saveSuccess = await saveLanguageData({
+          typeLanguage: 6,
+          languageData: response.data,
+        })
+
+        if (!saveSuccess) {
+          deleteDatabase()
+        }
+      }
+
+    } catch (error) {
+    } finally {
+      setLoadingLang(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchLangSeq()
+  }, [])
   const onFinish = async (values) => {
     const { login, password } = values
     setEmployeeId(login)

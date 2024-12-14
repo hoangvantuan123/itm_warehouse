@@ -29,6 +29,7 @@ import { transformDataMenu } from '../../utils/transformDataMenu'
 import ErrorPage from '../page/default/errorPage'
 import BarcodePrint from '../page/barcodePrint/barcodePrint'
 import BarcodeChange from '../page/barcodePrint/barcodeChange'
+import { deleteDatabase } from '../../IndexedDB/deleteIndexDB'
 const DeliveryList = lazy(() => import('../page/material/deliveryList'))
 const WaitingIqcStockIn = lazy(
   () => import('../page/material/waitingIqcStockIn'),
@@ -157,6 +158,7 @@ const UserRouter = () => {
     if (token && userInfo && rolesMenu) {
       setIsLoggedIn(true)
     } else {
+      deleteDatabase()
       Cookies.remove('a_a')
       localStorage.removeItem('userInfo')
       localStorage.removeItem('rolesMenu')
