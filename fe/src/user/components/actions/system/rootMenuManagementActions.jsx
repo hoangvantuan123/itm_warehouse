@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, Dropdown, Menu, message } from 'antd'
+import { Button, Dropdown, Menu, message, Input, Space, Form, InputNumber} from 'antd'
 import {
   SaveOutlined,
   PlusOutlined,
@@ -8,17 +8,25 @@ import {
   FileExcelOutlined,
   FileTextOutlined,
   DownOutlined,
+  SettingOutlined
 } from '@ant-design/icons'
 import * as XLSX from 'xlsx'
 import { saveAs } from 'file-saver'
 
 export default function RootMenuManagementActions({
-  openModal,
+  setClickCount,
   handleDeleteDataSheet,
   data,
+  handleSaveData, 
+  setNumRowsToAdd, 
+  numRowsToAdd
 }) {
   const [visible, setVisible] = useState(false)
+  const [inputValue, setInputValue] = useState(1);
 
+  const handleInputChange = (e) => {
+    setNumRowsToAdd(e.target.value);
+  };
   // Hàm xuất CSV
   const exportCSV = () => {
     const worksheet = XLSX.utils.json_to_sheet(data)
@@ -66,6 +74,9 @@ export default function RootMenuManagementActions({
         message.info(`Chức năng này đang phát triển`)
     }
   }
+  const handleClick = () => {
+    setClickCount(prevCount => prevCount + 1); 
+  };
 
   const menu = (
     <Menu onClick={handleMenuClick} className=" w-40">
@@ -86,33 +97,84 @@ export default function RootMenuManagementActions({
     </Menu>
   )
 
+
+  const handleAddRows = () => {
+    if (inputValue && !isNaN(inputValue) && inputValue > 0) {
+      setNumRowsToAdd(inputValue);
+    } 
+  };
+
+  const handleSave = () => {
+    handleAddRows(); 
+    setVisible(false); 
+  };
+
+  const handleCancel = () => {
+    setVisible(false); 
+  };
+  const rowMenu = (
+    <div  className=' bg-white  border rounded-lg p-3 w-80'>
+    <Form layout="vertical">
+        <Form.Item label="Enter number of rows">
+          <InputNumber
+            min={1} 
+            value={inputValue}
+            onChange={(value) => setInputValue(value)}
+            style={{
+              width: '100%',
+              borderRadius: '5px',
+            }}
+          />
+        </Form.Item>
+        <Space style={{ width: '100%' }} justify="space-between">
+          <Button onClick={() =>setVisible(false)}>Cancel</Button>
+          <Button
+            type="primary"
+            onClick={handleSave}
+            style={{
+              backgroundColor: '#4F46E5',
+              borderColor: '#4F46E5',
+            }}
+          >
+            Save
+          </Button>
+        </Space>
+      </Form>
+    </div>
+  );
   return (
     <div className="flex items-center gap-2">
       <Dropdown overlay={menu}>
         <Button>
-          Actions <DownOutlined />
+        <SettingOutlined />    Actions 
         </Button>
       </Dropdown>
 
-      <Button
-        key="Reset"
-        icon={<FileDoneOutlined />}
-        size="middle"
-        className="uppercase"
-        type="default"
-      >
-        Open
-      </Button>
+     
 
+     
+      <Dropdown overlay={rowMenu} trigger={['click']}  placement="bottomRight"  visible={visible} 
+        onVisibleChange={(visible) => setVisible(visible)}>
       <Button
         key="Save"
         type="primary"
         icon={<PlusOutlined />}
         size="middle"
-        onClick={openModal}
         style={{ backgroundColor: '#4F46E5', borderColor: '#4F46E5' }}
       >
-        ADD ROOT MENU
+        ADD ROWS
+      </Button>
+      </Dropdown>
+      <Button
+        key="save"
+        type="primary"
+        icon={<SaveOutlined />}
+        size="middle"
+        className="uppercase"
+        onClick={handleSaveData}
+        style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+      >
+        Save
       </Button>
     </div>
   )

@@ -24,9 +24,6 @@ import {
     @Column({ nullable: true })
     Link: string;
   
-   
-
-  
     @Column({ default: true, nullable: true})
     Utilities: boolean;
   

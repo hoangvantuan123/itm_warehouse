@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Menu, Button, Input, Table, Space, Checkbox, Layout } from 'antd'
-import { FolderOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
+import { Menu, Button, Input, Table, Space, Checkbox, Layout, Tabs } from 'antd'
+import { FolderOutlined, DeleteOutlined, PlusOutlined , UsergroupAddOutlined, KeyOutlined, AppstoreAddOutlined, UnorderedListOutlined } from '@ant-design/icons'
 import BG from '../../../../assets/defaultLogo.png'
 import ModalRootMenu from '../../modal/system/modalRootMenu'
 import ModalUsers from '../../modal/system/modalUsers'
@@ -9,8 +9,15 @@ import { getPaginatedRolesRootMenu } from '../../../../features/system/getPagina
 import { getPaginatedRolesMenu } from '../../../../features/system/getPaginatedRolesMenu'
 import { getPaginatedRolesUsers } from '../../../../features/system/getPaginatedRolesUsers'
 import debounce from 'lodash.debounce'
+import TabRoleUserGroup from '../../tabs/system/tabRoleUserGroup'
+import TabRoleGroupMenuAccess from '../../tabs/system/tabRoleGroupMenuAccess'
+import TabRoleMenuAccessPermiss from '../../tabs/system/tabRoleMenuPermiss'
+import TabRoleListUser from '../../tabs/system/tabRoleListUser'
 const { Header, Content, Footer } = Layout
 const menuStyle = { borderInlineEnd: 'none' }
+
+
+
 function ViewRoleManagement({
   groups,
   changedIds,
@@ -50,7 +57,13 @@ function ViewRoleManagement({
   const [updateData1, setUpdateData2] = useState([])
   const [data2, setData2] = useState([])
   const [data3, setData3] = useState([])
-
+  const [current, setCurrent] = useState('1');
+  const onChangeTabs = (key) => {
+    console.log(key);
+  };
+  const handleMenuClick = (e) => {
+    setCurrent(e.key);
+  };
   const handleTableSelectionChange = (newSelectedRowKeys, tableKey) => {
     setSelectedRowKeys((prevSelectedKeys) => ({
       ...prevSelectedKeys,
@@ -309,9 +322,37 @@ function ViewRoleManagement({
     setPage1(pagination.current)
     setLimit1(pagination.pageSize)
   }
+
+  const items = [
+    {
+      key: '1',
+      label: 'NHÓM NGƯỜI DÙNG',
+      icon: <UsergroupAddOutlined />, // Icon cho mục này
+      children: <TabRoleUserGroup userInfo={userInfo} setUserInfo={setUserInfo}/>,
+    },
+    {
+      key: '2',
+      label: 'QUYỀN TRUY CẬP NHÓM',
+      icon: <KeyOutlined />, // Icon cho mục này
+      children: <TabRoleGroupMenuAccess permissionColumns1={permissionColumns1} data1={data1} selectedRowKeys={selectedRowKeys} handleTableSelectionChange={handleTableSelectionChange} page1={page1} limit1={limit1} total1={total1} handleTableChange1={handleTableChange1} handleAddRow1={handleAddRow1}/>,
+    },
+    {
+      key: '3',
+      label: 'QUYỀN TRUY CẬP MENU',
+      icon: <AppstoreAddOutlined />, // Icon cho mục này
+      children: <TabRoleMenuAccessPermiss permissionColumns2={permissionColumns2} data2={data2} selectedRowKeys={selectedRowKeys} handleTableSelectionChange={handleTableSelectionChange} page2={page2} limit2={limit2} total2={total2} handleTableChange2={handleTableChange2} handleAddRow2={handleAddRow2}/>,
+    },
+    {
+      key: '4',
+      label: 'DANH SÁCH NGƯỜI DÙNG',
+      icon: <UnorderedListOutlined />, // Icon cho mục này
+      children: <TabRoleListUser permissionColumns3={userColumns} data3={data3} selectedRowKeys={selectedRowKeys} handleTableSelectionChange={handleTableSelectionChange} page3={page3} limit3={limit3} total3={total3} handleTableChange3={handleTableChange3} handleAddRow3={handleAddRow3}/>,
+    },
+  ];
+  
   return (
     <div className="w-full gap-3 h-full flex items-center justify-center">
-      <div className="w-1/4 h-full flex flex-col bg-white border rounded-lg overflow-hidden pb-10">
+      <div className="w-1/5 h-full flex flex-col bg-white border rounded-lg overflow-hidden pb-10">
         <div className="font-medium text-xs mb-4 text-gray-700 uppercase p-3">
           NHÓM NGƯỜI DÙNG
         </div>
@@ -323,7 +364,6 @@ function ViewRoleManagement({
             handleGroupClick(Number(e.key))
             setChangedIds([])
           }}
-          className=" border-none border-r-0"
         >
           {groups.map((group) => (
             <Menu.Item key={group?.Id} icon={<FolderOutlined />}>
@@ -332,158 +372,33 @@ function ViewRoleManagement({
           ))}
         </Menu>
       </div>
-
-      <div className="w-10/12 h-full flex flex-col border bg-white p-3 rounded-lg  overflow-auto  scroll-container pb-10">
-        <div className="font-medium text-xs mb-4">NGƯỜI DÙNG</div>
-
+      <div className="w-10/12 h-full flex flex-col border bg-white  rounded-lg  overflow-hidden  scroll-container">
         {openView ? (
           <>
-            {' '}
-            <div className="mb-4">
-              <Input
-                value={userInfo.groupName}
-                onChange={(e) =>
-                  setUserInfo({ ...userInfo, groupName: e.target.value })
-                }
-                placeholder="Nhập tên nhóm"
-                className="w-full mb-2"
-              />
-              <Input.TextArea
-                value={userInfo.note}
-                onChange={(e) =>
-                  setUserInfo({ ...userInfo, note: e.target.value })
-                }
-                placeholder="Ghi chú"
-                rows={4}
-              />
-            </div>
-            <div className="mb-4">
-              <div className="font-medium text-xs mb-2 uppercase">
-                Quyền Truy Nhóm Menu
-              </div>
+          <div className="flex">
+    <Menu
+      onClick={handleMenuClick}
+      selectedKeys={[current]}
+      mode="vertical"
+      style={menuStyle}
+      
+    >
+        <div className="font-medium text-xs mb-4 text-gray-700 uppercase p-3">
+         QUYỀN TRUY CẬP
+        </div>
+       {items.map(item => (
+        <Menu.Item key={item.key} icon={item.icon}>
+          <span className="text-xs">{item.label}</span>
+        </Menu.Item>
+      ))}
+    </Menu>
 
-              <Table
-                dataSource={data1}
-                columns={permissionColumns1}
-                rowKey="Id"
-                size="small"
-                rowSelection={{
-                  selectedRowKeys: selectedRowKeys.table1,
-                  onChange: (selectedKeys) =>
-                    handleTableSelectionChange(selectedKeys, 'table1'),
-                  selections: [
-                    Table.SELECTION_ALL,
-                    Table.SELECTION_INVERT,
-                    Table.SELECTION_NONE,
-                  ],
-                }}
-                pagination={{
-                  current: page1,
-                  pageSize: limit1,
-                  total: total1,
-                  showSizeChanger: true,
-                  showTotal: (total) => `Total ${total} Item`,
-                  onChange: (page, pageSize) =>
-                    handleTableChange1({ current: page, pageSize }),
-                }}
-                onChange={(pagination) => handleTableChange1(pagination)}
-                bordered
-                footer={() => (
-                  <span
-                    type="primary"
-                    onClick={handleAddRow1}
-                    className="mt-2 max-w-md cursor-pointer text-pretty text-base text-indigo-500"
-                    size="large"
-                  >
-                    Add Row
-                  </span>
-                )}
-              />
-            </div>
-            <div className="mb-4">
-              <div className="font-medium text-xs mb-2 uppercase">
-                Quyền Truy Cập Menu
-              </div>
-              <Table
-                dataSource={data2}
-                columns={permissionColumns2}
-                rowKey="Id"
-                size="small"
-                bordered
-                rowSelection={{
-                  selectedRowKeys: selectedRowKeys.table2,
-                  onChange: (selectedKeys) =>
-                    handleTableSelectionChange(selectedKeys, 'table2'),
-                  selections: [
-                    Table.SELECTION_ALL,
-                    Table.SELECTION_INVERT,
-                    Table.SELECTION_NONE,
-                  ],
-                }}
-                pagination={{
-                  current: page2,
-                  pageSize: limit2,
-                  total: total2,
-                  showSizeChanger: true,
-                  showTotal: (total) => `Total ${total} Item`,
-                  onChange: (page, pageSize) =>
-                    handleTableChange2({ current: page, pageSize }),
-                }}
-                onChange={(pagination) => handleTableChange2(pagination)}
-                footer={() => (
-                  <span
-                    type="primary"
-                    className="mt-2 max-w-md cursor-pointer text-pretty text-base text-indigo-500"
-                    size="small"
-                    onClick={handleAddRow2}
-                  >
-                    Add Row
-                  </span>
-                )}
-              />
-            </div>
-            <div className="mb-4">
-              <div className="font-medium text-xs mb-2 uppercase">
-                Danh Sách Người Dùng
-              </div>
-              <Table
-                dataSource={data3}
-                columns={userColumns}
-                rowKey="Id"
-                size="small"
-                bordered
-                rowSelection={{
-                  selectedRowKeys: selectedRowKeys.table3,
-                  onChange: (selectedKeys) =>
-                    handleTableSelectionChange(selectedKeys, 'table3'),
-                  selections: [
-                    Table.SELECTION_ALL,
-                    Table.SELECTION_INVERT,
-                    Table.SELECTION_NONE,
-                  ],
-                }}
-                pagination={{
-                  current: page3,
-                  pageSize: limit3,
-                  total: total3,
-                  showSizeChanger: true,
-                  showTotal: (total) => `Total ${total} Item`,
-                  onChange: (page, pageSize) =>
-                    handleTableChange3({ current: page, pageSize }),
-                }}
-                onChange={(pagination) => handleTableChange3(pagination)}
-                footer={() => (
-                  <span
-                    type="primary"
-                    className="mt-2 max-w-md cursor-pointer text-pretty text-base text-indigo-500"
-                    size="large"
-                    onClick={handleAddRow3}
-                  >
-                    Add Row
-                  </span>
-                )}
-              />
-            </div>
+    <div className="flex-1 p-4 border-l h-screen overflow-auto scroll-container pb-20">
+      {items.find(item => item.key === current)?.children}
+    </div>
+  </div>
+
+          
           </>
         ) : (
           <>

@@ -165,12 +165,12 @@ export default function Login({
   return (
     <>
       <Helmet>
-        <title>{t('auth.login')}</title>
+        <title>{t('Login')}</title>
       </Helmet>
       <div className="min-h-screen flex flex-col lg:flex-row items-center justify-center overflow-hidden">
-        <div className="hidden  lg:flex lg:w-1/2 h-screen items-center justify-center">
+       {/*  <div className="hidden  lg:flex lg:w-1/2 h-screen items-center justify-center">
           <BgCarousel />
-        </div>
+        </div> */}
 
         <div className="w-full  lg:w-1/2 flex flex-col items-center justify-center p-5 pt-36">
           <div className="flex flex-col items-center top-20 absolute">
@@ -179,16 +179,15 @@ export default function Login({
 
           {currentView === 'login' && !status ? (
             <>
-              <div className="mx-auto w-full text-center mb-5 mt-3">
-                <h1 className="text-2xl font-bold sm:text-3xl">
-                  Welcome Back!
-                </h1>
-                <p className="mt-4 text-gray-500 text-xs">
-                  ITM Semiconductor CO., Ltd, a company that gives trust to
-                  customers and happiness to employees, values shared growth to
-                  shareholders.
-                </p>
-              </div>
+              <div className="mx-auto w-full flex flex-col items-center justify-center text-center mb-5 mt-3">
+  <h1 className="text-2xl font-bold sm:text-3xl">
+    Welcome Back!
+  </h1>
+  <p className="mt-4 text-gray-500 text-xs w-96">
+    This is an internal project by ITM Semiconductor CO., Ltd, developed to support production processes and optimize operations within the company.
+  </p>
+</div>
+
 
               <Form
                 form={form}

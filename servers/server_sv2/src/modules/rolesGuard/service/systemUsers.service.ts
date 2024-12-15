@@ -67,7 +67,7 @@ export class SystemUsersService {
 
     const [data, total] = await this.resTCAGroupsWEBRepository.findAndCount({
       order: {
-        Id: 'DESC',
+        Id: 'ASC',
       },
     });
 
@@ -121,7 +121,7 @@ export class SystemUsersService {
     addFilterCondition('Key', 'menus.Key');
 
 
-    query.orderBy('menus.Id', 'DESC');
+    query.orderBy('menus.Id', 'ASC');
 
     const data = await query.getMany();
 
@@ -152,7 +152,7 @@ export class SystemUsersService {
     addFilterCondition('MenuSubRootId', 'menus.MenuSubRootId');
 
 
-    query.orderBy('menus.Id', 'DESC');
+    query.orderBy('menus.Id', 'ASC');
 
     const data = await query.getMany();
 

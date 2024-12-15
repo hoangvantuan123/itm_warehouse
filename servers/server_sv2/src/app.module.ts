@@ -8,7 +8,7 @@ import { HealthController } from './health.controller';
 import { sqlServerITMV } from './config/database.config';
 import { APP_FILTER } from '@nestjs/core';
 import { AuthsModule } from './modules/auth/module/auths.module';
-import { RolesUsersModule } from './modules/rolesGuard/module/rolesUsers.module';
+import { SystemUsersModule } from './modules/rolesGuard/module/systemUsers.module';
 import { LanguageModule } from './modules/language/module/language.module';
 
 @Module({
@@ -16,13 +16,12 @@ import { LanguageModule } from './modules/language/module/language.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    /*  TypeOrmModule.forRoot(databaseConfig1), */
     TypeOrmModule.forRoot({
       ...sqlServerITMV,
       name: 'ITMV',
     }),
     AuthsModule,
-    RolesUsersModule,
+    SystemUsersModule,
     LanguageModule
   ],
   providers: [{

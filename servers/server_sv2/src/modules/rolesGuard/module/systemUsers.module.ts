@@ -8,13 +8,16 @@ import { TCARolesUsersWEB } from '../entities/rolesUsers.entity';
 import { SystemUsersService } from '../service/systemUsers.service';
 import { SystemUsersController } from '../controller/systemUsers.controller';
 import { TCARootMenusWEB } from '../entities/rootMenus.entity';
+import { RootMenusService } from '../service/rootMenus.service';
+import { RootMenusController } from '../controller/rootMenus.controller';
 @Module({
     imports: [TypeOrmModule.forFeature([TCAGroupsWEB, TCAMenusWEB, TCARolesUsersWEB, TCARootMenusWEB]), TypeOrmModule.forRoot(sqlServerITMV),],
     providers: [
         DatabaseService,
-        SystemUsersService
+        SystemUsersService, 
+        RootMenusService
     ],
-    controllers: [SystemUsersController],
+    controllers: [SystemUsersController, RootMenusController],
     exports: [],
 })
-export class RolesUsersModule { }
+export class SystemUsersModule { }

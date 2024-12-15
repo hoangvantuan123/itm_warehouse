@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Button, Flex } from 'antd'
+import { Helmet } from 'react-helmet'
 const Home = () => {
   const [time, setTime] = useState(
     new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -32,7 +33,12 @@ const Home = () => {
   }, [])
 
   return (
+    <>
+      <Helmet>
+        <title>Home</title>
+      </Helmet>
     <div className="bg-slate-50 p-3 h-screen overflow-auto md:h-full md:overflow-hidden">
+
       <div className="flex flex-col gap-4 md:grid md:grid-cols-4 md:grid-rows-5 md:gap-4 h-full ">
         <div className="col-start-1 col-end-6 row-start-1 justify-center items-center row-end-6 bg-white border text-gray-950 w-full min-h-[100px] rounded-lg flex flex-col p-4">
           <h1 className="text-6xl font-medium">{time}</h1>
@@ -42,6 +48,7 @@ const Home = () => {
 
       </div>
     </div>
+    </>
   )
 }
 

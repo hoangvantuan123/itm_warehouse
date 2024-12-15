@@ -16,10 +16,13 @@ import UserManagementQuery from '../../components/query/system/userManagementQue
 import ViewRoleManagement from '../../components/view/system/viewRoleManagement'
 import { GetAllRootMenus } from '../../../features/system/getRootMenu'
 import RootMenuManagementActions from '../../components/actions/system/rootMenuManagementActions'
-import DrawerAddRootMenu from '../../components/drawer/system/addRootMenu'
 import TableRootMenuManagement from '../../components/table/system/tableRootMenuManagement'
 import { DeleteRootMenus } from '../../../features/system/deleteRootMenus'
 import { CompactSelection } from '@glideapps/glide-data-grid'
+import { PostUpdateRootMenu } from '../../../features/system/postUpdateRootMenu'
+import { PostAddRootMenu } from '../../../features/system/postAddRootMenu'
+import { filterAndSelectColumnsU } from '../../../utils/filterU'
+import { filterAndSelectColumnsA } from '../../../utils/filterA'
 export default function RootMenuTechnique({ permissions, isMobile }) {
   const { t } = useTranslation()
   const gridRef = useRef(null)
@@ -39,34 +42,33 @@ export default function RootMenuTechnique({ permissions, isMobile }) {
   const [clickedRowDataList, setClickedRowDataList] = useState([])
   const [isMinusClicked, setIsMinusClicked] = useState(false)
   const [lastClickedCell, setLastClickedCell] = useState(null)
+  const [addedRows, setAddedRows] = useState([]);  
+  const [editedRows, setEditedRows] = useState([]); 
   const [selection, setSelection] = useState({
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
   })
+  const [numRowsToAdd, setNumRowsToAdd] = useState(null); 
+  const [clickCount, setClickCount] = useState(0);
   const [showSearch, setShowSearch] = useState(false)
-  const fetchDataRootMenus = useCallback(async () => {
+  const [isSent, setIsSent] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const fetchDataRootMenus = async () => {
     setLoading(true)
     try {
       const response = await GetAllRootMenus()
-      setMenus(response.data.data || [])
+      setMenus(response.data.data)
     } catch (error) {
       setMenus([])
     } finally {
       setLoading(false)
     }
-  }, [])
-
-  const debouncedFetchDataMenus = useMemo(
-    () => debounce(fetchDataRootMenus, 100),
-    [fetchDataRootMenus],
-  )
+  }
 
   useEffect(() => {
-    debouncedFetchDataMenus()
-    return () => {
-      debouncedFetchDataMenus.cancel()
-    }
-  }, [debouncedFetchDataMenus])
+    fetchDataRootMenus()
+  }, [])
 
   const openModal = () => {
     setIsModalOpen(true)
@@ -74,6 +76,8 @@ export default function RootMenuTechnique({ permissions, isMobile }) {
   const closeModal = () => {
     setIsModalOpen(false)
   }
+
+
 
   const onCellClicked = (cell, event) => {
     let rowIndex
@@ -106,6 +110,9 @@ export default function RootMenuTechnique({ permissions, isMobile }) {
       setLastClickedCell(cell)
     }
   }
+
+
+
   const getSelectedRowIds = () => {
     const selectedRows = selection.rows.items
     let ids = []
@@ -137,7 +144,7 @@ export default function RootMenuTechnique({ permissions, isMobile }) {
       const response = await DeleteRootMenus(selectedRowIds)
 
       if (response.data.success) {
-        debouncedFetchDataMenus()
+        fetchDataRootMenus()
         message.success(response.data.message)
       } else {
         message.error(response.data.message)
@@ -157,6 +164,55 @@ export default function RootMenuTechnique({ permissions, isMobile }) {
       document.removeEventListener('keydown', handleKeyDown)
     }
   }, [])
+
+  const handleSaveData = async () => {
+    const columnsU = ['Id', 'Key', 'Label', 'Link', 'Icon']; 
+    const columnsA = ['Key', 'Label', 'Link', 'Icon']; 
+    
+    const resulU = filterAndSelectColumnsU(editedRows, columnsU, 'U');
+    const resulA = filterAndSelectColumnsA(addedRows, columnsA, 'A');
+
+    if (isSent) return;
+    setIsSent(true);
+
+    if (resulA.length > 0 || resulU.length > 0) {
+        const loadingMessage = message.loading("Đang thực hiện lưu dữ liệu...");
+
+        try {
+            const promises = [];
+
+            if (resulA.length > 0) {
+                promises.push(PostAddRootMenu(resulA));
+            }
+
+            if (resulU.length > 0) {
+                promises.push(PostUpdateRootMenu(resulU));
+            }
+
+            await Promise.all(promises);
+
+            loadingMessage(); 
+            setIsLoading(false);
+            setIsSent(false);
+            setEditedRows([])
+            setAddedRows([])
+            fetchDataRootMenus()
+            message.success("Lưu dữ liệu thành công!");
+        } catch (error) {
+            loadingMessage(); 
+            setIsLoading(false);
+            setIsSent(false);
+            setErrorMessage(error.message || "Có lỗi xảy ra");
+            message.error(error.message || "Có lỗi xảy ra khi lưu dữ liệu");
+        }
+    } else {
+        setIsLoading(false);
+        setIsSent(false);
+        message.warning("Không có dữ liệu để lưu!");
+    }
+};
+
+
   return (
     <>
       <Helmet>
@@ -173,6 +229,10 @@ export default function RootMenuTechnique({ permissions, isMobile }) {
                 openModal={openModal}
                 handleDeleteDataSheet={handleDeleteDataSheet}
                 data={menus}
+                handleSaveData={handleSaveData}
+                setNumRowsToAdd={setNumRowsToAdd}
+                setClickCount={setClickCount}
+                numRowsToAdd={numRowsToAdd}
               />
             </div>
           </div>
@@ -185,15 +245,17 @@ export default function RootMenuTechnique({ permissions, isMobile }) {
               selection={selection}
               showSearch={showSearch}
               setShowSearch={setShowSearch}
+              setAddedRows={setAddedRows}
+              addedRows={addedRows}
+              setEditedRows={setEditedRows}
+              editedRows={editedRows}
+              setNumRowsToAdd={setNumRowsToAdd}
+              clickCount={clickCount}
+              numRowsToAdd={numRowsToAdd}
             />
           </div>
         </div>
-        <DrawerAddRootMenu
-          isOpen={isModalOpen}
-          menus={menus}
-          onClose={closeModal}
-          fetchDataRootMenus={fetchDataRootMenus}
-        />
+       
       </div>
     </>
   )
