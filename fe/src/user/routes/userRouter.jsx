@@ -47,6 +47,7 @@ const RootMenuTechnique = lazy(() => import('../page/system/rootMenuTechnique'))
 const StockOutRequestFiFo = lazy(() => import('../page/material/stockOutFiFo'))
 const { Content } = Layout
 import { openDB } from 'idb'
+import KittingConfirm from '../page/kitting/kittingConfirm'
 
 const getLanguageData = async (typeLanguage) => {
   const db = await openDB('languageDatabase', 1)
@@ -420,6 +421,24 @@ const UserRouter = () => {
                               'View',
                             ) ? (
                               <BarcodeChange
+                                permissions={userPermissions}
+                                isMobile={isMobile}
+                              />
+                            ) : (
+                              <ErrorPage />
+                            )
+                          }
+                        />
+
+                        <Route
+                          path="/wms/u/warehouse/kitting/confirm"
+                          element={
+                            checkActionPermission(
+                              userPermissions,
+                              'warehousing-1-2',
+                              'View',
+                            ) ? (
+                              <KittingConfirm
                                 permissions={userPermissions}
                                 isMobile={isMobile}
                               />
