@@ -37,6 +37,7 @@ function TableMenuManagement({
   const gridRef = useRef(null);
   const [numRows, setNumRows] = useState(0);
   const [open, setOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [cols, setCols] = useState(() =>
     loadFromLocalStorageSheet("S_ERP_COLS_PAGE_MENU", defaultCols)
   );
@@ -115,7 +116,6 @@ function TableMenuManagement({
 
   const onCellEdited = useCallback(
     (cell, newValue) => {
-      console.log('cell' ,cell)
       if (newValue.kind !== GridCellKind.Text) {
         return;
       }
@@ -333,28 +333,28 @@ function TableMenuManagement({
           smoothScrollX={true}
           onCellEdited={onCellEdited}
           onCellClicked={onCellClicked}
-       /*    highlightRegions={[
-            {
-              color: "#E5E8FF",
-              range: {
-                x: 1,
-                y: 0,
-                width: 1,
-                height: numRows,
-              },
-              style: "solid"
-            },
-            {
-              color: "#DEE0F0",
-              range: {
-                x: 2,
-                y: 0,
-                width: 1,
-                height: numRows,
-              },
-              style: "solid"
-            },
-          ]} */
+          /*    highlightRegions={[
+               {
+                 color: "#E5E8FF",
+                 range: {
+                   x: 1,
+                   y: 0,
+                   width: 1,
+                   height: numRows,
+                 },
+                 style: "solid"
+               },
+               {
+                 color: "#DEE0F0",
+                 range: {
+                   x: 2,
+                   y: 0,
+                   width: 1,
+                   height: numRows,
+                 },
+                 style: "solid"
+               },
+             ]} */
           onColumnResize={onColumnResize}
           onHeaderMenuClick={onHeaderMenuClick}
           onColumnMoved={onColumnMoved}

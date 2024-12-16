@@ -446,6 +446,7 @@ export class StockInService {
         if (result.some((item: any) => item.Status !== 0)) {
           errors.push(result.map((item: any) => `${item.Result}`).join('; '));
         }
+        
         return result;
       };
 
@@ -475,7 +476,6 @@ export class StockInService {
       const saveProcedure = async (name: string, result: any) => {
         switch (name) {
           case '_SSLImpDelvMasterCheck_WEB':
-            console.log('_SSLImpDelvMasterCheck_WEB', result)
             return this._SSLImpDelvMasterSaveWEB(
               result,
               xmlFlags,

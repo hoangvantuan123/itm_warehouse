@@ -16,6 +16,7 @@ import { filterAndSelectColumnsU } from '../../../utils/filterU'
 import { filterAndSelectColumnsA } from '../../../utils/filterA'
 import { PostAddMenu } from '../../../features/system/postAddMenu'
 import { PostUpdateMenu } from '../../../features/system/postUpdateMenu'
+import ModalHelpMenu from '../../components/modal/system/modalHelpMenu'
 export default function MenuTechnique({ permissions, isMobile }) {
   const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
@@ -36,6 +37,8 @@ export default function MenuTechnique({ permissions, isMobile }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [openHelp, setOpenHelp] = useState(false);
   const fetchDataMenus = useCallback(async () => {
     setLoading(true)
     try {
@@ -123,9 +126,14 @@ export default function MenuTechnique({ permissions, isMobile }) {
   const onCellClicked = (cell, event) => {
     const currentTime = new Date().getTime();
 
-    if (currentTime - lastClickTime < 300) {
-      console.log("Double Click Detected:", cell);
+
+    if (cell[0] === 1) {
+      if (currentTime - lastClickTime < 300) {
+        setOpenHelp(true);
+        console.log("Double Click Detected:", cell);
+      }
     }
+
 
     lastClickTime = currentTime;
 
@@ -160,6 +168,20 @@ export default function MenuTechnique({ permissions, isMobile }) {
     }
   };
 
+
+  const handleKeyDown = (event) => {
+    if (event.ctrlKey && event.key === ' ') {
+      console.log('Ctrl + Space was pressed during cell editing');
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
 
   const handleSaveData = async () => {
@@ -256,6 +278,7 @@ export default function MenuTechnique({ permissions, isMobile }) {
           onClose={closeModal}
           fetchDataMenus={fetchDataMenus}
         />
+        <ModalHelpMenu openHelp={openHelp} setOpenHelp={setOpenHelp} />
       </div>
     </>
   )

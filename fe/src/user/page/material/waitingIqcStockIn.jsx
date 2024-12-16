@@ -142,18 +142,19 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
         const barcode = bufferRef.current.trim()
           .normalize('NFD')
           .replace(/[\u0300-\u036f]/g, '')
-          .replace(/[^a-zA-Z0-9/-]/g, '');
+          .replace(/[^a-zA-Z0-9/.\-*%_]/g, ''); 
         handleCheckBarcode(barcode);
         setInputCode(barcode);
-
+    
         bufferRef.current = '';
       } else if (e.key.length === 1) {
-        const normalizedKey = e.key.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-        if (/^[a-zA-Z0-9/-]$/.test(normalizedKey)) {
+        const normalizedKey = e.key.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); 
+        if (/^[a-zA-Z0-9/.\-*%_]{1}$/.test(normalizedKey)) { 
           bufferRef.current += normalizedKey;
         }
       }
     }
+    
 
 
     const handleFocus = () => setStatus(true)
