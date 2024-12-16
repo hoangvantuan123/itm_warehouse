@@ -8,6 +8,7 @@ import LayoutStatusMenuSheet from '../../sheet/layoutStatusMenu';
 import { Drawer, Checkbox } from 'antd';
 import { saveToLocalStorageSheet } from '../../../../localStorage/sheet/sheet';
 import { loadFromLocalStorageSheet } from '../../../../localStorage/sheet/sheet';
+import ModalHelpMenu from '../../modal/system/modalHelpMenu';
 
 
 const defaultCols = [
@@ -20,6 +21,12 @@ const defaultCols = [
   { title: 'Type', id: 'Type', kind: 'Text', readonly: false, width: 250, hasMenu: true },
 ];
 
+
+const dataSearch = [
+  { Key: 'A01', Label: 'Menu 1', Link: '/menu1', Type: 'Type1' },
+  { Key: 'A02', Label: 'Menu 2', Link: '/menu2', Type: 'Type2' },
+  { Key: 'A03', Label: 'Menu 3', Link: '/menu3', Type: 'Type3' },
+];
 function TableMenuManagement({
   data,
   onCellClicked,
@@ -31,7 +38,7 @@ function TableMenuManagement({
   addedRows,
   setEditedRows,
   editedRows,
-  setNumRowsToAdd, numRowsToAdd, clickCount
+  setNumRowsToAdd, numRowsToAdd, setInputHelp
 }) {
   const [gridData, setGridData] = useState([]);
   const gridRef = useRef(null);
@@ -44,7 +51,9 @@ function TableMenuManagement({
   const onSearchClose = useCallback(() => setShowSearch(false), []);
   const [showMenu, setShowMenu] = useState(null);
   const [hiddenColumns, setHiddenColumns] = useState(loadFromLocalStorageSheet("H_ERP_COLS_PAGE_MENU", []));
-
+  const [searchResultsHelp, setSearchResultsHelp] = useState([]);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [openHelp, setOpenHelp] = useState(false);
   const onHeaderMenuClick = useCallback((col, bounds) => {
     if (cols[col]?.id === 'Status') {
       setShowMenu({
@@ -116,29 +125,74 @@ function TableMenuManagement({
 
   const onCellEdited = useCallback(
     (cell, newValue) => {
+      console.log('cell' , cell)
       if (newValue.kind !== GridCellKind.Text) {
         return;
       }
-
+  
       const indexes = ['Status', 'MenuRootId', 'MenuSubRootId', 'Key', 'Label', 'Link', 'Type'];
       const [col, row] = cell;
       const key = indexes[col];
-
+  
+      if (key === 'MenuRootId') {
+        const searchText = newValue.data.trim().toLowerCase();
+        const searchResults = dataSearch.filter(
+            (item) =>
+                item.Key.toLowerCase().includes(searchText) ||
+                item.Label.toLowerCase().includes(searchText)
+        );
+    
+        setGridData((prevData) => {
+            const updatedData = [...prevData];
+            if (!updatedData[row]) updatedData[row] = {};
+    
+            const currentStatus = updatedData[row]['Status'] || '';
+            let newKey = updatedData[row]['Key'];
+            let newLabel = updatedData[row]['Label'];
+            let newLink = updatedData[row]['Link'];
+            let newType = updatedData[row]['Type'];
+    
+            if (searchResults.length > 0) {
+                const result = searchResults[0];
+                newKey = result.Key;
+                newLabel = result.Label;
+                newLink = result.Link;
+                newType = result.Type;
+            }
+    
+            updatedData[row] = {
+                ...updatedData[row],
+                Key: newKey,
+                Label: newLabel,
+                Link: newLink,
+                Type: newType,
+                Status: currentStatus === 'A' ? 'A' : 'U',
+            };
+    
+            return updatedData;
+        });
+    
+     
+    }
+    
       setGridData((prevData) => {
         const updatedData = [...prevData];
         if (!updatedData[row]) updatedData[row] = {};
-
+  
         const currentStatus = updatedData[row]['Status'] || '';
-
+  
         if (currentStatus === 'A') {
           updatedData[row][key] = newValue.data;
         } else {
           updatedData[row][key] = newValue.data;
           updatedData[row]['Status'] = 'U';
         }
-
+  
         setEditedRows((prevEditedRows) => {
-          const existingIndex = prevEditedRows.findIndex((editedRow) => editedRow.rowIndex === row);
+          const existingIndex = prevEditedRows.findIndex(
+            (editedRow) => editedRow.rowIndex === row
+          );
+  
           if (existingIndex === -1) {
             return [
               ...prevEditedRows,
@@ -155,13 +209,16 @@ function TableMenuManagement({
             return updatedEditedRows;
           }
         });
-
+  
         return updatedData;
       });
+      setInputHelp(newValue.data); 
     },
     []
   );
+  
 
+  
 
   const onColumnResize = useCallback(
     (column, newSize) => {
@@ -286,6 +343,12 @@ function TableMenuManagement({
       });
     }
   };
+
+
+  const handleSelectRow = (record) => {
+    console.log('Selected Row:', record);
+    setSelectedRow(record);
+};
   return (
     <div className="w-full gap-1 h-full flex items-center justify-center pb-8">
       <div className="w-full h-full flex flex-col border bg-white rounded-lg overflow-hidden ">
@@ -407,6 +470,7 @@ function TableMenuManagement({
             )
           ))}
         </Drawer>
+      
       </div>
     </div>
   );
