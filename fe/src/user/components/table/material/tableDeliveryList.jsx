@@ -6,36 +6,8 @@ import { useNavigate } from 'react-router-dom'
 import { CompactSelection } from '@glideapps/glide-data-grid'
 import { TableOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
-const SearchButton = ({ onClick }) => (
-  <Button onClick={onClick}>Show Search</Button>
-)
 
-
-const data = [
-  {
-    title: "4179",
-    DelvMngNo: "DEL123456",
-    ImpType: "Import",
-    TotalQty: 500,
-    OkQty: 450,
-    RemainQty: 50,
-    DelvDate: "2024-07-01",
-    CustSeq: 1234,
-    CustNm: "ABC Corporation",
-    DomOrImp: "Domestic",
-    PurchaseType: "Recurring",
-    BizUnitName: "Tech Division",
-    BizUnit: "T123",
-    EmpSeq: 5678,
-    EmpName: "Nguyen Van A",
-    DeptSeq: 10,
-    DeptName: "Sales",
-    CurrSeq: 1,
-    CurrName: "USD",
-    ExRate: 1.23
-  }
-];
-function TableDeliveryList({  onCellClicked, gridData, setGridData }) {
+function TableDeliveryList({ data, onCellClicked, gridData, setGridData }) {
   const [showSearch, setShowSearch] = useState(false)
   const ref = (useRef < data) | (null > null)
   const onSearchClose = useCallback(() => setShowSearch(false), [])
@@ -192,8 +164,8 @@ function TableDeliveryList({  onCellClicked, gridData, setGridData }) {
             i % 2 === 0
               ? undefined
               : {
-                  bgCell: '#FBFBFB',
-                }
+                bgCell: '#FBFBFB',
+              }
           }
         />
       </div>

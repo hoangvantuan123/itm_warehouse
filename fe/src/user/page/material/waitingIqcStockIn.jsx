@@ -59,10 +59,15 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
   })
+  const resetTable = () => {
+    setSelection({
+      columns: CompactSelection.empty(),
+      rows: CompactSelection.empty(),
+    })
+  }
   const [isOpenDetails, setIsOpenDetails] = useState(false)
   const [isAPISuccess, setIsAPISuccess] = useState(true)
-  const [isCheckSaveSuccess, setIsCheckSaveSuccess] = useState(true)
-  const [inputItemNo, setInputItemNo] = useState(""); 
+  const [inputItemNo, setInputItemNo] = useState("");
   useEffect(() => {
     const savedState = localStorage.getItem('detailsStateIqc')
     setIsOpenDetails(savedState === 'open')
@@ -73,7 +78,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     setIsOpenDetails(isOpen)
     localStorage.setItem('detailsStateIqc', isOpen ? 'open' : 'closed')
   }
-  const nameFrom = 'From Waiting IQC STOCK IN'; 
+  const nameFrom = 'From Waiting IQC STOCK IN';
 
   const Format = useCallback((date) => {
     const d = new Date(date)
@@ -136,7 +141,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
       if (e.key === 'Enter' && bufferRef.current.trim()) {
         const barcode = bufferRef.current.trim()
           .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')  
+          .replace(/[\u0300-\u036f]/g, '')
           .replace(/[^a-zA-Z0-9/-]/g, '');
         handleCheckBarcode(barcode);
         setInputCode(barcode);
@@ -315,6 +320,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
             reelNo: reel,
             barcode: barcode,
           }
+          resetTable()
           setInputItemNo(itemNo)
           debouncedCheckBarcode(formData, resultMessage)
         }
@@ -586,20 +592,20 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
         Qty: scanHistory[index]?.Qty,
       }));
 
-  
+
       const remainingRows = scanHistory.filter(
         (row, index) => !selectedRowIndices.includes(index),
       )
 
       setScanHistory(remainingRows)
-
+      resetTable()
       setData((prevData) =>
         prevData.map((item) => {
           const selectedItem = selectedItems.find((selected) => selected.ItemNo === item.ItemNo);
           if (selectedItem) {
             return {
               ...item,
-              OkQty: item.OutQty - selectedItem.Qty,
+              OkQty: item.OkQty - selectedItem.Qty,
               RemainQty: item.RemainQty + selectedItem.Qty,
             };
           }
@@ -619,6 +625,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
         return
       }
       setScanHistory([])
+      resetTable()
       fetchDeliveryData(filteredData?.DelvNo, filteredData?.PurchaseType)
       message.success('Reset form thành công!')
     },
@@ -709,10 +716,10 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
         setModal3Open={setModal3Open}
         pathRouter="/u/warehouse/material/delivery-list"
       />
-      <ModalFocus  
-       status={status}
+      <ModalFocus
+        status={status}
         setStatus={setStatus}
-        nameFrom={nameFrom}/>
+        nameFrom={nameFrom} />
     </>
   )
 }
