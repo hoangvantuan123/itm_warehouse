@@ -111,7 +111,7 @@ export default function DeliveryList({ permissions, isMobile }) {
 
   const nextPageStockIn = useCallback(() => {
     if (keyPath) {
-      navigate(`/u/warehouse/material/waiting-iqc-stock-in/${keyPath}`)
+      navigate(`/wms/u/warehouse/material/waiting-iqc-stock-in/${keyPath}`)
     }
   }, [keyPath, navigate])
 

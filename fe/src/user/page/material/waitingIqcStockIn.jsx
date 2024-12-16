@@ -120,7 +120,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
       const decryptedData = bytes.toString(CryptoJS.enc.Utf8)
       return JSON.parse(decryptedData)
     } catch (error) {
-      navigate(`/u/warehouse/material/delivery-list`)
+      navigate(`/wms/u/warehouse/material/delivery-list`)
       setModal3Open(true)
       return null
     }
@@ -531,7 +531,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
         })
         setResult(response)
         if (response.success) {
-          navigate(`/u/warehouse/material/delivery-list`)
+          navigate(`/wms/u/warehouse/material/delivery-list`)
           setModal4Open(false)
           setScanHistory([])
           setIsAPISuccess(true)
@@ -714,7 +714,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
       <ErrorPage
         modal3Open={modal3Open}
         setModal3Open={setModal3Open}
-        pathRouter="/u/warehouse/material/delivery-list"
+        pathRouter="/wms/u/warehouse/material/delivery-list"
       />
       <ModalFocus
         status={status}

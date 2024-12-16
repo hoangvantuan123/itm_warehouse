@@ -105,7 +105,7 @@ export default function MatWHStockIn({ permissions, isMobile }) {
       return JSON.parse(decryptedData)
     } catch (error) {
     
-      navigate(`/u/warehouse/material/waiting-iqc-status`) 
+      navigate(`/wms/u/warehouse/material/waiting-iqc-status`) 
       setModal3Open(true)
       return null
     }
@@ -270,7 +270,7 @@ const handleSubmit = useCallback(
 
       setResult(response)
       if (response.success) {
-        navigate(`/u/warehouse/material/waiting-iqc-status`)
+        navigate(`/wms/u/warehouse/material/waiting-iqc-status`)
         setModal4Open(false)
         setModal5Open(true)
         setSuccessMessage('Tất cả các dữ liệu đã được thực thi thành công!')
@@ -352,7 +352,7 @@ const handleSubmit = useCallback(
         modal5Open={modal5Open}
         successMessage={successMessage}
       />
-      <ErrorPage modal3Open={modal3Open} setModal3Open={setModal3Open} pathRouter="/u/warehouse/material/waiting-iqc-status" />
+      <ErrorPage modal3Open={modal3Open} setModal3Open={setModal3Open} pathRouter="/wms/u/warehouse/material/waiting-iqc-status" />
     </>
   )
 }

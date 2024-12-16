@@ -3,84 +3,39 @@ import { useTranslation } from 'react-i18next'
 import { Helmet } from 'react-helmet'
 import { Input, Space, Table, Typography, message, Tabs, Layout } from 'antd'
 const { Title, Text } = Typography
-import { FilterOutlined } from '@ant-design/icons'
-import { ArrowIcon } from '../../components/icons'
 import dayjs from 'dayjs'
-import { GetCodeHelp } from '../../../features/codeHelp/getCodeHelp'
-import { GetDeliveryList } from '../../../features/material/getDeliveryList'
 import { debounce } from 'lodash'
 import { useNavigate } from 'react-router-dom'
-import { encodeBase64Url } from '../../../utils/decode-JWT'
-import CryptoJS from 'crypto-js'
-import UserManagementQuery from '../../components/query/system/userManagementQuery'
-import ViewRoleManagement from '../../components/view/system/viewRoleManagement'
 import MenuManagementActions from '../../components/actions/system/menuManagementActions'
 import TableMenuManagement from '../../components/table/system/tableMenuManagement'
 import DrawerAddMenu from '../../components/drawer/system/addMenu'
 import { GetAllMenus } from '../../../features/system/getMenus'
 import { DeleteMenus } from '../../../features/system/deleteMenus'
 import { CompactSelection } from '@glideapps/glide-data-grid'
-const generateRandomData = () => {
-  const menuRootIds = [1, 2, 3, 4, 5]
-  const types = ['main', 'sub']
-  const labels = [
-    'Home',
-    'About Us',
-    'Services',
-    'Contact',
-    'FAQ',
-    'Blog',
-    'Portfolio',
-    'Shop',
-    'Careers',
-    'Support',
-  ]
-
-  const data = []
-
-  for (let i = 0; i < 1000; i++) {
-    const menuRootId =
-      menuRootIds[Math.floor(Math.random() * menuRootIds.length)]
-    const menuSubRootId = menuRootId * 100 + Math.floor(Math.random() * 100)
-    const key = labels[Math.floor(Math.random() * labels.length)]
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-    const label = labels[Math.floor(Math.random() * labels.length)]
-    const link = `/${key}`
-    const type = types[Math.floor(Math.random() * types.length)]
-
-    data.push({
-      'Menu Root ID': menuRootId,
-      'Menu Sub Root ID': menuSubRootId,
-      Key: key,
-      Label: label,
-      Link: link,
-      Type: type,
-    })
-  }
-
-  return data
-}
-
+import { filterAndSelectColumnsU } from '../../../utils/filterU'
+import { filterAndSelectColumnsA } from '../../../utils/filterA'
+import { PostAddMenu } from '../../../features/system/postAddMenu'
+import { PostUpdateMenu } from '../../../features/system/postUpdateMenu'
 export default function MenuTechnique({ permissions, isMobile }) {
   const { t } = useTranslation()
-  const gridRef = useRef(null)
-  const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
-  const [data, setData] = useState([])
   const [menus, setMenus] = useState([])
-  const [formData, setFormData] = useState(dayjs().startOf('month'))
-  const [toDate, setToDate] = useState(dayjs())
-  const [checkedRowKey, setCheckedRowKey] = useState(null)
-  const [keyPath, setKeyPath] = useState(null)
-  const [checkedPath, setCheckedPath] = useState(false)
-  const formatDate = useCallback((date) => date.format('YYYYMMDD'), [])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selection, setSelection] = useState({
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
   })
   const [showSearch, setShowSearch] = useState(false)
+  const [lastClickedCell, setLastClickedCell] = useState(null)
+  const [addedRows, setAddedRows] = useState([]);
+  const [editedRows, setEditedRows] = useState([]);
+  const [clickedRowData, setClickedRowData] = useState(null)
+  const [isMinusClicked, setIsMinusClicked] = useState(false)
+  const [numRowsToAdd, setNumRowsToAdd] = useState(null);
+  const [clickCount, setClickCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSent, setIsSent] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const fetchDataMenus = useCallback(async () => {
     setLoading(true)
     try {
@@ -161,6 +116,97 @@ export default function MenuTechnique({ permissions, isMobile }) {
       document.removeEventListener('keydown', handleKeyDown)
     }
   }, [])
+
+
+  let lastClickTime = 0;
+
+  const onCellClicked = (cell, event) => {
+    const currentTime = new Date().getTime();
+
+    if (currentTime - lastClickTime < 300) {
+      console.log("Double Click Detected:", cell);
+    }
+
+    lastClickTime = currentTime;
+
+    let rowIndex;
+
+    if (cell[0] !== -1) {
+      return;
+    }
+
+    if (cell[0] === -1) {
+      rowIndex = cell[1];
+      setIsMinusClicked(true);
+    } else {
+      rowIndex = cell[0];
+      setIsMinusClicked(false);
+    }
+
+    if (
+      lastClickedCell &&
+      lastClickedCell[0] === cell[0] &&
+      lastClickedCell[1] === cell[1]
+    ) {
+      setLastClickedCell(null);
+      setClickedRowData(null);
+      return;
+    }
+
+    if (rowIndex >= 0 && rowIndex < menus.length) {
+      const rowData = menus[rowIndex];
+      setClickedRowData(rowData);
+      setLastClickedCell(cell);
+    }
+  };
+
+
+
+  const handleSaveData = async () => {
+    const columnsU = ['Id', 'Key', 'Label', 'Link', 'MenuRootId', 'MenuSubRootId', 'Type'];
+    const columnsA = ['Key', 'Label', 'Link', 'MenuRootId', 'MenuSubRootId', 'Type'];
+
+    const resulU = filterAndSelectColumnsU(editedRows, columnsU, 'U');
+    const resulA = filterAndSelectColumnsA(addedRows, columnsA, 'A');
+
+    if (isSent) return;
+    setIsSent(true);
+
+    if (resulA.length > 0 || resulU.length > 0) {
+      const loadingMessage = message.loading("Đang thực hiện lưu dữ liệu...");
+
+      try {
+        const promises = [];
+
+        if (resulA.length > 0) {
+          promises.push(PostAddMenu(resulA));
+        }
+
+        if (resulU.length > 0) {
+          promises.push(PostUpdateMenu(resulU));
+        }
+
+        await Promise.all(promises);
+
+        loadingMessage();
+        setIsLoading(false);
+        setIsSent(false);
+        setEditedRows([])
+        setAddedRows([])
+        fetchDataMenus()
+        message.success("Lưu dữ liệu thành công!");
+      } catch (error) {
+        loadingMessage();
+        setIsLoading(false);
+        setIsSent(false);
+        message.error(error.message || "Có lỗi xảy ra khi lưu dữ liệu");
+      }
+    } else {
+      setIsLoading(false);
+      setIsSent(false);
+      message.warning("Không có dữ liệu để lưu!");
+    }
+  };
   return (
     <>
       <Helmet>
@@ -178,6 +224,9 @@ export default function MenuTechnique({ permissions, isMobile }) {
                 openModal={openModal}
                 handleDeleteDataSheet={handleDeleteDataSheet}
                 data={menus}
+                handleSaveData={handleSaveData}
+                setNumRowsToAdd={setNumRowsToAdd}
+                numRowsToAdd={numRowsToAdd}
               />
             </div>
           </div>
@@ -185,10 +234,18 @@ export default function MenuTechnique({ permissions, isMobile }) {
           <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg  overflow-auto">
             <TableMenuManagement
               data={menus}
+              onCellClicked={onCellClicked}
               setSelection={setSelection}
               selection={selection}
               showSearch={showSearch}
               setShowSearch={setShowSearch}
+              setAddedRows={setAddedRows}
+              addedRows={addedRows}
+              setEditedRows={setEditedRows}
+              editedRows={editedRows}
+              setNumRowsToAdd={setNumRowsToAdd}
+              clickCount={clickCount}
+              numRowsToAdd={numRowsToAdd}
             />
           </div>
         </div>

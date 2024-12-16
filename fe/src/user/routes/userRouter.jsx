@@ -57,7 +57,7 @@ const getLanguageData = async (typeLanguage) => {
 const LanguageProvider = ({ children, keyLanguage }) => {
   const [isReady, setIsReady] = useState(false)
   const [languageUser, setLanguageUser] = useState(null)
-
+  const navigate = useNavigate()
   useEffect(() => {
     const languageFromStorage =
       Number(localStorage.getItem('language_user')) || 6
@@ -148,7 +148,7 @@ const UserRouter = () => {
     }
   }, [])
 
-  const skippedRoutes = ['/u/login', '/u/home']
+  const skippedRoutes = ['/wms', '/wms/u/login']
 
   const checkLoginStatus = () => {
     const token = Cookies.get('a_a')
@@ -162,7 +162,7 @@ const UserRouter = () => {
       Cookies.remove('a_a')
       localStorage.removeItem('userInfo')
       localStorage.removeItem('rolesMenu')
-      navigate('/u/login')
+      navigate('/wms/u/login')
     }
   }
 
@@ -181,7 +181,7 @@ const UserRouter = () => {
   return (
     <Routes>
       <Route
-        path="u/login"
+        path="/wms/u/login"
         element={
           <Login
             processRolesMenu={processRolesMenu}
@@ -209,7 +209,7 @@ const UserRouter = () => {
                       />
                       <Routes>
                         <Route
-                          path="u/warehouse/material/delivery-list"
+                          path="/wms/u/warehouse/material/delivery-list"
                           element={
                             checkActionPermission(
                               userPermissions,
@@ -226,7 +226,7 @@ const UserRouter = () => {
                           }
                         />
                         <Route
-                          path="u/warehouse/material/waiting-iqc-stock-in/:id"
+                          path="/wms/u/warehouse/material/waiting-iqc-stock-in/:id"
                           element={
                             checkActionPermission(
                               userPermissions,
@@ -243,7 +243,7 @@ const UserRouter = () => {
                           }
                         />
                         <Route
-                          path="u/warehouse/material/waiting-iqc-status"
+                          path="/wms/u/warehouse/material/waiting-iqc-status"
                           element={
                             checkActionPermission(userPermissions, 'material-1-3', 'View') ? (
                               <IQCStatus
@@ -258,7 +258,7 @@ const UserRouter = () => {
                           }
                         />
                         <Route
-                          path="u/warehouse/material/material-wh-stock-in/:id"
+                          path="/wms/u/warehouse/material/material-wh-stock-in/:id"
                           element={
                             checkActionPermission(userPermissions, 'material-1-3', 'View') ? (
                               <MatWHStockIn
@@ -274,7 +274,7 @@ const UserRouter = () => {
                           }
                         />
                         <Route
-                          path="u/warehouse/material/stock-out-request"
+                          path="/wms/u/warehouse/material/stock-out-request"
                           element={
                             checkActionPermission(
                               userPermissions,
@@ -291,7 +291,7 @@ const UserRouter = () => {
                           }
                         />
                         <Route
-                          path="u/system_settings/users/user-management"
+                          path="/wms/u/system_settings/users/user-management"
                           element={
                             checkActionPermission(
                               userPermissions,
@@ -308,7 +308,7 @@ const UserRouter = () => {
                           }
                         />
                         <Route
-                          path="u/warehouse/material/stock-out-request/:id"
+                          path="/wms/u/warehouse/material/stock-out-request/:id"
                           element={
                             checkActionPermission(
                               userPermissions,
@@ -325,7 +325,7 @@ const UserRouter = () => {
                           }
                         />
                         <Route
-                          path="u/system_settings/users/user-management/profile/:id/:name"
+                          path="/wms/u/system_settings/users/user-management/profile/:id/:name"
                           element={
                             checkActionPermission(
                               userPermissions,
@@ -342,7 +342,7 @@ const UserRouter = () => {
                           }
                         />
                         <Route
-                          path="u/system_settings/users/role-management"
+                          path="/wms/u/system_settings/users/role-management"
                           element={
                             checkActionPermission(
                               userPermissions,
@@ -359,7 +359,7 @@ const UserRouter = () => {
                           }
                         />
                         <Route
-                          path="u/system_settings/technique/menu-items"
+                          path="/wms/u/system_settings/technique/menu-items"
                           element={
                             checkActionPermission(
                               userPermissions,
@@ -376,7 +376,7 @@ const UserRouter = () => {
                           }
                         />
                         <Route
-                          path="u/system_settings/technique/root-menu"
+                          path="/wms/u/system_settings/technique/root-menu"
                           element={
                             checkActionPermission(
                               userPermissions,
@@ -394,7 +394,7 @@ const UserRouter = () => {
                         />
 
                         <Route
-                          path="/u/warehouse/warehousing/barcode-print"
+                          path="/wms/u/warehouse/warehousing/barcode-print"
                           element={
                             checkActionPermission(
                               userPermissions,
@@ -412,7 +412,7 @@ const UserRouter = () => {
                         />
 
                         <Route
-                          path="/u/warehouse/warehousing/barcode-change"
+                          path="/wms/u/warehouse/warehousing/barcode-change"
                           element={
                             checkActionPermission(
                               userPermissions,
@@ -438,7 +438,7 @@ const UserRouter = () => {
                           }
                         />
                         <Route
-                          path="/u/home"
+                          path="/wms/u/home"
                           element={
                             <Home
                               permissions={userPermissions}

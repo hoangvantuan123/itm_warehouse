@@ -4,6 +4,19 @@ import { TableOutlined } from '@ant-design/icons';
 import { useLayer } from 'react-laag';
 import { onRowAppended } from '../../sheet/onRowAppended';
 import LayoutMenuSheet from '../../sheet/layoutMenu';
+import LayoutStatusMenuSheet from '../../sheet/layoutStatusMenu';
+import { Drawer, Checkbox } from 'antd';
+import { saveToLocalStorageSheet } from '../../../../localStorage/sheet/sheet';
+import { loadFromLocalStorageSheet } from '../../../../localStorage/sheet/sheet';
+
+
+
+const defaultCols = [{ title: '#', id: 'Status', kind: GridCellKind.Text, readonly: true, width: 50, hasMenu: true },
+{ title: 'Key', id: 'Key', kind: GridCellKind.Text, readonly: false, width: 200, hasMenu: true },
+{ title: 'Label', id: 'Label', kind: GridCellKind.Text, readonly: false, width: 250, hasMenu: true },
+{ title: 'Link', id: 'Link', kind: GridCellKind.Text, readonly: false, width: 250, hasMenu: true },
+{ title: 'Icon', id: 'Icon', kind: GridCellKind.Text, readonly: false, width: 250, hasMenu: true },
+];
 
 function TableRootMenuManagement({
   data,
@@ -12,31 +25,37 @@ function TableRootMenuManagement({
   selection,
   setShowSearch,
   showSearch,
-  setAddedRows, 
-  addedRows, 
-  setEditedRows, 
-  editedRows, 
+  setAddedRows,
+  addedRows,
+  setEditedRows,
+  editedRows,
   setNumRowsToAdd, numRowsToAdd, clickCount
 }) {
- 
-  const [gridData, setGridData] = useState([]);
 
+  const [gridData, setGridData] = useState([]);
   const gridRef = useRef(null);
   const [numRows, setNumRows] = useState(0);
-
-  const [cols, setCols] = useState([{ title: '#', id: 'Status', kind: GridCellKind.Text, readonly: true, width: 35, hasMenu: false }, 
-    { title: 'Key', id: 'Key', kind: GridCellKind.Text, readonly: false, width: 200, hasMenu: true },
-    { title: 'Label', id: 'Label', kind: GridCellKind.Text, readonly: false, width: 250, hasMenu: true },
-    { title: 'Link', id: 'Link', kind: GridCellKind.Text, readonly: false, width: 250, hasMenu: true },
-    { title: 'Icon', id: 'Icon', kind: GridCellKind.Text, readonly: false, width: 250, hasMenu: true },
-  ]);
-
+  const [open, setOpen] = useState(false);
+  const [cols, setCols] = useState(() =>
+    loadFromLocalStorageSheet("S_ERP_COLS_PAGE_ROOT_MENU", defaultCols)
+  );
   const onSearchClose = useCallback(() => setShowSearch(false), []);
   const [showMenu, setShowMenu] = useState(null);
-  const [hiddenColumns, setHiddenColumns] = useState([]); 
-
+  const [hiddenColumns, setHiddenColumns] = useState(loadFromLocalStorageSheet("H_ERP_COLS_PAGE_ROOT_MENU", []));
   const onHeaderMenuClick = useCallback((col, bounds) => {
-    setShowMenu({ col, bounds });
+    if (cols[col]?.id === 'Status') {
+      setShowMenu({
+        col,
+        bounds,
+        menuType: 'statusMenu',
+      });
+    } else {
+      setShowMenu({
+        col,
+        bounds,
+        menuType: 'defaultMenu',
+      });
+    }
   }, []);
   const [highlightRegions, setHighlightRegions] = useState([]);
 
@@ -50,9 +69,9 @@ function TableRootMenuManagement({
 
   const getData = useCallback(
     ([col, row]) => {
-      const person = gridData[row] || {}; 
-      const columnKey = cols[col]?.id || ''; 
-      const value = person[columnKey] || ''; 
+      const person = gridData[row] || {};
+      const columnKey = cols[col]?.id || '';
+      const value = person[columnKey] || '';
       const column = cols[col];
       return {
         kind: GridCellKind.Text,
@@ -60,7 +79,7 @@ function TableRootMenuManagement({
         displayData: String(value),
         readonly: column?.readonly || false,
         allowOverlay: true,
-        hasMenu: column?.hasMenu || false,    
+        hasMenu: column?.hasMenu || false,
       };
     },
     [gridData, cols]
@@ -86,33 +105,33 @@ function TableRootMenuManagement({
   const handleRowAppend = useCallback((numRowsToAdd) => {
     onRowAppended(cols, setGridData, setNumRows, setAddedRows, numRowsToAdd);
   }, [cols, setGridData, setNumRows, setAddedRows, numRowsToAdd]);
-  
+
   useEffect(() => {
     handleRowAppend(numRowsToAdd);
-  }, [ numRowsToAdd]);
+  }, [numRowsToAdd]);
   const onCellEdited = useCallback(
     (cell, newValue) => {
       if (newValue.kind !== GridCellKind.Text) {
         return;
       }
-  
+
       const indexes = ['Status', 'Key', 'Label', 'Link', 'Icon'];
       const [col, row] = cell;
       const key = indexes[col];
-  
+
       setGridData((prevData) => {
         const updatedData = [...prevData];
         if (!updatedData[row]) updatedData[row] = {};
-  
+
         const currentStatus = updatedData[row]['Status'] || '';
-  
+
         if (currentStatus === 'A') {
           updatedData[row][key] = newValue.data;
         } else {
           updatedData[row][key] = newValue.data;
-          updatedData[row]['Status'] = 'U'; 
+          updatedData[row]['Status'] = 'U';
         }
-  
+
         setEditedRows((prevEditedRows) => {
           const existingIndex = prevEditedRows.findIndex((editedRow) => editedRow.rowIndex === row);
           if (existingIndex === -1) {
@@ -121,23 +140,23 @@ function TableRootMenuManagement({
               {
                 rowIndex: row,
                 updatedRow: updatedData[row],
-                status: currentStatus === 'A' ? 'A' : 'U', 
+                status: currentStatus === 'A' ? 'A' : 'U',
               },
             ];
           } else {
             const updatedEditedRows = [...prevEditedRows];
             updatedEditedRows[existingIndex].updatedRow = updatedData[row];
-            updatedEditedRows[existingIndex].status = currentStatus === 'A' ? 'A' : 'U'; 
+            updatedEditedRows[existingIndex].status = currentStatus === 'A' ? 'A' : 'U';
             return updatedEditedRows;
           }
         });
-  
+
         return updatedData;
       });
     },
     []
   );
-  
+
 
   const onColumnResize = useCallback(
     (column, newSize) => {
@@ -155,7 +174,7 @@ function TableRootMenuManagement({
     [cols],
   )
 
-  
+
   const { renderLayer, layerProps } = useLayer({
     isOpen: showMenu !== null,
     triggerOffset: 4,
@@ -175,34 +194,86 @@ function TableRootMenuManagement({
     possiblePlacements: ["bottom-start", "bottom-end"],
   });
 
-/* TOOLLS */
-const handleSort = (columnId, direction) => {
-  setGridData((prevData) => {
-    const sortedData = [...prevData].sort((a, b) => {
-      if (a[columnId] < b[columnId]) return direction === "asc" ? -1 : 1;
-      if (a[columnId] > b[columnId]) return direction === "asc" ? 1 : -1;
-      return 0;
+  /* TOOLLS */
+  const handleSort = (columnId, direction) => {
+    setGridData((prevData) => {
+      const sortedData = [...prevData].sort((a, b) => {
+        if (a[columnId] < b[columnId]) return direction === "asc" ? -1 : 1;
+        if (a[columnId] > b[columnId]) return direction === "asc" ? 1 : -1;
+        return 0;
+      });
+      return sortedData;
     });
-    return sortedData;
-  });
-  setShowMenu(null);
-};
-  const handleHideColumn = (colIndex) => {
-    const columnId = cols[colIndex]?.id;
-    setHiddenColumns((prev) => [...prev, columnId]);
-    setCols((prevCols) => prevCols.filter((col, idx) => idx !== colIndex));
     setShowMenu(null);
   };
+  const handleHideColumn = (colIndex) => {
+    const columnId = cols[colIndex]?.id;
+    if (cols.length > 1) {
+      setHiddenColumns((prevHidden) => {
+        const newHidden = [...prevHidden, columnId];
+        saveToLocalStorageSheet("H_ERP_COLS_PAGE_ROOT_MENU", newHidden);
+        return newHidden;
+
+      });
+      setCols((prevCols) => {
+        const newCols = prevCols.filter((_, idx) => idx !== colIndex);
+        saveToLocalStorageSheet("S_ERP_COLS_PAGE_ROOT_MENU", newCols);
+        return newCols;
+      });
+      setShowMenu(null);
+    }
+  };
+
+
+  const handleReset = () => {
+    setCols(defaultCols);
+    setHiddenColumns([]);
+    localStorage.removeItem("S_ERP_COLS_PAGE_ROOT_MENU");
+    localStorage.removeItem("H_ERP_COLS_PAGE_ROOT_MENU");
+  };
+
 
   const onColumnMoved = useCallback((startIndex, endIndex) => {
     setCols((prevCols) => {
       const updatedCols = [...prevCols];
-      const [movedColumn] = updatedCols.splice(startIndex, 1); 
-      updatedCols.splice(endIndex, 0, movedColumn); 
+      const [movedColumn] = updatedCols.splice(startIndex, 1);
+      updatedCols.splice(endIndex, 0, movedColumn);
       return updatedCols;
     });
   }, []);
+  const showDrawer = () => {
+    setOpen(true);
+  };
+  const onClose = () => {
+    setOpen(false);
+  };
+  const handleCheckboxChange = (columnId, isChecked) => {
 
+    if (isChecked) {
+      const restoredColumn = defaultCols.find((col) => col.id === columnId);
+      setCols((prevCols) => {
+        const newCols = [...prevCols, restoredColumn];
+        saveToLocalStorageSheet("S_ERP_COLS_PAGE_MENU", newCols);
+        return newCols;
+      });
+      setHiddenColumns((prevHidden) => {
+        const newHidden = prevHidden.filter((id) => id !== columnId);
+        saveToLocalStorageSheet("H_ERP_COLS_PAGE_MENU", newHidden);
+        return newHidden;
+      });
+    } else {
+      setCols((prevCols) => {
+        const newCols = prevCols.filter((col) => col.id !== columnId);
+        saveToLocalStorageSheet("S_ERP_COLS_PAGE_ROOT_MENU", newCols);
+        return newCols;
+      });
+      setHiddenColumns((prevHidden) => {
+        const newHidden = [...prevHidden, columnId];
+        saveToLocalStorageSheet("H_ERP_COLS_PAGE_ROOT_MENU", newHidden);
+        return newHidden;
+      });
+    }
+  };
   return (
     <div className="w-full gap-1 h-full flex items-center justify-center pb-8">
       <div className="w-full h-full flex flex-col border bg-white rounded-lg overflow-hidden ">
@@ -211,69 +282,97 @@ const handleSort = (columnId, direction) => {
           DATA SHEET
         </h2>
         <DataEditor
-        ref={gridRef}
-        columns={cols}
-        getCellContent={getData}
-        onFill={onFill}
-        rows={numRows}
-        showSearch={showSearch}
-        onSearchClose={onSearchClose}
-        rowMarkers="both"
-        width="100%"
-        height="100%"
-        rowSelect="multi"
-        gridSelection={selection}
-        onGridSelectionChange={setSelection}
-        getCellsForSelection={true}
-        trailingRowOptions={{
-         hint: " ",
-          sticky: true,
-          tint: true,
-        }}
-        freezeColumns="0"
-        getRowThemeOverride={(i) =>
-          i % 2 === 0
-            ? undefined
-            : {
-              bgCell: '#FBFBFB',
-            }
-        }
-        onPaste={true}
-        fillHandle={true}
-        keybindings={{
-          downFill: true,
-          rightFill: true,
-        }}
-        isDraggable={false}
-        onRowAppended={() =>handleRowAppend(1)}
-        smoothScrollY={true}
-        smoothScrollX={true}
-        onCellEdited={onCellEdited}
-        highlightRegions={highlightRegions}
-        onColumnResize={onColumnResize}
-        onHeaderMenuClick={onHeaderMenuClick}
-        onColumnMoved={onColumnMoved}
+          ref={gridRef}
+          columns={cols}
+          getCellContent={getData}
+          onFill={onFill}
+          rows={numRows}
+          showSearch={showSearch}
+          onSearchClose={onSearchClose}
+          rowMarkers="both"
+          width="100%"
+          height="100%"
+          rowSelect="multi"
+          gridSelection={selection}
+          onGridSelectionChange={setSelection}
+          getCellsForSelection={true}
+          trailingRowOptions={{
+            hint: " ",
+            sticky: true,
+            tint: true,
+          }}
+          freezeColumns="0"
+          getRowThemeOverride={(i) =>
+            i % 2 === 0
+              ? undefined
+              : {
+                bgCell: '#FBFBFB',
+              }
+          }
+          onPaste={true}
+          fillHandle={true}
+          keybindings={{
+            downFill: true,
+            rightFill: true,
+          }}
+          isDraggable={false}
+          onRowAppended={() => handleRowAppend(1)}
+          smoothScrollY={true}
+          smoothScrollX={true}
+          onCellEdited={onCellEdited}
+          highlightRegions={highlightRegions}
+          onColumnResize={onColumnResize}
+          onHeaderMenuClick={onHeaderMenuClick}
+          onColumnMoved={onColumnMoved}
         />
         {showMenu !== null && renderLayer(
-         
+
           <div
             {...layerProps}
 
             className='border  w-72 rounded-lg bg-white shadow-lg cursor-pointer'
 
           >
-           <LayoutMenuSheet 
-          showMenu={showMenu}
-          handleSort={handleSort}
-          handleHideColumn={handleHideColumn}
-          cols={cols}
-          renderLayer={renderLayer}
-          setShowSearch={setShowSearch}
-          setShowMenu={setShowMenu}
-          layerProps={layerProps}
-          />
+            {showMenu.menuType === 'statusMenu' ? (
+              <LayoutStatusMenuSheet showMenu={showMenu}
+                handleSort={handleSort}
+                cols={cols}
+                renderLayer={renderLayer}
+                setShowSearch={setShowSearch}
+                setShowMenu={setShowMenu}
+                layerProps={layerProps}
+                handleReset={handleReset}
+                showDrawer={showDrawer} />
+
+            ) : (
+              <LayoutMenuSheet
+                showMenu={showMenu}
+                handleSort={handleSort}
+                handleHideColumn={handleHideColumn}
+                cols={cols}
+                renderLayer={renderLayer}
+                setShowSearch={setShowSearch}
+                setShowMenu={setShowMenu}
+                layerProps={layerProps}
+              />
+            )}
           </div>
         )}
+
+        <Drawer title="CÀI ĐẶT SHEET" onClose={onClose} open={open}>
+          {defaultCols.map((col) => (
+            col.id !== "Status" && (
+              <div key={col.id} style={{ marginBottom: "10px" }}>
+                <Checkbox
+                  checked={!hiddenColumns.includes(col.id)}
+                  onChange={(e) => handleCheckboxChange(col.id, e.target.checked)}
+                >
+                  {col.title}
+                </Checkbox>
+              </div>
+            )
+          ))}
+        </Drawer>
       </div>
     </div>
   );

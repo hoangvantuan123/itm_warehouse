@@ -1,11 +1,9 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { DataEditor, GridCellKind } from '@glideapps/glide-data-grid';
-import { Button } from 'antd';
-import '@glideapps/glide-data-grid/dist/index.css';
-import { useNavigate } from 'react-router-dom';
-import { CompactSelection } from '@glideapps/glide-data-grid';
 import { TableOutlined } from '@ant-design/icons';
 import { useLayer } from 'react-laag';
+import { onRowAppended } from '../../sheet/onRowAppended';
+import LayoutMenuSheet from '../../sheet/layoutMenu';
 
 function TableRootMenuManagement({
   data,
@@ -14,27 +12,39 @@ function TableRootMenuManagement({
   selection,
   setShowSearch,
   showSearch,
+  setAddedRows, 
+  addedRows, 
+  setEditedRows, 
+  editedRows, 
+  setNumRowsToAdd, numRowsToAdd, clickCount
 }) {
+ 
   const [gridData, setGridData] = useState([]);
+
   const gridRef = useRef(null);
   const [numRows, setNumRows] = useState(0);
-  const [highlightRegions, setHighlightRegions] = useState([]);
-  const [showMenu, setShowMenu] = useState(null);
-  const [hiddenColumns, setHiddenColumns] = useState([]);
-  const [cols, setCols] = useState([
-    { title: 'Key', id: 'Key', kind: GridCellKind.Text, readonly: false, width: 150, hasMenu: true },
-    { title: 'Label', id: 'Label', kind: GridCellKind.Text, readonly: false, width: 150, hasMenu: true },
-    { title: 'Link', id: 'UserId', kind: GridCellKind.Text, readonly: false, width: 150, hasMenu: true },
-    { title: 'Icon', id: 'Icon', kind: GridCellKind.Text, readonly: false, width: 150, hasMenu: true },
+
+  const [cols, setCols] = useState([{ title: '#', id: 'Status', kind: GridCellKind.Text, readonly: true, width: 35, hasMenu: false }, 
+    { title: 'Key', id: 'Key', kind: GridCellKind.Text, readonly: false, width: 200, hasMenu: true },
+    { title: 'Label', id: 'Label', kind: GridCellKind.Text, readonly: false, width: 250, hasMenu: true },
+    { title: 'Link', id: 'Link', kind: GridCellKind.Text, readonly: false, width: 250, hasMenu: true },
+    { title: 'Icon', id: 'Icon', kind: GridCellKind.Text, readonly: false, width: 250, hasMenu: true },
   ]);
 
   const onSearchClose = useCallback(() => setShowSearch(false), []);
-  
+  const [showMenu, setShowMenu] = useState(null);
+  const [hiddenColumns, setHiddenColumns] = useState([]); 
+
+  const onHeaderMenuClick = useCallback((col, bounds) => {
+    setShowMenu({ col, bounds });
+  }, []);
+  const [highlightRegions, setHighlightRegions] = useState([]);
+
+
   useEffect(() => {
-    // Cập nhật gridData khi nhận được data mới
     if (data && Array.isArray(data) && data.length > 0) {
       setGridData(data);
-      setNumRows(data.length); // Cập nhật số dòng cho grid
+      setNumRows(data.length);
     }
   }, [data]);
 
@@ -43,14 +53,14 @@ function TableRootMenuManagement({
       const person = gridData[row] || {}; 
       const columnKey = cols[col]?.id || ''; 
       const value = person[columnKey] || ''; 
-
+      const column = cols[col];
       return {
         kind: GridCellKind.Text,
         data: value,
         displayData: String(value),
-        readonly: false,
+        readonly: column?.readonly || false,
         allowOverlay: true,
-        hasMenu: true,
+        hasMenu: column?.hasMenu || false,    
       };
     },
     [gridData, cols]
@@ -73,49 +83,79 @@ function TableRootMenuManagement({
     [cols]
   );
 
-  const onRowAppended = useCallback(() => {
-    const newRow = {};
-    cols.forEach((col) => {
-      newRow[col.id] = '';
-    });
-    setGridData((prevData) => [...prevData, newRow]);
-    setNumRows((prev) => prev + 1);
-  }, [cols]);
-
+  const handleRowAppend = useCallback((numRowsToAdd) => {
+    onRowAppended(cols, setGridData, setNumRows, setAddedRows, numRowsToAdd);
+  }, [cols, setGridData, setNumRows, setAddedRows, numRowsToAdd]);
+  
+  useEffect(() => {
+    handleRowAppend(numRowsToAdd);
+  }, [ numRowsToAdd]);
   const onCellEdited = useCallback(
     (cell, newValue) => {
-      if (newValue.kind !== GridCellKind.Text) return;
-
-      const indexes = ['Key', 'Label', 'Link', 'Icon'];
+      if (newValue.kind !== GridCellKind.Text) {
+        return;
+      }
+  
+      const indexes = ['Status', 'Key', 'Label', 'Link', 'Icon'];
       const [col, row] = cell;
       const key = indexes[col];
-
+  
       setGridData((prevData) => {
         const updatedData = [...prevData];
         if (!updatedData[row]) updatedData[row] = {};
-        updatedData[row][key] = newValue.data;
+  
+        const currentStatus = updatedData[row]['Status'] || '';
+  
+        if (currentStatus === 'A') {
+          updatedData[row][key] = newValue.data;
+        } else {
+          updatedData[row][key] = newValue.data;
+          updatedData[row]['Status'] = 'U'; 
+        }
+  
+        setEditedRows((prevEditedRows) => {
+          const existingIndex = prevEditedRows.findIndex((editedRow) => editedRow.rowIndex === row);
+          if (existingIndex === -1) {
+            return [
+              ...prevEditedRows,
+              {
+                rowIndex: row,
+                updatedRow: updatedData[row],
+                status: currentStatus === 'A' ? 'A' : 'U', 
+              },
+            ];
+          } else {
+            const updatedEditedRows = [...prevEditedRows];
+            updatedEditedRows[existingIndex].updatedRow = updatedData[row];
+            updatedEditedRows[existingIndex].status = currentStatus === 'A' ? 'A' : 'U'; 
+            return updatedEditedRows;
+          }
+        });
+  
         return updatedData;
       });
     },
     []
   );
+  
 
   const onColumnResize = useCallback(
     (column, newSize) => {
-      const index = cols.indexOf(column);
+      const index = cols.indexOf(column)
       if (index !== -1) {
         const newCol = {
           ...column,
           width: newSize,
-        };
-        const newCols = [...cols];
-        newCols.splice(index, 1, newCol);
-        setCols(newCols);
+        }
+        const newCols = [...cols]
+        newCols.splice(index, 1, newCol)
+        setCols(newCols)
       }
     },
-    [cols]
-  );
+    [cols],
+  )
 
+  
   const { renderLayer, layerProps } = useLayer({
     isOpen: showMenu !== null,
     triggerOffset: 4,
@@ -135,18 +175,18 @@ function TableRootMenuManagement({
     possiblePlacements: ["bottom-start", "bottom-end"],
   });
 
-  const handleSort = (columnId, direction) => {
-    setGridData((prevData) => {
-      const sortedData = [...prevData].sort((a, b) => {
-        if (a[columnId] < b[columnId]) return direction === "asc" ? -1 : 1;
-        if (a[columnId] > b[columnId]) return direction === "asc" ? 1 : -1;
-        return 0;
-      });
-      return sortedData;
+/* TOOLLS */
+const handleSort = (columnId, direction) => {
+  setGridData((prevData) => {
+    const sortedData = [...prevData].sort((a, b) => {
+      if (a[columnId] < b[columnId]) return direction === "asc" ? -1 : 1;
+      if (a[columnId] > b[columnId]) return direction === "asc" ? 1 : -1;
+      return 0;
     });
-    setShowMenu(null);
-  };
-
+    return sortedData;
+  });
+  setShowMenu(null);
+};
   const handleHideColumn = (colIndex) => {
     const columnId = cols[colIndex]?.id;
     setHiddenColumns((prev) => [...prev, columnId]);
@@ -157,8 +197,8 @@ function TableRootMenuManagement({
   const onColumnMoved = useCallback((startIndex, endIndex) => {
     setCols((prevCols) => {
       const updatedCols = [...prevCols];
-      const [movedColumn] = updatedCols.splice(startIndex, 1);
-      updatedCols.splice(endIndex, 0, movedColumn);
+      const [movedColumn] = updatedCols.splice(startIndex, 1); 
+      updatedCols.splice(endIndex, 0, movedColumn); 
       return updatedCols;
     });
   }, []);
@@ -171,87 +211,69 @@ function TableRootMenuManagement({
           DATA SHEET
         </h2>
         <DataEditor
-          ref={gridRef}
-          columns={cols}
-          getCellContent={getData}
-          onFill={onFill}
-          rows={numRows}
-          showSearch={showSearch}
-          onSearchClose={onSearchClose}
-          width="100%"
-          height="100%"
-          rowMarkers={('checkbox-visible', 'both')}
-          smoothScrollY={true}
-          smoothScrollX={true}
-          onCellClicked={onCellClicked}
-          rowSelect="multi"
-          gridSelection={selection}
-          onGridSelectionChange={setSelection}
-          trailingRowOptions={{
-            hint: 'New row...',
-            sticky: true,
-            tint: true,
-          }}
-          freezeColumns="0"
-          getRowThemeOverride={(i) => (i % 2 === 0 ? undefined : { bgCell: '#FBFBFB' })}
-          onPaste={true}
-          fillHandle={true}
-          keybindings={{
-            downFill: true,
-            rightFill: true,
-          }}
-          isDraggable={false}
-          onRowAppended={onRowAppended}
-          onCellEdited={onCellEdited}
-          onColumnResize={onColumnResize}
-          onHeaderMenuClick={onColumnMoved}
-          onColumnMoved={onColumnMoved}
+        ref={gridRef}
+        columns={cols}
+        getCellContent={getData}
+        onFill={onFill}
+        rows={numRows}
+        showSearch={showSearch}
+        onSearchClose={onSearchClose}
+        rowMarkers="both"
+        width="100%"
+        height="100%"
+        rowSelect="multi"
+        gridSelection={selection}
+        onGridSelectionChange={setSelection}
+        getCellsForSelection={true}
+        trailingRowOptions={{
+         hint: " ",
+          sticky: true,
+          tint: true,
+        }}
+        freezeColumns="0"
+        getRowThemeOverride={(i) =>
+          i % 2 === 0
+            ? undefined
+            : {
+              bgCell: '#FBFBFB',
+            }
+        }
+        onPaste={true}
+        fillHandle={true}
+        keybindings={{
+          downFill: true,
+          rightFill: true,
+        }}
+        isDraggable={false}
+        onRowAppended={() =>handleRowAppend(1)}
+        smoothScrollY={true}
+        smoothScrollX={true}
+        onCellEdited={onCellEdited}
+        highlightRegions={highlightRegions}
+        onColumnResize={onColumnResize}
+        onHeaderMenuClick={onHeaderMenuClick}
+        onColumnMoved={onColumnMoved}
         />
-        {showMenu !== null &&
-          renderLayer(
-            <div
-              {...layerProps}
-              className="border w-64 py-2 rounded-lg bg-white shadow-lg cursor-pointer"
-            >
-              <ul className="space-y-1">
-                <li>
-                  <a
-                    onClick={() => {
-                      setShowSearch(true);
-                      setShowMenu(null);
-                    }}
-                    className="flex items-center gap-2  px-4 py-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                  >
-                    <span className=" text-[13px] font-medium">Tìm kiếm</span>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    onClick={() => handleSort(cols[showMenu.col]?.id, "asc")}
-                    className="flex items-center gap-2 px-4 py-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                  >
-                    <span className="text-[13px] font-medium">Sắp xếp tăng dần</span>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    onClick={() => handleSort(cols[showMenu.col]?.id, "desc")}
-                    className="flex items-center gap-2 px-4 py-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                  >
-                    <span className="text-[13px] font-medium">Sắp xếp giảm dần</span>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    onClick={() => handleHideColumn(showMenu.col)}
-                    className="flex items-center gap-2 px-4 py-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                  >
-                    <span className="text-[13px] font-medium">Ẩn cột</span>
-                  </a>
-                </li>
-              </ul>
-            </div>
-          )}
+        {showMenu !== null && renderLayer(
+         
+          <div
+            {...layerProps}
+
+            className='border  w-72 rounded-lg bg-white shadow-lg cursor-pointer'
+
+          >
+           <LayoutMenuSheet 
+          showMenu={showMenu}
+          handleSort={handleSort}
+          handleHideColumn={handleHideColumn}
+          cols={cols}
+          renderLayer={renderLayer}
+          setShowSearch={setShowSearch}
+          setShowMenu={setShowMenu}
+          layerProps={layerProps}
+          />
+          </div>
+        )}
       </div>
     </div>
   );

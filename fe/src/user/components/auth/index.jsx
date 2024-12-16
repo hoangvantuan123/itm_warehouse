@@ -15,7 +15,7 @@ const AuthUser = ({ collapsed }) => {
   const handleLogout = () => {
     Cookies.remove('accessToken')
     localStorage.removeItem('userInfo')
-    navigate('/u/login')
+    navigate('/wms/u/login')
   }
 
   const menu = (

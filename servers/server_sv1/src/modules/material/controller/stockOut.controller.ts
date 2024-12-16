@@ -29,9 +29,7 @@ export class StockOutController {
 
         try {
             const decodedToken = jwt.verify(token, jwtConstants.secret) as { UserId: any, EmpSeq: any, UserSeq: any, CompanySeq: any };
-            if (!decodedToken.EmpSeq && !decodedToken.EmpSeq && !decodedToken.UserSeq && !decodedToken.CompanySeq) {
-                throw new UnauthorizedException('You do not have permission to access this API.');
-            }
+           
             const {
                 xmlDocument,
                 xmlFlags,
@@ -75,9 +73,7 @@ export class StockOutController {
 
         try {
             const decodedToken = jwt.verify(token, jwtConstants.secret) as { UserId: any, EmpSeq: any, UserSeq: any, CompanySeq: any };
-            if (!decodedToken.EmpSeq && !decodedToken.EmpSeq && !decodedToken.UserSeq && !decodedToken.CompanySeq) {
-                throw new UnauthorizedException('You do not have permission to access this API.');
-            }
+            
             const result = await this.stockOutService.ITM_SPDMMOutReqItemList_WEB(outReqSeq);
             return result;
         } catch (error) {
@@ -117,9 +113,7 @@ export class StockOutController {
 
         try {
             const decodedToken = jwt.verify(token, jwtConstants.secret) as { UserId: any, EmpSeq: any, UserSeq: any, CompanySeq: any };
-            if (!decodedToken.EmpSeq && !decodedToken.EmpSeq && !decodedToken.UserSeq && !decodedToken.CompanySeq) {
-                throw new UnauthorizedException('You do not have permission to access this API.');
-            }
+            
 
             return await this.stockOutService._SMaterialQRStockOutCheck_WEB(
                 xmlDocument,
@@ -153,9 +147,7 @@ export class StockOutController {
         }
         try {
             const decodedToken = jwt.verify(token, jwtConstants.secret) as { UserId: any, EmpSeq: any, UserSeq: any, CompanySeq: any };
-            if (!decodedToken.EmpSeq && !decodedToken.EmpSeq && !decodedToken.UserSeq && !decodedToken.CompanySeq) {
-                throw new UnauthorizedException('You do not have permission to access this API.');
-            }
+            
             const { checkValueIsStop, outReqSeq, dataSave, xmlDocument, ...otherParams } = body;
             const procedureData = [
                 { name: '_SCOMCloseCheck_WEB', xmlDocument: xmlDocument.xmlSCOMCloseCheckWEB, serviceSeq: 2639 },

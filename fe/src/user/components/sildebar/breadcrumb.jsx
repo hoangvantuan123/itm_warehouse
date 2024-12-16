@@ -39,7 +39,7 @@ export default function BreadcrumbRouter({ menuTransForm, rootMenu }) {
     }, [])
 
   breadcrumbItems.unshift({
-    path: '/u/home',
+    path: '/wms/u/home',
     breadcrumbName: (
       <>
         <span>HOME</span>
@@ -55,7 +55,7 @@ export default function BreadcrumbRouter({ menuTransForm, rootMenu }) {
       <Menu>
         {subMenu.map((item) => (
           <Menu.Item key={item.MenuKey}>
-            <a href={item.MenuLink}>{item.MenuLabel}</a>
+            <a  className=' uppercase' href={item.MenuLink}>{item.MenuLabel}</a>
           </Menu.Item>
         ))}
       </Menu>
@@ -65,17 +65,17 @@ export default function BreadcrumbRouter({ menuTransForm, rootMenu }) {
   return (
     <div className="breadcrumb bg-slate-50 p-2 uppercase text-xs">
       {breadcrumbItems.map((item, index) => (
-        <span key={item.path}>
+        <span key={item.path}  className=' uppercase'>
           {index > 0 && <span> / </span>}
           {item.subMenu ? (
             <Dropdown
               overlay={renderSubMenu(item.subMenu)}
               trigger={['click', 'hover']}
             >
-              <a href={item.path}>{item.breadcrumbName}</a>
+              <a className=' uppercase' href={item.path}>{item.breadcrumbName}</a>
             </Dropdown>
           ) : (
-            <a href={item.path}>{item.breadcrumbName}</a>
+            <a   className=' uppercase' href={item.path}>{item.breadcrumbName}</a>
           )}
         </span>
       ))}

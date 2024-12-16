@@ -182,7 +182,7 @@ export default function AddUserSheetDrawer({ data: propData, onDataChange }) {
   }
 
   const handleNavigateToDetail = () => {
-    navigate(`/u/action=gen-info-1-2/from=view`)
+    navigate(`/wms/u/action=gen-info-1-2/from=view`)
   }
 
   return (

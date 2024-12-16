@@ -100,7 +100,7 @@ const Sidebar = ({ permissions, rootMenu, menuTransForm }) => {
     setMenu(!menu)
   }
 
-  if (location.pathname === '/u/login') {
+  if (location.pathname === '/wms/u/login') {
     return null
   }
 
@@ -143,7 +143,7 @@ const Sidebar = ({ permissions, rootMenu, menuTransForm }) => {
     Cookies.remove('a_a')
     localStorage.removeItem('userInfo')
     localStorage.removeItem('rolesMenu')
-    navigate('/u/login')
+    navigate('/wms/u/login')
     deleteDatabase()
   }, [])
 
@@ -176,7 +176,7 @@ const Sidebar = ({ permissions, rootMenu, menuTransForm }) => {
         <div className="flex">
           <div className="flex h-screen w-16 flex-col justify-between border-e bg-white">
             <div>
-              <Link to="/">
+              <Link to="/wms/home">
                 <div className="inline-flex size-16 items-center justify-center">
                   <img
                     src={Logo}
@@ -240,16 +240,7 @@ const Sidebar = ({ permissions, rootMenu, menuTransForm }) => {
 
             <div className="sticky inset-x-0 bottom-0 border-t border-gray-100 bg-white p-2">
               <div>
-                {/*   <button
-                  type="submit"
-                  className="group relative mb-5 flex w-full justify-center rounded-lg px-2 py-1.5 text-sm text-gray-500 bg-gray-100 hover:text-gray-700"
-                >
-                  <LogoutIcon />
-                  <span className="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white group-hover:visible">
-                    Logout
-                  </span>
-                </button> */}
-                <div className=" border-t pb-2 pt-2"></div>
+              
                 <button
                   onClick={openModalShowLogout}
                   className="group relative flex w-full justify-center rounded-lg px-2 py-1.5 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
@@ -413,7 +404,7 @@ const Sidebar = ({ permissions, rootMenu, menuTransForm }) => {
             ].map(({ key, icon, label, router }) => (
               <div key={key} className="flex-1 text-center">
                 <Link
-                  to={`/u/${router}`}
+                  to={`${router}`}
                   className="flex flex-col items-center"
                   onClick={() => handleOnClickMenuItemPhone(key)}
                 >

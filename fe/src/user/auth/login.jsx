@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 import { Helmet } from 'react-helmet'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Button, Form, Input, Typography, notification, message } from 'antd'
@@ -20,7 +19,6 @@ export default function Login({
   setKeyLanguage,
 }) {
   const navigate = useNavigate()
-  const { t } = useTranslation()
   const [form] = Form.useForm()
   const location = useLocation()
   const [error, setError] = useState(null)
@@ -34,7 +32,6 @@ export default function Login({
   const [status, setStatus] = useState(false)
   const [currentView, setCurrentView] = useState('login')
   const [username, setUsername] = useState(null)
-
 
 
   const fetchLangSeq = async () => {
@@ -61,6 +58,8 @@ export default function Login({
   useEffect(() => {
     fetchLangSeq()
   }, [])
+
+  
   const onFinish = async (values) => {
     const { login, password } = values
     setEmployeeId(login)
@@ -82,7 +81,7 @@ export default function Login({
         Cookies.set('a_a', response.data.token)
 
         processRolesMenu()
-        navigate('/u/home')
+        navigate('/wms/u/home')
       } else {
         switch (response.error.code) {
           case 'ACCOUNT_NOT_ACTIVATED':
@@ -158,14 +157,14 @@ export default function Login({
     if (token && decoded) {
       localStorage.setItem('token', token)
       localStorage.setItem('userInfo', JSON.stringify(decoded))
-      window.location.href = '/u/home'
+      window.location.href = '/wms/u/home'
     }
   }, [location])
 
   return (
     <>
       <Helmet>
-        <title>{t('Login')}</title>
+        <title>Login</title>
       </Helmet>
       <div className="min-h-screen flex flex-col lg:flex-row items-center justify-center overflow-hidden">
        {/*  <div className="hidden  lg:flex lg:w-1/2 h-screen items-center justify-center">

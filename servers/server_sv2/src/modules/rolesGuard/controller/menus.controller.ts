@@ -5,20 +5,20 @@ import {
     Req,
     UnauthorizedException,
 } from '@nestjs/common';
-import { RootMenusService } from '../service/rootMenus.service';
-import { TCARootMenusWEB } from '../entities/rootMenus.entity';
+import { MenusService } from '../service/menu.service';
+import { TCAMenusWEB } from '../entities/menus.entity';
 import { Request } from 'express';
 import { jwtConstants } from 'src/config/security.config';
 import * as jwt from 'jsonwebtoken';
 import { SimpleQueryResult } from 'src/common/interfaces/simple-query-result.interface';
 
 @Controller('v2/mssql/system-users')
-export class RootMenusController {
-    constructor(private readonly rootMenusService: RootMenusService) { }
+export class MenusController {
+    constructor(private readonly menusService: MenusService) { }
 
-    @Post('add-root-menus')
+    @Post('add-menus')
     async addBatch(
-        @Body() records: TCARootMenusWEB[],
+        @Body() records: TCAMenusWEB[],
         @Req() req: Request,
     ): Promise<SimpleQueryResult> {
         const authHeader = req.headers.authorization;
@@ -30,7 +30,6 @@ export class RootMenusController {
         }
 
         const token = authHeader.split(' ')[1];
-
         if (!token) {
             throw new UnauthorizedException(
                 'You do not have permission to access this API.',
@@ -46,14 +45,13 @@ export class RootMenusController {
             };
 
 
-            await this.rootMenusService.addMultipleRootMenu(records);
+            await this.menusService.addMultipleMenu(records);
 
             return {
                 success: true,
                 message: 'Insert successful',
             };
         } catch (error) {
-            console.error(error)
             throw new UnauthorizedException(
                 'You do not have permission to access this API.',
             );
@@ -61,9 +59,9 @@ export class RootMenusController {
     }
 
 
-    @Post('update-root-menus')
+    @Post('update-menus')
     async updateBatch(
-        @Body() records: TCARootMenusWEB[],
+        @Body() records: TCAMenusWEB[],
         @Req() req: Request,
     ): Promise<SimpleQueryResult> {
         const authHeader = req.headers.authorization;
@@ -90,9 +88,8 @@ export class RootMenusController {
                 CompanySeq: any;
             };
 
-
-
-            await this.rootMenusService.updateMultipleRootMenu(records);
+          
+            await this.menusService.updateMultipleMenu(records);
             return {
                 success: true,
                 message: 'Batch update successful',

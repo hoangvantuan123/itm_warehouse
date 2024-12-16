@@ -99,7 +99,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
       const decryptedData = bytes.toString(CryptoJS.enc.Utf8)
       return JSON.parse(decryptedData)
     } catch (error) {
-      navigate(`/u/warehouse/material/stock-out-request`)
+      navigate(`/wms/u/warehouse/material/stock-out-request`)
       return null
     }
   }
@@ -473,7 +473,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
 
         setResult(response)
         if (response.success) {
-          navigate(`/u/warehouse/material/stock-out-request`)
+          navigate(`/wms/u/warehouse/material/stock-out-request`)
           setModal4Open(false)
           setModal5Open(true)
           setSuccessMessage('Tất cả các dữ liệu đã được thực thi thành công!')

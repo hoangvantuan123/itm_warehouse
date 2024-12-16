@@ -1,4 +1,4 @@
-import  { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import UserRouter from './user/routes/userRouter'
 import './App.css'
@@ -18,11 +18,11 @@ const App = () => {
 
     if (!indexedDBSupported) {
       setIsModalVisible(true)
-    } 
+    }
 
     if (!webWorkerSupported) {
       setIsModalVisible(true)
-    } 
+    }
 
     if (!indexedDBSupported || !webWorkerSupported) {
       setIsModalVisible(true)
@@ -38,14 +38,14 @@ const App = () => {
       <UserRouter />
       <Modal
         title="Cảnh báo"
-        visible={isModalVisible}
+        open={isModalVisible}
         footer={null}
-        closable={false} 
-        maskClosable={false} 
-        centered={true} 
+        closable={false}
+        maskClosable={false}
+        centered={true}
       >
         <p>
-        Môi trường của bạn không hỗ trợ các tính năng cần thiết. Vui lòng sử dụng môi trường hiện đại hơn để tiếp tục.
+          Môi trường của bạn không hỗ trợ các tính năng cần thiết. Vui lòng sử dụng môi trường hiện đại hơn để tiếp tục.
         </p>
       </Modal>
     </div>

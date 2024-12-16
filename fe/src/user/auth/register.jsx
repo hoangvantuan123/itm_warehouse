@@ -19,7 +19,7 @@ export default function Register() {
     const { login, password } = values
     try {
       const data = await registerUser({ login, password })
-      window.location.href = '/u/login'
+      window.location.href = '/wms/u/login'
     } catch (error) {
       console.error(error.message)
     }

@@ -56,7 +56,7 @@ export default function UsersSelectors({
     setIsDrawerVisible(true)
   }
   const handleOnClickAddLink = () => {
-    navigate('/u/action=gen-info-1-2/from=add')
+    navigate('/wms/u/action=gen-info-1-2/from=add')
   }
   return (
     <div className="mt-1">

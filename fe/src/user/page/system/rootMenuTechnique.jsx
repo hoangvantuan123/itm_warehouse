@@ -25,21 +25,10 @@ import { filterAndSelectColumnsU } from '../../../utils/filterU'
 import { filterAndSelectColumnsA } from '../../../utils/filterA'
 export default function RootMenuTechnique({ permissions, isMobile }) {
   const { t } = useTranslation()
-  const gridRef = useRef(null)
-  const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
-  const [data, setData] = useState([])
   const [menus, setMenus] = useState([])
-  const [formData, setFormData] = useState(dayjs().startOf('month'))
-  const [toDate, setToDate] = useState(dayjs())
-  const [checkedRowKey, setCheckedRowKey] = useState(null)
-  const [keyPath, setKeyPath] = useState(null)
-  const [checkedPath, setCheckedPath] = useState(false)
-  const formatDate = useCallback((date) => date.format('YYYYMMDD'), [])
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedRowKeys, setSelectedRowKeys] = useState([])
   const [clickedRowData, setClickedRowData] = useState(null)
-  const [clickedRowDataList, setClickedRowDataList] = useState([])
   const [isMinusClicked, setIsMinusClicked] = useState(false)
   const [lastClickedCell, setLastClickedCell] = useState(null)
   const [addedRows, setAddedRows] = useState([]);  
@@ -80,6 +69,7 @@ export default function RootMenuTechnique({ permissions, isMobile }) {
 
 
   const onCellClicked = (cell, event) => {
+    
     let rowIndex
 
     if (cell[0] !== -1) {

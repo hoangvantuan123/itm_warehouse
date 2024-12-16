@@ -303,7 +303,7 @@ export default function StockOutRequest({ permissions, isMobile }) {
 
   const nextPage = useCallback(() => {
     if (keyPath) {
-      navigate(`/u/warehouse/material/stock-out-request/${keyPath}`)
+      navigate(`/wms/u/warehouse/material/stock-out-request/${keyPath}`)
     }
   }, [keyPath, navigate])
 

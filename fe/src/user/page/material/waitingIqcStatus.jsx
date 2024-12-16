@@ -118,7 +118,7 @@ export default function IQCStatus({ permissions, isMobile }) {
 
   const nextPageStockInMat = useCallback(() => {
     if (keyPath) {
-      navigate(`/u/warehouse/material/material-wh-stock-in/${keyPath}`)
+      navigate(`/wms/u/warehouse/material/material-wh-stock-in/${keyPath}`)
     }
   }, [keyPath, navigate])
 

@@ -31,9 +31,6 @@ export class DeliveryListController {
 
         try {
             const decodedToken = jwt.verify(token, jwtConstants.secret) as { UserId: any, EmpSeq: any, UserSeq: any, CompanySeq: any };
-            if (!decodedToken.EmpSeq && !decodedToken.EmpSeq && !decodedToken.UserSeq && !decodedToken.CompanySeq) {
-                throw new UnauthorizedException('You do not have permission to access this API.');
-            }
 
             const result = await this.deliverryService.ITM_SUGGetActiveDelivery_WEB(fromDate, toDate, deliveryNo, bizUnit);
             return result;
