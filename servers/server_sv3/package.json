@@ -42,6 +42,7 @@
     "cache-manager": "5.x",
     "cache-manager-ioredis": "^2.1.0",
     "cache-manager-redis-store": "^3.0.1",
+    "canvas": "^3.0.0-rc3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "compression": "^1.7.5",
@@ -81,7 +82,8 @@
     "uuid": "^9.0.1",
     "vm2": "^3.9.19",
     "winston": "^3.16.0",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "zpl-image": "^0.2.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

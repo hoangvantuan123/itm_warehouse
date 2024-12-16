@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { ERROR_MESSAGES, SUCCESS_MESSAGES } from 'src/common/utils/constants';
+import { Injectable, Logger } from '@nestjs/common';
+import { BARCODE_ERR_MESSAGES, BARCODE_SUCCESS_MESSAGES, ERROR_MESSAGES, SUCCESS_MESSAGES } from 'src/common/utils/constants';
 
 import * as net from 'net';
 import { BarcodeDto } from '../models/barcodeDto';
@@ -7,20 +7,20 @@ import { error, log } from 'console';
 import { ItemLabelDto } from '../models/itemLabelDto';
 import { DatabaseService } from 'src/common/database/sqlServer/ITMV20240117/database.service';
 
-
 @Injectable()
 export class PrintBarcodeService {
     constructor(
         private readonly databaseService: DatabaseService
     ) { }
 
+    private readonly logger = new Logger(PrintBarcodeService.name, { timestamp: true })
     async getPaginatedData(
         matID: string,
         lotNo: string,
         pageIndex: number,
         pageSize: number,
         vendor: string,
-        dateFr: string, 
+        dateFr: string,
         dateTo: string,
     ) {
         try {
@@ -36,9 +36,12 @@ export class PrintBarcodeService {
         let query = ` SELECT PLANT, TRAN_CODE, TRAN_SEQ, TRAN_TYPE, VENDOR, ITEMCD, LOTNO, QTY, DATECODE, REELNO, DATETIME, LOT_ID, USER_ID   FROM EWIPRMTBCI WHERE (1=1) `;
         query += await this.genWhereClause(matID, lotNo, vendor, dateFr, dateTo);
         query += ` ORDER BY DATETIME DESC `;
+
+        this.logger.log('SEARCH PAGE', query);
         const result = await this.databaseService.executeQuery(
             query
         );
+
         return result;
     }
 
@@ -48,60 +51,50 @@ export class PrintBarcodeService {
         let query = ``;
 
         if (dateFr != null) {
-          query += ` AND DATETIME >= '` + dateFr + `'`;
+            query += ` AND DATETIME >= '` + dateFr + `'`;
         }
         if (dateTo != null) {
-          query += ` AND DATETIME <= '` + dateTo + `'`;
+            query += ` AND DATETIME <= '` + dateTo + `'`;
         }
-        if (vendor != '') {
+        if (vendor != null && vendor != 'ALL') {
             query += ` AND VENDOR LIKE '` + vendor + `'`;
         }
-        if (matID != '') {
+        if (matID != null && matID != '') {
             query += ` AND ITEMCD LIKE '` + matID + `'`;
         }
-        if (lotNo != '') {
+        if (lotNo != null && lotNo != '') {
             query += ` AND LOTNO LIKE '` + lotNo + `'`;
         }
 
         return query;
     };
 
-    async printByZplCode(barcodeDto: BarcodeDto) {
+    async printBarcode(barcodeDto: any) {
 
         this.validDto(barcodeDto);
         this.isExistData(barcodeDto);
         const listDataLabel = [];
+        listDataLabel.push(...barcodeDto.listSelected)
+
         const dataCode = [];
 
-        if (!this.isPrintNewData(barcodeDto)) {
-            const newLabel = await this.execute(barcodeDto?.newlabel);
-            listDataLabel.push(newLabel);
-        } else {
-            listDataLabel.push(...barcodeDto.data); 
+        if (!barcodeDto?.device) {
+            return {
+                status: false,
+                message: BARCODE_ERR_MESSAGES.IP_OR_PORT_IS_NULL,
+            }
         }
+        const device = barcodeDto.device.split(':');
+        const ip = device[0] || '';
+        const port = device[1] || 0;
+
+        const qTemplateLabel = ` SELECT label, value FROM ZPLCODE WHERE (1=1) AND label LIKE 'barcode-change'`.trim();
+        const rTemplateLabel = await this.databaseService.executeQuery(
+            qTemplateLabel
+        );
 
         for (const data of listDataLabel) {
-            let zplCode = `
-                            ^XA
-                                ^PW790               
-                                ^LL160                ; Chiều cao tem (0.79in x 203dpi = 160 dots)
-                                ^CF0,20               ; Đặt kích thước font mặc định
-                                ^FO180,10^BY1,1,65     ; Đặt vị trí và kích thước barcode
-                                    ^BCN,50,Y,N,N
-                                ^FD{BARCODE_DATA}^FS
-                                ; Cột trái
-                                ^FO30,90^A0N,20,20^FDCode: {CODE}^FS 
-                                ^FO250,90^A0N,20,20^FDLot: {LOT}^FS
-                                ^FO500,90^A0N,20,20^FDReel: {REEL}^FS
-                                ; Cột phải
-                                ^FO30,120^A0N,20,20^FDQTY: {QTY}^FS
-                                ^FO250,120^A0N,20,20^FDDC: {DC}^FS
-                                ^FO500,120^A0N,20,20^FDUserID: {USER_ID}^FS
-                                ; QR Code
-                                ^FO700,60^BQN,3.5,3.5   ; QR code nhỏ hơn
-                                ^FDQA,{QR_DATA}^FS
-                            ^XZ 
-                         `;
+            let zplCode = rTemplateLabel[0].value;
 
             const zpl = zplCode
                 .replace('{BARCODE_DATA}', data.LOT_ID)
@@ -115,25 +108,23 @@ export class PrintBarcodeService {
 
             dataCode.push(zpl);
             try {
-                const client = new net.Socket();
-                await new Promise((resolve, reject) => {
-                    client.connect(barcodeDto.port, barcodeDto.ip, () => {
-                        client.write(zpl);
-                        client.end();
-                        resolve('Printed');
-                        log("Print succesfull", zpl);
-                    });
 
-                    client.on('error', (err) => {
-                        error('Error connecting to printer:', err);
-                        reject(err);
-                    });
-                });
+                const printResult = await this.printZpl(ip, port, zpl);
+                if (barcodeDto.isMulti == false && printResult == true) {
+                    try {
+                        await this.createBarcode(barcodeDto.listSelected[0]);
+                    } catch (err) {
+                        this.logger.error('Error execute query: ', err);
+                    }
+                }
 
             } catch (err) {
                 error('Error connecting to printer:', err);
+                return {
+                    status: false,
+                    message: err,
+                }
             }
-
         }
 
         return {
@@ -143,64 +134,227 @@ export class PrintBarcodeService {
         }
     };
 
+    async printBarcodeChangeSize(barcodeDto: any) {
+
+        this.validDto(barcodeDto);
+        this.isExistData(barcodeDto);
+        const listDataLabel = [];
+        listDataLabel.push(...barcodeDto.listSelected)
+
+        const dataCode = [];
+
+        if (!barcodeDto?.device) {
+            return {
+                status: false,
+                message: BARCODE_ERR_MESSAGES.IP_OR_PORT_IS_NULL,
+            }
+        }
+        if (!barcodeDto?.labelsize) {
+            return {
+                status: false,
+                message: BARCODE_ERR_MESSAGES.LABEL_SIZE_NULL,
+            }
+        }
+        const labelSize = barcodeDto.labelsize;
+
+        const device = barcodeDto.device.split(':');
+        const ip = device[0] || '';
+        const port = device[1] || 0;
+
+        const qTemplateLabel = ` SELECT label, value FROM ZPLCODE WHERE (1=1) AND label LIKE 'barcode-change-size'`.trim();
+        const rTemplateLabel = await this.databaseService.executeQuery(
+            qTemplateLabel
+        );
+
+        for (const data of listDataLabel) {
+            let zplCode = rTemplateLabel[0].value;
+
+            const zpl = zplCode
+                .replace('{BARCODE_DATA}', data.LOT_ID)
+                .replace('{CODE}', data.ITEMCD)
+                .replace('{LOT}', data.LOTNO)
+                .replace('{QTY}', data.QTY)
+                .replace('{DC}', data.DATECODE)
+                .replace('{REEL}', data.REELNO)
+                .replace('{USER_ID}', data.USER_ID)
+                .replace('{QR_DATA}', data.LOT_ID)
+                .replace('{barcodeX}', labelSize.barCodePosX)
+                .replace('{barcodeY}', labelSize.barCodePosY)
+                .replace('{barcodeSizeX}', labelSize.barCodeSizeX)
+                .replace('{barcodeSizeY}', labelSize.barCodeSizeY)
+                .replace('{qrCodePosX}', labelSize.QrPosX)
+                .replace('{qrCodePosY}', labelSize.QrPosY)
+                .replace('{qrCodeSizeX}', labelSize.QrSizeX)
+                .replace('{qrCodeSizeY}', labelSize.QrSizeY)
+                .replace('{paperSizeX}', labelSize.paperSizeX)
+                .replace('{paperSizeY}', labelSize.paperSizeY);
+
+            dataCode.push(zpl);
+
+            this.logger.log('ZPL CODE', zpl);
+            try {
+
+                const printResult = await this.printZpl(ip, port, zpl);
+                if (barcodeDto.isMulti == false && printResult == true) {
+                    try {
+                        await this.createBarcode(barcodeDto.listSelected[0]);
+                    } catch (err) {
+                        this.logger.error('Error execute query: ', err);
+                    }
+                }
+
+            } catch (err) {
+                error('Error connecting to printer:', err);
+                return {
+                    status: false,
+                    message: err,
+                }
+            }
+        }
+
+        return {
+            status: true,
+            message: SUCCESS_MESSAGES.REQUEST_SUCCESS,
+            data: dataCode
+        }
+    };
+
+
     async validDto(barcodeDto: BarcodeDto) {
 
         if (barcodeDto == null) {
             throw new Error("INVALID_OBJECT");
         }
 
-        if (barcodeDto.ip == null || barcodeDto.port == null) {
-            throw new Error("IP_OR_PORT_NOT_NULL");
-        }
-        // if (!barcodeDto.data || !Array.isArray(barcodeDto.data)) {
-        //     throw new Error("INVALID_DATA_LABEL");
-        // }
     };
 
     async isExistData(barcodeDto: BarcodeDto) {
         // Todo : check is exist label 
     };
 
-    async createLabel(barcodeDto: BarcodeDto) {
+    private async printZpl(ip: string, port: number, zpl: string) {
+        return new Promise((resolve, reject) => {
+            const client = new net.Socket();
 
-    };
+            client.connect(Number(port), ip, () => {
+                client.write(zpl);
+                client.end();
+                resolve(true);
+                this.logger.log(BARCODE_SUCCESS_MESSAGES.PRINT_SUCCESSFULL, zpl);
+            });
 
-    async execute(itemLabel: ItemLabelDto): Promise<any> {
+            client.on('error', (err) => {
+                reject(err);
+            });
+        });
+    }
+
+    async createBarcode(itemLabel: any): Promise<any> {
+
 
         const tranNo = await this.GetBarcodeInNo();
-        const tranSeq = this.getBarcodeInSeq(tranNo);
+        const tranSeq = await this.getBarcodeInSeq(tranNo);
         const tranTime = new Date().toISOString().replace(/[-T:.Z]/g, '').slice(0, 14);
 
-        let lotID = itemLabel.matID + '/' + itemLabel.lotNo + '/' + itemLabel.qty + '/' + itemLabel.date + '/' + itemLabel.reelNo;
+        let lotID = itemLabel.ITEMCD + '/' + itemLabel.LOTNO + '/' + itemLabel.QTY + '/' + itemLabel.DATECODE + '/' + itemLabel.REELNO;
 
-        let query = ` INSERT INTO insert into EWIPRMTBCI (plant, tran_code, tran_seq, tran_type, vendor, itemcd, lotno, qty, reelno, datecode, datetime, lot_id, remark, user_id )
-                                 values ( 'ITMVPSG', 
-                                 ${tranNo}, 
-                                 ${tranSeq}, 
-                                 N'', 
-                                 ${itemLabel.vendor}, 
-                                 ${itemLabel.matID}, 
-                                 ${itemLabel.lotNo}, 
-                                 ${itemLabel.qty}, 
-                                 ${itemLabel.reelNo}, 
-                                 ${itemLabel.date}, 
+        let query = ` INSERT INTO EWIPRMTBCI (
+                                plant, 
+                                tran_code, 
+                                tran_seq, 
+                                tran_type, 
+                                vendor, 
+                                itemcd, 
+                                lotno, 
+                                qty, 
+                                reelno, 
+                                datecode, 
+                                datetime, 
+                                lot_id, 
+                                remark, 
+                                user_id )
+                        VALUES ( 
+                                 'ITMVPSG', 
+                                 '${tranNo}', 
+                                 '${tranSeq}', 
+                                 'N', 
+                                 '${itemLabel.VENDOR}', 
+                                 '${itemLabel.ITEMCD}', 
+                                 '${itemLabel.LOTNO}', 
+                                 ${itemLabel.QTY}, 
+                                 '${itemLabel.REELNO}', 
+                                 '${itemLabel.DATECODE}', 
                                  ${tranTime}, 
-                                 ${lotID}, 
-                                 ${itemLabel.remark}, 
-                                 ${itemLabel.userId} ) ;`;
+                                 '${lotID}', 
+                                 '${itemLabel.REMARK}', 
+                                 '${itemLabel.USER_ID}' 
+                        ) ;`;
 
-        if (this.chkStock("ITMVPSG", "1000", itemLabel.matID)) {
-            query += ` UPDATE EWIPRMTSTS SET stock_qty = stock_qty + ${itemLabel.qty} 
-                where plant = 'ITMVPSG' and wh_code = '1000' and mat_id = '${itemLabel.matID}';  `;
+        if (this.chkStock("ITMVPSG", "1000", itemLabel.ITEMCD)) {
+            query += ` 
+            UPDATE EWIPRMTSTS SET 
+                stock_qty = stock_qty + ${itemLabel.QTY} 
+            WHERE plant = 'ITMVPSG' 
+                AND wh_code = '1000' 
+                AND mat_id = '${itemLabel.ITEMCD}';  
+            `;
         }
         else {
-            query += ` insert into EWIPRMTSTS ( plant,  wh_code,  mat_id,  stock_qty,  hold_qty,  wit_qty,  qm_wit_qty,  lock_qty, loss_qty )
-                             values ( 'ITMVPSG', '1000', '${itemLabel.matID}', ${itemLabel.qty} , 0, 0, 0, 0, 0 ); `;
+            query += ` 
+                INSERT INTO EWIPRMTSTS ( 
+                    plant,  
+                    wh_code,  
+                    mat_id,  
+                    stock_qty,  
+                    hold_qty,  
+                    wit_qty,  
+                    qm_wit_qty,  
+                    lock_qty, 
+                    loss_qty 
+                    )
+                VALUES 
+                ( 
+                    'ITMVPSG', 
+                    '1000', 
+                    '${itemLabel.ITEMCD}', 
+                    ${itemLabel.QTY} , 
+                    0, 0, 0, 0, 0 
+                ); 
+            `;
         }
-        query += ` insert into EWIPLOTSTS ( plant, lot_id, lot_gubun, wh_code,  product_type, mat_id, oper_code, lot_status, qty, good_flag, lock_flag, hold_flag )
-             values ( 'ITMVPSG', '${lotID}', '양산', '1000', '양산', '${itemLabel.matID}', '', '', ${itemLabel.qty}, 'G', 'N', 'N'); `;
+        query += ` 
+            INSERT INTO EWIPLOTSTS (
+                plant, 
+                lot_id, 
+                lot_gubun, 
+                wh_code,  
+                product_type, 
+                mat_id, 
+                oper_code, 
+                lot_status, 
+                qty, 
+                good_flag, 
+                lock_flag, 
+                hold_flag 
+            )
+            VALUES 
+             ( 
+                'ITMVPSG', 
+                '${lotID}', 
+                '양산', 
+                '1000', 
+                '양산', 
+                '${itemLabel.ITEMCD}', 
+                '', 
+                '', 
+                ${itemLabel.QTY}, 
+                'G', 
+                'N', 
+                'N'
+            ); `;
 
         try {
+            this.logger.log("CREATE LABEL", query);
             await this.databaseService.executeQuery(query);
             return {
                 LOT_ID: lotID,
@@ -212,7 +366,7 @@ export class PrintBarcodeService {
                 USER_ID: itemLabel?.userId,
             };
         } catch (e) {
-            throw new Error("Error insert data");
+            throw new Error(`Error insert data : ${e}`);
         }
     };
 
@@ -220,6 +374,7 @@ export class PrintBarcodeService {
         let vInNo: string = '';
         const qTrancode = ` SELECT MAX(TRAN_CODE) AS TRAN_CODE FROM EWIPRMTBCI `;
         try {
+
             const result = await this.databaseService.executeQuery(qTrancode);
 
             if (!result || result.length === 0) {
@@ -316,6 +471,7 @@ export class PrintBarcodeService {
         `;
 
         try {
+            this.logger.log("CHECK QTY STOCK", sql);
             const result = await this.databaseService.executeQuery(sql);
 
             if (!result || result.length === 0) {
@@ -331,12 +487,105 @@ export class PrintBarcodeService {
         }
     };
 
-    async isPrintNewData(barcodeDto: BarcodeDto): Promise<boolean> {
+    async getMatIdByVendor(plant: any, partNo: any): Promise<any> {
+        const qMatId = `
+            SELECT ItemNo FROM _TDAItem WHERE 
+                    ItemSeq IN  (
+                                SELECT ItemSeq FROM _TDAItemUserDefine 
+                                WHERE MngSerl = 1000007 
+                                    AND MngValText = '${partNo}'
+                            ) 
+                    AND ItemNo NOT LIKE 'N-%'
+        `;
 
-        if (Array.isArray(barcodeDto?.data) && barcodeDto?.newlabel == null) {
-            return false;
+        this.logger.log('GET MAT ID BY VENDOR ', qMatId);
+
+        try {
+            const result = await this.databaseService.executeQuery(qMatId);
+
+            if (!result || result.length === 0) {
+                return {
+                    status: false,
+                    data: null,
+                }
+            }
+            return {
+                status: true,
+                data: result[0].ItemNo,
+            }
+        } catch (error) {
+            console.error('Error checking stock:', error);
+            throw new Error('Failed to check stock');
         }
-        return true;
-    };
+    }
+
+    async getReelSeq(dto: any): Promise<any> {
+        let vSeq = '2-';
+        const sql = `
+            SELECT 
+                MAX(CONVERT(REPLACE(ReelNo, '2-', ''), int)) +1 AS ReelNo 
+            FROM EWIPRMTBCI WHERE (1=1)
+                AND plant = '${dto.plant}' 
+                AND lotno = '${dto.lotNo}' 
+        `;
+
+        this.logger.log('GET REEL SEQ ', sql);
+
+        try {
+            const result = await this.databaseService.executeQuery(sql);
+
+            if (!result || result.length === 0) {
+                return '2-1';
+            } else {
+                const vMaxNo = result[0];
+                if (vMaxNo == '') {
+                    return '2-1';
+                }
+                vSeq = vSeq + vMaxNo;
+            }
+            return vSeq;
+        } catch (error) {
+            console.error('Error checking stock:', error);
+            throw new Error('Failed to check stock');
+        }
+    }
+
+    async getLotCount(plant: string, lotNo: string): Promise<any> {
+        let vSeq = 0;
+        const sql = `
+            SELECT COUNT(*) as LotCount 
+            FROM EWIPRMTBCI a 
+            WHERE plant = '${plant}' 
+                AND lotno = '${lotNo}'
+                AND tran_code + tran_seq IN(
+                    SELECT tran_code + max(tran_seq) 
+                    FROM EWIPRMTBCI b 
+                    WHERE plant = 'ITMVPSG' 
+                    AND a.lotno = b.lotno 
+                    AND a.tran_code = b.tran_code GROUP BY tran_code ) ;
+        `;
+
+        this.logger.log('GET LOT COUNT', sql);
+
+        try {
+            const result = await this.databaseService.executeQuery(sql);
+
+            if (!result || result.length === 0) {
+                return vSeq;
+            }
+            else {
+                const vMaxNo = result[0];
+                if (vMaxNo == 0) {
+                    return vSeq;
+                }
+                vSeq = vMaxNo;
+
+            }
+            return vSeq;
+        } catch (error) {
+            console.error('Error checking stock:', error);
+            throw new Error('Failed to check stock');
+        }
+    }
 
 }

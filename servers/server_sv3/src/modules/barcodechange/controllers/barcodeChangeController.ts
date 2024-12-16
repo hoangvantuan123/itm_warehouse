@@ -72,7 +72,7 @@ export class BarcodeChangeController {
             return {
                 status: true,
                 message: BARCODE_SUCCESS_MESSAGES.BARCODE_CONFIRM_SUCCESSFULL,
-                data: null,
+                data: result,
             };
         } catch (error) {
             return {
@@ -86,9 +86,41 @@ export class BarcodeChangeController {
     @Post('confirm')
     async confirmBarcode(
         @Body() dataBarcode: any[]
-    ) {
+    ): Promise<any> {
         try {
             const result = await this.barcodeChangeService.confirmBarcode(dataBarcode);
+            return result ;  
+        } catch (error) {
+            return {
+                status: false,
+                message: error.message || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+                data: null,
+            };
+        }
+    }
+
+    @Post('exist-barcode')
+    async isExistBarcode(
+        @Body() dataBarcode: any
+    ) {
+        try {
+            const result = await this.barcodeChangeService.isExistBarcode(dataBarcode);
+            return result;
+        } catch (error) {
+            return {
+                status: false,
+                message: error.message || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+                data: null,
+            };
+        }
+    }
+
+    @Get('device-printer')
+    async searchByPrinter(
+        @Param("name") name?: any
+    ) {
+        try {
+            const result = await this.barcodeChangeService.getPrinter(name);
             return { result };
         } catch (error) {
             return {

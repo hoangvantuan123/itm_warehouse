@@ -1,7 +1,13 @@
 import axios from 'axios'
 import { HOST_API_SERVER_3 } from '../../services'
 
-export const GetPageItem = async (fromDate, toDate, vendor, matID, lotNo) => {
+export const GetPageItem = async (
+  fromDate,
+  toDate,
+  vendor,
+  matID,
+  lotNo,
+) => {
   try {
     const url = `${HOST_API_SERVER_3}/print-barcode/paginated`
 
@@ -42,21 +48,133 @@ export const GetPageItem = async (fromDate, toDate, vendor, matID, lotNo) => {
 }
 
 export const CreatePrintLabel = async (requestData) => {
-  const dataToSend = {
-    ip: requestData.ip,
-    port: requestData.port,
-    data: requestData.data,
-    newlabel: requestData.newlabel,
-  }
-
-  console.log(requestData)
 
   return axios
-    .post(`${HOST_API_SERVER_3}/print-barcode/printer`, dataToSend, {
+    .post(
+      `${HOST_API_SERVER_3}/print-barcode/printer`,
+      requestData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+    .then((response) => {
+      if (response.status === 200 || response.status === 201) {
+        return response.data
+      }
+      throw new Error('Error from API: ' + response.data.message)
+    })
+    .catch((error) => {
+      const errorMessage = error.response
+        ? error.response.data.message || 'Error from API'
+        : 'Unknown error occurred'
+      throw new Error(errorMessage)
+    })
+}
+
+export const getMatIdByVendor = async (requestData) => {
+  const {
+    plant,
+    partNo,
+  } = requestData;
+
+  return axios
+    .get(
+      `${HOST_API_SERVER_3}/print-barcode/get-matid`, {
+      params: {
+        plant,
+        partNo,
+      },
       headers: {
         'Content-Type': 'application/json',
-      },
+      }
+    }
+    )
+    .then((response) => {
+      if (response.status === 200 || response.status === 201) {
+        return response.data.result
+      }
+      throw new Error('Error from API: ' + response.data.message)
     })
+    .catch((error) => {
+      const errorMessage = error.response
+        ? error.response.data.message || 'Error from API'
+        : 'Unknown error occurred'
+      throw new Error(errorMessage)
+    })
+}
+
+export const getReelNo = async (requestData) => {
+
+  return axios
+    .get(
+      `${HOST_API_SERVER_3}/print-barcode/get-reel-no`,
+      requestData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+    .then((response) => {
+      if (response.status === 200 || response.status === 201) {
+        return response.data
+      }
+      throw new Error('Error from API: ' + response.data.message)
+    })
+    .catch((error) => {
+      const errorMessage = error.response
+        ? error.response.data.message || 'Error from API'
+        : 'Unknown error occurred'
+      throw new Error(errorMessage)
+    })
+}
+
+export const getLotCount = async (requestData) => {
+
+  const {
+    plant,
+    lotNo,
+  } = requestData;
+
+  return axios
+    .get(`${HOST_API_SERVER_3}/print-barcode/get-lot-count`, {
+      params: {
+        plant,
+        lotNo,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    }
+    )
+    .then((response) => {
+      if (response.status === 200 || response.status === 201) {
+        return response.data.result;
+      }
+      throw new Error('Error from API: ' + response.data.message)
+    })
+    .catch((error) => {
+      const errorMessage = error.response
+        ? error.response.data.message || 'Error from API'
+        : 'Unknown error occurred'
+      throw new Error(errorMessage)
+    })
+}
+
+export const CreatePrintLabelBySize = async (requestData) => {
+
+  return axios
+    .post(
+      `${HOST_API_SERVER_3}/print-barcode/print-by-size`,
+      requestData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    )
     .then((response) => {
       if (response.status === 200 || response.status === 201) {
         return response.data
