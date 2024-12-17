@@ -118,6 +118,8 @@ export class StockOutService {
                 @UserSeq = ${userSeq},
                 @PgmSeq = ${pgmSeq};
         `;
+        console.log('CHECK_STOCKOUT_USERSEQ', userSeq, 'Date:', new Date().toLocaleString());
+        console.log('CHECK_STOCKOUT_QUERY', query);
         return await this.databaseService.executeQuery(query);
     }
 
@@ -169,7 +171,10 @@ export class StockOutService {
                 );
 
                 if (result.some((item: any) => item.Status !== 0)) {
-                    errors.push(result.map((item: any) => `${item.Result}`).join('; '));
+
+                    errors.push(
+                        ...result.map((item: any) => `Result: ${item.Result}, IDX_NO: ${item.IDX_NO}`)
+                    );
                 }
                 return result;
             } catch (err) {
@@ -204,7 +209,17 @@ export class StockOutService {
         }
 
         if (errors.length > 0) {
-            return { success: false, message: errors.join('; '), data };
+            return {
+                success: false,
+                message: 'Some procedures encountered errors.',
+                data: errors.map((errorMsg, index) => {
+                    const [result, idx_no] = errorMsg.split(', ').map(part => part.split(': ')[1]);
+                    return {
+                        procedureIndex: index + 1,
+                        error: [result, idx_no],
+                    };
+                }),
+            };
         }
 
         const saveProcedure = async (name: string, result: any): Promise<boolean> => {

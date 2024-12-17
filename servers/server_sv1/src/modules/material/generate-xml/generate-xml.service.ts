@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
 export class GenerateXmlService {
 
   /* _SSLImpDelvMasterSave_WEB */
-  async generateXMLSSLImpDelvMasterSave(result: any[], SPDelvNo: any): Promise<string> {
+  async generateXMLSSLImpDelvMasterSave(result: any[], SPDelvNo: any, InvoiceNo: string): Promise<string> {
     return `<ROOT>${result.map((item, index) => `
     <DataBlock1>
     <WorkingTag>A</WorkingTag>
@@ -29,7 +29,7 @@ export class GenerateXmlService {
     <CurrName>${item?.CurrName}</CurrName>
     <CurrSeq>${item?.CurrSeq}</CurrSeq>
     <ExRate>${item?.ExRate}</ExRate>
-    <Remark>${item?.DelvSeq}</Remark>
+    <Remark>${InvoiceNo}</Remark>
     <SMImpKindName>${item?.SMImpKindName}</SMImpKindName>
     <SMImpKind>${item?.SMImpKind}</SMImpKind>
     <IsPJT>${item?.IsPJT}</IsPJT>
@@ -288,8 +288,8 @@ export class GenerateXmlService {
   }
 
   /* _SSLImpDelvMasterSave_WEB Mat stockin*/
- async generateXMLSLGInOutDailySave_WEB(result: any[], SPInOutNo: any): Promise<string> {
-  return `<ROOT>${result.map((item, index) => `
+  async generateXMLSLGInOutDailySave_WEB(result: any[], SPInOutNo: any): Promise<string> {
+    return `<ROOT>${result.map((item, index) => `
 <DataBlock1>
 <WorkingTag>A</WorkingTag>
 <IDX_NO>${index + 1}</IDX_NO>
@@ -323,10 +323,10 @@ export class GenerateXmlService {
 <Remark />
 <Memo />
 </DataBlock1>`).join('')}</ROOT>`;
-}
+  }
 
-async generateXMLSLGInOutDailyItemSave_WEB(result: any[], SPInOutSeq: any): Promise<string> {
-return `<ROOT>${result.map((item, index) => `
+  async generateXMLSLGInOutDailyItemSave_WEB(result: any[], SPInOutSeq: any): Promise<string> {
+    return `<ROOT>${result.map((item, index) => `
 <DataBlock2>
 <WorkingTag>A</WorkingTag>
 <IDX_NO>${index + 1}</IDX_NO> 
@@ -363,7 +363,7 @@ return `<ROOT>${result.map((item, index) => `
 <Price>0.00000</Price>
 <STDUnitName>${item?.UnitName}</STDUnitName>
 </DataBlock2>`).join('')}</ROOT>`;
-}
+  }
 
 
 

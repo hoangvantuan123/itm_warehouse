@@ -19,6 +19,7 @@ export default function MenuManagementActions({
   data,
   handleSaveData,
   setNumRowsToAdd,
+  clickCount
 }) {
   const [visible, setVisible] = useState(false)
   const [inputValue, setInputValue] = useState(1);
@@ -70,6 +71,9 @@ export default function MenuManagementActions({
         message.info(`Chức năng này đang phát triển`)
     }
   }
+
+
+
   const menu = (
     <Menu onClick={handleMenuClick} className=" w-40">
 
@@ -99,6 +103,8 @@ export default function MenuManagementActions({
   const handleSave = () => {
     handleAddRows();
     setVisible(false);
+    setInputValue(1)
+    setClickCount(!clickCount)
   };
 
   const handleCancel = () => {
@@ -110,6 +116,7 @@ export default function MenuManagementActions({
         <Form.Item label="Enter number of rows">
           <InputNumber
             min={1}
+            max={2000}
             value={inputValue}
             onChange={(value) => setInputValue(value)}
             style={{

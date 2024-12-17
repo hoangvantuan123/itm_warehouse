@@ -23,6 +23,7 @@ import LoadSubmit from '../default/loadSubmit'
 import SuccessSubmit from '../default/successSubmit'
 import { CompactSelection } from '@glideapps/glide-data-grid'
 import ModalFocus from '../default/focus'
+import ModalWaiting2 from '../../components/modal/material/modalWaiting2'
 
 
 
@@ -47,6 +48,8 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const [modal5Open, setModal5Open] = useState(false)
   const [highlightRegions, setHighlightRegions] = useState([]);
   const [error, setError] = useState(null)
+  const [dataError, setDataError] = useState([])
+  console.log('dataError', dataError)
   const [successMessage, setSuccessMessage] = useState(null)
   const [scanHistory, setScanHistory] = useState([])
   const dataRefSacenHistory = useRef(scanHistory)
@@ -142,19 +145,19 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
         const barcode = bufferRef.current.trim()
           .normalize('NFD')
           .replace(/[\u0300-\u036f]/g, '')
-          .replace(/[^a-zA-Z0-9/.\-*%_]/g, ''); 
+          .replace(/[^a-zA-Z0-9/.\-*%_]/g, '');
         handleCheckBarcode(barcode);
         setInputCode(barcode);
-    
+
         bufferRef.current = '';
       } else if (e.key.length === 1) {
-        const normalizedKey = e.key.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); 
-        if (/^[a-zA-Z0-9/.\-*%_]{1}$/.test(normalizedKey)) { 
+        const normalizedKey = e.key.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        if (/^[a-zA-Z0-9/.\-*%_]{1}$/.test(normalizedKey)) {
           bufferRef.current += normalizedKey;
         }
       }
     }
-    
+
 
 
     const handleFocus = () => setStatus(true)
@@ -540,6 +543,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
         } else {
           setModal4Open(false)
           setModal2Open(true)
+          setDataError(response?.data)
           setError(response.message)
           setIsAPISuccess(true)
         }
@@ -700,12 +704,13 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
           </div>
         </div>
       </div>
-      <ModalWaiting
-        modal2Open={modal2Open}
+      <ModalWaiting2 modal2Open={modal2Open}
         setModal2Open={setModal2Open}
         error={error}
+        dataError={dataError} />
 
-      />
+
+        
       <LoadSubmit setModal4Open={setModal4Open} modal4Open={modal4Open} />
       <SuccessSubmit
         setModal5Open={setModal5Open}

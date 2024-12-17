@@ -17,6 +17,7 @@ import { filterAndSelectColumnsA } from '../../../utils/filterA'
 import { PostAddMenu } from '../../../features/system/postAddMenu'
 import { PostUpdateMenu } from '../../../features/system/postUpdateMenu'
 import ModalHelpMenu from '../../components/modal/system/modalHelpMenu'
+import useKeydownHandler from '../../components/hooks/sheet/useKeydownHandler'
 export default function MenuTechnique({ permissions, isMobile }) {
   const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
@@ -33,7 +34,8 @@ export default function MenuTechnique({ permissions, isMobile }) {
   const [clickedRowData, setClickedRowData] = useState(null)
   const [isMinusClicked, setIsMinusClicked] = useState(false)
   const [numRowsToAdd, setNumRowsToAdd] = useState(null);
-  const [clickCount, setClickCount] = useState(0);
+
+  const [clickCount, setClickCount] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -41,6 +43,10 @@ export default function MenuTechnique({ permissions, isMobile }) {
   const [openHelp, setOpenHelp] = useState(false);
   const [inputHelp, setInputHelp] = useState(null)
   const [isCellSelected, setIsCellSelected] = useState(false);
+  const [isCell, setIsCell] = useState(null)
+  const [onSelectRow, setOnSelectRow] = useState([])
+  const [keySelectColumn, setKeySelectColumn] = useState(false)
+
   const fetchDataMenus = useCallback(async () => {
     setLoading(true)
     try {
@@ -71,43 +77,37 @@ export default function MenuTechnique({ permissions, isMobile }) {
   const closeModal = () => {
     setIsModalOpen(false)
   }
-  const getSelectedRowIds = () => {
-    const selectedRows = selection.rows.items
-    let ids = []
+
+
+  const getSelectedRows = () => {
+    const selectedRows = selection.rows.items;
+    let rows = [];
 
     selectedRows.forEach((range) => {
-      const start = range[0]
-      const end = range[1] - 1
+      const start = range[0];
+      const end = range[1] - 1;
 
       for (let i = start; i <= end; i++) {
-        ids.push(menus[i]?.Id)
+        if (editedRows[i]) {
+          rows.push(editedRows[i]);
+        }
       }
-    })
+    });
 
-    return ids.filter((id) => id !== undefined)
-  }
+    return rows;
+  };
+
+
   const handleDeleteDataSheet = useCallback(
     async (e) => {
-      const selectedRowIds = getSelectedRowIds()
-      if (selectedRowIds.length === 0) {
-        message.warning('Vui lòng chọn ít nhất một hàng để xóa.')
-        return
-      }
+      const selectedRows = getSelectedRows();
 
-      const remainingRows = menus.filter(
-        (row) => !selectedRowIds.includes(row.id),
-      )
-
-      const response = await DeleteMenus(selectedRowIds)
-      if (response.data.success) {
-        debouncedFetchDataMenus()
-        message.success(response.data.message)
-      } else {
-        message.error(response.data.message)
-      }
+      console.log('selectedRows', selectedRows);
+      console.log('remainingRows', remainingRows);
     },
-    [menus, selection],
-  )
+    [ selection, editedRows]
+  );
+
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -122,12 +122,29 @@ export default function MenuTechnique({ permissions, isMobile }) {
     }
   }, [])
 
+  /* HOOKS KEY */
+  useKeydownHandler(isCellSelected, setOpenHelp);
 
   const onCellClicked = (cell, event) => {
-    if (cell[0] === 1) {
+    if (cell.length >= 2 && cell[0] === 1) {
       setIsCellSelected(true);
     } else {
       setIsCellSelected(false);
+      setIsMinusClicked(false);
+      setLastClickedCell(null);
+      setClickedRowData(null);
+    }
+
+    if (
+      lastClickedCell &&
+      lastClickedCell[0] === cell[0] &&
+      lastClickedCell[1] === cell[1]
+    ) {
+      setIsCellSelected(false);
+      setIsMinusClicked(false);
+      setLastClickedCell(null);
+      setClickedRowData(null);
+      return;
     }
 
     let rowIndex;
@@ -144,57 +161,12 @@ export default function MenuTechnique({ permissions, isMobile }) {
       setIsMinusClicked(false);
     }
 
-    if (
-      lastClickedCell &&
-      lastClickedCell[0] === cell[0] &&
-      lastClickedCell[1] === cell[1]
-    ) {
-      setLastClickedCell(null);
-      setClickedRowData(null);
-      return;
-    }
-
     if (rowIndex >= 0 && rowIndex < menus.length) {
       const rowData = menus[rowIndex];
       setClickedRowData(rowData);
       setLastClickedCell(cell);
     }
   };
-
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (isCellSelected) {
-        if (
-          (event.metaKey && event.shiftKey && event.key === ' ') || 
-          (event.ctrlKey && event.shiftKey && event.key === ' ')
-        ) {
-          setOpenHelp(true)
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isCellSelected]);
-  
-
-
-  const handleKeyDown = (event) => {
-    if (event.ctrlKey && event.key === ' ') {
-      console.log('Ctrl + Space was pressed during cell editing');
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
 
 
   const handleSaveData = async () => {
@@ -242,6 +214,8 @@ export default function MenuTechnique({ permissions, isMobile }) {
       message.warning("Không có dữ liệu để lưu!");
     }
   };
+
+
   return (
     <>
       <Helmet>
@@ -262,6 +236,8 @@ export default function MenuTechnique({ permissions, isMobile }) {
                 handleSaveData={handleSaveData}
                 setNumRowsToAdd={setNumRowsToAdd}
                 numRowsToAdd={numRowsToAdd}
+                setClickCount={setClickCount}
+                clickCount={clickCount}
               />
             </div>
           </div>
@@ -282,6 +258,12 @@ export default function MenuTechnique({ permissions, isMobile }) {
               clickCount={clickCount}
               numRowsToAdd={numRowsToAdd}
               setInputHelp={setInputHelp}
+              onSelectRow={onSelectRow}
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
+              setOnSelectRow={setOnSelectRow}
+              setIsCellSelected={setIsCellSelected}
+              isCellSelected={isCellSelected}
             />
           </div>
         </div>
@@ -292,7 +274,6 @@ export default function MenuTechnique({ permissions, isMobile }) {
           onClose={closeModal}
           fetchDataMenus={fetchDataMenus}
         />
-        <ModalHelpMenu openHelp={openHelp} setOpenHelp={setOpenHelp}  inputHelp={inputHelp} setInputHelp={setInputHelp}/>
       </div>
     </>
   )

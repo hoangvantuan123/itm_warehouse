@@ -60,7 +60,7 @@ export class StockInService {
         @PgmSeq = ${pgmSeq};
     `;
     try {
-    
+
       const result = await this.databaseService.executeQuery(query);
       const invalidStatuses = result.some((item: any) => item.Status !== 0);
       if (invalidStatuses) {
@@ -224,191 +224,12 @@ export class StockInService {
             @UserSeq = ${userSeq},
             @PgmSeq = ${pgmSeq};
     `;
-
+    console.log('CHECK_STOCKIN_USERSEQ', userSeq, 'Date:', new Date().toLocaleString());
+    console.log('CHECK_STOCKIN_QUERY', query);
     return await this.databaseService.executeQuery(query);
   }
 
 
-  /*  async checkAllProceduresStockIn(
-     procedureData: { name: string; xmlDocument: string; serviceSeq: number }[],
-     xmlFlags: number,
-     workingTag: string,
-     companySeq: number,
-     languageSeq: number,
-     userSeq: number,
-     pgmSeq: number,
-     dataSave: any[]
-   ): Promise<SimpleQueryResult> {
-     try {
-       const errors: string[] = [];
-       let masterCheckResult: any[] | null = null;
-       const data: any[] = [];
-       for (const { name, xmlDocument, serviceSeq } of procedureData) {
-         let result: any;
-         if (name === '_SSLImpDelvMasterCheck_WEB') {
-           result = await this._executeProcedure(
-             name,
-             xmlDocument,
-             xmlFlags,
-             serviceSeq,
-             workingTag,
-             companySeq,
-             languageSeq,
-             userSeq,
-             pgmSeq
-           );
- 
-           const invalidStatuses = result.some((item: any) => item.Status !== 0);
-           if (invalidStatuses) {
-             errors.push(result.map((item: any) => `${item.Result}`).join('; '));
-           }
-           masterCheckResult = result;
-         } else if (name === '_SSLImpDelvSheetCheck_WEB') {
-           if (masterCheckResult) {
-             const DelvSeqItem = masterCheckResult[0].DelvSeq;
-             const updatedXmlDocument = xmlDocument
-               .replace(/<DataBlock2>(.*?)<\/DataBlock2>/gs, (match: any) => {
-                 return match.replace(
-                   /<DelvSeq><\/DelvSeq>/,
-                   `<DelvSeq>${DelvSeqItem}</DelvSeq>`
-                 );
-               });
- 
-             result = await this._executeProcedure(
-               name,
-               updatedXmlDocument,
-               xmlFlags,
-               serviceSeq,
-               workingTag,
-               companySeq,
-               languageSeq,
-               userSeq,
-               pgmSeq
-             );
- 
-             const invalidStatuses = result.some((item: any) => item.Status !== 0);
-             if (invalidStatuses) {
-               errors.push(result.map((item: any) => `${item.Result}`).join('; '));
-             }
-           } else {
-             errors.push("Master check procedure didn't complete successfully.");
-           }
-         } else {
-           result = await this._executeProcedure(
-             name,
-             xmlDocument,
-             xmlFlags,
-             serviceSeq,
-             workingTag,
-             companySeq,
-             languageSeq,
-             userSeq,
-             pgmSeq
-           );
- 
-           const invalidStatuses = result.some((item: any) => item.Status !== 0);
-           if (invalidStatuses) {
-             errors.push(result.map((item: any) => `${item.Result}`).join('; '));
-           }
-         }
- 
-         data.push({ name, result });
- 
-       }
- 
-       if (errors.length > 0) {
-         return { success: false, message: errors.join('; '), data };
-       }
- 
- 
-       if (data && data.length > 0) {
-         let saveResult: SimpleQueryResult | null = null;
- 
-         for (const item of data) {
- 
-           if (item.name === '_SSLImpDelvMasterCheck_WEB') {
-             saveResult = await this._SSLImpDelvMasterSaveWEB(
-               item.result,
-               xmlFlags,
-               4493,
-               workingTag,
-               companySeq,
-               languageSeq,
-               userSeq,
-               pgmSeq,
-               item.result[0]?.DelvNo
-             );
-           }
- 
-           if (item.name === '_SSLImpDelvSheetCheck_WEB') {
-             saveResult = await this._SSLImpDelvSheetSaveWEB(
-               dataSave,
-               xmlFlags,
-               4493,
-               workingTag,
-               companySeq,
-               languageSeq,
-               userSeq,
-               pgmSeq,
-               item.result[0]?.DelvSeq,
-             );
- 
- 
-             saveResult = await this._SCOMSourceDailySaveWEB(
-               dataSave,
-               xmlFlags,
-               3181,
-               workingTag,
-               companySeq,
-               languageSeq,
-               userSeq,
-               pgmSeq,
-               item.result[0]?.DelvSeq
-             );
- 
- 
-             saveResult = await this._SLGInOutDailyBatchWEB(
-               item.result,
-               xmlFlags,
-               2619,
-               workingTag,
-               companySeq,
-               languageSeq,
-               userSeq,
-               pgmSeq,
-               item.result[0]?.DelvSeq
-             );
- 
-           }
- 
-           if (item.name === '_SLGLotNoMasterCheck_WEB') {
-             saveResult = await this._SLGLotNoMasterSaveWEB(
-               item.result,
-               xmlFlags,
-               4422,
-               workingTag,
-               companySeq,
-               languageSeq,
-               userSeq,
-               pgmSeq,
-             );
-           }
-           if (saveResult) {
-             if (!saveResult.success) {
-               console.error(`Save procedure for ${item.name} failed: ${saveResult.message}`);
-             } else {
-               console.log(`Save procedure for ${item.name} succeeded: `, saveResult.data);
-             }
-           }
-         }
-       }
- 
-       return { success: true, message: 'All procedures executed successfully.', data };
-     } catch (error) {
-       return { success: false, message: ERROR_MESSAGES.DATABASE_ERROR, data: [] };
-     }
-   } */
-  /* SAVE */
 
   async checkAllProceduresStockIn(
     procedureData: { name: string; xmlDocument: string; serviceSeq: number }[],
@@ -420,12 +241,11 @@ export class StockInService {
     pgmSeq: number,
     dataSave: any[]
   ): Promise<SimpleQueryResult> {
-    console.log('userSeq', userSeq)
+    console.log('CHECK_USERSEQ', userSeq, 'Date:', new Date().toLocaleString());
     try {
       const errors: string[] = [];
       const data: any[] = [];
       let masterCheckResult: any[] | null = null;
-
       const executeProcedure = async (
         name: string,
         xmlDocument: string,
@@ -444,9 +264,12 @@ export class StockInService {
         );
 
         if (result.some((item: any) => item.Status !== 0)) {
-          errors.push(result.map((item: any) => `${item.Result}`).join('; '));
+
+          errors.push(
+            ...result.map((item: any) => `Result: ${item.Result}, IDX_NO: ${item.IDX_NO}`)
+          );
         }
-        
+
         return result;
       };
 
@@ -470,8 +293,20 @@ export class StockInService {
       }
 
       if (errors.length > 0) {
-        return { success: false, message: errors.join('; '), data };
+        return {
+          success: false,
+          message: 'Some procedures encountered errors.',
+          data: errors.map((errorMsg, index) => {
+            const [result, idx_no] = errorMsg.split(', ').map(part => part.split(': ')[1]);
+            return {
+              procedureIndex: index + 1,
+              error: [result, idx_no],
+            };
+          }),
+        };
       }
+
+
 
       const saveProcedure = async (name: string, result: any) => {
         switch (name) {
@@ -485,7 +320,8 @@ export class StockInService {
               languageSeq,
               userSeq,
               pgmSeq,
-              result[0]?.DelvNo
+              result[0]?.DelvNo,
+              dataSave[0]?.InvoiceNo
             );
           case '_SSLImpDelvSheetCheck_WEB': {
             const delvSeq = result[0]?.DelvSeq;
@@ -556,13 +392,13 @@ export class StockInService {
       }
       return { success: true, message: 'All procedures executed successfully.', data };
     } catch (error) {
-      return { success: false, message: ERROR_MESSAGES.DATABASE_ERROR, data: [] };
+      return { success: false, message: error.message || ERROR_MESSAGES.DATABASE_ERROR, data: [] };
     }
   }
 
   /*_SSLImpDelvMasterSave_WEB  */
-  async _SSLImpDelvMasterSaveWEB(result: any[], xmlFlags: number, serviceSeq: number, workingTag: string, companySeq: number, languageSeq: number, userSeq: number, pgmSeq: number, SPDelvNo: any): Promise<SimpleQueryResult> {
-    const xmlDocument = await this.generateXmlService.generateXMLSSLImpDelvMasterSave(result, SPDelvNo);
+  async _SSLImpDelvMasterSaveWEB(result: any[], xmlFlags: number, serviceSeq: number, workingTag: string, companySeq: number, languageSeq: number, userSeq: number, pgmSeq: number, SPDelvNo: any, InvoiceNo: string): Promise<SimpleQueryResult> {
+    const xmlDocument = await this.generateXmlService.generateXMLSSLImpDelvMasterSave(result, SPDelvNo, InvoiceNo);
     const query = `
       EXEC _SSLImpDelvMasterSave_WEB
         @xmlDocument = N'${xmlDocument}',
@@ -575,6 +411,7 @@ export class StockInService {
         @PgmSeq = ${pgmSeq};
     `;
     try {
+      console.log('CHECK_USERSEQ', userSeq, 'Date:', new Date().toLocaleString());
       console.log('_SSLImpDelvMasterSave_WEB', query)
       const result = await this.databaseService.executeQuery(query);
       return { success: true, data: result };
@@ -597,6 +434,8 @@ export class StockInService {
         @PgmSeq = ${pgmSeq};
     `;
     try {
+      console.log('CHECK_USERSEQ', userSeq, 'Date:', new Date().toLocaleString());
+      console.log('_SSLImpDelvSheetSave_WEB', query)
       const result = await this.databaseService.executeQuery(query);
       return { success: true, data: result };
     } catch (error) {
@@ -617,7 +456,7 @@ export class StockInService {
         @PgmSeq = ${pgmSeq};
     `;
     try {
-
+      console.log('_SLGLotNoMasterSave_WEB', query)
       const result = await this.databaseService.executeQuery(query);
       return { success: true, data: result };
     } catch (error) {
@@ -639,6 +478,8 @@ export class StockInService {
         @PgmSeq = ${pgmSeq};
     `;
     try {
+      console.log('CHECK_USERSEQ', userSeq, 'Date:', new Date().toLocaleString());
+      console.log('_SCOMSourceDailySave_WEB', query)
       const result = await this.databaseService.executeQuery(query);
       return { success: true, data: result };
     } catch (error) {
@@ -659,7 +500,8 @@ export class StockInService {
         @PgmSeq = ${pgmSeq};
     `;
     try {
-
+      console.log('CHECK_USERSEQ', userSeq, 'Date:', new Date().toLocaleString());
+      console.log('_SLGInOutDailyBatch_WEB', query)
       const result = await this.databaseService.executeQuery(query);
       return { success: true, data: result };
     } catch (error) {

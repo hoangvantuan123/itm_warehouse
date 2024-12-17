@@ -29,7 +29,6 @@ const dataSearch = [
 ];
 function TableMenuManagement({
   data,
-  onCellClicked,
   setSelection,
   selection,
   setShowSearch,
@@ -38,22 +37,26 @@ function TableMenuManagement({
   addedRows,
   setEditedRows,
   editedRows,
-  setNumRowsToAdd, numRowsToAdd, setInputHelp
+  setNumRowsToAdd, numRowsToAdd, setInputHelp,
+  onSelectRow,
+  setOnSelectRow,
+  setIsCellSelected,
+  isCellSelected,
+  setOpenHelp,
+  openHelp,
+  clickCount
 }) {
   const [gridData, setGridData] = useState([]);
   const gridRef = useRef(null);
   const [numRows, setNumRows] = useState(0);
   const [open, setOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
   const [cols, setCols] = useState(() =>
     loadFromLocalStorageSheet("S_ERP_COLS_PAGE_MENU", defaultCols)
   );
   const onSearchClose = useCallback(() => setShowSearch(false), []);
   const [showMenu, setShowMenu] = useState(null);
+  const [isCell, setIsCell] = useState(null);
   const [hiddenColumns, setHiddenColumns] = useState(loadFromLocalStorageSheet("H_ERP_COLS_PAGE_MENU", []));
-  const [searchResultsHelp, setSearchResultsHelp] = useState([]);
-  const [selectedRow, setSelectedRow] = useState(null);
-  const [openHelp, setOpenHelp] = useState(false);
   const onHeaderMenuClick = useCallback((col, bounds) => {
     if (cols[col]?.id === 'Status') {
       setShowMenu({
@@ -70,7 +73,31 @@ function TableMenuManagement({
     }
   }, []);
 
-  const [highlightRegions, setHighlightRegions] = useState([]);
+  const highlightRegions = [
+    {
+      color: "#e8f0ff",
+      range: {
+        x: 1,
+        y: 0,
+        width: 1,
+        height: numRows,
+      },
+    },
+    {
+      color: "#e8f0ff",
+      range: {
+        x: 2,
+        y: 0,
+        width: 1,
+        height: numRows,
+      },
+    },
+  ];
+  const [keybindings, setKeybindings] = useState({
+    downFill: true,
+    rightFill: true,
+    selectColumn: false
+  });
 
 
   useEffect(() => {
@@ -121,104 +148,279 @@ function TableMenuManagement({
 
   useEffect(() => {
     handleRowAppend(numRowsToAdd);
-  }, [numRowsToAdd]);
+  }, [numRowsToAdd, clickCount]);
+
+  useEffect(() => {
+    if (!onSelectRow || Object.keys(onSelectRow).length === 0) return;
+
+    const [col, row] = isCell;
+
+    setGridData((prevData) => {
+      const updatedData = [...prevData];
+      if (!updatedData[row]) updatedData[row] = {};
+
+      const currentStatus = updatedData[row]['Status'] || '';
+
+      updatedData[row] = {
+        ...updatedData[row],
+        Key: onSelectRow.Key,
+        Label: onSelectRow.Label,
+        Link: onSelectRow.Link,
+        Type: onSelectRow.Type,
+        Status: currentStatus === 'A' ? 'A' : 'U',
+      };
+
+      setEditedRows((prevEditedRows) => {
+        const existingIndex = prevEditedRows.findIndex(
+          (editedRow) => editedRow.rowIndex === row
+        );
+
+        const updatedRowData = {
+          rowIndex: row,
+          updatedRow: updatedData[row],
+          status: currentStatus === 'A' ? 'A' : 'U',
+        };
+
+        if (existingIndex === -1) {
+          return [...prevEditedRows, updatedRowData];
+        } else {
+          const updatedEditedRows = [...prevEditedRows];
+          updatedEditedRows[existingIndex] = updatedRowData;
+          return updatedEditedRows;
+        }
+      });
+
+      return updatedData;
+    });
+
+    setOnSelectRow(null);
+  }, [onSelectRow, isCell]);
+
+
+
+  const onCellClicked = useCallback(
+    (cell, event) => {
+      if (cell.length >= 2 && cell[0] === 1) {
+        setIsCellSelected(true);
+        setIsCell(cell)
+      } else {
+        setIsCell(null)
+        setIsCellSelected(false);
+        setOnSelectRow([])
+      }
+    },
+    []
+  );
+
+  /*  const onCellEdited = useCallback(
+     (cell, newValue) => {
+       if (newValue.kind !== GridCellKind.Text) {
+         return;
+       }
+ 
+       const indexes = ['Status', 'MenuRootId', 'MenuSubRootId', 'Key', 'Label', 'Link', 'Type'];
+       const [col, row] = cell;
+       const key = indexes[col];
+ 
+       if (key === 'MenuRootId') {
+         const searchText = newValue.data.trim().toLowerCase();
+ 
+         if (searchText !== '') {
+           const searchResults = dataSearch.filter(
+             (item) =>
+               item.Key.toLowerCase().includes(searchText) ||
+               item.Label.toLowerCase().includes(searchText)
+           );
+ 
+           setGridData((prevData) => {
+             const updatedData = [...prevData];
+             if (!updatedData[row]) updatedData[row] = {};
+ 
+             const currentStatus = updatedData[row]['Status'] || '';
+             let newKey = updatedData[row]['Key'];
+             let newMenuRootId = updatedData[row]['Key'];
+             let newLabel = updatedData[row]['Label'];
+             let newLink = updatedData[row]['Link'];
+             let newType = updatedData[row]['Type'];
+ 
+             if (searchResults.length > 0) {
+               const result = searchResults[0];
+               newKey = result.Key;
+               newLabel = result.Label;
+               newLink = result.Link;
+               newType = result.Type;
+               newMenuRootId = result.Key;
+             }
+ 
+             updatedData[row] = {
+               ...updatedData[row],
+               Key: newKey,
+               Label: newLabel,
+               Link: newLink,
+               Type: newType,
+               MenuRootId: newMenuRootId,
+               Status: currentStatus === 'A' ? 'A' : 'U',
+             };
+ 
+             return updatedData;
+           });
+         }
+ 
+         newValue.data = '';
+         return;
+       }
+ 
+       setGridData((prevData) => {
+         const updatedData = [...prevData];
+         if (!updatedData[row]) updatedData[row] = {};
+ 
+         const currentStatus = updatedData[row]['Status'] || '';
+         updatedData[row][key] = newValue.data;
+         updatedData[row]['Status'] = currentStatus === 'A' ? 'A' : 'U';
+ 
+         setEditedRows((prevEditedRows) => {
+           const existingIndex = prevEditedRows.findIndex(
+             (editedRow) => editedRow.rowIndex === row
+           );
+ 
+           const updatedRowData = {
+             rowIndex: row,
+             updatedRow: updatedData[row],
+             status: currentStatus === 'A' ? 'A' : 'U',
+           };
+ 
+           if (existingIndex === -1) {
+             return [...prevEditedRows, updatedRowData];
+           } else {
+             const updatedEditedRows = [...prevEditedRows];
+             updatedEditedRows[existingIndex] = updatedRowData;
+             return updatedEditedRows;
+           }
+         });
+ 
+         return updatedData;
+       });
+     },
+     [dataSearch]
+   ); */
+
+
+
 
   const onCellEdited = useCallback(
     (cell, newValue) => {
-      console.log('cell' , cell)
       if (newValue.kind !== GridCellKind.Text) {
         return;
       }
-  
+
       const indexes = ['Status', 'MenuRootId', 'MenuSubRootId', 'Key', 'Label', 'Link', 'Type'];
       const [col, row] = cell;
       const key = indexes[col];
-  
+
       if (key === 'MenuRootId') {
         const searchText = newValue.data.trim().toLowerCase();
-        const searchResults = dataSearch.filter(
+
+        if (searchText !== '') {
+          const searchResults = dataSearch.filter(
             (item) =>
-                item.Key.toLowerCase().includes(searchText) ||
-                item.Label.toLowerCase().includes(searchText)
-        );
-    
-        setGridData((prevData) => {
+              item.Key.toLowerCase().includes(searchText) ||
+              item.Label.toLowerCase().includes(searchText)
+          );
+
+          setGridData((prevData) => {
             const updatedData = [...prevData];
             if (!updatedData[row]) updatedData[row] = {};
-    
+
             const currentStatus = updatedData[row]['Status'] || '';
             let newKey = updatedData[row]['Key'];
+            let newMenuRootId = updatedData[row]['Key'];
             let newLabel = updatedData[row]['Label'];
             let newLink = updatedData[row]['Link'];
             let newType = updatedData[row]['Type'];
-    
+
             if (searchResults.length > 0) {
-                const result = searchResults[0];
-                newKey = result.Key;
-                newLabel = result.Label;
-                newLink = result.Link;
-                newType = result.Type;
+              const result = searchResults[0];
+              newKey = result.Key;
+              newLabel = result.Label;
+              newLink = result.Link;
+              newType = result.Type;
+              newMenuRootId = result.Key;
             }
-    
+
             updatedData[row] = {
-                ...updatedData[row],
-                Key: newKey,
-                Label: newLabel,
-                Link: newLink,
-                Type: newType,
-                Status: currentStatus === 'A' ? 'A' : 'U',
+              ...updatedData[row],
+              Key: newKey,
+              Label: newLabel,
+              Link: newLink,
+              Type: newType,
+              MenuRootId: newMenuRootId,
+              Status: currentStatus === 'A' ? 'A' : 'U',
             };
-    
+
+            // Cập nhật setEditedRows
+            setEditedRows((prevEditedRows) => {
+              const existingIndex = prevEditedRows.findIndex(
+                (editedRow) => editedRow.rowIndex === row
+              );
+
+              const updatedRowData = {
+                rowIndex: row,
+                updatedRow: updatedData[row],
+                status: currentStatus === 'A' ? 'A' : 'U',
+              };
+
+              if (existingIndex === -1) {
+                return [...prevEditedRows, updatedRowData];
+              } else {
+                const updatedEditedRows = [...prevEditedRows];
+                updatedEditedRows[existingIndex] = updatedRowData;
+                return updatedEditedRows;
+              }
+            });
+
             return updatedData;
-        });
-    
-     
-    }
-    
+          });
+        }
+
+        newValue.data = '';
+        return;
+      }
+
+      // Trường hợp xử lý các key khác
       setGridData((prevData) => {
         const updatedData = [...prevData];
         if (!updatedData[row]) updatedData[row] = {};
-  
+
         const currentStatus = updatedData[row]['Status'] || '';
-  
-        if (currentStatus === 'A') {
-          updatedData[row][key] = newValue.data;
-        } else {
-          updatedData[row][key] = newValue.data;
-          updatedData[row]['Status'] = 'U';
-        }
-  
+        updatedData[row][key] = newValue.data;
+        updatedData[row]['Status'] = currentStatus === 'A' ? 'A' : 'U';
+
         setEditedRows((prevEditedRows) => {
           const existingIndex = prevEditedRows.findIndex(
             (editedRow) => editedRow.rowIndex === row
           );
-  
+
+          const updatedRowData = {
+            rowIndex: row,
+            updatedRow: updatedData[row],
+            status: currentStatus === 'A' ? 'A' : 'U',
+          };
+
           if (existingIndex === -1) {
-            return [
-              ...prevEditedRows,
-              {
-                rowIndex: row,
-                updatedRow: updatedData[row],
-                status: currentStatus === 'A' ? 'A' : 'U',
-              },
-            ];
+            return [...prevEditedRows, updatedRowData];
           } else {
             const updatedEditedRows = [...prevEditedRows];
-            updatedEditedRows[existingIndex].updatedRow = updatedData[row];
-            updatedEditedRows[existingIndex].status = currentStatus === 'A' ? 'A' : 'U';
+            updatedEditedRows[existingIndex] = updatedRowData;
             return updatedEditedRows;
           }
         });
-  
+
         return updatedData;
       });
-      setInputHelp(newValue.data); 
     },
-    []
+    [dataSearch]
   );
-  
 
-  
 
   const onColumnResize = useCallback(
     (column, newSize) => {
@@ -345,10 +547,7 @@ function TableMenuManagement({
   };
 
 
-  const handleSelectRow = (record) => {
-    console.log('Selected Row:', record);
-    setSelectedRow(record);
-};
+
   return (
     <div className="w-full gap-1 h-full flex items-center justify-center pb-8">
       <div className="w-full h-full flex flex-col border bg-white rounded-lg overflow-hidden ">
@@ -386,38 +585,14 @@ function TableMenuManagement({
           }
           onPaste={true}
           fillHandle={true}
-          keybindings={{
-            downFill: true,
-            rightFill: true,
-          }}
+          keybindings={keybindings}
           isDraggable={false}
           onRowAppended={() => handleRowAppend(1)}
           smoothScrollY={true}
           smoothScrollX={true}
           onCellEdited={onCellEdited}
           onCellClicked={onCellClicked}
-          /*    highlightRegions={[
-               {
-                 color: "#E5E8FF",
-                 range: {
-                   x: 1,
-                   y: 0,
-                   width: 1,
-                   height: numRows,
-                 },
-                 style: "solid"
-               },
-               {
-                 color: "#DEE0F0",
-                 range: {
-                   x: 2,
-                   y: 0,
-                   width: 1,
-                   height: numRows,
-                 },
-                 style: "solid"
-               },
-             ]} */
+          highlightRegions={highlightRegions}
           onColumnResize={onColumnResize}
           onHeaderMenuClick={onHeaderMenuClick}
           onColumnMoved={onColumnMoved}
@@ -470,7 +645,7 @@ function TableMenuManagement({
             )
           ))}
         </Drawer>
-      
+        <ModalHelpMenu openHelp={openHelp} setOpenHelp={setOpenHelp} setInputHelp={setInputHelp} setOnSelectRow={setOnSelectRow} />
       </div>
     </div>
   );

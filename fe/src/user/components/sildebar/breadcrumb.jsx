@@ -63,7 +63,7 @@ export default function BreadcrumbRouter({ menuTransForm, rootMenu }) {
   }
 
   return (
-    <div className="breadcrumb bg-slate-50 p-2 uppercase text-xs">
+    <div className="p-2 uppercase text-xs bg-white border-b">
       {breadcrumbItems.map((item, index) => (
         <span key={item.path}  className=' uppercase'>
           {index > 0 && <span> / </span>}

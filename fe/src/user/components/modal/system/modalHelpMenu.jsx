@@ -1,10 +1,14 @@
-import  { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Modal, Button, Input, Table } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
 const { Search } = Input;
-
-export default function ModalHelpMenu({ openHelp, setOpenHelp, searchResultsHelp, onSelectRow , inputHelp}) {
+const dataSearch = [
+    { Key: 'A01', Label: 'Menu 1', Link: '/menu1', Type: 'Type1' },
+    { Key: 'A02', Label: 'Menu 2', Link: '/menu2', Type: 'Type2' },
+    { Key: 'A03', Label: 'Menu 3', Link: '/menu3', Type: 'Type3' },
+];
+export default function ModalHelpMenu({ openHelp, setOpenHelp, searchResultsHelp, setOnSelectRow, inputHelp }) {
 
     const columns = [
         {
@@ -30,14 +34,12 @@ export default function ModalHelpMenu({ openHelp, setOpenHelp, searchResultsHelp
     ];
 
     const handleRowClick = (record) => {
-        onSelectRow(record);  
-        setOpenHelp(false);   
+        setOnSelectRow(record);
+        setOpenHelp(false);
     };
-console.log('inputHelp' , inputHelp)
-useEffect(() => {
-  // Giả sử chúng ta muốn làm gì đó khi inputHelp thay đổi, ví dụ như lọc kết quả tìm kiếm
-  console.log('Updated inputHelp:', inputHelp);
-}, [inputHelp]);
+    useEffect(() => {
+        console.log('Updated inputHelp:', inputHelp);
+    }, [inputHelp]);
 
     return (
         <Modal
@@ -51,28 +53,24 @@ useEffect(() => {
                 style={{ display: 'flex', flexDirection: 'column', height: '75vh' }}
                 className="gap-4"
             >
-                {/* Thêm phần tìm kiếm */}
                 <Search
                     placeholder="Tìm kiếm theo Key hoặc Label"
                     onSearch={(value) => {
                     }}
-                    onChange={(e) => {
-                      setInputHelp(e.target.value); // Cập nhật giá trị khi người dùng nhập
-                    }}
+
                     value={inputHelp}
                     enterButton={<SearchOutlined />}
                     style={{ marginBottom: 20 }}
                 />
 
-                {/* Bảng kết quả tìm kiếm */}
                 <Table
                     columns={columns}
-                    dataSource={searchResultsHelp}
                     rowKey="Key"
+                    dataSource={dataSearch}
                     onRow={(record) => ({
                         onClick: () => handleRowClick(record),
                     })}
-                    pagination={false} // Tắt phân trang nếu muốn hiển thị tất cả
+                    pagination={false}
                 />
             </div>
 
