@@ -8,6 +8,7 @@ import {
   Select,
   message,
   Form,
+  Row,
 } from 'antd'
 
 import { DataEditor, GridCellKind } from "@glideapps/glide-data-grid";
@@ -15,6 +16,9 @@ import '@glideapps/glide-data-grid/dist/index.css';
 import { checkConfirmBarcode, checkConfirmNewBarcode, confirmBarcode } from "../../../../features/barcode/barcodeChangeService";
 import { BARCODE_ERR_MESSAGE, BARCODE_SUCCESS_MESSAGE } from "../../../../utils/constants";
 import ModalWaiting from "../../modal/material/modalWaiting";
+import { ArrowIcon } from '../../icons';
+import { FilterOutlined, PrinterFilled, SearchOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 
 
@@ -34,6 +38,7 @@ export default function BarcodeChangeAction({
 
   formChange,
   onKeyDownChangeQty,
+  barcodeRef,
   changeQtyRef,
   remarkRef,
   onChangeNewQty,
@@ -50,6 +55,7 @@ export default function BarcodeChangeAction({
   const [form] = Form.useForm();
   const [formPopup] = Form.useForm();
   const [data, setData] = useState([]);
+  const { t } = useTranslation();
 
   const [oldBarcode, setOldBarcode] = useState('');
   const [newBarcode, setNewBarcode] = useState('');
@@ -64,8 +70,7 @@ export default function BarcodeChangeAction({
   const userIDRef = useRef(null);
 
 
-  const onFormLayoutChange = ({ layout }) => {
-  };
+
 
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo)
@@ -134,12 +139,23 @@ export default function BarcodeChangeAction({
     }
   }
 
+  const onChangeUserId = (e) => {
+    const userid = e.target.value;
+    setUserId(userid);
+}
+
+const onChangeRemark = (e) => {
+    const remark = e.target.value;
+    setRemark(remark);
+}
+
   const handleKeyDownOldBarcode = async (e) => {
     if (e.key === 'Enter') {
       const oldBarcode = e.target.value
 
       if (!oldBarcode.includes('/')) {
-        message.warning(BARCODE_ERR_MESSAGE.INVALID_BARCODE_FORMAT)
+        setModal2Open(true);
+        setError(BARCODE_ERR_MESSAGE.INVALID_BARCODE_FORMAT)
         return
       }
 
@@ -289,16 +305,7 @@ export default function BarcodeChangeAction({
 
   useEffect(() => {
     formChange.resetFields()
-    if (clickedRowData?.BarcodeID) {
-      formChange.setFieldsValue({ oldBarcode: clickedRowData.BarcodeID })
-    }
-    if (clickedRowData?.Remark) {
-      formChange.setFieldsValue({ remark: clickedRowData.Remark })
-    }
-    if (clickedRowData?.UserID) {
-      formChange.setFieldsValue({ userID: clickedRowData.UserID })
-    }
-  }, [formChange, clickedRowData])
+  }, [formChange])
 
   return (
     <div className="mt-1">
@@ -324,221 +331,265 @@ export default function BarcodeChangeAction({
               <DatePicker size="small" />
             </Form.Item>
 
-            <Form.Item label="Barcode" name="barcode">
-              <Input placeholder="" size="small" />
+            <Form.Item label="Barcode" name="barcode" >
+              <Input placeholder="" size="small"  className='w-96'/>
             </Form.Item>
-            <Form.Item label="Mat ID" name="matID">
-              <Input placeholder="" size="small" />
+            <Form.Item label="Mat ID" name="matID" >
+              <Input placeholder="" size="small" className='w-28' />
             </Form.Item>
-            <Form.Item label="Lot No" name="lotNo">
-              <Input placeholder="" size="small" />
+            <Form.Item label="Lot No" name="lotNo" >
+              <Input placeholder="" size="small" className='w-36'/>
             </Form.Item>
             <Form.Item>
-              <Button type="primary" size="small" htmlType="submit">
+              <Button icon={<SearchOutlined />} type="primary" size="small" htmlType="submit">
                 SEARCH
               </Button>
             </Form.Item>
 
             <Form.Item>
-              <Button onClick={btnOpenModal} type="primary" size="small">
+              <Button icon={<PrinterFilled/>} onClick={btnOpenModal} type="primary" size="small">
                 PRINT
               </Button>
             </Form.Item>
           </Form>
         </Card>
 
-        <Card className="mb-1 p-1 shadow-sm" size="small">
-          <Form
-            layout={'inline'}
-            form={formChange}
-            initialValues={{
-              layout: 'inline',
-            }}
-            onValuesChange={onFormLayoutChange}
-            style={{
-              maxWidth: 'inline' ? 'none' : 600,
-            }}
+        <details
+          className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
+          open
+        >
+          <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
+            <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600 uppercase">
+              <FilterOutlined />
+              {t('Thông tin chi tiết')}
+            </h2>
+            <span className="relative size-5 shrink-0">
+              <ArrowIcon />
+            </span>
+          </summary>
 
-            onFinishFailed={onFinishFailed}
-            autoComplete="off"
-          >
+          <Card className="mb-1 p-1 shadow-sm" size="small">
+            <Form
+              layout={'vertical'}
+              form={formChange}
+              style={{
+                maxWidth: 'inline' ? 'none' : 600,
+              }}
 
-            <Form.Item
-              label="Barcode"
-              name="oldBarcode"
-              rules={[
-                {
-                  required: true,
-                  message: BARCODE_ERR_MESSAGE.BARCODE_NOT_NULL,
-                },
-              ]}
+              onFinishFailed={onFinishFailed}
+              autoComplete="off"
             >
-              <Input
-                placeholder=""
-                size="small"
-                onKeyDown={handleEnter}
-                className='w-[300px]'
-              />
-            </Form.Item>
-            <Form.Item label="Pre QTY" name="preQty">
-              <Input
-                placeholder=""
-                size="small"
-                type="number"
-                min={0}
-                disabled={true}
-              />
-            </Form.Item>
-            <Form.Item
-              label="Change QTY"
-              name="changeQty"
-              rules={[
-                {
-                  required: true,
-                  message: BARCODE_ERR_MESSAGE.QTY_NOT_NULL,
-                },
-              ]}>
-              <Input
-                placeholder=""
-                size="small"
-                type="number"
-                min={0}
-                onKeyDown={onKeyDownChangeQty}
-                ref={changeQtyRef}
-              />
-            </Form.Item>
-            <Form.Item label="QTY" name="qty">
-              <Input
-                placeholder=""
-                size="small"
-                type="number"
-                min={0}
-                value={newQty}
-                disabled={true}
-                onChange={onChangeNewQty} />
-            </Form.Item>
+              <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600 uppercase">
+                {t('Thông tin thay đổi')}
+              </h2>
 
-            <Form.Item label="Remark" name="remark">
-              <Input placeholder="" size="small" onKeyDown={onKeyDownRemark} ref={remarkRef} />
-            </Form.Item>
-            <Form.Item label=" User ID" name="userID">
-              <Input placeholder="" size="small" onKeyDown={onKeyDownUserId} ref={userIDRef} />
-            </Form.Item>
+              <Card className='m-0 p-0' bodyStyle={{ padding: 5 }}>
+                <Row className='flex m-0 p-0 gap-3'>
+                  <Form.Item
+                    label="Barcode"
+                    name="oldBarcode"
+                    rules={[
+                      {
+                        required: true,
+                        message: BARCODE_ERR_MESSAGE.BARCODE_NOT_NULL,
+                      },
+                    ]}
+                  >
+                    <Input
+                      placeholder=""
 
-            <Form.Item label="1D Position" layout={'inline'}>
-              <div className="flex gap-0">
-                <Form.Item name="barcodePosX" layout={'inline'}>
-                  <Input
-                    placeholder="X"
-                    size="small"
-                    style={{ width: 50 }}
-                    type="number"
-                    min={0}
-                  />
-                </Form.Item>
-                <Form.Item name="barcodePosY" layout={'inline'}>
-                  <Input
-                    placeholder="Y"
-                    size="small"
-                    style={{ width: 50 }}
-                    type="number"
-                    min={0}
-                  />
-                </Form.Item>
-              </div>
+                      onKeyDown={handleEnter}
+                      className='w-[300px]'
+                      ref={barcodeRef}
+                    />
+                  </Form.Item>
+                  <Form.Item label="Pre QTY" name="preQty">
+                    <Input
+                      placeholder=""
 
-            </Form.Item>
+                      type="number"
+                      min={0}
+                      disabled={true}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    label="Change QTY"
+                    name="changeQty"
+                    rules={[
+                      {
+                        required: true,
+                        message: BARCODE_ERR_MESSAGE.QTY_NOT_NULL,
+                      },
+                    ]}>
+                    <Input
+                      placeholder=""
+                      type="number"
+                      min={0}
+                      onKeyDown={onKeyDownChangeQty}
+                      ref={changeQtyRef}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    label="QTY"
+                    name="qty">
+                    <Input
+                      placeholder=""
 
+                      type="number"
+                      min={0}
+                      value={newQty}
+                      disabled={true}
+                      onChange={onChangeNewQty} />
+                  </Form.Item>
 
-            <Form.Item label="1D Size" layout={'inline'}>
-              <div className="flex gap-0">
-                <Form.Item name="barcodeSizeX" layout={'inline'}>
-                  <Input
-                    placeholder="X"
-                    size="small"
-                    style={{ width: 50 }}
-                    type="number"
-                    min={0}
-                  />
-                </Form.Item>
+                  <Form.Item label="Remark" name="remark">
+                    <Input
+                      placeholder=""
 
-                <Form.Item name="barcodeSizeY" layout={'inline'}>
-                  <Input
-                    placeholder="Y"
-                    size="small"
-                    style={{ width: 50 }}
-                    type="number"
-                    min={0}
-                  />
-                </Form.Item>
-              </div>
-            </Form.Item>
+                      onKeyDown={onKeyDownRemark}
+                      onChange={onChangeRemark}
+                      ref={remarkRef} />
+                  </Form.Item>
+                  <Form.Item
+                    label=" User ID"
+                    name="userID">
+                    <Input
+                      placeholder=""
 
+                      onKeyDown={onKeyDownUserId}
+                      onChange={onChangeUserId}
+                      ref={userIDRef} />
+                  </Form.Item>
 
-            <Form.Item label="2D Position" layout={'inline'}>
-            <div className="flex gap-0">
-              <Form.Item name="qrcodePosX" layout={'inline'}>
-                <Input
-                  placeholder="X"
-                  size="small"
-                  style={{ width: 50 }}
-                  type="number"
-                  min={0}
-                />
-              </Form.Item>
+                  <Form.Item
+                    label="Device Printer"
+                    name="device"
+                    className='w-52'>
+                    <Select
+                      labelInValue
+                      id="typeSelect"
+                      defaultValue=""
 
-              <Form.Item name="qrcodePosY" layout={'inline'}>
-                <Input
-                  placeholder="Y"
-                  size="small"
-                  style={{ width: 50 }}
-                  type="number"
-                  min={0}
-                />
-              </Form.Item>
-              </div>
-            </Form.Item>
+                      allowClear
+                      options={optionDevices}
+                      onDropdownVisibleChange={onDropDownChange}
+                      onChange={handleOnchangeDevice}
+                    />
+                  </Form.Item>
 
-            <Form.Item label="2D Size" layout={"inline"}>
-            <div className="flex gap-0">
-              <Form.Item name="qrcodeSizeX" layout={"inline"} >
-                <Input placeholder="X" size="small" style={{ width: 50 }} type="number" min={0} />
-              </Form.Item>
-              <Form.Item name="qrcodeSizeY" layout={"inline"} >
-                <Input placeholder="Y" size="small" style={{ width: 50 }} type="number" min={0} />
-              </Form.Item>
-              </div>
-            </Form.Item>
+                </Row>
+
+              </Card>
+
+              <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600 uppercase mt-3">
+              {t('Cài đặt in tem')}
+            </h2>
+            <span className="relative size-5 shrink-0">
+            </span>
+
+              <Card className='m-0 p-0' bodyStyle={{ padding: 5 }}>
+
+                <Row className='flex m-0 p-0 gap-3'>
+
+                  <Form.Item label="1D Position" layout={'inline'}>
+                    <div className="flex gap-3">
+                      <Form.Item name="barcodePosX" layout={'inline'}>
+                        <Input
+                          placeholder="X"
+                          
+                          type="number"
+                          min={0}
+                        />
+                      </Form.Item>
+                      <Form.Item name="barcodePosY" layout={'inline'}>
+                        <Input
+                          placeholder="Y"
+                          
+                          type="number"
+                          min={0}
+                        />
+                      </Form.Item>
+                    </div>
+
+                  </Form.Item>
 
 
-            <Form.Item label="Device Printer" name="device">
-              <Select
-                labelInValue
-                id="typeSelect"
-                defaultValue=""
-                size="small"
-                style={{
-                  width: 150,
-                }}
-                allowClear
-                options={optionDevices}
-                onDropdownVisibleChange={onDropDownChange}
-                onChange={handleOnchangeDevice}
-              />
-            </Form.Item>
+                  <Form.Item label="1D Size" layout={'inline'}>
+                    <div className="flex gap-3">
+                      <Form.Item name="barcodeSizeX" layout={'inline'}>
+                        <Input
+                          placeholder="X"
+                          
+                          type="number"
+                          min={0}
+                        />
+                      </Form.Item>
+
+                      <Form.Item name="barcodeSizeY" layout={'inline'}>
+                        <Input
+                          placeholder="Y"
+                          
+                          type="number"
+                          min={0}
+                        />
+                      </Form.Item>
+                    </div>
+                  </Form.Item>
 
 
-          </Form>
+                  <Form.Item label="2D Position" layout={'inline'}>
+                    <div className="flex gap-3">
+                      <Form.Item name="qrcodePosX" layout={'inline'}>
+                        <Input
+                          placeholder="X"
+                          
+                          type="number"
+                          min={0}
+                        />
+                      </Form.Item>
 
-        </Card>
+                      <Form.Item name="qrcodePosY" layout={'inline'}>
+                        <Input
+                          placeholder="Y"
+    
+                          type="number"
+                          min={0}
+                        />
+                      </Form.Item>
+                    </div>
+                  </Form.Item>
+
+                  <Form.Item label="2D Size" layout={"inline"}>
+                    <div className="flex gap-3">
+                      <Form.Item name="qrcodeSizeX" layout={"inline"} >
+                        <Input placeholder="X"  type="number" min={0} />
+                      </Form.Item>
+                      <Form.Item name="qrcodeSizeY" layout={"inline"} >
+                        <Input placeholder="Y"  type="number" min={0} />
+                      </Form.Item>
+                    </div>
+                  </Form.Item>
+
+                </Row>
+              </Card>
+            </Form>
+
+          </Card>
+
+        </details>
+
 
         <Modal
           title="Print Label Confirmation"
-          visible={isModalVisible}
+          open={isModalVisible}
           onOk={handleBtnConfirm}
           maskClosable={false}
           closable={false}
-          width={800}
+          bodyStyle={{
+            maxHeight: '500px',
+            overflowY: 'auto', 
+          }}
+          width={600}
         >
 
           <Form
@@ -547,7 +598,6 @@ export default function BarcodeChangeAction({
             initialValues={{
               layout: 'inline',
             }}
-            onValuesChange={onFormLayoutChange}
             style={{
               maxWidth: 'inline' ? 'none' : 600,
             }}

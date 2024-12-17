@@ -199,17 +199,21 @@ export const checkConfirmNewBarcode = async (requestData) => {
       })
   }
 
-  export const getPrinterDevice = async (requestData) => {
+  export const getPrinterDevice = async (userId) => {
+
+
   
     return axios
       .get(
-        `${HOST_API_SERVER_3}/barcode-change/device-printer`,
-        requestData,
-        {
+        `${HOST_API_SERVER_3}/barcode-change/device-printer`,{
+          params: {
+            userId,
+          },
           headers: {
             'Content-Type': 'application/json',
-          },
-        },
+          }
+        }
+        
       )
       .then((response) => {
         if (response.status === 200 || response.status === 201) {

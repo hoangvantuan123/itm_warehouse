@@ -56,8 +56,16 @@ export const BARCODE_SUCCESS_MESSAGES = {
 
 
 export const BARCODE_ERR_MESSAGES = {
-  IP_OR_PORT_IS_NULL: 'IP or PORT is null.',
+  IP_OR_PORT_IS_NULL: 'No device printer has been selected yet.',
   BARCODE_ID_NOT_EXIST: 'Barcode ID is not exist',
-  BARCODE_ID_HAS_ALREADY_CHANGE: 'Barcode has already change ',
-  LABEL_SIZE_NULL: 'Label size is null.'
+  BARCODE_ID_HAS_ALREADY_CHANGE: 'Barcode has already change',
+  LABEL_SIZE_NULL: 'Label size is null',
+  LOT_ID_NOT_NULL: 'Lot ID not null',
+  LOTNO_NOT_NULL: 'Lot No not null',
+  QTY_NOT_NULL: 'QTY not null',
+  DATECODE_NOT_NULL: 'Date code not null',
+  REELNO_NOT_NULL: 'Reel No not null',
+  USER_ID_NOT_NULL: 'User ID not null',
+  BARCODEID_NOT_NULL: 'Barcode ID not null',
+  BARCODE_ID_EXIST: 'Barcode ID is exist',
 };

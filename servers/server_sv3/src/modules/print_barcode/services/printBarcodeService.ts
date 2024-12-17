@@ -71,7 +71,11 @@ export class PrintBarcodeService {
 
     async printBarcode(barcodeDto: any) {
 
-        this.validDto(barcodeDto);
+        const rCheck = await this.validDto(barcodeDto);
+        
+        if(rCheck != null && rCheck.status == false){
+            return rCheck;
+        }
         this.isExistData(barcodeDto);
         const listDataLabel = [];
         listDataLabel.push(...barcodeDto.listSelected)
@@ -119,7 +123,8 @@ export class PrintBarcodeService {
                 }
 
             } catch (err) {
-                error('Error connecting to printer:', err);
+                this.logger.error('Error connecting to printer:', err);
+                
                 return {
                     status: false,
                     message: err,
@@ -220,10 +225,51 @@ export class PrintBarcodeService {
     };
 
 
-    async validDto(barcodeDto: BarcodeDto) {
+    async validDto(barcodeDto: any) {
 
         if (barcodeDto == null) {
             throw new Error("INVALID_OBJECT");
+        }
+
+        if (Array.isArray(barcodeDto?.listSelected) && barcodeDto?.listSelected.length == 1){
+            const newBarcode = barcodeDto?.listSelected[0];
+
+            if(newBarcode?.LOT_ID == null || newBarcode?.LOT_ID == '' ){
+                return {
+                    status: false,
+                    message: BARCODE_ERR_MESSAGES.LOT_ID_NOT_NULL,
+                }
+            }
+            if(newBarcode?.LOTNO == null || newBarcode?.LOTNO == '' ){
+                return {
+                    status: false,
+                    message: BARCODE_ERR_MESSAGES.LOTNO_NOT_NULL,
+                }
+            }
+            if(newBarcode?.QTY == null || newBarcode?.QTY == '' ){
+                return {
+                    status: false,
+                    message: BARCODE_ERR_MESSAGES.QTY_NOT_NULL,
+                }
+            }
+            if(newBarcode?.DATECODE == null || newBarcode?.DATECODE == '' ){
+                return {
+                    status: false,
+                    message: BARCODE_ERR_MESSAGES.DATECODE_NOT_NULL,
+                }
+            }
+            if(newBarcode?.REELNO == null || newBarcode?.REELNO == '' ){
+                return {
+                    status: false,
+                    message: BARCODE_ERR_MESSAGES.REELNO_NOT_NULL,
+                }
+            }
+            if(newBarcode?.USER_ID == null || newBarcode?.USER_ID == '' ){
+                return {
+                    status: false,
+                    message: BARCODE_ERR_MESSAGES.USER_ID_NOT_NULL,
+                }
+            }
         }
 
     };
@@ -258,6 +304,12 @@ export class PrintBarcodeService {
 
         let lotID = itemLabel.ITEMCD + '/' + itemLabel.LOTNO + '/' + itemLabel.QTY + '/' + itemLabel.DATECODE + '/' + itemLabel.REELNO;
 
+        const isExist = await this.isExistBarcode(lotID);
+
+        if (isExist != null  && isExist.status == false){
+            return isExist;
+        }
+        
         let query = ` INSERT INTO EWIPRMTBCI (
                                 plant, 
                                 tran_code, 
@@ -369,6 +421,28 @@ export class PrintBarcodeService {
             throw new Error(`Error insert data : ${e}`);
         }
     };
+
+    async isExistBarcode (barcode: any) : Promise<any>{
+
+        const qCheck  = ` SELECT COUNT(*) AS count_ewip FROM EWIPRMTBCI WHERE LOT_ID LIKE '${barcode}' ;`;
+        try {
+            const result = await this.databaseService.executeQuery(qCheck);
+            if(result[0]?.count_ewip != null && result[0]?.count_ewip > 0 ){
+                return {
+                    status: false,
+                    message: BARCODE_ERR_MESSAGES.BARCODE_ID_EXIST,
+                }
+            }
+        }
+        catch(err){
+            return {
+                status: false,
+                message: err,
+            }
+
+        }
+        
+    }
 
     async GetBarcodeInNo(): Promise<string> {
         let vInNo: string = '';

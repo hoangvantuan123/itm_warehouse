@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet';
 import { Typography, Layout, message, Form } from 'antd';
+import { FilterOutlined } from '@ant-design/icons'
+
 const { Title } = Typography;
 const { Header, Content } = Layout;
 import 'moment/locale/vi';
@@ -12,6 +14,8 @@ import { CreatePrintLabel, CreatePrintLabelBySize, getLotCount, getMatIdByVendor
 import { createChangeBarcode, getPrinterDevice } from '../../../features/barcode/barcodeChangeService';
 import ModalWaiting from '../../components/modal/material/modalWaiting';
 import { BARCODE_ERR_MESSAGE, BARCODE_SUCCESS_MESSAGE, VENDOR_ERR_MESSAGE } from '../../../utils/constants';
+import { ArrowIcon } from '../../components/icons';
+import BarcodePrintQuery from '../../components/actions/barcodePrint/barcodePrintQuery';
 
 export default function BarcodePrint({ permissions, isMobile }) {
     const [formQuery] = Form.useForm();
@@ -36,6 +40,7 @@ export default function BarcodePrint({ permissions, isMobile }) {
     const [optionDevices, setOptionDevices] = useState([]);
     const [device, setDevice] = useState('');
 
+    const [barcode, setBarcode] = useState('');
     const [acVendor, setAcVendor] = useState();
     const [acPartNoVendor, setAcPartNo] = useState(null);
     const [acMatId, setAcMatId] = useState('');
@@ -57,19 +62,20 @@ export default function BarcodePrint({ permissions, isMobile }) {
     const userIdRef = useRef(null);
     const remarkRef = useRef(null);
     const lotTotalCNTRef = useRef(null);
+    const barcodeRef = useRef(null);
 
     const [sizeLabel, setSizeLabel] = useState({
 
-        barCodePosX: Number(0),
-        barCodePosY: Number(0),
+        barCodePosX: Number(180),
+        barCodePosY: Number(30),
         barCodeSizeX: Number(1),
-        barCodeSizeY: Number(20),
-        QrPosX: Number(0),
-        QrPosY: Number(0),
-        QrSizeX: Number(40),
-        QrSizeY: Number(0),
-        paperSizeX: Number(0),
-        paperSizeY: Number(0),
+        barCodeSizeY: Number(1),
+        QrPosX: Number(700),
+        QrPosY: Number(60),
+        QrSizeX: Number(3.5),
+        QrSizeY: Number(3.5),
+        paperSizeX: Number(790),
+        paperSizeY: Number(160),
 
     });
 
@@ -106,6 +112,25 @@ export default function BarcodePrint({ permissions, isMobile }) {
         }
     }
 
+    const fetchData = async () => {
+        setData([]);
+        setLoading(true);
+        let loadingMessage;
+        try {
+            loadingMessage = message.loading('Please  Wait...', 0,);
+            const itemList = await GetPageItem(
+                formatDate(fromDate),
+                formatDate(toDate),
+            );
+            setData(itemList?.data.data || [])
+        } catch (error) {
+            setData([])
+        } finally {
+            if (loadingMessage) loadingMessage()
+            setLoading(false)
+        }
+    }
+
     const getMultiSelectedRows = () => {
         const selectedRows = selectRow.rows.items
 
@@ -132,10 +157,10 @@ export default function BarcodePrint({ permissions, isMobile }) {
                 const result = await getPrinterDevice(body);
                 if (result?.result) {
                     const data = result.result;
-                    const formattedOptions = data.map((item) => ({
+                    const formattedOptions = data.map((item, index) => ({
                         label: item.ip,
                         value: `${item.ip}:${item.port}`,
-                        key: item.userid,
+                        key: index.toString(),
                     }));
                     setOptionDevices([...formattedOptions]);
                 }
@@ -149,41 +174,78 @@ export default function BarcodePrint({ permissions, isMobile }) {
             }
         };
 
+        const userInfo = localStorage.getItem('userInfo');
+        const parsedData = JSON.parse(userInfo);
+
         if (e) {
-            getDeviceOptions();
+            getDeviceOptions(parsedData.UserId);
         }
+
     }
 
     const handleOnchangeDevice = (e) => {
-        setDevice(e.value);
+        if (!e) {
+            setDevice('')
+        }
+        else {
+            setDevice(e.value);
+        }
 
     }
 
     const onChangeVendor = (e) => {
-        setAcVendor(e.value);
+        if (e != null) {
+            const vendor = e.value;
+            setAcVendor(e.value);
+            switch (vendor) {
+                case "ABLIC":
+                    barcodeRef.current.focus();
+                    break;
+                case "SMK":
+                    barcodeRef.current.focus();
+                    break;
+                case "INFINEON":
+                    lotNoRef.current.focus();
+                    break;
+                case "MITSUMI":
+                    lotNoRef.current.focus();
+                    break;
+                case "NISSHINBO":
+                    barcodeRef.current.focus();
+                    break;
+                default:
+                    break;
+            }
 
-        setAcPartNo('')
-        setAcMatId('')
-        setAcLotTotalCnt(0);
-        setAcLotNo('');
-        setAcQty('');
-        setAcDateCode('');
-        setAcReelNo('');
-        setAcUserId('');
-        setAcIssueNo('');
-        setAcRemark('');
-
-        formQuery.setFieldsValue({
-            partNo: '',
-            matID: '',
-            lotTotalCNT: '',
-            lotNo: '',
-            qty: '',
-            dateCode: '',
-            reelNo: '',
-        });
+            setAcPartNo('')
+            setAcMatId('')
+            setAcLotTotalCnt(0);
+            setAcLotNo('');
+            setAcQty('');
+            setAcDateCode('');
+            setAcReelNo('');
+            setAcUserId('');
+            setAcIssueNo('');
+            setAcRemark('');
+            setDevice(null);
 
 
+            formQuery.setFieldsValue({
+                partNo: '',
+                matID: '',
+                lotTotalCNT: '',
+                lotNo: '',
+                qty: '',
+                dateCode: '',
+                reelNo: '',
+                device: '',
+                barcode: '',
+                userID: '',
+                remark: '',
+            });
+
+
+        }
     }
 
     const onClearVendorValue = () => {
@@ -416,7 +478,8 @@ export default function BarcodePrint({ permissions, isMobile }) {
                         partNo = arrLotNo[1];
                         matId = await getValueMatId(partNo);
                         lotNoSplit = arrLotNo[3];
-                        dateCode = arrLotNo[2];
+                        dateCode = arrLotNo[5];
+                        qty = arrLotNo[2];
                         reelNo = arrLotNo[6].trimEnd().slice(-4);
                         lotTotalQty = await getLotCountByLotNo(lotNoSplit);
 
@@ -673,10 +736,170 @@ export default function BarcodePrint({ permissions, isMobile }) {
 
     }
 
+    const onChangeUserId = (e) => {
+        const iUserId = e.target.value;
+        setAcUserId(iUserId);
+    }
+
     const onKeyDownRemark = (e) => {
+        const iRemark = e.target.value;
+        if(acRemark != null){
+            setAcRemark(iRemark);
+        }
+        
+    }
+
+    const onChangeRemark = (e) => {
         const iRemark = e.target.value;
         setAcRemark(iRemark);
     }
+
+    const onKeyDownBarcode = useCallback(
+        async (e) => {
+
+            const setAcValue = (partNo, matId, lotNoSplit, qty, dateCode, reelNo, lotTotalQty) => {
+                setAcPartNo(partNo);
+                setAcMatId(matId.data);
+                setAcLotNo(lotNoSplit);
+                setAcQty(qty);
+                setAcDateCode(dateCode);
+                setAcReelNo(reelNo);
+                setAcLotTotalCnt(lotTotalQty.LotCount);
+            };
+
+            if (e.key == 'Enter') {
+                const lotNo = e.target.value;
+                let arrLotNo = [];
+                let lotNoSplit = '';
+                let reelNo = '';
+                let lotTotalQty = 0;
+                let matId = '';
+                let qty = '';
+                let dateCode = '';
+                let partNo = '';
+
+                if (!acVendor) {
+                    setModal2Open(true);
+                    setError(BARCODE_ERR_MESSAGE.VENDOR_NOT_SELECT);
+                    resetAllState();
+                    return;
+                }
+
+                if (acVendor == 'ABLIC') {
+                    const lengthLotNo = lotNo.split('$').length - 1;
+                    if (lengthLotNo === 6) {
+                        const arrLotNo = lotNo.split('$');
+                        partNo = arrLotNo[1];
+                        matId = await getValueMatId(partNo);
+                        lotNoSplit = arrLotNo[3];
+                        dateCode = arrLotNo[5];
+                        qty = arrLotNo[2];
+                        reelNo = arrLotNo[6].trimEnd().slice(-4);
+                        lotTotalQty = await getLotCountByLotNo(lotNoSplit);
+
+                        setAcValue(partNo, matId, lotNoSplit, qty, dateCode, reelNo, lotTotalQty);
+                        formQuery.setFieldsValue({
+                            partNo: partNo,
+                            matID: matId?.data || '',
+                            lotTotalCNT: lotTotalQty?.LotCount || 0,
+                            lotNo: lotNoSplit,
+                            qty: qty,
+                            dateCode: dateCode,
+                            reelNo: reelNo,
+                        });
+
+                        qtyRef.current.focus();
+
+                    } else {
+                        setModal2Open(true);
+                        setError(VENDOR_ERR_MESSAGE.ABLIC_NOT_FIT);
+                        return;
+                    }
+                }
+                if (acVendor == 'SMK') {
+                    const lengthLotNo = Number(lotNo.split(',').length - 1);
+                    if (lengthLotNo == 5) {
+                        const arrLotNo = lotNo.split(',');
+                        partNo = arrLotNo[2].slice(1);
+                        matId = await getValueMatId(partNo);
+                        lotNoSplit = arrLotNo[4].slice(1);
+                        qty = arrLotNo[1].slice(1);
+                        dateCode = arrLotNo[3].slice(1);
+                        reelNo = arrLotNo[5].slice(2);
+                        lotTotalQty = await getLotCountByLotNo(lotNoSplit);
+
+                        setAcValue(partNo, matId, lotNoSplit, qty, dateCode, reelNo, lotTotalQty);
+                        formQuery.setFieldsValue({
+                            partNo: partNo,
+                            matID: matId?.data || '',
+                            lotTotalCNT: lotTotalQty?.LotCount || 0,
+                            lotNo: lotNoSplit,
+                            qty: qty,
+                            dateCode: dateCode,
+                            reelNo: reelNo,
+                            barcode: ''
+                        });
+
+                        userIdRef.current.focus();
+                        return;
+
+
+                    } else {
+                        setModal2Open(true);
+                        setError(VENDOR_ERR_MESSAGE.SMK_NOT_FIT);
+                        return;
+                    }
+                }
+                if (acVendor == 'NISSHINBO') {
+                    const lengthLotNo = Number(lotNo.split(',').length - 1);
+                    if (lengthLotNo == 4) {
+                        const arrLotNo = lotNo.split(',');
+                        partNo = arrLotNo[0];
+                        matId = await getValueMatId(partNo);
+                        lotNoSplit = arrLotNo[4];
+                        qty = arrLotNo[1];
+                        dateCode = arrLotNo[3].substring(0, 4);
+                        reelNo = await getValueReelNoByLotNo(lotNoSplit)
+                        lotTotalQty = await getLotCountByLotNo(lotNoSplit);
+
+                        setAcValue(partNo, matId, lotNoSplit, qty, dateCode, reelNo, lotTotalQty);
+                        formQuery.setFieldsValue({
+                            partNo: partNo,
+                            matID: matId?.data || '',
+                            lotTotalCNT: lotTotalQty?.LotCount || 0,
+                            lotNo: lotNoSplit,
+                            qty: qty,
+                            dateCode: dateCode,
+                            reelNo: reelNo,
+                        });
+                    } else {
+                        setModal2Open(true);
+                        setError(VENDOR_ERR_MESSAGE.NISSHINBO_NOT_FIT);
+                        resetAllState();
+                        return;
+                    }
+                }
+
+                userIdRef.current.focus();
+                formQuery.setFieldsValue({ barcode: '' })
+
+            }
+        }, [
+        acVendor,
+        acPartNoVendor,
+        acMatId,
+        acLotTotalCnt,
+        acLotNo,
+        acQty,
+        acDateCode,
+        acReelNo,
+        acUserId,
+        acIssueNo,
+        acRemark,
+        formQuery,
+
+    ]
+    )
 
     const onClickPrint = useCallback(
         async () => {
@@ -722,7 +945,7 @@ export default function BarcodePrint({ permissions, isMobile }) {
                 }
                 else {
                     setModal2Open(true);
-                    setError(BARCODE_ERR_MESSAGE.PRINTER_ERROR);
+                    setError(result.result.message);
                 }
 
             } catch (error) {
@@ -782,12 +1005,20 @@ export default function BarcodePrint({ permissions, isMobile }) {
         setAcUserId('');
         setAcIssueNo('');
         setAcRemark('');
+        setDevice('')
+
         formQuery.resetFields();
+        formPreview.resetFields();
     };
 
-    useEffect(() => {
+    const onClickReset = () => {
+        resetAllState();
+    }
+
+    useEffect((e) => {
 
         resetAllState();
+        fetchData();
 
     }, [])
 
@@ -899,51 +1130,83 @@ export default function BarcodePrint({ permissions, isMobile }) {
                         {t('PRINT BARCODE')}
                     </Title>
 
+                    <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
+                        <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600 uppercase">
+                            <FilterOutlined />
+                            {t('Điều kiện truy vấn')}
+                        </h2>
+
+                    </summary>
+
                     <BarcodePrintAction
-                        formQuery={formQuery}
                         fromDate={fromDate}
                         toDate={toDate}
-
                         onFinish={onFinish}
                         onClickPrint={onClickPrint}
-                        isModalVisible={isModalVisible}
-                        onClickCancel={onClickCancel}
-
-                        onDropDownChange={onDropDownChange}
-                        optionDevices={optionDevices}
-                        handleOnchangeDevice={handleOnchangeDevice}
-
-                        onChangeVendor={onChangeVendor}
-                        onClearVendorValue={onClearVendorValue}
-                        onKeyDownPartNo={onKeyDownPartNo}
-                        onKeyDownMatId={onKeyDownMatId}
-                        onKeyDownLotTotalCnt={onKeyDownLotTotalCnt}
-                        onKeyDownLotNo={onKeyDownLotNo}
-                        onKeyDownQty={onKeyDownQty}
-                        onKeyDownDateCode={onKeyDownDateCode}
-                        onKeyDownReelNo={onKeyDownReelNo}
-                        onKeyDownUserId={onKeyDownUserId}
-                        onKeyDownRemark={onKeyDownRemark}
-
-                        partNoRef={partNoRef}
-                        matIdRef={matIdRef}
-                        lotNoRef={lotNoRef}
-                        qtyRef={qtyRef}
-                        dateCodeRef={dateCodeRef}
-                        reelNoRef={reelNoRef}
-                        userIdRef={userIdRef}
-                        remarkRef={remarkRef}
-                        lotTotalCNTRef={lotTotalCNTRef}
-
-                        formPreview={formPreview}
-                        onFinishPreview={onFinishPreview}
-                        sizeLabel={sizeLabel}
-                        setPreviewLabel={setPreviewLabel}
-                        previewLabel={previewLabel}
-                        label={label}
-                        onClickOk={onClickOk}
-
                     />
+                    <details
+                        className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
+                        open
+                    >
+                        <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
+                            <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600 uppercase">
+                                <FilterOutlined />
+                                {t('Thông tin chi tiết')}
+                            </h2>
+                            <span className="relative size-5 shrink-0">
+                                <ArrowIcon />
+                            </span>
+                        </summary>
+                        <BarcodePrintQuery
+                            formQuery={formQuery}
+
+                            onClickPrint={onClickPrint}
+                            isModalVisible={isModalVisible}
+                            onClickCancel={onClickCancel}
+
+                            onDropDownChange={onDropDownChange}
+                            optionDevices={optionDevices}
+                            handleOnchangeDevice={handleOnchangeDevice}
+
+                            onChangeVendor={onChangeVendor}
+                            onClearVendorValue={onClearVendorValue}
+                            onKeyDownPartNo={onKeyDownPartNo}
+                            onKeyDownMatId={onKeyDownMatId}
+                            onKeyDownLotTotalCnt={onKeyDownLotTotalCnt}
+                            onKeyDownLotNo={onKeyDownLotNo}
+                            onKeyDownQty={onKeyDownQty}
+                            onKeyDownDateCode={onKeyDownDateCode}
+                            onKeyDownReelNo={onKeyDownReelNo}
+                            onKeyDownUserId={onKeyDownUserId}
+                            onChangeUserId={onChangeUserId}
+                            onKeyDownRemark={onKeyDownRemark}
+                            onChangeRemark = {onChangeRemark}
+                            onKeyDownBarcode={onKeyDownBarcode}
+
+                            partNoRef={partNoRef}
+                            matIdRef={matIdRef}
+                            lotNoRef={lotNoRef}
+                            qtyRef={qtyRef}
+                            dateCodeRef={dateCodeRef}
+                            reelNoRef={reelNoRef}
+                            userIdRef={userIdRef}
+                            remarkRef={remarkRef}
+                            lotTotalCNTRef={lotTotalCNTRef}
+                            barcodeRef={barcodeRef}
+
+                            formPreview={formPreview}
+                            onFinishPreview={onFinishPreview}
+                            sizeLabel={sizeLabel}
+                            setPreviewLabel={setPreviewLabel}
+                            previewLabel={previewLabel}
+                            label={label}
+                            onClickOk={onClickOk}
+                            onClickReset={onClickReset}
+                        />
+                    </details>
+
+
+
                 </Header>
 
                 <Content className="flex-grow px-4  bg-slate-50">

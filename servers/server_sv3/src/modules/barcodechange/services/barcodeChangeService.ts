@@ -11,7 +11,7 @@ import { BarcodeChange } from '../models/baseDto';
 export class BarcodeChangeService {
     constructor(
         private readonly databaseService: DatabaseService,
-    
+
     ) { }
 
     private readonly logger = new Logger(BarcodeChangeService.name, { timestamp: true })
@@ -41,13 +41,13 @@ export class BarcodeChangeService {
         if (dateTo == null) {
             dateTo = '';
         }
-        if (lotNo == null) {
+        if (lotNo == null || lotNo == '') {
             lotNo = '';
         }
-        if (matID == null) {
+        if (matID == null || matID == '') {
             matID = '';
         }
-        if (barcode == null) {
+        if (barcode == null || barcode == '') {
             barcode = '';
         }
 
@@ -67,7 +67,10 @@ export class BarcodeChangeService {
 
     async printBarcode(barcodeDto: any) {
 
-        this.validDto(barcodeDto);
+        const rCheck  = await this.validDto(barcodeDto);
+        if(rCheck != null && rCheck.status == false){
+            return rCheck;
+        }
         this.isExistData(barcodeDto);
         const listDataLabel = [];
         listDataLabel.push(...barcodeDto.listSelected)
@@ -84,7 +87,7 @@ export class BarcodeChangeService {
         const ip = device[0] || '';
         const port = device[1] || 0;
 
-        const qTemplateLabel = ` SELECT label, value FROM tbl_zplcode WHERE (1=1) AND label LIKE 'barcode-change'`.trim();
+        const qTemplateLabel = ` SELECT label, value FROM ZPLCODE WHERE (1=1) AND label LIKE 'barcode-change'`.trim();
         const rTemplateLabel = await this.databaseService.executeQuery(
             qTemplateLabel
         );
@@ -128,7 +131,7 @@ export class BarcodeChangeService {
 
                 if (barcodeDto.isConfirm && data.NewStatus == '' && printResult == true) {
                     try {
-                         await this.createBarcodeChange(barcodeDto.listSelected[0]);
+                        await this.createBarcodeChange(barcodeDto.listSelected[0]);
                     } catch (err) {
                         this.logger.error('Error execute query: ', err);
                     }
@@ -174,10 +177,57 @@ export class BarcodeChangeService {
         return result;
     };
 
-    async validDto(barcodeDto: BarcodeChange) {
+    async validDto(barcodeDto: any) {
 
         if (barcodeDto == null) {
             throw new Error("INVALID_OBJECT");
+        }
+        if (Array.isArray(barcodeDto?.listSelected) && barcodeDto?.listSelected.length == 1) {
+            const newBarcode = barcodeDto?.listSelected[0];
+
+            if (newBarcode?.BarcodeID == null || newBarcode?.BarcodeID == '') {
+                return {
+                    status: false,
+                    message: BARCODE_ERR_MESSAGES.BARCODEID_NOT_NULL,
+                }
+            }
+
+            if (newBarcode?.NewBarcodeID == null || newBarcode?.NewBarcodeID == '') {
+                return {
+                    status: false,
+                    message: BARCODE_ERR_MESSAGES.LOT_ID_NOT_NULL,
+                }
+            }
+            if (newBarcode?.LotNo == null || newBarcode?.LotNo == '') {
+                return {
+                    status: false,
+                    message: BARCODE_ERR_MESSAGES.LOTNO_NOT_NULL,
+                }
+            }
+            if (newBarcode?.NewQty == null || newBarcode?.NewQty == '') {
+                return {
+                    status: false,
+                    message: BARCODE_ERR_MESSAGES.QTY_NOT_NULL,
+                }
+            }
+            if (newBarcode?.DateCode == null || newBarcode?.DateCode == '') {
+                return {
+                    status: false,
+                    message: BARCODE_ERR_MESSAGES.DATECODE_NOT_NULL,
+                }
+            }
+            if (newBarcode?.ReelNo == null || newBarcode?.ReelNo == '') {
+                return {
+                    status: false,
+                    message: BARCODE_ERR_MESSAGES.REELNO_NOT_NULL,
+                }
+            }
+            if (newBarcode?.UserID == null || newBarcode?.UserID == '') {
+                return {
+                    status: false,
+                    message: BARCODE_ERR_MESSAGES.USER_ID_NOT_NULL,
+                }
+            }
         }
 
     };
@@ -208,7 +258,7 @@ export class BarcodeChangeService {
         }
     }
 
-    async confirmBarcode(dataBarcode: any[]) : Promise<any> {
+    async confirmBarcode(dataBarcode: any[]): Promise<any> {
         const res = [];
 
         for (const data of dataBarcode) {
@@ -221,7 +271,7 @@ export class BarcodeChangeService {
                 await this.databaseService.executeQuery(
                     query
                 );
-                this.logger.log('Confirm barcode', query);  
+                this.logger.log('Confirm barcode', query);
             } catch (error) {
                 return {
                     status: false,
@@ -246,7 +296,7 @@ export class BarcodeChangeService {
                @pBarcode = '${barcode.oldBarcode}',
                @pNewBarcode = '${barcode.newBarcode}'
          `.trim();
-         this.logger.log('Check new barcode', query);
+        this.logger.log('Check new barcode', query);
         const result = await this.databaseService.executeQuery(
             query
         );
@@ -277,7 +327,7 @@ export class BarcodeChangeService {
             qDuplicate
         );
 
-        if(!result){
+        if (!result) {
             return {
                 status: false,
                 message: BARCODE_ERR_MESSAGES.BARCODE_ID_NOT_EXIST,
@@ -285,7 +335,7 @@ export class BarcodeChangeService {
             }
         }
 
-        if (rDuplicate[0].cBarcode > 0){
+        if (rDuplicate[0].cBarcode > 0) {
             return {
                 status: false,
                 message: BARCODE_ERR_MESSAGES.BARCODE_ID_HAS_ALREADY_CHANGE,
@@ -300,8 +350,8 @@ export class BarcodeChangeService {
         }
     };
 
-    async getPrinter(name: any): Promise<any[]> {
-        const query = ` SELECT userid, ip, port FROM Printer WHERE (1=1) `.trim();
+    async getPrinter(userId: any): Promise<any[]> {
+        const query = ` SELECT userid, ip, port FROM Printer WHERE (1=1) AND userId LIKE '${userId}'`.trim();
         const result = await this.databaseService.executeQuery(
             query
         );
