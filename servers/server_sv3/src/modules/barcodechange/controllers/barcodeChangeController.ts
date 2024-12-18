@@ -14,7 +14,7 @@ export class BarcodeChangeController {
         @Query("fromDate") dateFr: string,
         @Query("toDate") dateTo: string,
         @Query("lotNo") lotNo: string,
-        @Query("matId") matID: string,
+        @Query("matID") matID: string,
         @Query("barcode") barcode: string,
         @Query("pageIndex") pageIndex: number,
         @Query("pageSize") pageSize: number,
@@ -117,10 +117,10 @@ export class BarcodeChangeController {
 
     @Get('device-printer')
     async searchByPrinter(
-        @Param("name") name?: any
+        @Query("userId") userId?: any
     ) {
         try {
-            const result = await this.barcodeChangeService.getPrinter(name);
+            const result = await this.barcodeChangeService.getPrinter(userId);
             return { result };
         } catch (error) {
             return {

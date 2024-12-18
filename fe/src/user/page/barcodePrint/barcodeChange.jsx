@@ -43,6 +43,7 @@ export default function BarcodeChange({ permissions, isMobile }) {
     const [Remark, setRemark] = useState('');
     const [UserID, setUserID] = useState('');
     const [device, setDevice] = useState('');
+    const barcodeRef = useState(null);
     const changeQtyRef = useRef(null);
     const remarkRef = useRef(null);
     const [optionDevices, setOptionDevices] = useState([]);
@@ -64,20 +65,18 @@ export default function BarcodeChange({ permissions, isMobile }) {
         return rows
     }
 
-    const getValues = () => {
-        const values = formChange.getFieldsValue()
-    }
 
     useEffect(() => {
 
         formChange.resetFields();
-        const unsubscribe = formChange.setFieldsValue(() => {
-            getValues();
-        });
 
-
-        return () => unsubscribe;
     }, [formChange]);
+
+    useEffect(() => {
+
+        fetchData();
+        resetAllData();
+    }, []);
 
     const onFinish = async (e) => {
         setData([]);
@@ -100,6 +99,29 @@ export default function BarcodeChange({ permissions, isMobile }) {
                 lotNo,
                 matID,
                 barcode,
+            )
+
+            setData(result.data.data || [])
+        } catch (err) {
+            setData([])
+        }
+        finally {
+            setLoading(false);
+            if(loadingMessage) loadingMessage();
+        }
+    }
+
+    const fetchData = async() => {
+        setData([]);
+        
+        let loadingMessage;
+
+        try {
+            setLoading(true);
+            loadingMessage = message.loading("Please Wait...", 0, );
+            const result = await searchPage(
+                formatDate(fromDate),
+                formatDate(toDate),
             )
 
             setData(result.data.data || [])
@@ -148,6 +170,7 @@ export default function BarcodeChange({ permissions, isMobile }) {
                     setError(result.message + ': ' + result.data);
                 resetAllData();
                 formChange.resetFields();
+                barcodeRef.current.focus();
             } else {
                 oldQty = Number(arrLot[2]);
                 setBarcodeID(inputValue);
@@ -192,13 +215,9 @@ export default function BarcodeChange({ permissions, isMobile }) {
 
         const handleCreateChangeBarcode = async (body) => {
             try {
-                const result = await createChangeBarcode(body);
-                if (result && result.result.status) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
+
+                return await createChangeBarcode(body);
+                
             } catch (err) {
                 console.error('Error creating barcode change:', err);
                 message.error(BARCODE_ERR_MESSAGE.PRINTER_ERROR);
@@ -208,11 +227,13 @@ export default function BarcodeChange({ permissions, isMobile }) {
         if (listSelected.length >= 1) {
             const body = createPayload(false, listSelected, device);
             const isSucces = await handleCreateChangeBarcode(body);
-            if (isSucces) {
-                message.info(BARCODE_SUCCESS_MESSAGE.PRINTER_SUCCESS);
+            if (isSucces.result.status) {
+                message.success(BARCODE_SUCCESS_MESSAGE.PRINTER_SUCCESS);
                 return;
             } else {
-                message.error(BARCODE_ERR_MESSAGE.PRINTER_ERROR);
+                setModal2Open(true),
+                setError(isSucces.result.message);
+                resetAllData();
                 return;
             }
         } else {
@@ -234,14 +255,16 @@ export default function BarcodeChange({ permissions, isMobile }) {
             const body = createPayload(true, [singleRow], device);
             const isSucces = await handleCreateChangeBarcode(body);
 
-            if (isSucces) {
-                message.info(BARCODE_SUCCESS_MESSAGE.PRINTER_SUCCESS);
+            if (isSucces.result.status) {
+                message.success(BARCODE_SUCCESS_MESSAGE.PRINTER_SUCCESS);
                 setIsModalVisible(true);
                 resetAllData();
                 return;
             }
             else {
-                message.error(BARCODE_ERR_MESSAGE.PRINTER_ERROR);
+                setModal2Open(true),
+                setError(isSucces.result.message);
+                resetAllData();
                 return;
             }
         }
@@ -283,10 +306,10 @@ export default function BarcodeChange({ permissions, isMobile }) {
                     const data = result.result;
 
 
-                    const formattedOptions = data.map((item) => ({
+                    const formattedOptions = data.map((item, index) => ({
                         label: item.ip,
                         value: `${item.ip}:${item.port}`,
-                        key: item.userid,
+                        key: index.toString(),
                     }));
 
                     setOptionDevices([...formattedOptions]);
@@ -302,14 +325,22 @@ export default function BarcodeChange({ permissions, isMobile }) {
             }
         };
 
+        const userInfo =  localStorage.getItem('userInfo');
+        const parsedData = JSON.parse(userInfo);
+
         if (e) {
-            getDeviceOptions();
+            getDeviceOptions(parsedData.UserId);
         }
 
     }
 
     const handleOnchangeDevice = (e) => {
-        setDevice(e.value);
+        
+        if(!e){
+            setDevice(null);
+        }else{
+            setDevice(e.value);
+        }  
 
     }
 
@@ -325,6 +356,7 @@ export default function BarcodeChange({ permissions, isMobile }) {
         setRemark('');
         setUserID('');
         setDevice('');
+        formChange.resetFields();
     }
 
     return (
@@ -350,6 +382,7 @@ export default function BarcodeChange({ permissions, isMobile }) {
 
                         formChange={formChange}
                         onKeyDownChangeQty={onKeyDownChangeQty}
+                        barcodeRef = {barcodeRef}
                         changeQtyRef={changeQtyRef}
                         remarkRef={remarkRef}
                         onChangeNewQty={onChangeNewQty}

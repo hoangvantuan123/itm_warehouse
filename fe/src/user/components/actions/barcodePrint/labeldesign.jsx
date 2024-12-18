@@ -34,8 +34,8 @@ const LabelItem = ({ label, dataSize }) => {
       <div className="flex flex-col justify-center items-center mt-1 col-span-4 ">
         <Barcode
           value={labelData.barcodeData}
-          width={size.barCodeSizeX}
-          height={size.barCodeSizeY}
+          width={1}
+          height={20}
           displayValue={false}
           margin={0}
         />
@@ -60,7 +60,7 @@ const LabelItem = ({ label, dataSize }) => {
           <QRCode
             type="svg"
             value={labelData.barcodeData}
-            size={size.QrSizeX}
+            size={40}
             bordered={false}
           />
         </div>
