@@ -12,7 +12,7 @@ import DrawerAddMenu from '../../components/drawer/system/addMenu'
 import { GetAllMenus } from '../../../features/system/getMenus'
 import { DeleteMenus } from '../../../features/system/deleteMenus'
 import { CompactSelection } from '@glideapps/glide-data-grid'
-import { filterAndSelectColumnsU } from '../../../utils/filterU'
+import { filterAndSelectColumns } from '../../../utils/filterUorA'
 import { filterAndSelectColumnsA } from '../../../utils/filterA'
 import { PostAddMenu } from '../../../features/system/postAddMenu'
 import { PostUpdateMenu } from '../../../features/system/postUpdateMenu'
@@ -29,20 +29,21 @@ export default function MenuTechnique({ permissions, isMobile }) {
   })
   const [showSearch, setShowSearch] = useState(false)
   const [lastClickedCell, setLastClickedCell] = useState(null)
-  const [addedRows, setAddedRows] = useState([]);
-  const [editedRows, setEditedRows] = useState([]);
+  const [addedRows, setAddedRows] = useState([])
+ 
+  const [editedRows, setEditedRows] = useState([])
   const [clickedRowData, setClickedRowData] = useState(null)
   const [isMinusClicked, setIsMinusClicked] = useState(false)
-  const [numRowsToAdd, setNumRowsToAdd] = useState(null);
+  const [numRowsToAdd, setNumRowsToAdd] = useState(null)
 
-  const [clickCount, setClickCount] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSent, setIsSent] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isEditing, setIsEditing] = useState(false);
-  const [openHelp, setOpenHelp] = useState(false);
+  const [clickCount, setClickCount] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSent, setIsSent] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+  const [isEditing, setIsEditing] = useState(false)
+  const [openHelp, setOpenHelp] = useState(false)
 
-  const [isCellSelected, setIsCellSelected] = useState(false);
+  const [isCellSelected, setIsCellSelected] = useState(false)
   const [isCell, setIsCell] = useState(null)
   const [onSelectRow, setOnSelectRow] = useState([])
   const [keySelectColumn, setKeySelectColumn] = useState(false)
@@ -78,36 +79,33 @@ export default function MenuTechnique({ permissions, isMobile }) {
     setIsModalOpen(false)
   }
 
-
   const getSelectedRows = () => {
-    const selectedRows = selection.rows.items;
-    let rows = [];
+    const selectedRows = selection.rows.items
+    let rows = []
 
     selectedRows.forEach((range) => {
-      const start = range[0];
-      const end = range[1] - 1;
+      const start = range[0]
+      const end = range[1] - 1
 
       for (let i = start; i <= end; i++) {
         if (editedRows[i]) {
-          rows.push(editedRows[i]);
+          rows.push(editedRows[i])
         }
       }
-    });
+    })
 
-    return rows;
-  };
-
+    return rows
+  }
 
   const handleDeleteDataSheet = useCallback(
     async (e) => {
-      const selectedRows = getSelectedRows();
+      const selectedRows = getSelectedRows()
 
-      console.log('selectedRows', selectedRows);
-      console.log('remainingRows', remainingRows);
+      console.log('selectedRows', selectedRows)
+      console.log('remainingRows', remainingRows)
     },
-    [selection, editedRows]
-  );
-
+    [selection, editedRows],
+  )
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -123,16 +121,16 @@ export default function MenuTechnique({ permissions, isMobile }) {
   }, [])
 
   /* HOOKS KEY */
-  useKeydownHandler(isCellSelected, setOpenHelp);
+  useKeydownHandler(isCellSelected, setOpenHelp)
 
   const onCellClicked = (cell, event) => {
     if (cell.length >= 2 && cell[0] === 1) {
-      setIsCellSelected(true);
+      setIsCellSelected(true)
     } else {
-      setIsCellSelected(false);
-      setIsMinusClicked(false);
-      setLastClickedCell(null);
-      setClickedRowData(null);
+      setIsCellSelected(false)
+      setIsMinusClicked(false)
+      setLastClickedCell(null)
+      setClickedRowData(null)
     }
 
     if (
@@ -140,81 +138,94 @@ export default function MenuTechnique({ permissions, isMobile }) {
       lastClickedCell[0] === cell[0] &&
       lastClickedCell[1] === cell[1]
     ) {
-      setIsCellSelected(false);
-      setIsMinusClicked(false);
-      setLastClickedCell(null);
-      setClickedRowData(null);
-      return;
+      setIsCellSelected(false)
+      setIsMinusClicked(false)
+      setLastClickedCell(null)
+      setClickedRowData(null)
+      return
     }
 
-    let rowIndex;
+    let rowIndex
 
     if (cell[0] !== -1) {
-      return;
+      return
     }
 
     if (cell[0] === -1) {
-      rowIndex = cell[1];
-      setIsMinusClicked(true);
+      rowIndex = cell[1]
+      setIsMinusClicked(true)
     } else {
-      rowIndex = cell[0];
-      setIsMinusClicked(false);
+      rowIndex = cell[0]
+      setIsMinusClicked(false)
     }
 
     if (rowIndex >= 0 && rowIndex < menus.length) {
-      const rowData = menus[rowIndex];
-      setClickedRowData(rowData);
-      setLastClickedCell(cell);
+      const rowData = menus[rowIndex]
+      setClickedRowData(rowData)
+      setLastClickedCell(cell)
     }
-  };
-
+  }
 
   const handleSaveData = async () => {
-    const columnsU = ['Id', 'Key', 'Label', 'Link', 'MenuRootId', 'MenuSubRootId', 'Type'];
-    const columnsA = ['Key', 'Label', 'Link', 'MenuRootId', 'MenuSubRootId', 'Type'];
+    const columnsU = [
+      'Id',
+      'Key',
+      'Label',
+      'Link',
+      'MenuRootId',
+      'MenuSubRootId',
+      'Type',
+    ]
+    const columnsA = [
+      'Key',
+      'Label',
+      'Link',
+      'MenuRootId',
+      'MenuSubRootId',
+      'Type',
+    ]
 
-    const resulU = filterAndSelectColumnsU(editedRows, columnsU, 'U');
-    const resulA = filterAndSelectColumnsA(addedRows, columnsA, 'A');
+    const resulU = filterAndSelectColumns(editedRows, columnsU, 'U')
+    const resulA = filterAndSelectColumns(editedRows, columnsA, 'A')
 
-    if (isSent) return;
-    setIsSent(true);
+    if (isSent) return
+    setIsSent(true)
 
     if (resulA.length > 0 || resulU.length > 0) {
-      const loadingMessage = message.loading("Đang thực hiện lưu dữ liệu...");
+      const loadingMessage = message.loading('Đang thực hiện lưu dữ liệu...')
 
       try {
-        const promises = [];
+        const promises = []
 
         if (resulA.length > 0) {
-          promises.push(PostAddMenu(resulA));
+          promises.push(PostAddMenu(resulA))
         }
 
         if (resulU.length > 0) {
-          promises.push(PostUpdateMenu(resulU));
+          promises.push(PostUpdateMenu(resulU))
         }
 
-        await Promise.all(promises);
+        await Promise.all(promises)
 
-        loadingMessage();
-        setIsLoading(false);
-        setIsSent(false);
+        loadingMessage()
+        setIsLoading(false)
+        setIsSent(false)
         setEditedRows([])
         setAddedRows([])
         fetchDataMenus()
-        message.success("Lưu dữ liệu thành công!");
+        message.success('Lưu dữ liệu thành công!')
       } catch (error) {
-        loadingMessage();
-        setIsLoading(false);
-        setIsSent(false);
-        message.error(error.message || "Có lỗi xảy ra khi lưu dữ liệu");
+        loadingMessage()
+        setIsLoading(false)
+        setIsSent(false)
+        message.error(error.message || 'Có lỗi xảy ra khi lưu dữ liệu')
       }
     } else {
-      setIsLoading(false);
-      setIsSent(false);
-      message.warning("Không có dữ liệu để lưu!");
+      setIsLoading(false)
+      setIsSent(false)
+      message.warning('Không có dữ liệu để lưu!')
     }
-  };
-
+  }
 
   return (
     <>

@@ -23,7 +23,12 @@ export default function ModalLogout({
         </p>
 
         <div className="flex w-full gap-4">
-          <Button    onClick={() => setModalOpen(false)} type="default" size="large" className="w-full">
+          <Button
+            onClick={() => setModalOpen(false)}
+            type="default"
+            size="large"
+            className="w-full"
+          >
             Hủy
           </Button>
           <Button

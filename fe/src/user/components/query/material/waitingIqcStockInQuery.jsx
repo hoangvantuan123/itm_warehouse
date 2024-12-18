@@ -30,7 +30,7 @@ export default function WaitingIqcStockInQuery({
       handleCheckBarcode(inputBarCode)
     }
   }
-  
+
   return (
     <div className="flex items-center gap-2">
       <Form layout="vertical">

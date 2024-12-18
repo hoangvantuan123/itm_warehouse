@@ -17,7 +17,6 @@ function TableLabelPreview({ setData }) {
   const [sizeHigh, setSizeHigh] = useState('')
   const navigate = useNavigate()
 
-
   const Desc = () => (
     <Flex
       justify="center"

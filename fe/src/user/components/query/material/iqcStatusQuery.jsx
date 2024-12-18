@@ -131,7 +131,7 @@ export default function IqcStatusQuery({
                 //allowClear
                 onChange={handleChange}
                 options={[
-                  { label: "All", value: "0" },
+                  { label: 'All', value: '0' },
                   ...(dataUnit?.map((item) => ({
                     label: item?.AccUnitName,
                     value: item?.BizUnit,

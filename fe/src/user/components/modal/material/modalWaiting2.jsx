@@ -1,8 +1,8 @@
-import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
-import { DataEditor, GridCellKind } from '@glideapps/glide-data-grid';
-import '@glideapps/glide-data-grid/dist/index.css';
-import { Modal } from 'antd';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
+import { DataEditor, GridCellKind } from '@glideapps/glide-data-grid'
+import '@glideapps/glide-data-grid/dist/index.css'
+import { Modal } from 'antd'
+import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { CompactSelection } from '@glideapps/glide-data-grid'
 function ModalWaiting2({
   modal2Open,
@@ -12,22 +12,24 @@ function ModalWaiting2({
   setKeyPath,
   dataError,
 }) {
-  const [gridData, setGridData] = useState([]);
+  const [gridData, setGridData] = useState([])
   const [selection, setSelection] = useState({
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
-  });
-  const ref = useRef();
+  })
+  const ref = useRef()
 
   const columns = useMemo(
     () => [
-      { title: 'Error Code', width: 100, },
-      { title: 'Error Message', width: 400, },
+      { title: 'Error Code', width: 100 },
+      { title: 'Error Message', width: 400 },
     ],
-    []
-  );
-  const [cols, setCols] = useState([{ title: 'Error Code', width: 100, },
-  { title: 'Error Message', width: 350, },]);
+    [],
+  )
+  const [cols, setCols] = useState([
+    { title: 'Error Code', width: 100 },
+    { title: 'Error Message', width: 350 },
+  ])
 
   const onColumnResize = useCallback(
     (column, newSize) => {
@@ -45,38 +47,37 @@ function ModalWaiting2({
     [cols],
   )
 
-
   const getData = useCallback(
     ([col, row]) => {
-      const person = gridData[row] || {};
-      const { errorMessage, errorCode } = person;
+      const person = gridData[row] || {}
+      const { errorMessage, errorCode } = person
 
-      const safeString = (value) => (value != null ? String(value) : '');
+      const safeString = (value) => (value != null ? String(value) : '')
 
       const columnMap = {
         0: { kind: GridCellKind.Text, data: safeString(errorCode) },
         1: { kind: GridCellKind.Text, data: safeString(errorMessage) },
-      };
-
-      if (columnMap.hasOwnProperty(col)) {
-        const { kind, data } = columnMap[col];
-        return { kind, data, displayData: data };
       }
 
-      return { kind: GridCellKind.Text, data: '', displayData: '' };
+      if (columnMap.hasOwnProperty(col)) {
+        const { kind, data } = columnMap[col]
+        return { kind, data, displayData: data }
+      }
+
+      return { kind: GridCellKind.Text, data: '', displayData: '' }
     },
-    [gridData]
-  );
+    [gridData],
+  )
 
   const handleOnCancel = () => {
-    setModal2Open(false);
+    setModal2Open(false)
     if (typeof resetTable === 'function') {
-      resetTable();
+      resetTable()
     }
     if (typeof setKeyPath === 'function') {
-      setKeyPath(null);
+      setKeyPath(null)
     }
-  };
+  }
 
   useEffect(() => {
     const rows = dataError.map((item) => {
@@ -84,10 +85,10 @@ function ModalWaiting2({
         procedureIndex: item.procedureIndex,
         errorMessage: item.error[0],
         errorCode: item.error[1],
-      };
-    });
-    setGridData(rows);
-  }, [dataError]);
+      }
+    })
+    setGridData(rows)
+  }, [dataError])
 
   return (
     <Modal
@@ -128,7 +129,7 @@ function ModalWaiting2({
         </div>
       </div>
     </Modal>
-  );
+  )
 }
 
-export default ModalWaiting2;
+export default ModalWaiting2

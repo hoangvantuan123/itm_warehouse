@@ -9,14 +9,11 @@ const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
 
-  function TableTransferMatWHStockInBarcode({
-    data,    
-  }) {
-  
-    const [showSearch, setShowSearch] = useState(false)
-    const ref = (useRef < data) | (null > null)
-    const onSearchClose = useCallback(() => setShowSearch(false), [])
-  
+function TableTransferMatWHStockInBarcode({ data }) {
+  const [showSearch, setShowSearch] = useState(false)
+  const ref = (useRef < data) | (null > null)
+  const onSearchClose = useCallback(() => setShowSearch(false), [])
+
   const columns = useMemo(
     () => [
       { title: 'InOutDate' },
@@ -128,32 +125,28 @@ const SearchButton = ({ onClick }) => (
     setLastActivated(cell)
   }, [])
 
-  
-
-
   const onGridSelectionChange = (newSelection) => {
     console.log('Selection aborted', newSelection)
   }
 
   return (
-      <div className="w-full h-full border-t border-b overflow-hidden scroll-container ">
-        <DataEditor
-          columns={cols}
-          getCellContent={getData}
-          rows={data.length}
-          showSearch={showSearch}
-          getCellsForSelection={true}
-          onSearchClose={onSearchClose}
-          width="100%"
-          height="100%"
-          rowMarkers={('checkbox-visible', 'both')}
-          useRef={useRef}
-          onColumnResize={onColumnResize}
-          smoothScrollY={true}
-          smoothScrollX={true}
-          rowSelect="multi"
-      
-        />
+    <div className="w-full h-full border-t border-b overflow-hidden scroll-container ">
+      <DataEditor
+        columns={cols}
+        getCellContent={getData}
+        rows={data.length}
+        showSearch={showSearch}
+        getCellsForSelection={true}
+        onSearchClose={onSearchClose}
+        width="100%"
+        height="100%"
+        rowMarkers={('checkbox-visible', 'both')}
+        useRef={useRef}
+        onColumnResize={onColumnResize}
+        smoothScrollY={true}
+        smoothScrollX={true}
+        rowSelect="multi"
+      />
     </div>
   )
 }

@@ -37,17 +37,15 @@ const Home = () => {
       <Helmet>
         <title>Home</title>
       </Helmet>
-    <div className="bg-slate-50 p-3 h-screen overflow-auto md:h-full md:overflow-hidden">
-
-      <div className="flex flex-col gap-4 md:grid md:grid-cols-4 md:grid-rows-5 md:gap-4 h-full ">
-        <div className="col-start-1 col-end-6 row-start-1 justify-center items-center row-end-6 bg-white border text-gray-950 w-full min-h-[100px] rounded-lg flex flex-col p-4">
-          <h1 className="text-6xl font-medium">{time}</h1>
-          <p className="text-2xl">{date}</p>
-          <p className="text-2xl">{greeting}</p>
+      <div className="bg-slate-50 p-3 h-screen overflow-auto md:h-full md:overflow-hidden">
+        <div className="flex flex-col gap-4 md:grid md:grid-cols-4 md:grid-rows-5 md:gap-4 h-full ">
+          <div className="col-start-1 col-end-6 row-start-1 justify-center items-center row-end-6 bg-white border text-gray-950 w-full min-h-[100px] rounded-lg flex flex-col p-4">
+            <h1 className="text-6xl font-medium">{time}</h1>
+            <p className="text-2xl">{date}</p>
+            <p className="text-2xl">{greeting}</p>
+          </div>
         </div>
-
       </div>
-    </div>
     </>
   )
 }

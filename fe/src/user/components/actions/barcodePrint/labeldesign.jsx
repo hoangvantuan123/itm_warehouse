@@ -12,9 +12,7 @@ const LabelItem = ({ label, dataSize }) => {
     barcodeData: label?.LOT_ID,
   }
 
-  
   const size = {
-    
     barCodePosX: Number(dataSize?.barCodePosX),
     barCodePosY: Number(dataSize?.barCodePosY),
     barCodeSizeX: Number(dataSize?.barCodeSizeX) ?? 1,
@@ -27,7 +25,7 @@ const LabelItem = ({ label, dataSize }) => {
     paperSizeY: Number(dataSize?.paperSizeY),
   }
 
-  console.log("size", size)
+  console.log('size', size)
 
   return (
     <div className="grid grid-cols-4 gap-0 w-auto h-auto  justify-center border">

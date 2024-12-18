@@ -21,8 +21,7 @@ import { DeleteRootMenus } from '../../../features/system/deleteRootMenus'
 import { CompactSelection } from '@glideapps/glide-data-grid'
 import { PostUpdateRootMenu } from '../../../features/system/postUpdateRootMenu'
 import { PostAddRootMenu } from '../../../features/system/postAddRootMenu'
-import { filterAndSelectColumnsU } from '../../../utils/filterU'
-import { filterAndSelectColumnsA } from '../../../utils/filterA'
+import { filterAndSelectColumns } from '../../../utils/filterUorA'
 export default function RootMenuTechnique({ permissions, isMobile }) {
   const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
@@ -31,18 +30,18 @@ export default function RootMenuTechnique({ permissions, isMobile }) {
   const [clickedRowData, setClickedRowData] = useState(null)
   const [isMinusClicked, setIsMinusClicked] = useState(false)
   const [lastClickedCell, setLastClickedCell] = useState(null)
-  const [addedRows, setAddedRows] = useState([]);  
-  const [editedRows, setEditedRows] = useState([]); 
+  const [addedRows, setAddedRows] = useState([])
+  const [editedRows, setEditedRows] = useState([])
   const [selection, setSelection] = useState({
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
   })
-  const [numRowsToAdd, setNumRowsToAdd] = useState(null); 
-  const [clickCount, setClickCount] = useState(0);
+  const [numRowsToAdd, setNumRowsToAdd] = useState(null)
+  const [clickCount, setClickCount] = useState(0)
   const [showSearch, setShowSearch] = useState(false)
-  const [isSent, setIsSent] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSent, setIsSent] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const fetchDataRootMenus = async () => {
     setLoading(true)
     try {
@@ -66,10 +65,7 @@ export default function RootMenuTechnique({ permissions, isMobile }) {
     setIsModalOpen(false)
   }
 
-
-
   const onCellClicked = (cell, event) => {
-    
     let rowIndex
 
     if (cell[0] !== -1) {
@@ -100,8 +96,6 @@ export default function RootMenuTechnique({ permissions, isMobile }) {
       setLastClickedCell(cell)
     }
   }
-
-
 
   const getSelectedRowIds = () => {
     const selectedRows = selection.rows.items
@@ -156,52 +150,51 @@ export default function RootMenuTechnique({ permissions, isMobile }) {
   }, [])
 
   const handleSaveData = async () => {
-    const columnsU = ['Id', 'Key', 'Label', 'Link', 'Icon']; 
-    const columnsA = ['Key', 'Label', 'Link', 'Icon']; 
-    
-    const resulU = filterAndSelectColumnsU(editedRows, columnsU, 'U');
-    const resulA = filterAndSelectColumnsA(addedRows, columnsA, 'A');
+    const columnsU = ['Id', 'Key', 'Label', 'Link', 'Icon']
+    const columnsA = ['Key', 'Label', 'Link', 'Icon']
 
-    if (isSent) return;
-    setIsSent(true);
+    const resulU = filterAndSelectColumns(editedRows, columnsU, 'U')
+    const resulA = filterAndSelectColumns(editedRows, columnsA, 'A')
+
+    if (isSent) return
+    setIsSent(true)
 
     if (resulA.length > 0 || resulU.length > 0) {
-        const loadingMessage = message.loading("Đang thực hiện lưu dữ liệu...");
+      const loadingMessage = message.loading('Đang thực hiện lưu dữ liệu...')
 
-        try {
-            const promises = [];
+      try {
+        const promises = []
 
-            if (resulA.length > 0) {
-                promises.push(PostAddRootMenu(resulA));
-            }
-
-            if (resulU.length > 0) {
-                promises.push(PostUpdateRootMenu(resulU));
-            }
-
-            await Promise.all(promises);
-
-            loadingMessage(); 
-            setIsLoading(false);
-            setIsSent(false);
-            setEditedRows([])
-            setAddedRows([])
-            fetchDataRootMenus()
-            message.success("Lưu dữ liệu thành công!");
-        } catch (error) {
-            loadingMessage(); 
-            setIsLoading(false);
-            setIsSent(false);
-            setErrorMessage(error.message || "Có lỗi xảy ra");
-            message.error(error.message || "Có lỗi xảy ra khi lưu dữ liệu");
+        if (resulA.length > 0) {
+          promises.push(PostAddRootMenu(resulA))
         }
-    } else {
-        setIsLoading(false);
-        setIsSent(false);
-        message.warning("Không có dữ liệu để lưu!");
-    }
-};
 
+        if (resulU.length > 0) {
+          promises.push(PostUpdateRootMenu(resulU))
+        }
+
+        await Promise.all(promises)
+
+        loadingMessage()
+        setIsLoading(false)
+        setIsSent(false)
+        setEditedRows([])
+        setAddedRows([])
+        fetchDataRootMenus()
+        message.success('Lưu dữ liệu thành công!')
+      } catch (error) {
+        loadingMessage()
+        setIsLoading(false)
+        setIsSent(false)
+        setErrorMessage(error.message || 'Có lỗi xảy ra')
+        message.error(error.message || 'Có lỗi xảy ra khi lưu dữ liệu')
+      }
+    } else {
+      setIsLoading(false)
+      setIsSent(false)
+      message.warning('Không có dữ liệu để lưu!')
+    }
+  }
 
   return (
     <>
@@ -245,7 +238,6 @@ export default function RootMenuTechnique({ permissions, isMobile }) {
             />
           </div>
         </div>
-       
       </div>
     </>
   )

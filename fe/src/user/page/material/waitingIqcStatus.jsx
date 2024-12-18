@@ -16,7 +16,6 @@ import { useNavigate } from 'react-router-dom'
 import { encodeBase64Url } from '../../../utils/decode-JWT'
 import CryptoJS from 'crypto-js'
 
-
 export default function IQCStatus({ permissions, isMobile }) {
   const { t } = useTranslation()
   const gridRef = useRef(null)
@@ -40,28 +39,31 @@ export default function IQCStatus({ permissions, isMobile }) {
   const [clickedRowData, setClickedRowData] = useState(null)
   const [clickedRowDataList, setClickedRowDataList] = useState([])
   const [gridData, setGridData] = useState([])
-  const [isOpenDetails, setIsOpenDetails] = useState(false);
-  const [isAPISuccess, setIsAPISuccess] = useState(true);
+  const [isOpenDetails, setIsOpenDetails] = useState(false)
+  const [isAPISuccess, setIsAPISuccess] = useState(true)
 
   useEffect(() => {
-    const savedState = localStorage.getItem("detailsStateDelist");
-    setIsOpenDetails(savedState === "open");
-  }, []);
+    const savedState = localStorage.getItem('detailsStateDelist')
+    setIsOpenDetails(savedState === 'open')
+  }, [])
 
   const handleToggle = (event) => {
-    const isOpen = event.target.open; 
-    setIsOpenDetails(isOpen);
-    localStorage.setItem("detailsStateDelist", isOpen ? "open" : "closed");
-  };
+    const isOpen = event.target.open
+    setIsOpenDetails(isOpen)
+    localStorage.setItem('detailsStateDelist', isOpen ? 'open' : 'closed')
+  }
 
   const fetchIQCStatusData = async () => {
     if (isAPISuccess === false) {
-      message.warning('Không thể thực hiện, vui lòng kiểm tra trạng thái.');
-      return;
+      message.warning('Không thể thực hiện, vui lòng kiểm tra trạng thái.')
+      return
     }
     setIsAPISuccess(false)
-    setLoadingA(true);
-    const loadingMessage = message.loading('Đang tải dữ liệu, vui lòng chờ...', 0);
+    setLoadingA(true)
+    const loadingMessage = message.loading(
+      'Đang tải dữ liệu, vui lòng chờ...',
+      0,
+    )
     try {
       const iqcStatusResponse = await GetIQCStatus(
         formatDate(formData),
@@ -70,23 +72,23 @@ export default function IQCStatus({ permissions, isMobile }) {
         bizUnit,
         itemNo,
         itemName,
-      );
-      const fetchedData = iqcStatusResponse?.data || [];
-      setData(fetchedData);
+      )
+      const fetchedData = iqcStatusResponse?.data || []
+      setData(fetchedData)
       setIsAPISuccess(true)
-      loadingMessage();
-      message.success('Tải dữ liệu thành công!');
+      loadingMessage()
+      message.success('Tải dữ liệu thành công!')
     } catch (error) {
-      setData([]);
+      setData([])
       setIsAPISuccess(true)
-      loadingMessage();
-      notification.destroy();
-      message.error("Có lỗi xảy ra khi tải dữ liệu.");
+      loadingMessage()
+      notification.destroy()
+      message.error('Có lỗi xảy ra khi tải dữ liệu.')
     } finally {
       setIsAPISuccess(true)
-      setLoadingA(false);
+      setLoadingA(false)
     }
-  };
+  }
 
   const fetchCodeHelpData = useCallback(async () => {
     setLoading(true)
@@ -109,7 +111,6 @@ export default function IQCStatus({ permissions, isMobile }) {
       setLoading(false)
     }
   }, [])
-
 
   const debouncedFetchCodeHelpData = useMemo(
     () => debounce(fetchCodeHelpData, 100),

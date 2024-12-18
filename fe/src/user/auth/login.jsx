@@ -33,7 +33,6 @@ export default function Login({
   const [currentView, setCurrentView] = useState('login')
   const [username, setUsername] = useState(null)
 
-
   const fetchLangSeq = async () => {
     setLoadingLang(true)
     try {
@@ -48,7 +47,6 @@ export default function Login({
           deleteDatabase()
         }
       }
-
     } catch (error) {
     } finally {
       setLoadingLang(false)
@@ -59,7 +57,6 @@ export default function Login({
     fetchLangSeq()
   }, [])
 
-  
   const onFinish = async (values) => {
     const { login, password } = values
     setEmployeeId(login)
@@ -167,7 +164,7 @@ export default function Login({
         <title>Login</title>
       </Helmet>
       <div className="min-h-screen flex flex-col lg:flex-row items-center justify-center overflow-hidden">
-       {/*  <div className="hidden  lg:flex lg:w-1/2 h-screen items-center justify-center">
+        {/*  <div className="hidden  lg:flex lg:w-1/2 h-screen items-center justify-center">
           <BgCarousel />
         </div> */}
 
@@ -179,14 +176,15 @@ export default function Login({
           {currentView === 'login' && !status ? (
             <>
               <div className="mx-auto w-full flex flex-col items-center justify-center text-center mb-5 mt-3">
-  <h1 className="text-2xl font-bold sm:text-3xl">
-    Welcome Back!
-  </h1>
-  <p className="mt-4 text-gray-500 text-xs w-96">
-    This is an internal project by ITM Semiconductor CO., Ltd, developed to support production processes and optimize operations within the company.
-  </p>
-</div>
-
+                <h1 className="text-2xl font-bold sm:text-3xl">
+                  Welcome Back!
+                </h1>
+                <p className="mt-4 text-gray-500 text-xs w-96">
+                  This is an internal project by ITM Semiconductor CO., Ltd,
+                  developed to support production processes and optimize
+                  operations within the company.
+                </p>
+              </div>
 
               <Form
                 form={form}

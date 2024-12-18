@@ -163,8 +163,8 @@ function TableStockOUtFiFoB({ data, selection, setSelection }) {
           i % 2 === 0
             ? undefined
             : {
-              bgCell: '#FBFBFB',
-            }
+                bgCell: '#FBFBFB',
+              }
         }
       />
     </div>

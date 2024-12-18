@@ -25,8 +25,6 @@ import { CompactSelection } from '@glideapps/glide-data-grid'
 import ModalFocus from '../default/focus'
 import ModalWaiting2 from '../../components/modal/material/modalWaiting2'
 
-
-
 export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const { t } = useTranslation()
   const { id } = useParams()
@@ -46,7 +44,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const [modal3Open, setModal3Open] = useState(false)
   const [modal4Open, setModal4Open] = useState(false)
   const [modal5Open, setModal5Open] = useState(false)
-  const [highlightRegions, setHighlightRegions] = useState([]);
+  const [highlightRegions, setHighlightRegions] = useState([])
   const [error, setError] = useState(null)
   const [dataError, setDataError] = useState([])
   console.log('dataError', dataError)
@@ -70,7 +68,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   }
   const [isOpenDetails, setIsOpenDetails] = useState(false)
   const [isAPISuccess, setIsAPISuccess] = useState(true)
-  const [inputItemNo, setInputItemNo] = useState("");
+  const [inputItemNo, setInputItemNo] = useState('')
   useEffect(() => {
     const savedState = localStorage.getItem('detailsStateIqc')
     setIsOpenDetails(savedState === 'open')
@@ -81,7 +79,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
     setIsOpenDetails(isOpen)
     localStorage.setItem('detailsStateIqc', isOpen ? 'open' : 'closed')
   }
-  const nameFrom = 'From Waiting IQC STOCK IN';
+  const nameFrom = 'From Waiting IQC STOCK IN'
 
   const Format = useCallback((date) => {
     const d = new Date(date)
@@ -142,23 +140,24 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (e.key === 'Enter' && bufferRef.current.trim()) {
-        const barcode = bufferRef.current.trim()
+        const barcode = bufferRef.current
+          .trim()
           .normalize('NFD')
           .replace(/[\u0300-\u036f]/g, '')
-          .replace(/[^a-zA-Z0-9/.\-*%_]/g, '');
-        handleCheckBarcode(barcode);
-        setInputCode(barcode);
+          .replace(/[^a-zA-Z0-9/.\-*%_]/g, '')
+        handleCheckBarcode(barcode)
+        setInputCode(barcode)
 
-        bufferRef.current = '';
+        bufferRef.current = ''
       } else if (e.key.length === 1) {
-        const normalizedKey = e.key.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const normalizedKey = e.key
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
         if (/^[a-zA-Z0-9/.\-*%_]{1}$/.test(normalizedKey)) {
-          bufferRef.current += normalizedKey;
+          bufferRef.current += normalizedKey
         }
       }
     }
-
-
 
     const handleFocus = () => setStatus(true)
 
@@ -265,10 +264,10 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
             prevData.map((item) =>
               item.ItemNo === formData.itemNo
                 ? {
-                  ...item,
-                  OkQty: item.OkQty + formData.qty,
-                  RemainQty: item.RemainQty - formData.qty,
-                }
+                    ...item,
+                    OkQty: item.OkQty + formData.qty,
+                    RemainQty: item.RemainQty - formData.qty,
+                  }
                 : item,
             ),
           )
@@ -595,8 +594,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
       const selectedItems = selectedRowIndices.map((index) => ({
         ItemNo: scanHistory[index]?.ItemNo,
         Qty: scanHistory[index]?.Qty,
-      }));
-
+      }))
 
       const remainingRows = scanHistory.filter(
         (row, index) => !selectedRowIndices.includes(index),
@@ -606,17 +604,19 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
       resetTable()
       setData((prevData) =>
         prevData.map((item) => {
-          const selectedItem = selectedItems.find((selected) => selected.ItemNo === item.ItemNo);
+          const selectedItem = selectedItems.find(
+            (selected) => selected.ItemNo === item.ItemNo,
+          )
           if (selectedItem) {
             return {
               ...item,
               OkQty: item.OkQty - selectedItem.Qty,
               RemainQty: item.RemainQty + selectedItem.Qty,
-            };
+            }
           }
-          return item;
-        })
-      );
+          return item
+        }),
+      )
     },
     [scanHistory, selection, setData],
   )
@@ -704,13 +704,13 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
           </div>
         </div>
       </div>
-      <ModalWaiting2 modal2Open={modal2Open}
+      <ModalWaiting2
+        modal2Open={modal2Open}
         setModal2Open={setModal2Open}
         error={error}
-        dataError={dataError} />
+        dataError={dataError}
+      />
 
-
-        
       <LoadSubmit setModal4Open={setModal4Open} modal4Open={modal4Open} />
       <SuccessSubmit
         setModal5Open={setModal5Open}
@@ -722,10 +722,7 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
         setModal3Open={setModal3Open}
         pathRouter="/wms/u/warehouse/material/delivery-list"
       />
-      <ModalFocus
-        status={status}
-        setStatus={setStatus}
-        nameFrom={nameFrom} />
+      <ModalFocus status={status} setStatus={setStatus} nameFrom={nameFrom} />
     </>
   )
 }

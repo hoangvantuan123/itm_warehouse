@@ -11,16 +11,25 @@ import {
   Row,
 } from 'antd'
 
-import { DataEditor, GridCellKind } from "@glideapps/glide-data-grid";
-import '@glideapps/glide-data-grid/dist/index.css';
-import { checkConfirmBarcode, checkConfirmNewBarcode, confirmBarcode } from "../../../../features/barcode/barcodeChangeService";
-import { BARCODE_ERR_MESSAGE, BARCODE_SUCCESS_MESSAGE } from "../../../../utils/constants";
-import ModalWaiting from "../../modal/material/modalWaiting";
-import { ArrowIcon } from '../../icons';
-import { FilterOutlined, PrinterFilled, SearchOutlined } from '@ant-design/icons';
-import { useTranslation } from 'react-i18next';
-
-
+import { DataEditor, GridCellKind } from '@glideapps/glide-data-grid'
+import '@glideapps/glide-data-grid/dist/index.css'
+import {
+  checkConfirmBarcode,
+  checkConfirmNewBarcode,
+  confirmBarcode,
+} from '../../../../features/barcode/barcodeChangeService'
+import {
+  BARCODE_ERR_MESSAGE,
+  BARCODE_SUCCESS_MESSAGE,
+} from '../../../../utils/constants'
+import ModalWaiting from '../../modal/material/modalWaiting'
+import { ArrowIcon } from '../../icons'
+import {
+  FilterOutlined,
+  PrinterFilled,
+  SearchOutlined,
+} from '@ant-design/icons'
+import { useTranslation } from 'react-i18next'
 
 export default function BarcodeChangeAction({
   fromDate,
@@ -50,27 +59,23 @@ export default function BarcodeChangeAction({
   optionDevices,
   clickedRowData,
   handleOnchangeDevice,
-
 }) {
-  const [form] = Form.useForm();
-  const [formPopup] = Form.useForm();
-  const [data, setData] = useState([]);
-  const { t } = useTranslation();
+  const [form] = Form.useForm()
+  const [formPopup] = Form.useForm()
+  const [data, setData] = useState([])
+  const { t } = useTranslation()
 
-  const [oldBarcode, setOldBarcode] = useState('');
-  const [newBarcode, setNewBarcode] = useState('');
-  const [cfBarcode, setCfBarcode] = useState('');
-  const [dataConfirm, setDataConfirm] = useState({});
+  const [oldBarcode, setOldBarcode] = useState('')
+  const [newBarcode, setNewBarcode] = useState('')
+  const [cfBarcode, setCfBarcode] = useState('')
+  const [dataConfirm, setDataConfirm] = useState({})
   const formatDate = useCallback((date) => date.format('YYYYMMDDHHmmss'), [])
-  form.setFieldsValue({ toDate: toDate });
-  form.setFieldsValue({ fromDate: fromDate });
-  const oldBarcodeRef = useRef(null);
-  const newBarcodeRef = useRef(null);
-  const userIdModalRef = useRef(null);
-  const userIDRef = useRef(null);
-
-
-
+  form.setFieldsValue({ toDate: toDate })
+  form.setFieldsValue({ fromDate: fromDate })
+  const oldBarcodeRef = useRef(null)
+  const newBarcodeRef = useRef(null)
+  const userIdModalRef = useRef(null)
+  const userIDRef = useRef(null)
 
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo)
@@ -124,37 +129,35 @@ export default function BarcodeChangeAction({
     [data],
   )
 
-
   const onKeyDownRemark = (e) => {
     if (e.key === 'Enter') {
-      setRemark(e.target.value);
-      userIDRef.current.focus();
+      setRemark(e.target.value)
+      userIDRef.current.focus()
     }
-
   }
 
   const onKeyDownUserId = (e) => {
     if (e.key === 'Enter') {
-      setUserId(e.target.value);
+      setUserId(e.target.value)
     }
   }
 
   const onChangeUserId = (e) => {
-    const userid = e.target.value;
-    setUserId(userid);
-}
+    const userid = e.target.value
+    setUserId(userid)
+  }
 
-const onChangeRemark = (e) => {
-    const remark = e.target.value;
-    setRemark(remark);
-}
+  const onChangeRemark = (e) => {
+    const remark = e.target.value
+    setRemark(remark)
+  }
 
   const handleKeyDownOldBarcode = async (e) => {
     if (e.key === 'Enter') {
       const oldBarcode = e.target.value
 
       if (!oldBarcode.includes('/')) {
-        setModal2Open(true);
+        setModal2Open(true)
         setError(BARCODE_ERR_MESSAGE.INVALID_BARCODE_FORMAT)
         return
       }
@@ -176,18 +179,17 @@ const onChangeRemark = (e) => {
         const result = await checkConfirmBarcode(dataConfirm)
 
         if (result.result[0] != null) {
-          setNewBarcode(result.result[0].NewBarcodeID);
+          setNewBarcode(result.result[0].NewBarcodeID)
           message.info(BARCODE_SUCCESS_MESSAGE.CHECK_OLD_BARCODE_OK)
         } else {
-          setError(BARCODE_ERR_MESSAGE.BARCODEID_NOT_EXISTS);
-          setModal2Open(true);
-          resetValueModal();
+          setError(BARCODE_ERR_MESSAGE.BARCODEID_NOT_EXISTS)
+          setModal2Open(true)
+          resetValueModal()
         }
-
       } catch (err) {
         console.log(err)
       }
-      newBarcodeRef.current.focus();
+      newBarcodeRef.current.focus()
     }
   }
 
@@ -206,10 +208,10 @@ const onChangeRemark = (e) => {
       }
 
       if (INewBarcode != newBarcode) {
-        setError(BARCODE_ERR_MESSAGE.NEW_BARCODEID_NOT_EXISTS);
-        formPopup.resetFields(["newBarcode"]);
-        setModal2Open(true);
-        return;
+        setError(BARCODE_ERR_MESSAGE.NEW_BARCODEID_NOT_EXISTS)
+        formPopup.resetFields(['newBarcode'])
+        setModal2Open(true)
+        return
       }
 
       const dataConfirm = {
@@ -222,17 +224,16 @@ const onChangeRemark = (e) => {
         const result = await checkConfirmNewBarcode(dataConfirm)
 
         if (result != null) {
-
-          formPopup.setFieldsValue({ cfBarcode: result.data[0].NewBarcodeID });
-          formPopup.setFieldsValue({ userid: result.data[0].UserID });
-          formPopup.setFieldsValue({ status: "OK" });
+          formPopup.setFieldsValue({ cfBarcode: result.data[0].NewBarcodeID })
+          formPopup.setFieldsValue({ userid: result.data[0].UserID })
+          formPopup.setFieldsValue({ status: 'OK' })
           // formPopup.setFieldsValue({ time: result.result[0].LastDateTime});
 
           const newRow = {
             oldBarcode: dataConfirm.oldBarcode,
             newBarcode: result.data[0].NewBarcodeID,
-            isconfirm: "OK"
-          };
+            isconfirm: 'OK',
+          }
 
           const isDuplicate = data.some(
             (row) =>
@@ -241,19 +242,17 @@ const onChangeRemark = (e) => {
           )
 
           if (!isDuplicate) {
-            setData([...data, newRow]);
-            userIdModalRef.current.focus();
+            setData([...data, newRow])
+            userIdModalRef.current.focus()
           } else {
-            message.info(BARCODE_ERR_MESSAGE.DUPLICATE_ROW);
+            message.info(BARCODE_ERR_MESSAGE.DUPLICATE_ROW)
           }
-
         } else {
-          setError(BARCODE_ERR_MESSAGE.BARCODEID_NOT_EXISTS);
-          setModal2Open(true);
-          formPopup.resetFields(newBarcode);
-          resetValueModal();
+          setError(BARCODE_ERR_MESSAGE.BARCODEID_NOT_EXISTS)
+          setModal2Open(true)
+          formPopup.resetFields(newBarcode)
+          resetValueModal()
         }
-
       } catch (err) {
         console.log(err)
       }
@@ -261,31 +260,27 @@ const onChangeRemark = (e) => {
   }
 
   const handleBtnConfirm = async () => {
-
-    const body = data;
+    const body = data
     try {
-      const result = await confirmBarcode(
-        body
-      );
+      const result = await confirmBarcode(body)
 
-      setIsModalVisible(false);
+      setIsModalVisible(false)
 
       if (result.status) {
-        setModal2Open(true);
-        setError(BARCODE_SUCCESS_MESSAGE.BARCODE_CONFIRM_SUCCESS);
-        resetValueModal();
+        setModal2Open(true)
+        setError(BARCODE_SUCCESS_MESSAGE.BARCODE_CONFIRM_SUCCESS)
+        resetValueModal()
       } else {
-        setError(BARCODE_ERR_MESSAGE.BARCODE_NOT_CONFIRM);
-        setModal2Open(true);
-        resetValueModal();
+        setError(BARCODE_ERR_MESSAGE.BARCODE_NOT_CONFIRM)
+        setModal2Open(true)
+        resetValueModal()
       }
-
     } catch (err) {
-      message.error(err);
-      resetValueModal();
-      setError(err);
-      setModal2Open(true);
-      setIsModalVisible(false);
+      message.error(err)
+      resetValueModal()
+      setError(err)
+      setModal2Open(true)
+      setIsModalVisible(false)
     }
   }
 
@@ -331,23 +326,33 @@ const onChangeRemark = (e) => {
               <DatePicker size="small" />
             </Form.Item>
 
-            <Form.Item label="Barcode" name="barcode" >
-              <Input placeholder="" size="small"  className='w-96'/>
+            <Form.Item label="Barcode" name="barcode">
+              <Input placeholder="" size="small" className="w-96" />
             </Form.Item>
-            <Form.Item label="Mat ID" name="matID" >
-              <Input placeholder="" size="small" className='w-28' />
+            <Form.Item label="Mat ID" name="matID">
+              <Input placeholder="" size="small" className="w-28" />
             </Form.Item>
-            <Form.Item label="Lot No" name="lotNo" >
-              <Input placeholder="" size="small" className='w-36'/>
+            <Form.Item label="Lot No" name="lotNo">
+              <Input placeholder="" size="small" className="w-36" />
             </Form.Item>
             <Form.Item>
-              <Button icon={<SearchOutlined />} type="primary" size="small" htmlType="submit">
+              <Button
+                icon={<SearchOutlined />}
+                type="primary"
+                size="small"
+                htmlType="submit"
+              >
                 SEARCH
               </Button>
             </Form.Item>
 
             <Form.Item>
-              <Button icon={<PrinterFilled/>} onClick={btnOpenModal} type="primary" size="small">
+              <Button
+                icon={<PrinterFilled />}
+                onClick={btnOpenModal}
+                type="primary"
+                size="small"
+              >
                 PRINT
               </Button>
             </Form.Item>
@@ -375,7 +380,6 @@ const onChangeRemark = (e) => {
               style={{
                 maxWidth: 'inline' ? 'none' : 600,
               }}
-
               onFinishFailed={onFinishFailed}
               autoComplete="off"
             >
@@ -383,8 +387,8 @@ const onChangeRemark = (e) => {
                 {t('Thông tin thay đổi')}
               </h2>
 
-              <Card className='m-0 p-0' bodyStyle={{ padding: 5 }}>
-                <Row className='flex m-0 p-0 gap-3'>
+              <Card className="m-0 p-0" bodyStyle={{ padding: 5 }}>
+                <Row className="flex m-0 p-0 gap-3">
                   <Form.Item
                     label="Barcode"
                     name="oldBarcode"
@@ -397,16 +401,14 @@ const onChangeRemark = (e) => {
                   >
                     <Input
                       placeholder=""
-
                       onKeyDown={handleEnter}
-                      className='w-[300px]'
+                      className="w-[300px]"
                       ref={barcodeRef}
                     />
                   </Form.Item>
                   <Form.Item label="Pre QTY" name="preQty">
                     <Input
                       placeholder=""
-
                       type="number"
                       min={0}
                       disabled={true}
@@ -420,7 +422,8 @@ const onChangeRemark = (e) => {
                         required: true,
                         message: BARCODE_ERR_MESSAGE.QTY_NOT_NULL,
                       },
-                    ]}>
+                    ]}
+                  >
                     <Input
                       placeholder=""
                       type="number"
@@ -429,155 +432,109 @@ const onChangeRemark = (e) => {
                       ref={changeQtyRef}
                     />
                   </Form.Item>
-                  <Form.Item
-                    label="QTY"
-                    name="qty">
+                  <Form.Item label="QTY" name="qty">
                     <Input
                       placeholder=""
-
                       type="number"
                       min={0}
                       value={newQty}
                       disabled={true}
-                      onChange={onChangeNewQty} />
+                      onChange={onChangeNewQty}
+                    />
                   </Form.Item>
 
                   <Form.Item label="Remark" name="remark">
                     <Input
                       placeholder=""
-
                       onKeyDown={onKeyDownRemark}
                       onChange={onChangeRemark}
-                      ref={remarkRef} />
+                      ref={remarkRef}
+                    />
                   </Form.Item>
-                  <Form.Item
-                    label=" User ID"
-                    name="userID">
+                  <Form.Item label=" User ID" name="userID">
                     <Input
                       placeholder=""
-
                       onKeyDown={onKeyDownUserId}
                       onChange={onChangeUserId}
-                      ref={userIDRef} />
+                      ref={userIDRef}
+                    />
                   </Form.Item>
 
                   <Form.Item
                     label="Device Printer"
                     name="device"
-                    className='w-52'>
+                    className="w-52"
+                  >
                     <Select
                       labelInValue
                       id="typeSelect"
                       defaultValue=""
-
                       allowClear
                       options={optionDevices}
                       onDropdownVisibleChange={onDropDownChange}
                       onChange={handleOnchangeDevice}
                     />
                   </Form.Item>
-
                 </Row>
-
               </Card>
 
               <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600 uppercase mt-3">
-              {t('Cài đặt in tem')}
-            </h2>
-            <span className="relative size-5 shrink-0">
-            </span>
+                {t('Cài đặt in tem')}
+              </h2>
+              <span className="relative size-5 shrink-0"></span>
 
-              <Card className='m-0 p-0' bodyStyle={{ padding: 5 }}>
-
-                <Row className='flex m-0 p-0 gap-3'>
-
+              <Card className="m-0 p-0" bodyStyle={{ padding: 5 }}>
+                <Row className="flex m-0 p-0 gap-3">
                   <Form.Item label="1D Position" layout={'inline'}>
                     <div className="flex gap-3">
                       <Form.Item name="barcodePosX" layout={'inline'}>
-                        <Input
-                          placeholder="X"
-                          
-                          type="number"
-                          min={0}
-                        />
+                        <Input placeholder="X" type="number" min={0} />
                       </Form.Item>
                       <Form.Item name="barcodePosY" layout={'inline'}>
-                        <Input
-                          placeholder="Y"
-                          
-                          type="number"
-                          min={0}
-                        />
+                        <Input placeholder="Y" type="number" min={0} />
                       </Form.Item>
                     </div>
-
                   </Form.Item>
-
 
                   <Form.Item label="1D Size" layout={'inline'}>
                     <div className="flex gap-3">
                       <Form.Item name="barcodeSizeX" layout={'inline'}>
-                        <Input
-                          placeholder="X"
-                          
-                          type="number"
-                          min={0}
-                        />
+                        <Input placeholder="X" type="number" min={0} />
                       </Form.Item>
 
                       <Form.Item name="barcodeSizeY" layout={'inline'}>
-                        <Input
-                          placeholder="Y"
-                          
-                          type="number"
-                          min={0}
-                        />
+                        <Input placeholder="Y" type="number" min={0} />
                       </Form.Item>
                     </div>
                   </Form.Item>
-
 
                   <Form.Item label="2D Position" layout={'inline'}>
                     <div className="flex gap-3">
                       <Form.Item name="qrcodePosX" layout={'inline'}>
-                        <Input
-                          placeholder="X"
-                          
-                          type="number"
-                          min={0}
-                        />
+                        <Input placeholder="X" type="number" min={0} />
                       </Form.Item>
 
                       <Form.Item name="qrcodePosY" layout={'inline'}>
-                        <Input
-                          placeholder="Y"
-    
-                          type="number"
-                          min={0}
-                        />
+                        <Input placeholder="Y" type="number" min={0} />
                       </Form.Item>
                     </div>
                   </Form.Item>
 
-                  <Form.Item label="2D Size" layout={"inline"}>
+                  <Form.Item label="2D Size" layout={'inline'}>
                     <div className="flex gap-3">
-                      <Form.Item name="qrcodeSizeX" layout={"inline"} >
-                        <Input placeholder="X"  type="number" min={0} />
+                      <Form.Item name="qrcodeSizeX" layout={'inline'}>
+                        <Input placeholder="X" type="number" min={0} />
                       </Form.Item>
-                      <Form.Item name="qrcodeSizeY" layout={"inline"} >
-                        <Input placeholder="Y"  type="number" min={0} />
+                      <Form.Item name="qrcodeSizeY" layout={'inline'}>
+                        <Input placeholder="Y" type="number" min={0} />
                       </Form.Item>
                     </div>
                   </Form.Item>
-
                 </Row>
               </Card>
             </Form>
-
           </Card>
-
         </details>
-
 
         <Modal
           title="Print Label Confirmation"
@@ -587,11 +544,10 @@ const onChangeRemark = (e) => {
           closable={false}
           bodyStyle={{
             maxHeight: '500px',
-            overflowY: 'auto', 
+            overflowY: 'auto',
           }}
           width={600}
         >
-
           <Form
             layout={'inline'}
             form={formPopup}
@@ -601,14 +557,15 @@ const onChangeRemark = (e) => {
             style={{
               maxWidth: 'inline' ? 'none' : 600,
             }}
-
             onFinishFailed={onFinishFailed}
             autoComplete="off"
           >
-
-            <Form.Item label="Barcode" name="oldBarcode" layout={"inline"} >
-              <Input size="small" style={{ width: 350 }}
-                onKeyDown={handleKeyDownOldBarcode} />
+            <Form.Item label="Barcode" name="oldBarcode" layout={'inline'}>
+              <Input
+                size="small"
+                style={{ width: 350 }}
+                onKeyDown={handleKeyDownOldBarcode}
+              />
             </Form.Item>
 
             <Form.Item label="New Barcode" name="newBarcode" layout={'inline'}>
@@ -658,17 +615,13 @@ const onChangeRemark = (e) => {
               />
             </div>
           </div>
-
         </Modal>
         <ModalWaiting
           modal2Open={modal2Open}
           setModal2Open={setModal2Open}
           error={error}
         />
-
       </Card>
-
     </div>
-
-  );
+  )
 }

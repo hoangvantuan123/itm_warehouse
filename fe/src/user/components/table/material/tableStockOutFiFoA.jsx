@@ -9,8 +9,7 @@ const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
 
-function TableStockOUtFiFoA({ data,  setInputItemNo,
-  inputItemNo}) {
+function TableStockOUtFiFoA({ data, setInputItemNo, inputItemNo }) {
   const [gridData, setGridData] = useState([])
   const [showSearch, setShowSearch] = useState(false)
   const ref = (useRef < data) | (null > null)
@@ -19,7 +18,7 @@ function TableStockOUtFiFoA({ data,  setInputItemNo,
   const [clickedRowDataList, setClickedRowDataList] = useState([])
   const [isMinusClicked, setIsMinusClicked] = useState(false)
   const [lastClickedCell, setLastClickedCell] = useState(null)
-  const [highlightRegions, setHighlightRegions] = useState([]);
+  const [highlightRegions, setHighlightRegions] = useState([])
   const [selection, setSelection] = useState({
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
@@ -142,25 +141,25 @@ function TableStockOUtFiFoA({ data,  setInputItemNo,
 
   const findRowByItemNo = useCallback(
     (itemNo) => gridData.findIndex((row) => row.ItemNo === itemNo),
-    [gridData]
-  );
+    [gridData],
+  )
 
   const highlightRowByItemNo = useCallback(
     (itemNo) => {
-      const rowIndex = findRowByItemNo(itemNo);
+      const rowIndex = findRowByItemNo(itemNo)
       if (rowIndex !== null && rowIndex >= 0) {
         const highlightRegionB = {
-          color: "#ff00ff33", 
+          color: '#ff00ff33',
           range: { x: 0, y: rowIndex, width: columns.length, height: 1 },
-        };
-        setHighlightRegions([highlightRegionB]);
+        }
+        setHighlightRegions([highlightRegionB])
       }
     },
-    [findRowByItemNo, columns.length]
-  );
+    [findRowByItemNo, columns.length],
+  )
 
   useEffect(() => {
-    highlightRowByItemNo(inputItemNo);
+    highlightRowByItemNo(inputItemNo)
   }, [inputItemNo])
   return (
     <div className="w-full h-full border-t border-b overflow-hidden scroll-container ">
@@ -189,7 +188,7 @@ function TableStockOUtFiFoA({ data,  setInputItemNo,
                 bgCell: '#FBFBFB',
               }
         }
-        highlightRegions={highlightRegions} 
+        highlightRegions={highlightRegions}
       />
     </div>
   )

@@ -1,11 +1,6 @@
-import {
-  HOST_API_SERVER_2
-} from '../../services'
+import { HOST_API_SERVER_2 } from '../../services'
 
-export const LoginAuth = async ({
-  login,
-  password
-}) => {
+export const LoginAuth = async ({ login, password }) => {
   try {
     const response = await fetch(`${HOST_API_SERVER_2}/acc/p2/login`, {
       method: 'POST',
@@ -20,7 +15,6 @@ export const LoginAuth = async ({
     })
 
     const data = await response.json()
-
 
     return data
   } catch (error) {

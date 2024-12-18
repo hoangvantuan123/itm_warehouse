@@ -45,7 +45,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const dataRefSacenHistory = useRef(scanHistory) /* DATA */
   const [status, setStatus] = useState(false)
   const [filteredData, setFilteredData] = useState(null)
-  const [inputItemNo, setInputItemNo] = useState(""); 
+  const [inputItemNo, setInputItemNo] = useState('')
   const [checkValueIsStop, setCheckValueIsStop] = useState(
     filteredData?.IsStop ? 1 : 0,
   )
@@ -57,18 +57,14 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const [loading, setLoading] = useState(false)
   const [isAPISuccess, setIsAPISuccess] = useState(true)
   const [isOpenDetails, setIsOpenDetails] = useState(false)
-  const [isFormDirty, setIsFormDirty] = useState(false);
-  const location = useLocation();
+  const [isFormDirty, setIsFormDirty] = useState(false)
+  const location = useLocation()
   const secretKey = 'TEST_ACCESS_KEY'
-  const nameFrom = 'From STOCK OUT FIFO'; 
-
- 
-
-
+  const nameFrom = 'From STOCK OUT FIFO'
 
   const handleChange = () => {
-    setHasUnsavedChanges(true);
-  };
+    setHasUnsavedChanges(true)
+  }
 
   useEffect(() => {
     const savedState = localStorage.getItem('detailsStateStockOutFiFo')
@@ -185,25 +181,26 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
   }, [])
 
   useEffect(() => {
-    
     const handleKeyPress = (e) => {
       if (e.key === 'Enter' && bufferRef.current.trim()) {
-        const barcode = bufferRef.current.trim()
+        const barcode = bufferRef.current
+          .trim()
           .normalize('NFD')
           .replace(/[\u0300-\u036f]/g, '')
-          .replace(/[^a-zA-Z0-9/.\-*%_]/g, ''); 
-        handleCheckBarcode(barcode);
-        setInputCode(barcode);
-    
-        bufferRef.current = '';
+          .replace(/[^a-zA-Z0-9/.\-*%_]/g, '')
+        handleCheckBarcode(barcode)
+        setInputCode(barcode)
+
+        bufferRef.current = ''
       } else if (e.key.length === 1) {
-        const normalizedKey = e.key.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); 
-        if (/^[a-zA-Z0-9/.\-*%_]{1}$/.test(normalizedKey)) { 
-          bufferRef.current += normalizedKey;
+        const normalizedKey = e.key
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+        if (/^[a-zA-Z0-9/.\-*%_]{1}$/.test(normalizedKey)) {
+          bufferRef.current += normalizedKey
         }
       }
     }
-
 
     const handleFocus = () => setStatus(true)
 
@@ -238,10 +235,10 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
             prevData.map((item) =>
               item.ItemNo === formData.ItemNo
                 ? {
-                  ...item,
-                  OutQty: item.OutQty + formData.Qty,
-                  RemainQty: item.RemainQty - formData.Qty,
-                }
+                    ...item,
+                    OutQty: item.OutQty + formData.Qty,
+                    RemainQty: item.RemainQty - formData.Qty,
+                  }
                 : item,
             ),
           )
@@ -488,29 +485,28 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const handleRestFrom = useCallback(
     async (e) => {
       if (scanHistory.length === 0) {
-        setModal2Open(true);
-        setError('Không có dữ liệu để reset! Vui lòng quét dữ liệu trước.');
-        return;
+        setModal2Open(true)
+        setError('Không có dữ liệu để reset! Vui lòng quét dữ liệu trước.')
+        return
       }
 
-      const selectedItems = scanHistory.map(item => ({ 
+      const selectedItems = scanHistory.map((item) => ({
         ItemSeq: item?.ItemSeq,
-        ItemLotNo: item?.LotNoFull
-      }));
+        ItemLotNo: item?.LotNoFull,
+      }))
 
       DeleteTFIFOListTemp(selectedItems)
         .then(() => {
-          setScanHistory([]);
-          fetchDataA(dataA?.OutReqSeq);
-          message.success('Reset form thành công!');
+          setScanHistory([])
+          fetchDataA(dataA?.OutReqSeq)
+          message.success('Reset form thành công!')
         })
         .catch((error) => {
-          message.error('Đã xảy ra lỗi khi reset form!');
-        });
+          message.error('Đã xảy ra lỗi khi reset form!')
+        })
     },
-    [scanHistory, dataA]
-  );
-
+    [scanHistory, dataA],
+  )
 
   const getSelectedRowIndices = () => {
     const selectedRows = selection.rows.items
@@ -529,52 +525,53 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
 
   const handleDelete = useCallback(
     async (e) => {
-      e.preventDefault();
+      e.preventDefault()
 
-      const selectedRowIndices = getSelectedRowIndices();
+      const selectedRowIndices = getSelectedRowIndices()
       if (selectedRowIndices.length === 0) {
-        setModal2Open(true);
-        setError('Vui lòng chọn ít nhất một hàng để xóa.');
-        return;
+        setModal2Open(true)
+        setError('Vui lòng chọn ít nhất một hàng để xóa.')
+        return
       }
       if (scanHistory.length === 0) {
-        setModal2Open(true);
-        setError('Không có dữ liệu nào để xóa.');
-        return;
+        setModal2Open(true)
+        setError('Không có dữ liệu nào để xóa.')
+        return
       }
 
       const selectedItems = selectedRowIndices.map((index) => ({
         ItemNo: scanHistory[index]?.ItemNo,
         Qty: scanHistory[index]?.Qty,
-      }));
+      }))
 
       const selectedItemsDelete = selectedRowIndices.map((index) => ({
         ItemSeq: scanHistory[index]?.ItemSeq,
         ItemLotNo: scanHistory[index]?.LotNoFull,
-      }));
+      }))
       const remainingRows = scanHistory.filter(
         (row, index) => !selectedRowIndices.includes(index),
-      );
+      )
       DeleteTFIFOListTemp(selectedItemsDelete)
-      setScanHistory(remainingRows);
+      setScanHistory(remainingRows)
 
       setDataA((prevData) =>
         prevData.map((item) => {
-          const selectedItem = selectedItems.find((selected) => selected.ItemNo === item.ItemNo);
+          const selectedItem = selectedItems.find(
+            (selected) => selected.ItemNo === item.ItemNo,
+          )
           if (selectedItem) {
             return {
               ...item,
               OutQty: item.OutQty - selectedItem.Qty,
               RemainQty: item.RemainQty + selectedItem.Qty,
-            };
+            }
           }
-          return item;
-        })
-      );
+          return item
+        }),
+      )
     },
     [scanHistory, selection, setDataA],
-  );
-
+  )
 
   return (
     <>
@@ -643,10 +640,7 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
           modal5Open={modal5Open}
           successMessage={successMessage}
         />
-          <ModalFocus  
-       status={status}
-        setStatus={setStatus}
-        nameFrom={nameFrom}/>
+        <ModalFocus status={status} setStatus={setStatus} nameFrom={nameFrom} />
       </div>
     </>
   )

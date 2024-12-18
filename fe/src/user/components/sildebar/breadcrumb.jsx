@@ -55,7 +55,9 @@ export default function BreadcrumbRouter({ menuTransForm, rootMenu }) {
       <Menu>
         {subMenu.map((item) => (
           <Menu.Item key={item.MenuKey}>
-            <a  className=' uppercase' href={item.MenuLink}>{item.MenuLabel}</a>
+            <a className=" uppercase" href={item.MenuLink}>
+              {item.MenuLabel}
+            </a>
           </Menu.Item>
         ))}
       </Menu>
@@ -65,17 +67,21 @@ export default function BreadcrumbRouter({ menuTransForm, rootMenu }) {
   return (
     <div className="p-2 uppercase text-xs bg-white border-b">
       {breadcrumbItems.map((item, index) => (
-        <span key={item.path}  className=' uppercase'>
+        <span key={item.path} className=" uppercase">
           {index > 0 && <span> / </span>}
           {item.subMenu ? (
             <Dropdown
               overlay={renderSubMenu(item.subMenu)}
               trigger={['click', 'hover']}
             >
-              <a className=' uppercase' href={item.path}>{item.breadcrumbName}</a>
+              <a className=" uppercase" href={item.path}>
+                {item.breadcrumbName}
+              </a>
             </Dropdown>
           ) : (
-            <a   className=' uppercase' href={item.path}>{item.breadcrumbName}</a>
+            <a className=" uppercase" href={item.path}>
+              {item.breadcrumbName}
+            </a>
           )}
         </span>
       ))}

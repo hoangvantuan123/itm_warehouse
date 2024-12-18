@@ -8,13 +8,9 @@ export default function TabRoleUserGroup({ userInfo, setUserInfo }) {
 
   return (
     <>
-     <div className="font-medium text-xs mb-2 uppercase">
-               NHÓM NGƯỜI DÙNG
-              </div>
+      <div className="font-medium text-xs mb-2 uppercase">NHÓM NGƯỜI DÙNG</div>
       <div className="mb-2">
-        <label >
-          {t('Tên nhóm')}
-        </label>
+        <label>{t('Tên nhóm')}</label>
         <Input
           value={userInfo?.groupName}
           onChange={(e) =>
@@ -25,14 +21,10 @@ export default function TabRoleUserGroup({ userInfo, setUserInfo }) {
         />
       </div>
       <div>
-        <label >
-          {t('Ghi chú')}
-        </label>
+        <label>{t('Ghi chú')}</label>
         <Input.TextArea
           value={userInfo?.note}
-          onChange={(e) =>
-            setUserInfo({ ...userInfo, note: e.target.value })
-          }
+          onChange={(e) => setUserInfo({ ...userInfo, note: e.target.value })}
           placeholder={t('Ghi chú')}
           rows={4}
         />

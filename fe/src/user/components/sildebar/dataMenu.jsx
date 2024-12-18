@@ -5,7 +5,6 @@ import {
   ContainerOutlined,
   FolderOpenOutlined,
   ShoppingOutlined,
-  
 } from '@ant-design/icons'
 
 export const iconMapping = {
@@ -14,5 +13,3 @@ export const iconMapping = {
   SettingOutlined: <SettingOutlined style={{ fontSize: '20px' }} />,
   ShoppingOutlined: <ShoppingOutlined style={{ fontSize: '20px' }} />,
 }
-
-

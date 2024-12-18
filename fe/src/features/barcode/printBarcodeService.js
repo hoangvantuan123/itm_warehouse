@@ -1,13 +1,7 @@
 import axios from 'axios'
 import { HOST_API_SERVER_3 } from '../../services'
 
-export const GetPageItem = async (
-  fromDate,
-  toDate,
-  vendor,
-  matID,
-  lotNo,
-) => {
+export const GetPageItem = async (fromDate, toDate, vendor, matID, lotNo) => {
   try {
     const url = `${HOST_API_SERVER_3}/print-barcode/paginated`
 
@@ -48,17 +42,12 @@ export const GetPageItem = async (
 }
 
 export const CreatePrintLabel = async (requestData) => {
-
   return axios
-    .post(
-      `${HOST_API_SERVER_3}/print-barcode/printer`,
-      requestData,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+    .post(`${HOST_API_SERVER_3}/print-barcode/printer`, requestData, {
+      headers: {
+        'Content-Type': 'application/json',
       },
-    )
+    })
     .then((response) => {
       if (response.status === 200 || response.status === 201) {
         return response.data
@@ -74,23 +63,18 @@ export const CreatePrintLabel = async (requestData) => {
 }
 
 export const getMatIdByVendor = async (requestData) => {
-  const {
-    plant,
-    partNo,
-  } = requestData;
+  const { plant, partNo } = requestData
 
   return axios
-    .get(
-      `${HOST_API_SERVER_3}/print-barcode/get-matid`, {
+    .get(`${HOST_API_SERVER_3}/print-barcode/get-matid`, {
       params: {
         plant,
         partNo,
       },
       headers: {
         'Content-Type': 'application/json',
-      }
-    }
-    )
+      },
+    })
     .then((response) => {
       if (response.status === 200 || response.status === 201) {
         return response.data.result
@@ -106,17 +90,12 @@ export const getMatIdByVendor = async (requestData) => {
 }
 
 export const getReelNo = async (requestData) => {
-
   return axios
-    .get(
-      `${HOST_API_SERVER_3}/print-barcode/get-reel-no`,
-      requestData,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+    .get(`${HOST_API_SERVER_3}/print-barcode/get-reel-no`, requestData, {
+      headers: {
+        'Content-Type': 'application/json',
       },
-    )
+    })
     .then((response) => {
       if (response.status === 200 || response.status === 201) {
         return response.data
@@ -132,11 +111,7 @@ export const getReelNo = async (requestData) => {
 }
 
 export const getLotCount = async (requestData) => {
-
-  const {
-    plant,
-    lotNo,
-  } = requestData;
+  const { plant, lotNo } = requestData
 
   return axios
     .get(`${HOST_API_SERVER_3}/print-barcode/get-lot-count`, {
@@ -146,12 +121,11 @@ export const getLotCount = async (requestData) => {
       },
       headers: {
         'Content-Type': 'application/json',
-      }
-    }
-    )
+      },
+    })
     .then((response) => {
       if (response.status === 200 || response.status === 201) {
-        return response.data.result;
+        return response.data.result
       }
       throw new Error('Error from API: ' + response.data.message)
     })
@@ -164,17 +138,12 @@ export const getLotCount = async (requestData) => {
 }
 
 export const CreatePrintLabelBySize = async (requestData) => {
-
   return axios
-    .post(
-      `${HOST_API_SERVER_3}/print-barcode/print-by-size`,
-      requestData,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+    .post(`${HOST_API_SERVER_3}/print-barcode/print-by-size`, requestData, {
+      headers: {
+        'Content-Type': 'application/json',
       },
-    )
+    })
     .then((response) => {
       if (response.status === 200 || response.status === 201) {
         return response.data

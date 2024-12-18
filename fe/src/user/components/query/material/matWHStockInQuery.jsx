@@ -5,9 +5,7 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/vi'
 dayjs.locale('vi')
 const { Title } = Typography
-export default function MatWHStockInQuery({
-  filteredData
-}) {
+export default function MatWHStockInQuery({ filteredData }) {
   const [date] = useState(dayjs())
 
   const formatDateWithWeekday = (date) => {

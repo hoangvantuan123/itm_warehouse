@@ -11,9 +11,10 @@ import { Request } from 'express';
 import { jwtConstants } from 'src/config/security.config';
 import * as jwt from 'jsonwebtoken';
 import { SimpleQueryResult } from 'src/common/interfaces/simple-query-result.interface';
-
+const pendingRequests = {}; 
 @Controller('v2/mssql/system-users')
 export class RootMenusController {
+    private readonly ongoingRequests = new Map<string, NodeJS.Timeout>();
     constructor(private readonly rootMenusService: RootMenusService) { }
 
     @Post('add-root-menus')
@@ -107,7 +108,7 @@ export class RootMenusController {
 
     @Post('search-root-menus')
     async searchMenus(
-        @Body() body: { searchValue: string },
+        @Body() body: { searchValue: string, searchFields: string[] }, 
         @Req() req: Request
     ) {
         const authHeader = req.headers.authorization;
@@ -116,15 +117,15 @@ export class RootMenusController {
                 'You do not have permission to access this API.',
             );
         }
-
+    
         const token = authHeader.split(' ')[1];
-
+    
         if (!token) {
             throw new UnauthorizedException(
                 'You do not have permission to access this API.',
             );
         }
-
+    
         try {
             const decodedToken = jwt.verify(token, jwtConstants.secret) as {
                 UserId: any;
@@ -132,12 +133,15 @@ export class RootMenusController {
                 UserSeq: any;
                 CompanySeq: any;
             };
-            const { searchValue } = body; 
-            return this.rootMenusService.searchRootMenus(searchValue);
+            
+            const { searchValue, searchFields } = body; 
+    
+            return this.rootMenusService.searchRootMenus(searchValue, searchFields);
         } catch (error) {
             throw new UnauthorizedException(
                 'You do not have permission to access this API.',
             );
         }
     }
+    
 }

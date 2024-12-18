@@ -164,8 +164,8 @@ function TableDeliveryList({ data, onCellClicked, gridData, setGridData }) {
             i % 2 === 0
               ? undefined
               : {
-                bgCell: '#FBFBFB',
-              }
+                  bgCell: '#FBFBFB',
+                }
           }
         />
       </div>

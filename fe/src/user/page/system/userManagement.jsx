@@ -91,27 +91,25 @@ export default function UserManagement({ permissions, isMobile }) {
   }
   const handleUpdatePassUsers = async () => {
     if (!isAPISuccess) {
-      return;
+      return
     }
-    setIsAPISuccess(false);
-    setLoadingUpadtePass(true);
-    const loadingMessage = message.loading('Updating passwords...', 0);
+    setIsAPISuccess(false)
+    setLoadingUpadtePass(true)
+    const loadingMessage = message.loading('Updating passwords...', 0)
     try {
-      const selectedRowIndices = getSelectedRowIndices();
-      const selectedIds = selectedRowIndices.map((index) => data[index].UserId);
-      await UpdatePass2(selectedIds);
-      loadingMessage();
-      message.success('Passwords updated successfully!');
+      const selectedRowIndices = getSelectedRowIndices()
+      const selectedIds = selectedRowIndices.map((index) => data[index].UserId)
+      await UpdatePass2(selectedIds)
+      loadingMessage()
+      message.success('Passwords updated successfully!')
     } catch (error) {
-      loadingMessage();
-      message.error('Failed to update passwords. Please try again.');
+      loadingMessage()
+      message.error('Failed to update passwords. Please try again.')
     } finally {
-      setIsAPISuccess(true);
-      setLoadingUpadtePass(false);
+      setIsAPISuccess(true)
+      setLoadingUpadtePass(false)
     }
-  };
-
-
+  }
 
   useEffect(() => {
     const handleKeyDown = (e) => {

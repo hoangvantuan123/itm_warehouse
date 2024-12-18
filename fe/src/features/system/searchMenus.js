@@ -6,12 +6,12 @@ import {
     accessToken
 } from "../../services/tokenService";
 
-export const SearchRootMenu = async (searchValue, searchFields) => {  
+export const SearchMenus = async (searchValue, searchFields) => {  
     try {
         const token = accessToken();
 
         const response = await axios.post(
-            `${HOST_API_SERVER_2}/mssql/system-users/search-root-menus`, {
+            `${HOST_API_SERVER_2}/mssql/system-users/search-menus`, {
                 searchValue,          
                 searchFields         
             }, {

@@ -55,7 +55,25 @@ export class MenusService {
         return { affectedRows };
     }
 
-
+    async searchMenus(searchValue: string, searchFields: string[]): Promise<{ data: any[]; total: number; message: string }> {
+        if (!searchValue) {
+          return { data: [], total: 0, message: 'Search value is required' };
+        }
+      
+        const queryBuilder = this.menusRepository.createQueryBuilder('items')
+          .select(['items.Id', 'items.Key', 'items.Label']);
+      
+        searchFields.forEach(field => {
+          queryBuilder.orWhere(`items.${field} LIKE :searchValue COLLATE SQL_Latin1_General_CP1_CI_AS`, { searchValue: `%${searchValue}%` });
+        });
+      
+        try {
+          const items = await queryBuilder.getMany();
+          return { data: items, total: items.length, message: 'Success' };
+        } catch (error) {
+          return { data: [], total: 0, message: `Error while searching items: ${error.message}` };
+        }
+      }
 
 
 }

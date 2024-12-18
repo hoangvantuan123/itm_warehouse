@@ -59,40 +59,27 @@ export class RootMenusService {
 
 
 
-  async searchRootMenus(searchValue: string): Promise<{ data: any[]; total: number; message: string }> {
-
+  async searchRootMenus(searchValue: string, searchFields: string[]): Promise<{ data: any[]; total: number; message: string }> {
     if (!searchValue) {
-      return {
-        data: [],
-        total: 0,
-        message: 'Search value is required',
-      };
+      return { data: [], total: 0, message: 'Search value is required' };
     }
-
+  
+    const queryBuilder = this.rootMenusRepository.createQueryBuilder('items')
+      .select(['items.Id', 'items.Key', 'items.Label']);
+  
+    searchFields.forEach(field => {
+      queryBuilder.orWhere(`items.${field} LIKE :searchValue COLLATE SQL_Latin1_General_CP1_CI_AS`, { searchValue: `%${searchValue}%` });
+    });
+  
     try {
-      const items = await this.rootMenusRepository
-        .createQueryBuilder('items')
-        .select(['items.Id', 'items.Key', 'items.Label'])  // Chỉ lấy các trường cần thiết
-        .where('items.Key LIKE :searchValue COLLATE SQL_Latin1_General_CP1_CI_AS', { searchValue: `%${searchValue}%` })
-        .orWhere('items.Id LIKE :searchValue COLLATE SQL_Latin1_General_CP1_CI_AS', { searchValue: `%${searchValue}%` })
-        .orWhere('items.Label LIKE :searchValue COLLATE SQL_Latin1_General_CP1_CI_AS', { searchValue: `%${searchValue}%` })
-        .orWhere('items.Link LIKE :searchValue COLLATE SQL_Latin1_General_CP1_CI_AS', { searchValue: `%${searchValue}%` })
-        .getMany();
-
-
-      return {
-        data: items,
-        total: items.length,
-        message: 'Success',
-      };
+      const items = await queryBuilder.getMany();
+      return { data: items, total: items.length, message: 'Success' };
     } catch (error) {
-      return {
-        data: [],
-        total: 0,
-        message: `Error while searching items: ${error.message}`,
-      };
+      return { data: [], total: 0, message: `Error while searching items: ${error.message}` };
     }
   }
+  
+
 
 
 }

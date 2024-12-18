@@ -1,14 +1,9 @@
 import { useState } from 'react'
 import { Button } from 'antd'
-import {
-  SaveOutlined
-} from '@ant-design/icons'
+import { SaveOutlined } from '@ant-design/icons'
 import { LiveIcon, OffIcon } from '../../icons'
 
-export default function MatWHStockInActions({
-  status,
-  handleSubmit,
-}) {
+export default function MatWHStockInActions({ status, handleSubmit }) {
   return (
     <div className="flex items-center gap-2">
       {status ? (

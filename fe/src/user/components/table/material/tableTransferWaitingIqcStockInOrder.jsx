@@ -3,15 +3,16 @@ import { DataEditor, GridCellKind } from '@glideapps/glide-data-grid'
 import '@glideapps/glide-data-grid/dist/index.css'
 import { useNavigate } from 'react-router-dom'
 import { CompactSelection } from '@glideapps/glide-data-grid'
-import { Button, Input } from "antd";
+import { Button, Input } from 'antd'
 const SearchButton = ({ onClick }) => (
   <Button onClick={onClick}>Show Search</Button>
 )
 
-
-
-
-function TableTransferWaitingIqcStockInOrder({ data , setInputItemNo, inputItemNo}) {
+function TableTransferWaitingIqcStockInOrder({
+  data,
+  setInputItemNo,
+  inputItemNo,
+}) {
   const [gridData, setGridData] = useState([])
   const [showSearch, setShowSearch] = useState(false)
   const ref = (useRef < data) | (null > null)
@@ -20,7 +21,7 @@ function TableTransferWaitingIqcStockInOrder({ data , setInputItemNo, inputItemN
   const [clickedRowDataList, setClickedRowDataList] = useState([])
   const [isMinusClicked, setIsMinusClicked] = useState(false)
   const [lastClickedCell, setLastClickedCell] = useState(null)
-  const [highlightRegions, setHighlightRegions] = useState([]);
+  const [highlightRegions, setHighlightRegions] = useState([])
   const [selection, setSelection] = useState({
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
@@ -87,8 +88,6 @@ function TableTransferWaitingIqcStockInOrder({ data , setInputItemNo, inputItemN
     setGridData(data)
   }, [data])
 
-
-  
   const onCellClicked = (cell, event) => {
     let rowIndex
 
@@ -125,34 +124,31 @@ function TableTransferWaitingIqcStockInOrder({ data , setInputItemNo, inputItemN
     }
   }
 
-  const onGridSelectionChange = (newSelection) => {
-    
-  }
+  const onGridSelectionChange = (newSelection) => {}
   const findRowByItemNo = useCallback(
     (itemNo) => gridData.findIndex((row) => row.ItemNo === itemNo),
-    [gridData]
-  );
+    [gridData],
+  )
 
   const highlightRowByItemNo = useCallback(
     (itemNo) => {
-      const rowIndex = findRowByItemNo(itemNo);
+      const rowIndex = findRowByItemNo(itemNo)
       if (rowIndex !== null && rowIndex >= 0) {
         const highlightRegionB = {
-          color: "#ff00ff33", 
+          color: '#ff00ff33',
           range: { x: 0, y: rowIndex, width: columns.length, height: 1 },
-        };
-        setHighlightRegions([highlightRegionB]);
+        }
+        setHighlightRegions([highlightRegionB])
       }
     },
-    [findRowByItemNo, columns.length]
-  );
+    [findRowByItemNo, columns.length],
+  )
 
   useEffect(() => {
-    highlightRowByItemNo(inputItemNo);
+    highlightRowByItemNo(inputItemNo)
   }, [inputItemNo])
-  return ( 
+  return (
     <div className="w-full h-full border-t border-b overflow-hidden scroll-container ">
-       
       <DataEditor
         columns={cols}
         getCellContent={getData}
@@ -178,7 +174,7 @@ function TableTransferWaitingIqcStockInOrder({ data , setInputItemNo, inputItemN
                 bgCell: '#FBFBFB',
               }
         }
-        highlightRegions={highlightRegions} 
+        highlightRegions={highlightRegions}
       />
     </div>
   )

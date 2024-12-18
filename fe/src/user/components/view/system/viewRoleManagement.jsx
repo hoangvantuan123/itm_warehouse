@@ -1,6 +1,14 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Menu, Button, Input, Table, Space, Checkbox, Layout, Tabs } from 'antd'
-import { FolderOutlined, DeleteOutlined, PlusOutlined , UsergroupAddOutlined, KeyOutlined, AppstoreAddOutlined, UnorderedListOutlined } from '@ant-design/icons'
+import {
+  FolderOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  UsergroupAddOutlined,
+  KeyOutlined,
+  AppstoreAddOutlined,
+  UnorderedListOutlined,
+} from '@ant-design/icons'
 import BG from '../../../../assets/defaultLogo.png'
 import ModalRootMenu from '../../modal/system/modalRootMenu'
 import ModalUsers from '../../modal/system/modalUsers'
@@ -15,8 +23,6 @@ import TabRoleMenuAccessPermiss from '../../tabs/system/tabRoleMenuPermiss'
 import TabRoleListUser from '../../tabs/system/tabRoleListUser'
 const { Header, Content, Footer } = Layout
 const menuStyle = { borderInlineEnd: 'none' }
-
-
 
 function ViewRoleManagement({
   groups,
@@ -57,13 +63,13 @@ function ViewRoleManagement({
   const [updateData1, setUpdateData2] = useState([])
   const [data2, setData2] = useState([])
   const [data3, setData3] = useState([])
-  const [current, setCurrent] = useState('1');
+  const [current, setCurrent] = useState('1')
   const onChangeTabs = (key) => {
-    console.log(key);
-  };
+    console.log(key)
+  }
   const handleMenuClick = (e) => {
-    setCurrent(e.key);
-  };
+    setCurrent(e.key)
+  }
   const handleTableSelectionChange = (newSelectedRowKeys, tableKey) => {
     setSelectedRowKeys((prevSelectedKeys) => ({
       ...prevSelectedKeys,
@@ -328,28 +334,66 @@ function ViewRoleManagement({
       key: '1',
       label: 'NHÓM NGƯỜI DÙNG',
       icon: <UsergroupAddOutlined />, // Icon cho mục này
-      children: <TabRoleUserGroup userInfo={userInfo} setUserInfo={setUserInfo}/>,
+      children: (
+        <TabRoleUserGroup userInfo={userInfo} setUserInfo={setUserInfo} />
+      ),
     },
     {
       key: '2',
       label: 'QUYỀN TRUY CẬP NHÓM',
       icon: <KeyOutlined />, // Icon cho mục này
-      children: <TabRoleGroupMenuAccess permissionColumns1={permissionColumns1} data1={data1} selectedRowKeys={selectedRowKeys} handleTableSelectionChange={handleTableSelectionChange} page1={page1} limit1={limit1} total1={total1} handleTableChange1={handleTableChange1} handleAddRow1={handleAddRow1}/>,
+      children: (
+        <TabRoleGroupMenuAccess
+          permissionColumns1={permissionColumns1}
+          data1={data1}
+          selectedRowKeys={selectedRowKeys}
+          handleTableSelectionChange={handleTableSelectionChange}
+          page1={page1}
+          limit1={limit1}
+          total1={total1}
+          handleTableChange1={handleTableChange1}
+          handleAddRow1={handleAddRow1}
+        />
+      ),
     },
     {
       key: '3',
       label: 'QUYỀN TRUY CẬP MENU',
       icon: <AppstoreAddOutlined />, // Icon cho mục này
-      children: <TabRoleMenuAccessPermiss permissionColumns2={permissionColumns2} data2={data2} selectedRowKeys={selectedRowKeys} handleTableSelectionChange={handleTableSelectionChange} page2={page2} limit2={limit2} total2={total2} handleTableChange2={handleTableChange2} handleAddRow2={handleAddRow2}/>,
+      children: (
+        <TabRoleMenuAccessPermiss
+          permissionColumns2={permissionColumns2}
+          data2={data2}
+          selectedRowKeys={selectedRowKeys}
+          handleTableSelectionChange={handleTableSelectionChange}
+          page2={page2}
+          limit2={limit2}
+          total2={total2}
+          handleTableChange2={handleTableChange2}
+          handleAddRow2={handleAddRow2}
+        />
+      ),
     },
     {
       key: '4',
       label: 'DANH SÁCH NGƯỜI DÙNG',
       icon: <UnorderedListOutlined />, // Icon cho mục này
-      children: <TabRoleListUser permissionColumns3={userColumns} data3={data3} selectedRowKeys={selectedRowKeys} handleTableSelectionChange={handleTableSelectionChange} page3={page3} limit3={limit3} total3={total3} handleTableChange3={handleTableChange3} handleAddRow3={handleAddRow3}/>,
+      children: (
+        <TabRoleListUser
+          permissionColumns3={userColumns}
+          data3={data3}
+          selectedRowKeys={selectedRowKeys}
+          handleTableSelectionChange={handleTableSelectionChange}
+          page3={page3}
+          limit3={limit3}
+          total3={total3}
+          handleTableChange3={handleTableChange3}
+          handleAddRow3={handleAddRow3}
+        />
+      ),
     },
-  ];
-  
+  ]
+
   return (
     <div className="w-full gap-3 h-full flex items-center justify-center">
       <div className="w-1/5 h-full flex flex-col bg-white border rounded-lg overflow-hidden pb-10">
@@ -375,30 +419,27 @@ function ViewRoleManagement({
       <div className="w-10/12 h-full flex flex-col border bg-white  rounded-lg  overflow-hidden  scroll-container">
         {openView ? (
           <>
-          <div className="flex">
-    <Menu
-      onClick={handleMenuClick}
-      selectedKeys={[current]}
-      mode="vertical"
-      style={menuStyle}
-      
-    >
-        <div className="font-medium text-xs mb-4 text-gray-700 uppercase p-3">
-         QUYỀN TRUY CẬP
-        </div>
-       {items.map(item => (
-        <Menu.Item key={item.key} icon={item.icon}>
-          <span className="text-xs">{item.label}</span>
-        </Menu.Item>
-      ))}
-    </Menu>
+            <div className="flex">
+              <Menu
+                onClick={handleMenuClick}
+                selectedKeys={[current]}
+                mode="vertical"
+                style={menuStyle}
+              >
+                <div className="font-medium text-xs mb-4 text-gray-700 uppercase p-3">
+                  QUYỀN TRUY CẬP
+                </div>
+                {items.map((item) => (
+                  <Menu.Item key={item.key} icon={item.icon}>
+                    <span className="text-xs">{item.label}</span>
+                  </Menu.Item>
+                ))}
+              </Menu>
 
-    <div className="flex-1 p-4 border-l h-screen overflow-auto scroll-container pb-20">
-      {items.find(item => item.key === current)?.children}
-    </div>
-  </div>
-
-          
+              <div className="flex-1 p-4 border-l h-screen overflow-auto scroll-container pb-20">
+                {items.find((item) => item.key === current)?.children}
+              </div>
+            </div>
           </>
         ) : (
           <>

@@ -22,8 +22,6 @@ import LoadSubmit from '../default/loadSubmit'
 import SuccessSubmit from '../default/successSubmit'
 import { CompactSelection } from '@glideapps/glide-data-grid'
 
-
-
 export default function MatWHStockIn({ permissions, isMobile }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -49,19 +47,19 @@ export default function MatWHStockIn({ permissions, isMobile }) {
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
   })
-  
-  const [isOpenDetails, setIsOpenDetails] = useState(false);
+
+  const [isOpenDetails, setIsOpenDetails] = useState(false)
 
   useEffect(() => {
-    const savedState = localStorage.getItem("detailsStateMatWH");
-    setIsOpenDetails(savedState === "open");
-  }, []);
+    const savedState = localStorage.getItem('detailsStateMatWH')
+    setIsOpenDetails(savedState === 'open')
+  }, [])
 
   const handleToggle = (event) => {
-    const isOpen = event.target.open;
-    setIsOpenDetails(isOpen);
-    localStorage.setItem("detailsStateMatWH", isOpen ? "open" : "closed");
-  };
+    const isOpen = event.target.open
+    setIsOpenDetails(isOpen)
+    localStorage.setItem('detailsStateMatWH', isOpen ? 'open' : 'closed')
+  }
 
   const Format = useCallback((date) => {
     const d = new Date(date)
@@ -73,7 +71,6 @@ export default function MatWHStockIn({ permissions, isMobile }) {
 
   const DateIn = Format(new Date())
 
-
   const decodeBase64Url = (base64Url) => {
     try {
       let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
@@ -83,7 +80,7 @@ export default function MatWHStockIn({ permissions, isMobile }) {
     } catch (error) {
       throw new Error('Invalid Base64 URL')
     }
-  } 
+  }
 
   const fetchMatWHData = async (blSeq, blSerl) => {
     try {
@@ -104,13 +101,11 @@ export default function MatWHStockIn({ permissions, isMobile }) {
       const decryptedData = bytes.toString(CryptoJS.enc.Utf8)
       return JSON.parse(decryptedData)
     } catch (error) {
-    
-      navigate(`/wms/u/warehouse/material/waiting-iqc-status`) 
+      navigate(`/wms/u/warehouse/material/waiting-iqc-status`)
       setModal3Open(true)
       return null
     }
   }
-
 
   useEffect(() => {
     if (id) {
@@ -140,7 +135,6 @@ export default function MatWHStockIn({ permissions, isMobile }) {
           </DataBlock1>
       `
   }
-
 
   const createXmlCloseItemCheck = (row, index) => `
   <DataBlock2>
@@ -238,59 +232,60 @@ export default function MatWHStockIn({ permissions, isMobile }) {
   </DataBlock2>
 `
 
-
-const handleSubmit = useCallback(
-  async (e) => {
-    e.preventDefault()
-    setLoadingSave(true)
-    setResult(null)
-    setModal4Open(true)
-    if (data.length === 0) {
-      setLoadingSave(false)
-      setModal2Open(true)
-      setModal4Open(false)
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault()
+      setLoadingSave(true)
       setResult(null)
-      setError('Chưa có dữ liệu để gửi. Vui lòng quét dữ liệu trước khi gửi.')
-      return
-    }
-    const xmlSCOMCloseCheckWEB = createXmlDataCloseCheck(data[0])
-    const xmlSCOMCloseItemCheckWEB = data
-      .map(createXmlCloseItemCheck)
-      .join('\n')
-    const xmlInOutDailyCheckWEB = createXmlInOutDailyCheck(data[0])
-    const xmlInOutDailyItemCheckWEB = data.map(createXmlInOutDailyItemCheck).join('\n')
-
-    try {
-      const response = await CheckAllProceduresMatWHStockIn(data, {
-        xmlSCOMCloseCheckWEB: xmlSCOMCloseCheckWEB,
-        xmlSCOMCloseItemCheckWEB: xmlSCOMCloseItemCheckWEB,
-        xmlInOutDailyCheckWEB: xmlInOutDailyCheckWEB,
-        xmlInOutDailyItemCheckWEB: xmlInOutDailyItemCheckWEB,
-      })
-
-      setResult(response)
-      if (response.success) {
-        navigate(`/wms/u/warehouse/material/waiting-iqc-status`)
-        setModal4Open(false)
-        setModal5Open(true)
-        setSuccessMessage('Tất cả các dữ liệu đã được thực thi thành công!')
-        setData([])
-      } else {
-        setModal4Open(false)
+      setModal4Open(true)
+      if (data.length === 0) {
+        setLoadingSave(false)
         setModal2Open(true)
-        setError(response.message)
+        setModal4Open(false)
+        setResult(null)
+        setError('Chưa có dữ liệu để gửi. Vui lòng quét dữ liệu trước khi gửi.')
+        return
       }
-    } catch (error) {
-      setModal4Open(false)
-      setResult({ error: error.message })
-      setModal2Open(true)
-      setError(error.message)
-    } finally {
-      setLoadingSave(false)
-    }
-  },
-  [data],
-)
+      const xmlSCOMCloseCheckWEB = createXmlDataCloseCheck(data[0])
+      const xmlSCOMCloseItemCheckWEB = data
+        .map(createXmlCloseItemCheck)
+        .join('\n')
+      const xmlInOutDailyCheckWEB = createXmlInOutDailyCheck(data[0])
+      const xmlInOutDailyItemCheckWEB = data
+        .map(createXmlInOutDailyItemCheck)
+        .join('\n')
+
+      try {
+        const response = await CheckAllProceduresMatWHStockIn(data, {
+          xmlSCOMCloseCheckWEB: xmlSCOMCloseCheckWEB,
+          xmlSCOMCloseItemCheckWEB: xmlSCOMCloseItemCheckWEB,
+          xmlInOutDailyCheckWEB: xmlInOutDailyCheckWEB,
+          xmlInOutDailyItemCheckWEB: xmlInOutDailyItemCheckWEB,
+        })
+
+        setResult(response)
+        if (response.success) {
+          navigate(`/wms/u/warehouse/material/waiting-iqc-status`)
+          setModal4Open(false)
+          setModal5Open(true)
+          setSuccessMessage('Tất cả các dữ liệu đã được thực thi thành công!')
+          setData([])
+        } else {
+          setModal4Open(false)
+          setModal2Open(true)
+          setError(response.message)
+        }
+      } catch (error) {
+        setModal4Open(false)
+        setResult({ error: error.message })
+        setModal2Open(true)
+        setError(error.message)
+      } finally {
+        setLoadingSave(false)
+      }
+    },
+    [data],
+  )
 
   return (
     <>
@@ -325,19 +320,17 @@ const handleSubmit = useCallback(
                 </span>
               </summary>
               <div className="flex p-2 gap-4">
-                <MatWHStockInQuery
-                  filteredData={filteredData}
-                />
+                <MatWHStockInQuery filteredData={filteredData} />
               </div>
             </details>
           </div>
 
           <div className="col-start-1 col-end-5 row-start-2 w-full h-full rounded-lg  overflow-auto">
-          <TableTransferMatWHStockInBarcode
+            <TableTransferMatWHStockInBarcode
               data={data}
               loading={loading}
-              setData={setData}          
-           />
+              setData={setData}
+            />
           </div>
         </div>
       </div>
@@ -352,7 +345,11 @@ const handleSubmit = useCallback(
         modal5Open={modal5Open}
         successMessage={successMessage}
       />
-      <ErrorPage modal3Open={modal3Open} setModal3Open={setModal3Open} pathRouter="/wms/u/warehouse/material/waiting-iqc-status" />
+      <ErrorPage
+        modal3Open={modal3Open}
+        setModal3Open={setModal3Open}
+        pathRouter="/wms/u/warehouse/material/waiting-iqc-status"
+      />
     </>
   )
 }

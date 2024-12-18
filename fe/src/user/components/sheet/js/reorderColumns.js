@@ -1,3 +1,3 @@
 export const reorderColumns = (columns) => {
-    return columns.map(col => col.id);
-  };
+  return columns.map((col) => col.id)
+}

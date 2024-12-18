@@ -1,5 +1,14 @@
 import { useState } from 'react'
-import { Button, Dropdown, Menu, message, Input, Space, Form, InputNumber } from 'antd'
+import {
+  Button,
+  Dropdown,
+  Menu,
+  message,
+  Input,
+  Space,
+  Form,
+  InputNumber,
+} from 'antd'
 import {
   SaveOutlined,
   PlusOutlined,
@@ -9,7 +18,8 @@ import {
   FileTextOutlined,
   DownOutlined,
   ExportOutlined,
-  SettingOutlined, TableOutlined
+  SettingOutlined,
+  TableOutlined,
 } from '@ant-design/icons'
 import * as XLSX from 'xlsx'
 import { saveAs } from 'file-saver'
@@ -19,10 +29,10 @@ export default function MenuManagementActions({
   data,
   handleSaveData,
   setNumRowsToAdd,
-  clickCount
+  clickCount,
 }) {
   const [visible, setVisible] = useState(false)
-  const [inputValue, setInputValue] = useState(1);
+  const [inputValue, setInputValue] = useState(1)
 
   // Hàm xuất CSV
   const exportCSV = () => {
@@ -72,11 +82,8 @@ export default function MenuManagementActions({
     }
   }
 
-
-
   const menu = (
     <Menu onClick={handleMenuClick} className=" w-40">
-
       <Menu.SubMenu key="export" title="Export" icon={<ExportOutlined />}>
         <Menu.Item key="csv" icon={<FileTextOutlined />}>
           CSV Export
@@ -96,22 +103,22 @@ export default function MenuManagementActions({
 
   const handleAddRows = () => {
     if (inputValue && !isNaN(inputValue) && inputValue > 0) {
-      setNumRowsToAdd(inputValue);
+      setNumRowsToAdd(inputValue)
     }
-  };
+  }
 
   const handleSave = () => {
-    handleAddRows();
-    setVisible(false);
+    handleAddRows()
+    setVisible(false)
     setInputValue(1)
     setClickCount(!clickCount)
-  };
+  }
 
   const handleCancel = () => {
-    setVisible(false);
-  };
+    setVisible(false)
+  }
   const rowMenu = (
-    <div className=' bg-white  border rounded-lg p-3 w-80'>
+    <div className=" bg-white  border rounded-lg p-3 w-80">
       <Form layout="vertical">
         <Form.Item label="Enter number of rows">
           <InputNumber
@@ -140,18 +147,22 @@ export default function MenuManagementActions({
         </Space>
       </Form>
     </div>
-  );
+  )
   return (
     <div className="flex items-center gap-2">
       <Dropdown overlay={menu}>
         <Button>
-          <SettingOutlined />    Actions
+          <SettingOutlined /> Actions
         </Button>
       </Dropdown>
 
-
-      <Dropdown overlay={rowMenu} trigger={['click']} placement="bottomRight" visible={visible}
-        onVisibleChange={(visible) => setVisible(visible)}>
+      <Dropdown
+        overlay={rowMenu}
+        trigger={['click']}
+        placement="bottomRight"
+        visible={visible}
+        onVisibleChange={(visible) => setVisible(visible)}
+      >
         <Button
           key="Save"
           type="primary"

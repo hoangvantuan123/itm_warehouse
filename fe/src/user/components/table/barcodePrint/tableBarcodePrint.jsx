@@ -6,7 +6,7 @@ import {
 } from '@glideapps/glide-data-grid'
 import '@glideapps/glide-data-grid/dist/index.css'
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react'
 function TableBarcodePrint({
   data,
   setGridData,
@@ -14,13 +14,10 @@ function TableBarcodePrint({
   setSelectRow,
   onCellClicked,
 }) {
-
-
   const [selection, setSelection] = useState({
     columns: CompactSelection.empty(),
     rows: CompactSelection.empty(),
-  });
-  
+  })
 
   const columns = useMemo(
     () => [
@@ -105,12 +102,11 @@ function TableBarcodePrint({
   )
 
   useEffect(() => {
-    setGridData(data);
-    setSelectRow(selection);
+    setGridData(data)
+    setSelectRow(selection)
   }, [data, setSelectRow, selection])
 
   return (
-
     <div className="w-full gap-1 h-full flex items-center justify-center pb-8">
       <div className="w-full h-full flex flex-col border bg-white rounded-lg overflow-hidden ">
         <DataEditor
@@ -131,8 +127,7 @@ function TableBarcodePrint({
         />
       </div>
     </div>
-
-  );
+  )
 }
 
 export default TableBarcodePrint

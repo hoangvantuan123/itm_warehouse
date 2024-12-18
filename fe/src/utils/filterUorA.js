@@ -1,17 +1,22 @@
-export const filterAndSelectColumnsA = (addRows, columnsToSelect, status) => {
-  const filteredRows = addRows
-    .filter((row) => row.Status === status)
+export const filterAndSelectColumns = (
+  editedRows,
+  columnsToSelect,
+  status,
+) => {
+  const filteredRows = editedRows
+    .filter((row) => row.status === status)
     .map((row) => {
       const selectedRow = {}
       let isValidRow = false
 
       columnsToSelect.forEach((col) => {
-        if (col !== 'Status' && row.hasOwnProperty(col)) {
-          const value = row[col]
+        if (row.updatedRow.hasOwnProperty(col)) {
+          const value = row.updatedRow[col]
 
           if (value !== '' && value != null) {
             isValidRow = true
           }
+
           if (isValidRow) {
             selectedRow[col] = value
           }

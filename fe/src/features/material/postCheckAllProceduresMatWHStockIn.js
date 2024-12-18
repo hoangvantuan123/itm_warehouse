@@ -1,9 +1,6 @@
 import axios from 'axios'
 import { HOST_API_SERVER_1 } from '../../services'
-import {
-  accessToken
-} from '../../services/tokenService'
-
+import { accessToken } from '../../services/tokenService'
 
 const DEFAULTS = {
   xmlFlags: 2,
@@ -13,7 +10,10 @@ const DEFAULTS = {
   pgmSeq: 5484,
 }
 
-export const CheckAllProceduresMatWHStockIn = async (dataSave, xmlDocuments) => {
+export const CheckAllProceduresMatWHStockIn = async (
+  dataSave,
+  xmlDocuments,
+) => {
   try {
     const token = accessToken()
     const dataToSend = {

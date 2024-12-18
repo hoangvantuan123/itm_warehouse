@@ -1,20 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import UserRouter from './user/routes/userRouter'
 import './App.css'
-import { Modal } from 'antd';
+import { Modal } from 'antd'
 const App = () => {
-
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false)
   const isIndexedDBSupported = () => {
-    return 'indexedDB' in window;
-  };
+    return 'indexedDB' in window
+  }
   const isWebWorkerSupported = () => {
-    return typeof Worker !== 'undefined';
-  };
+    return typeof Worker !== 'undefined'
+  }
   const checkBrowserSupport = () => {
-    const indexedDBSupported = isIndexedDBSupported();
-    const webWorkerSupported = isWebWorkerSupported();
+    const indexedDBSupported = isIndexedDBSupported()
+    const webWorkerSupported = isWebWorkerSupported()
 
     if (!indexedDBSupported) {
       setIsModalVisible(true)
@@ -27,11 +26,11 @@ const App = () => {
     if (!indexedDBSupported || !webWorkerSupported) {
       setIsModalVisible(true)
     }
-  };
+  }
 
   useEffect(() => {
-    checkBrowserSupport();
-  }, []);
+    checkBrowserSupport()
+  }, [])
 
   return (
     <div className="h-screen overflow-hidden ">
@@ -45,7 +44,8 @@ const App = () => {
         centered={true}
       >
         <p>
-          Môi trường của bạn không hỗ trợ các tính năng cần thiết. Vui lòng sử dụng môi trường hiện đại hơn để tiếp tục.
+          Môi trường của bạn không hỗ trợ các tính năng cần thiết. Vui lòng sử
+          dụng môi trường hiện đại hơn để tiếp tục.
         </p>
       </Modal>
     </div>

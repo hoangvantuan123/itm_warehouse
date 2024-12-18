@@ -50,7 +50,7 @@ export default function StockOutRequest({ permissions, isMobile }) {
   const [progStatus, setProgStatus] = useState('')
   const [useType, setUseType] = useState('')
   const [keyPath, setKeyPath] = useState(null)
-  const formatDate = (date) => date.format('YYYYMMDD');
+  const formatDate = (date) => date.format('YYYYMMDD')
 
   const [isMinusClicked, setIsMinusClicked] = useState(false)
   const [lastClickedCell, setLastClickedCell] = useState(null)

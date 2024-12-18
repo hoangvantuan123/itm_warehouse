@@ -25,13 +25,13 @@ export const databaseConfig1: TypeOrmModuleOptions = {
 
 export const sqlServerITMV: TypeOrmModuleOptions = {
   type: 'mssql',
-  host: '192.168.35.150',
-  port: 14233,
-  username: 'genuine',
-  password: 'Itmv209#',
+  host: 'localhost',
+  port: 1433,
+  username: 'sa',
+  password: 'YourStrongPassword!',
   database: 'ITMV20240117',
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-  synchronize: false,
+  synchronize: true,
   logging: true,
   cache: true,
   extra: {

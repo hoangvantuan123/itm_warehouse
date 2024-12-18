@@ -3,10 +3,7 @@ import { HOST_API_SERVER_1 } from '../../services'
 import { ERROR_MESSAGES } from '../../utils/constants'
 import { accessToken } from '../../services/tokenService'
 
-export const GetMatWHStockInList = async (
-  blSeq,
-  blSerl,
-) => {
+export const GetMatWHStockInList = async (blSeq, blSerl) => {
   try {
     const url = `${HOST_API_SERVER_1}/mssql/stock-in/itm-spd-mat-wh-stockin-list`
 
