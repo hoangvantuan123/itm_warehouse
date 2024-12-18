@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository , In} from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { SimpleQueryResult } from 'src/common/interfaces/simple-query-result.interface';
 import { DatabaseService } from 'src/common/database/sqlServer/ITMV/database.service';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from 'src/common/utils/constants';
@@ -136,32 +136,50 @@ export class SystemUsersService {
     date?: string
   ): Promise<{ data: any[]; total: number; message: string }> {
     const query = this.resTCAMenusWEBRepository.createQueryBuilder('menus');
-
+  
     const addFilterCondition = (filterKey: string, dbField: string) => {
       const values = filter[filterKey];
       if (Array.isArray(values) && values.length > 0) {
-        const conditions = values.map((_, index) => `${dbField} ILIKE :${filterKey}${index}`).join(' OR ');
+        const conditions = values
+          .map((_, index) => `${dbField} ILIKE :${filterKey}${index}`)
+          .join(' OR ');
         values.forEach((value, index) => query.setParameter(`${filterKey}${index}`, `%${value}%`));
         query.andWhere(`(${conditions})`);
       }
     };
-
+  
     addFilterCondition('Label', 'menus.Label');
-    addFilterCondition('Key', 'menus.Key');
+    addFilterCondition('Key', 'menus.[Key]'); 
     addFilterCondition('MenuRootId', 'menus.MenuRootId');
     addFilterCondition('MenuSubRootId', 'menus.MenuSubRootId');
-
-
+  
+    query
+      .leftJoin('_TCARootMenus_WEB', 'root', 'root.Id = menus.MenuRootId')
+      .leftJoin('_TCAMenus_WEB', 'subroot', 'subroot.Id = menus.MenuSubRootId');
+  
+    query.select([
+      'menus.Id as Id',
+      'menus.[Key] as "Key"', 
+      'menus.Label as Label',
+      'menus.Link as Link',
+      'menus.Type as Type',
+      'menus.MenuRootId as MenuRootId',
+      'menus.MenuSubRootId as MenuSubRootId',
+      'root.Label as MenuRootName',
+      'subroot.Label as MenuSubRootName',
+    ]);
+  
     query.orderBy('menus.Id', 'ASC');
-
-    const data = await query.getMany();
-
+  
+    const data = await query.getRawMany();
+  
     return {
       data,
       total: data.length,
-      message: 'Thành công',
+      message: 'Success',
     };
   }
+  
 
 
   async getRootMenusNotInRole(groupId: number): Promise<TCARootMenusWEB[]> {
@@ -507,10 +525,10 @@ export class SystemUsersService {
   async deleteGroupsByIds(ids: number[]): Promise<any> {
     try {
       const result = await this.resTCAGroupsWEBRepository.delete({ Id: In(ids) });
-  
+
       if (result.affected > 0) {
         const result2 = await this.resTCARolesUserWEBRepository.delete({ GroupId: In(ids) });
-  
+
         return {
           success: true,
           message: `${result.affected} group(s) deleted successfully, and ${result2.affected} related record(s) deleted successfully`,
@@ -529,7 +547,7 @@ export class SystemUsersService {
       };
     }
   }
-  
+
   async deleteMennusByIds(ids: number[]): Promise<any> {
     try {
       const existingRecords = await this.resTCARolesUserWEBRepository.find({
@@ -543,9 +561,9 @@ export class SystemUsersService {
           message: 'Cannot delete menus because there are related records in TCARolesUsersWEB.',
         };
       }
-  
+
       const result = await this.resTCAMenusWEBRepository.delete({ Id: In(ids) });
-  
+
       if (result.affected > 0) {
         return {
           success: true,
@@ -565,7 +583,7 @@ export class SystemUsersService {
       };
     }
   }
-  
+
 
   async deleteRootMenusByIds(ids: number[]): Promise<any> {
     try {
@@ -574,16 +592,16 @@ export class SystemUsersService {
           RootMenuId: In(ids),
         },
       });
-  
+
       if (existingRecords.length > 0) {
         return {
           success: false,
           message: 'Cannot delete root menus because there are related records in TCARolesUsersWEB.',
         };
       }
-  
+
       const result = await this.resTCARootMenusWEBRepository.delete({ Id: In(ids) });
-  
+
       if (result.affected > 0) {
         return {
           success: true,

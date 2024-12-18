@@ -103,4 +103,41 @@ export class RootMenusController {
             );
         }
     }
+
+
+    @Post('search-root-menus')
+    async searchMenus(
+        @Body() body: { searchValue: string },
+        @Req() req: Request
+    ) {
+        const authHeader = req.headers.authorization;
+        if (!authHeader) {
+            throw new UnauthorizedException(
+                'You do not have permission to access this API.',
+            );
+        }
+
+        const token = authHeader.split(' ')[1];
+
+        if (!token) {
+            throw new UnauthorizedException(
+                'You do not have permission to access this API.',
+            );
+        }
+
+        try {
+            const decodedToken = jwt.verify(token, jwtConstants.secret) as {
+                UserId: any;
+                EmpSeq: any;
+                UserSeq: any;
+                CompanySeq: any;
+            };
+            const { searchValue } = body; 
+            return this.rootMenusService.searchRootMenus(searchValue);
+        } catch (error) {
+            throw new UnauthorizedException(
+                'You do not have permission to access this API.',
+            );
+        }
+    }
 }

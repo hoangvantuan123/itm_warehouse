@@ -41,7 +41,7 @@ export default function MenuTechnique({ permissions, isMobile }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [openHelp, setOpenHelp] = useState(false);
-  const [inputHelp, setInputHelp] = useState(null)
+
   const [isCellSelected, setIsCellSelected] = useState(false);
   const [isCell, setIsCell] = useState(null)
   const [onSelectRow, setOnSelectRow] = useState([])
@@ -105,7 +105,7 @@ export default function MenuTechnique({ permissions, isMobile }) {
       console.log('selectedRows', selectedRows);
       console.log('remainingRows', remainingRows);
     },
-    [ selection, editedRows]
+    [selection, editedRows]
   );
 
 
@@ -257,7 +257,6 @@ export default function MenuTechnique({ permissions, isMobile }) {
               setNumRowsToAdd={setNumRowsToAdd}
               clickCount={clickCount}
               numRowsToAdd={numRowsToAdd}
-              setInputHelp={setInputHelp}
               onSelectRow={onSelectRow}
               openHelp={openHelp}
               setOpenHelp={setOpenHelp}

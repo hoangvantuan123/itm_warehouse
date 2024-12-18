@@ -5,25 +5,25 @@ import { TCARootMenusWEB } from '../entities/rootMenus.entity';
 
 @Injectable()
 export class RootMenusService {
-    constructor(
-        @InjectRepository(TCARootMenusWEB)
-        private readonly rootMenusRepository: Repository<TCARootMenusWEB>,
-    ) { }
+  constructor(
+    @InjectRepository(TCARootMenusWEB)
+    private readonly rootMenusRepository: Repository<TCARootMenusWEB>,
+  ) { }
 
-    private chunkArray<T>(array: T[], size: number): T[][] {
-        const result: T[][] = [];
-        for (let i = 0; i < array.length; i += size) {
-            result.push(array.slice(i, i + size));
-        }
-        return result;
+  private chunkArray<T>(array: T[], size: number): T[][] {
+    const result: T[][] = [];
+    for (let i = 0; i < array.length; i += size) {
+      result.push(array.slice(i, i + size));
     }
+    return result;
+  }
 
-   async addMultipleRootMenu(records: TCARootMenusWEB[]): Promise<any> {
+  async addMultipleRootMenu(records: TCARootMenusWEB[]): Promise<any> {
     if (!records || records.length === 0) {
       throw new Error('No records provided for insertion');
     }
 
-    const batchSize = 1000; 
+    const batchSize = 1000;
     const batches = this.chunkArray(records, batchSize);
 
     let affectedRows = 0;
@@ -54,6 +54,45 @@ export class RootMenusService {
     }
 
     return { affectedRows };
-}
+  }
+
+
+
+
+  async searchRootMenus(searchValue: string): Promise<{ data: any[]; total: number; message: string }> {
+
+    if (!searchValue) {
+      return {
+        data: [],
+        total: 0,
+        message: 'Search value is required',
+      };
+    }
+
+    try {
+      const items = await this.rootMenusRepository
+        .createQueryBuilder('items')
+        .select(['items.Id', 'items.Key', 'items.Label'])  // Chỉ lấy các trường cần thiết
+        .where('items.Key LIKE :searchValue COLLATE SQL_Latin1_General_CP1_CI_AS', { searchValue: `%${searchValue}%` })
+        .orWhere('items.Id LIKE :searchValue COLLATE SQL_Latin1_General_CP1_CI_AS', { searchValue: `%${searchValue}%` })
+        .orWhere('items.Label LIKE :searchValue COLLATE SQL_Latin1_General_CP1_CI_AS', { searchValue: `%${searchValue}%` })
+        .orWhere('items.Link LIKE :searchValue COLLATE SQL_Latin1_General_CP1_CI_AS', { searchValue: `%${searchValue}%` })
+        .getMany();
+
+
+      return {
+        data: items,
+        total: items.length,
+        message: 'Success',
+      };
+    } catch (error) {
+      return {
+        data: [],
+        total: 0,
+        message: `Error while searching items: ${error.message}`,
+      };
+    }
+  }
+
 
 }
