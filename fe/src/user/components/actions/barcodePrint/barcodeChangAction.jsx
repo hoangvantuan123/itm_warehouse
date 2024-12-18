@@ -39,6 +39,7 @@ export default function BarcodeChangeAction({
   btnOpenModal,
   isModalVisible,
   setIsModalVisible,
+  setReload,
 
   modal2Open,
   setModal2Open,
@@ -267,9 +268,10 @@ export default function BarcodeChangeAction({
       setIsModalVisible(false)
 
       if (result.status) {
-        setModal2Open(true)
-        setError(BARCODE_SUCCESS_MESSAGE.BARCODE_CONFIRM_SUCCESS)
-        resetValueModal()
+        setModal2Open(true);
+        setError(BARCODE_SUCCESS_MESSAGE.BARCODE_CONFIRM_SUCCESS);
+        resetValueModal();
+        setReload((pre) => pre + 1);
       } else {
         setError(BARCODE_ERR_MESSAGE.BARCODE_NOT_CONFIRM)
         setModal2Open(true)

@@ -56,6 +56,7 @@ export const BARCODE_SUCCESS_MESSAGES = {
 
 
 export const BARCODE_ERR_MESSAGES = {
+  NO_CONNECTION_PRINTER: 'No connection to printer',
   IP_OR_PORT_IS_NULL: 'No device printer has been selected yet.',
   BARCODE_ID_NOT_EXIST: 'Barcode ID is not exist',
   BARCODE_ID_HAS_ALREADY_CHANGE: 'Barcode has already change',
