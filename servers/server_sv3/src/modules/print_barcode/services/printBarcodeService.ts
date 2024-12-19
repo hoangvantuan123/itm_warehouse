@@ -127,7 +127,7 @@ export class PrintBarcodeService {
                 
                 return {
                     status: false,
-                    message: err,
+                    message: BARCODE_ERR_MESSAGES.NO_CONNECTION_PRINTER + ' ' + ip + ':' + port,
                 }
             }
         }
@@ -212,7 +212,7 @@ export class PrintBarcodeService {
                 error('Error connecting to printer:', err);
                 return {
                     status: false,
-                    message: err,
+                    message: BARCODE_ERR_MESSAGES.NO_CONNECTION_PRINTER + ' ' + ip + ':' + port,
                 }
             }
         }
