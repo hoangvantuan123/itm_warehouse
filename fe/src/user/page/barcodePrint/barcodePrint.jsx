@@ -30,19 +30,24 @@ import {
 } from '../../../utils/constants'
 import { ArrowIcon } from '../../components/icons'
 import BarcodePrintQuery from '../../components/actions/barcodePrint/barcodePrintQuery'
+import BarcodePrintFilter from '../../components/actions/barcodePrint/queryPrint'
 
 export default function BarcodePrint({ permissions, isMobile }) {
-    const [formQuery] = Form.useForm();
-    const [formPreview] = Form.useForm();
-    const [modal2Open, setModal2Open] = useState(false);
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [reload, setReload] = useState(0);
-    const [data, setData] = useState([]);
-    const { t } = useTranslation();
-    const [fromDate, setFromDate] = useState(dayjs().startOf('week'))
-    const [toDate, setToDate] = useState(dayjs().endOf('week'))
-    const formatDate = useCallback((date) => date.format('YYYYMMDDHHmmss'), [])
+  const [formQuery] = Form.useForm();
+  const [formPreview] = Form.useForm();
+  const [modal2Open, setModal2Open] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [reload, setReload] = useState(0);
+  const [data, setData] = useState([]);
+  const { t } = useTranslation();
+  const [fromDate, setFromDate] = useState(dayjs().startOf('week'))
+  const [toDate, setToDate] = useState(dayjs().endOf('week'))
+  const formatDate = useCallback((date) => date.format('YYYYMMDDHHmmss'), [])
+
+  const [matIdSearch, setMatIdSearch] = useState('');
+  const [lotNoSearch, setLotNoSearch] = useState('');
+  const [vendorSearch, setVendorSearch] = useState('');
 
   const [gridData, setGridData] = useState([])
   const [isModalVisible, setIsModalVisible] = useState(false)
@@ -54,6 +59,8 @@ export default function BarcodePrint({ permissions, isMobile }) {
 
   const [optionDevices, setOptionDevices] = useState([])
   const [device, setDevice] = useState('')
+  const [deviceDefault, setDeviceDefault] = useState(null);
+
 
   const [barcode, setBarcode] = useState('')
   const [acVendor, setAcVendor] = useState()
@@ -96,9 +103,11 @@ export default function BarcodePrint({ permissions, isMobile }) {
 
   const [previewLabel, setPreviewLabel] = useState(null)
 
-  const onFinish = async (e) => {
+  const userInfo = localStorage.getItem('userInfo')
+  const parsedData = JSON.parse(userInfo)
+
+  const onFinish = async () => {
     setData([])
-    const { fromDate, toDate, vendor, matID, lotNo } = e
     setLoading(true)
     let loadingMessage
     try {
@@ -106,9 +115,9 @@ export default function BarcodePrint({ permissions, isMobile }) {
       const itemList = await GetPageItem(
         formatDate(fromDate),
         formatDate(toDate),
-        vendor?.value || 'ALL',
-        matID,
-        lotNo,
+        vendorSearch || 'ALL',
+        matIdSearch,
+        lotNoSearch,
       )
       setData(itemList?.data.data || [])
     } catch (error) {
@@ -155,34 +164,34 @@ export default function BarcodePrint({ permissions, isMobile }) {
     return rows
   }
 
-  const onDropDownChange = (e) => {
-    const getDeviceOptions = async (body) => {
-      try {
-        const result = await getPrinterDevice(body)
-        if (result?.result) {
-          const data = result.result
-          const formattedOptions = data.map((item, index) => ({
-            label: item.ip,
-            value: `${item.ip}:${item.port}`,
-            key: index.toString(),
-          }))
-          setOptionDevices([...formattedOptions])
-        } else {
-          message.error(BARCODE_ERR_MESSAGE.NO_DATA_PRINTER)
-          return
-        }
-      } catch (err) {
-        console.error('Error creating barcode change:', err)
+  const getDeviceOptions = async (body) => {
+    try {
+      const result = await getPrinterDevice(body)
+      if (result?.result) {
+        const data = result.result
+        console.log("data", data)
+        const formattedOptions = await data.map((item, index) => ({
+          label: item.ip,
+          value: `${item.ip}:${item.port}`,
+          key: index.toString(),
+        }))
+        setOptionDevices([...formattedOptions])
+        
+          setDeviceDefault(formattedOptions[0]);
+          setDevice(formattedOptions[0].value);
+        
+      } else {
         message.error(BARCODE_ERR_MESSAGE.NO_DATA_PRINTER)
+        return
       }
+    } catch (err) {
+      console.error('Error creating barcode change:', err)
+      message.error(BARCODE_ERR_MESSAGE.NO_DATA_PRINTER)
     }
+  }
 
-    const userInfo = localStorage.getItem('userInfo')
-    const parsedData = JSON.parse(userInfo)
-
-    if (e) {
-      getDeviceOptions(parsedData.UserId)
-    }
+  const onDropDownChange = (e) => {
+    
   }
 
   const handleOnchangeDevice = (e) => {
@@ -1005,27 +1014,27 @@ export default function BarcodePrint({ permissions, isMobile }) {
       payLoad = createPayload(false, [singleRow], device)
     }
 
-            try {
-                const result = await CreatePrintLabel(
-                    payLoad
-                );
-                if (result.result.status) {
-                    setModal2Open(true);
-                    setError(BARCODE_SUCCESS_MESSAGE.PRINTER_SUCCESS);
-                    resetAllState();
-                    setReload((pre) => pre + 1);
-                }
-                else {
-                    setModal2Open(true);
-                    setError(result.result.message);
-                }
+    try {
+      const result = await CreatePrintLabel(
+        payLoad
+      );
+      if (result.result.status) {
+        setModal2Open(true);
+        setError(BARCODE_SUCCESS_MESSAGE.PRINTER_SUCCESS);
+        resetAllState();
+        setReload((pre) => pre + 1);
+      }
+      else {
+        setModal2Open(true);
+        setError(result.result.message);
+      }
 
-            } catch (error) {
+    } catch (error) {
 
-            }
+    }
 
-        }, [getMultiSelectedRows]
-    )
+  }, [getMultiSelectedRows]
+  )
 
   const onClickCancel = () => {
     setIsModalVisible(false)
@@ -1081,13 +1090,13 @@ export default function BarcodePrint({ permissions, isMobile }) {
     resetAllState()
   }
 
-    useEffect((e) => {
+  useEffect(() => {
 
-        resetAllState();
-        fetchData();
-
-    }, [reload])
-
+    resetAllState();
+    fetchData();
+    getDeviceOptions(parsedData.UserId);
+    
+  }, [reload])
 
   const onCellClicked = (cell) => {
     const [colIndex, rowIndex] = cell
@@ -1179,7 +1188,7 @@ export default function BarcodePrint({ permissions, isMobile }) {
         setModal2Open(true)
         setError(result.result.message)
       }
-    } catch (error) {}
+    } catch (error) { }
   }, [label, sizeLabel, device])
 
   return (
@@ -1190,9 +1199,17 @@ export default function BarcodePrint({ permissions, isMobile }) {
 
       <div className="flex flex-col h-full ">
         <Header className="bg-slate-50 px-4 h-auto flex-shrink-0">
-          <Title level={5} className="mt-2 uppercase">
-            {t('PRINT BARCODE')}
-          </Title>
+
+
+          <div className="flex items-center justify-between mb-2">
+            <Title level={4} className="mt-2 uppercase opacity-85 ">
+              {t('PRINT BARCODE')}
+            </Title>
+            <BarcodePrintAction
+              onFinish={onFinish}
+              onClickPrint={onClickPrint}
+            />
+          </div>
 
           <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
             <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600 uppercase">
@@ -1201,11 +1218,13 @@ export default function BarcodePrint({ permissions, isMobile }) {
             </h2>
           </summary>
 
-          <BarcodePrintAction
+          <BarcodePrintFilter
             fromDate={fromDate}
             toDate={toDate}
-            onFinish={onFinish}
-            onClickPrint={onClickPrint}
+            setMatIdSearch={setMatIdSearch}
+            setLotNoSearch={setLotNoSearch}
+            setVendorSearch = {setVendorSearch}
+
           />
           <details
             className="group p-2 [&_summary::-webkit-details-marker]:hidden border rounded-lg bg-white"
@@ -1228,6 +1247,7 @@ export default function BarcodePrint({ permissions, isMobile }) {
               onDropDownChange={onDropDownChange}
               optionDevices={optionDevices}
               handleOnchangeDevice={handleOnchangeDevice}
+              defaultDevice = {deviceDefault}
               onChangeVendor={onChangeVendor}
               onClearVendorValue={onClearVendorValue}
               onKeyDownPartNo={onKeyDownPartNo}

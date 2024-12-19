@@ -485,14 +485,14 @@ export default function BarcodeChangeAction({
               </h2>
               <span className="relative size-5 shrink-0"></span>
 
-              <Card className="m-0 p-0" bodyStyle={{ padding: 5 }}>
-                <Row className="flex m-0 p-0 gap-3">
+              <Card className="m-0 p-0" bodyStyle={{ padding: 0, marginBottom:0, paddingBottom: 0}}>
+                <Row className="flex m-0 p-0 gap-20 h-6">
                   <Form.Item label="1D Position" layout={'inline'}>
                     <div className="flex gap-3">
-                      <Form.Item name="barcodePosX" layout={'inline'}>
+                      <Form.Item name="barcodePosX" className='w-32' layout={'inline'}>
                         <Input placeholder="X" type="number" min={0} />
                       </Form.Item>
-                      <Form.Item name="barcodePosY" layout={'inline'}>
+                      <Form.Item name="barcodePosY" className='w-32' layout={'inline'}>
                         <Input placeholder="Y" type="number" min={0} />
                       </Form.Item>
                     </div>
@@ -500,11 +500,11 @@ export default function BarcodeChangeAction({
 
                   <Form.Item label="1D Size" layout={'inline'}>
                     <div className="flex gap-3">
-                      <Form.Item name="barcodeSizeX" layout={'inline'}>
+                      <Form.Item name="barcodeSizeX" className='w-32' layout={'inline'}>
                         <Input placeholder="X" type="number" min={0} />
                       </Form.Item>
 
-                      <Form.Item name="barcodeSizeY" layout={'inline'}>
+                      <Form.Item name="barcodeSizeY" className='w-32' layout={'inline'}>
                         <Input placeholder="Y" type="number" min={0} />
                       </Form.Item>
                     </div>
@@ -512,11 +512,11 @@ export default function BarcodeChangeAction({
 
                   <Form.Item label="2D Position" layout={'inline'}>
                     <div className="flex gap-3">
-                      <Form.Item name="qrcodePosX" layout={'inline'}>
+                      <Form.Item name="qrcodePosX"  className='w-32'layout={'inline'}>
                         <Input placeholder="X" type="number" min={0} />
                       </Form.Item>
 
-                      <Form.Item name="qrcodePosY" layout={'inline'}>
+                      <Form.Item name="qrcodePosY" className='w-32' layout={'inline'}>
                         <Input placeholder="Y" type="number" min={0} />
                       </Form.Item>
                     </div>
@@ -524,10 +524,10 @@ export default function BarcodeChangeAction({
 
                   <Form.Item label="2D Size" layout={'inline'}>
                     <div className="flex gap-3">
-                      <Form.Item name="qrcodeSizeX" layout={'inline'}>
+                      <Form.Item name="qrcodeSizeX"  className='w-32' layout={'inline'}>
                         <Input placeholder="X" type="number" min={0} />
                       </Form.Item>
-                      <Form.Item name="qrcodeSizeY" layout={'inline'}>
+                      <Form.Item name="qrcodeSizeY" className='w-32' layout={'inline'}>
                         <Input placeholder="Y" type="number" min={0} />
                       </Form.Item>
                     </div>
