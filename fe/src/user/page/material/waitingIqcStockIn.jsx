@@ -47,7 +47,6 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const [highlightRegions, setHighlightRegions] = useState([])
   const [error, setError] = useState(null)
   const [dataError, setDataError] = useState([])
-  console.log('dataError', dataError)
   const [successMessage, setSuccessMessage] = useState(null)
   const [scanHistory, setScanHistory] = useState([])
   const dataRefSacenHistory = useRef(scanHistory)

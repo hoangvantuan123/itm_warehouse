@@ -13,7 +13,11 @@ import { reorderColumns } from '../../sheet/js/reorderColumns'
 import { SearchRootMenu } from '../../../../features/system/searchRootMenus'
 import { SearchMenus } from '../../../../features/system/searchMenus'
 import { updateEditedRows } from '../../sheet/js/updateEditedRows'
-
+import {
+  useExtraCells,
+} from "@glideapps/glide-data-grid-cells";
+import { AsyncDropdownCellRenderer } from '../../sheet/cells/AsyncDropdownCellRenderer'
+import axios from "axios";
 const defaultCols = [
   {
     title: '#',
@@ -88,7 +92,9 @@ const defaultCols = [
     hasMenu: true,
   },
 ]
-
+function getProducts() {
+  return axios.get("https://dummyjson.com/products");
+}
 function TableMenuManagement({
   data,
   setSelection,
@@ -104,12 +110,16 @@ function TableMenuManagement({
   setOpenHelp,
   openHelp,
   clickCount,
+  setGridData, 
+  gridData
 }) {
-  const [gridData, setGridData] = useState([])
+ 
   const gridRef = useRef(null)
   const [numRows, setNumRows] = useState(0)
   const [open, setOpen] = useState(false)
   const [inputHelp, setInputHelp] = useState(null)
+  const cellProps = useExtraCells();
+
   const [cols, setCols] = useState(() =>
     loadFromLocalStorageSheet('S_ERP_COLS_PAGE_MENU', defaultCols),
   )
@@ -122,7 +132,6 @@ function TableMenuManagement({
   const [error1, setError1] = useState(null)
   const [loading1, setLoading1] = useState(false)
   const [previousSearchText, setPreviousSearchText] = useState('')
-  const cachedResults = useRef({})
   const [searchText, setSearchText] = useState('')
   const searchResultsRef = useRef([])
   const onHeaderMenuClick = useCallback((col, bounds) => {
@@ -140,7 +149,7 @@ function TableMenuManagement({
       })
     }
   }, [])
-
+  const [brands, setBrands] = useState([]);
   const highlightRegions = [
     {
       color: '#e8f0ff',
@@ -184,20 +193,40 @@ function TableMenuManagement({
     rightFill: true,
     selectColumn: false,
   })
-
+  useEffect(() => {
+    getProducts().then((res) => {
+      if (res.status === 200) {
+        const s = new Set(res.data.products.map((prod) => prod.brand));
+        setBrands(Array.from(s));
+      }
+    });
+  }, []);
   useEffect(() => {
     if (data && Array.isArray(data) && data.length > 0) {
       setGridData(data)
       setNumRows(data.length)
     }
   }, [data])
-
   const getData = useCallback(
     ([col, row]) => {
-      const person = gridData[row] || {}
-      const columnKey = cols[col]?.id || ''
-      const value = person[columnKey] || ''
-      const column = cols[col]
+      const person = gridData[row] || {};
+      const column = cols[col];
+      const columnKey = column?.id || '';
+      const value = person[columnKey] || '';
+
+      if (columnKey === 'Type') {
+        return {
+          kind: GridCellKind.Custom,
+          allowOverlay: true,
+          data: {
+            kind: "async-dropdown-cell",
+            allowedValues: ['submenu', 'menu'],
+            value: value
+          },
+          readOnly: false
+        };
+      }
+
       return {
         kind: GridCellKind.Text,
         data: value,
@@ -205,10 +234,10 @@ function TableMenuManagement({
         readonly: column?.readonly || false,
         allowOverlay: true,
         hasMenu: column?.hasMenu || false,
-      }
+      };
     },
     [gridData, cols],
-  )
+  );
 
   const onFill = useCallback(
     (start, end, data) => {
@@ -328,17 +357,38 @@ function TableMenuManagement({
   )
   const onCellEdited = useCallback(
     async (cell, newValue) => {
-      if (newValue.kind !== GridCellKind.Text) {
+
+      if (newValue.kind !== GridCellKind.Text && newValue.kind !== GridCellKind.Custom) {
         return;
       }
-  
       const indexes = reorderColumns(cols);
       const [col, row] = cell;
       const key = indexes[col];
-  
+
+      if (key === 'Type') {
+        if (newValue.kind === GridCellKind.Custom) {
+          setGridData((prev) => {
+            const product = prev[row];
+            product[cols[col].id] = newValue.data.value;
+            const currentStatus = product['Status'] || '';
+            product['Status'] = currentStatus === 'A' ? 'A' : 'U';
+
+
+
+            setEditedRows((prevEditedRows) =>
+              updateEditedRows(prevEditedRows, row, prev, currentStatus)
+            );
+            return [...prev];
+          });
+          return;
+        }
+      }
+
+
+
       if (key === 'MenuRootId') {
         const searchText = newValue.data.trim().toLowerCase();
-  
+
         if (searchText !== '') {
           setPreviousSearchText(searchText);
           if (searchText !== previousSearchText) {
@@ -356,12 +406,12 @@ function TableMenuManagement({
               setLoading1(false);
             }
           }
-  
+
           const searchResults = searchResultsRef.current;
-  
+
           if (searchResults.length > 0) {
             const result = searchResults[0];
-  
+
             setGridData((prevData) => {
               const updatedData = [...prevData];
               if (!updatedData[row]) updatedData[row] = {};
@@ -369,15 +419,15 @@ function TableMenuManagement({
               const status = currentStatus === 'A' ? 'A' : 'U';
               updatedData[row] = {
                 ...updatedData[row],
-                MenuRootId: result.Id, 
-                MenuRootName: result.Label, 
-                Status: status, 
+                MenuRootId: result.Id,
+                MenuRootName: result.Label,
+                Status: status,
               };
-  
+
               setEditedRows((prevEditedRows) =>
                 updateEditedRows(prevEditedRows, row, updatedData, status)
               );
-  
+
               return updatedData;
             });
           }
@@ -386,22 +436,22 @@ function TableMenuManagement({
           setGridData((prevData) => {
             const updatedData = [...prevData];
             if (!updatedData[row]) updatedData[row] = {};
-            updatedData[row]['MenuRootId'] = ''; 
+            updatedData[row]['MenuRootId'] = '';
             updatedData[row]['MenuRootName'] = '';
             setEditedRows((prevEditedRows) =>
               updateEditedRows(prevEditedRows, row, updatedData, 'U')
             );
-  
+
             return updatedData;
           });
         }
-  
+
         return;
       }
 
       if (key === 'MenuRootName') {
         const searchText = newValue.data.trim().toLowerCase();
-  
+
         setPreviousSearchText(searchText);
         if (searchText !== '') {
           if (searchText !== previousSearchText) {
@@ -419,12 +469,12 @@ function TableMenuManagement({
               setLoading1(false);
             }
           }
-  
+
           const searchResults = searchResultsRef.current;
-  
+
           if (searchResults.length > 0) {
             const result = searchResults[0];
-  
+
             setGridData((prevData) => {
               const updatedData = [...prevData];
               if (!updatedData[row]) updatedData[row] = {};
@@ -432,16 +482,16 @@ function TableMenuManagement({
               const status = currentStatus === 'A' ? 'A' : 'U';
               updatedData[row] = {
                 ...updatedData[row],
-                MenuRootId: result.Id, 
-                MenuRootName: result.Label, 
-                Status: status, 
+                MenuRootId: result.Id,
+                MenuRootName: result.Label,
+                Status: status,
               };
-  
-             
+
+
               setEditedRows((prevEditedRows) =>
                 updateEditedRows(prevEditedRows, row, updatedData, status)
               );
-  
+
               return updatedData;
             });
           }
@@ -449,17 +499,17 @@ function TableMenuManagement({
           setGridData((prevData) => {
             const updatedData = [...prevData];
             if (!updatedData[row]) updatedData[row] = {};
-            updatedData[row]['MenuRootId'] = ''; 
+            updatedData[row]['MenuRootId'] = '';
             updatedData[row]['MenuRootName'] = '';
-          
+
             setEditedRows((prevEditedRows) =>
               updateEditedRows(prevEditedRows, row, updatedData, 'U')
             );
-  
+
             return updatedData;
           });
         }
-  
+
         return;
       }
 
@@ -467,7 +517,7 @@ function TableMenuManagement({
 
       if (key === 'MenuSubRootId') {
         const searchText = newValue.data.trim().toLowerCase();
-  
+
         if (searchText !== '') {
           setPreviousSearchText(searchText);
           if (searchText !== previousSearchText) {
@@ -485,12 +535,12 @@ function TableMenuManagement({
               setLoading1(false);
             }
           }
-  
+
           const searchResults = searchResultsRef.current;
-  
+
           if (searchResults.length > 0) {
             const result = searchResults[0];
-  
+
             setGridData((prevData) => {
               const updatedData = [...prevData];
               if (!updatedData[row]) updatedData[row] = {};
@@ -498,16 +548,16 @@ function TableMenuManagement({
               const status = currentStatus === 'A' ? 'A' : 'U';
               updatedData[row] = {
                 ...updatedData[row],
-                MenuSubRootId: result.Id, 
-                MenuSubRootName: result.Label, 
-                Status: status, 
+                MenuSubRootId: result.Id,
+                MenuSubRootName: result.Label,
+                Status: status,
               };
-  
-           
+
+
               setEditedRows((prevEditedRows) =>
                 updateEditedRows(prevEditedRows, row, updatedData, status)
               );
-  
+
               return updatedData;
             });
           }
@@ -515,22 +565,22 @@ function TableMenuManagement({
           setGridData((prevData) => {
             const updatedData = [...prevData];
             if (!updatedData[row]) updatedData[row] = {};
-            updatedData[row]['MenuSubRootId'] = ''; 
+            updatedData[row]['MenuSubRootId'] = '';
             updatedData[row]['MenuSubRootName'] = '';
-            
+
             setEditedRows((prevEditedRows) =>
               updateEditedRows(prevEditedRows, row, updatedData, 'U')
             );
-  
+
             return updatedData;
           });
         }
-  
+
         return;
       }
       if (key === 'MenuSubRootName') {
         const searchText = newValue.data.trim().toLowerCase();
-  
+
         setPreviousSearchText(searchText);
         if (searchText !== '') {
           if (searchText !== previousSearchText) {
@@ -548,12 +598,12 @@ function TableMenuManagement({
               setLoading1(false);
             }
           }
-  
+
           const searchResults = searchResultsRef.current;
-  
+
           if (searchResults.length > 0) {
             const result = searchResults[0];
-  
+
             setGridData((prevData) => {
               const updatedData = [...prevData];
               if (!updatedData[row]) updatedData[row] = {};
@@ -561,22 +611,22 @@ function TableMenuManagement({
               const status = currentStatus === 'A' ? 'A' : 'U';
               updatedData[row] = {
                 ...updatedData[row],
-                MenuSubRootId: result.Id, 
-                MenuSubRootName: result.Label, 
-                Status: status, 
+                MenuSubRootId: result.Id,
+                MenuSubRootName: result.Label,
+                Status: status,
               };
-  
+
               setEditedRows((prevEditedRows) => {
                 const existingIndex = prevEditedRows.findIndex(
                   (editedRow) => editedRow.rowIndex === row,
                 );
-  
+
                 const updatedRowData = {
                   rowIndex: row,
                   updatedRow: updatedData[row],
                   status: status,
                 };
-  
+
                 if (existingIndex === -1) {
                   return [...prevEditedRows, updatedRowData];
                 } else {
@@ -585,7 +635,7 @@ function TableMenuManagement({
                   return updatedEditedRows;
                 }
               });
-  
+
               return updatedData;
             });
           }
@@ -593,19 +643,19 @@ function TableMenuManagement({
           setGridData((prevData) => {
             const updatedData = [...prevData];
             if (!updatedData[row]) updatedData[row] = {};
-            updatedData[row]['MenuSubRootId'] = ''; 
+            updatedData[row]['MenuSubRootId'] = '';
             updatedData[row]['MenuSubRootName'] = '';
             setEditedRows((prevEditedRows) => {
               const existingIndex = prevEditedRows.findIndex(
                 (editedRow) => editedRow.rowIndex === row,
               );
-  
+
               const updatedRowData = {
                 rowIndex: row,
                 updatedRow: updatedData[row],
-                status: 'U', 
+                status: 'U',
               };
-  
+
               if (existingIndex === -1) {
                 return [...prevEditedRows, updatedRowData];
               } else {
@@ -614,33 +664,33 @@ function TableMenuManagement({
                 return updatedEditedRows;
               }
             });
-  
+
             return updatedData;
           });
         }
-  
+
         return;
       }
-  
+
       setGridData((prevData) => {
         const updatedData = [...prevData];
         if (!updatedData[row]) updatedData[row] = {};
-  
+
         const currentStatus = updatedData[row]['Status'] || '';
         updatedData[row][key] = newValue.data;
         updatedData[row]['Status'] = currentStatus === 'A' ? 'A' : 'U';
-  
+
         setEditedRows((prevEditedRows) => {
           const existingIndex = prevEditedRows.findIndex(
             (editedRow) => editedRow.rowIndex === row,
           );
-  
+
           const updatedRowData = {
             rowIndex: row,
             updatedRow: updatedData[row],
             status: currentStatus === 'A' ? 'A' : 'U',
           };
-  
+
           if (existingIndex === -1) {
             return [...prevEditedRows, updatedRowData];
           } else {
@@ -649,14 +699,14 @@ function TableMenuManagement({
             return updatedEditedRows;
           }
         });
-  
+
         return updatedData;
       });
     },
-    [cols, previousSearchText],
+    [cols, previousSearchText, gridData],
   );
-  
-  
+
+
 
   const onColumnResize = useCallback(
     (column, newSize) => {
@@ -783,6 +833,7 @@ function TableMenuManagement({
           DATA SHEET
         </h2>
         <DataEditor
+          {...cellProps}
           ref={gridRef}
           columns={cols}
           getCellContent={getData}
@@ -807,8 +858,8 @@ function TableMenuManagement({
             i % 2 === 0
               ? undefined
               : {
-                  bgCell: '#FBFBFB',
-                }
+                bgCell: '#FBFBFB',
+              }
           }
           onPaste={true}
           fillHandle={true}
@@ -824,6 +875,7 @@ function TableMenuManagement({
           onHeaderMenuClick={onHeaderMenuClick}
           onColumnMoved={onColumnMoved}
           onKeyUp={onKeyUp}
+          customRenderers={[AsyncDropdownCellRenderer]}
         />
         {showMenu !== null &&
           renderLayer(

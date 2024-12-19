@@ -13,7 +13,7 @@ export const filterAndSelectColumns = (
         if (row.updatedRow.hasOwnProperty(col)) {
           const value = row.updatedRow[col]
 
-          if (value !== '' && value != null) {
+          if (value !== '' && value != null && col !== 'Id') {
             isValidRow = true
           }
 

@@ -3,9 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Helmet } from 'react-helmet'
 import { Input, Space, Table, Typography, message, Tabs, Layout } from 'antd'
 const { Title, Text } = Typography
-import dayjs from 'dayjs'
 import { debounce } from 'lodash'
-import { useNavigate } from 'react-router-dom'
 import MenuManagementActions from '../../components/actions/system/menuManagementActions'
 import TableMenuManagement from '../../components/table/system/tableMenuManagement'
 import DrawerAddMenu from '../../components/drawer/system/addMenu'
@@ -13,15 +11,14 @@ import { GetAllMenus } from '../../../features/system/getMenus'
 import { DeleteMenus } from '../../../features/system/deleteMenus'
 import { CompactSelection } from '@glideapps/glide-data-grid'
 import { filterAndSelectColumns } from '../../../utils/filterUorA'
-import { filterAndSelectColumnsA } from '../../../utils/filterA'
 import { PostAddMenu } from '../../../features/system/postAddMenu'
 import { PostUpdateMenu } from '../../../features/system/postUpdateMenu'
-import ModalHelpMenu from '../../components/modal/system/modalHelpMenu'
 import useKeydownHandler from '../../components/hooks/sheet/useKeydownHandler'
 export default function MenuTechnique({ permissions, isMobile }) {
   const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
   const [menus, setMenus] = useState([])
+  const [gridData, setGridData] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selection, setSelection] = useState({
     columns: CompactSelection.empty(),
@@ -30,7 +27,7 @@ export default function MenuTechnique({ permissions, isMobile }) {
   const [showSearch, setShowSearch] = useState(false)
   const [lastClickedCell, setLastClickedCell] = useState(null)
   const [addedRows, setAddedRows] = useState([])
- 
+
   const [editedRows, setEditedRows] = useState([])
   const [clickedRowData, setClickedRowData] = useState(null)
   const [isMinusClicked, setIsMinusClicked] = useState(false)
@@ -82,14 +79,13 @@ export default function MenuTechnique({ permissions, isMobile }) {
   const getSelectedRows = () => {
     const selectedRows = selection.rows.items
     let rows = []
-
     selectedRows.forEach((range) => {
       const start = range[0]
       const end = range[1] - 1
 
       for (let i = start; i <= end; i++) {
-        if (editedRows[i]) {
-          rows.push(editedRows[i])
+        if (gridData[i]) {
+          rows.push(gridData[i])
         }
       }
     })
@@ -99,13 +95,35 @@ export default function MenuTechnique({ permissions, isMobile }) {
 
   const handleDeleteDataSheet = useCallback(
     async (e) => {
-      const selectedRows = getSelectedRows()
+      const selectedRows = getSelectedRows();
 
-      console.log('selectedRows', selectedRows)
-      console.log('remainingRows', remainingRows)
+      const rowsWithStatusD = [];
+      selectedRows.forEach((row) => {
+        if (!row.Status || row.Status === 'U' || row.Status === 'D') {
+          row.Status = 'D';
+          rowsWithStatusD.push(row);
+        }
+      });
+
+      console.log('Rows with Status D:', rowsWithStatusD);
+
+      const rowsWithStatusA = selectedRows.filter((row) => row.Status === 'A');
+      console.log('Rows with Status A:', rowsWithStatusA);
+
+      const idsWithStatusA = rowsWithStatusA.map((row) => row.Id);
+
+      const remainingRows = gridData.filter((row) => !idsWithStatusA.includes(row.Id));
+
+
+
+      setGridData(remainingRows);
     },
-    [selection, editedRows],
-  )
+    [gridData, selection]
+  );
+
+
+
+
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -274,6 +292,8 @@ export default function MenuTechnique({ permissions, isMobile }) {
               setOnSelectRow={setOnSelectRow}
               setIsCellSelected={setIsCellSelected}
               isCellSelected={isCellSelected}
+              setGridData={setGridData}
+              gridData={gridData}
             />
           </div>
         </div>

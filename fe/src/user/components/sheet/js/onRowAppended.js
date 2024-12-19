@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';  // Sử dụng thư viện uuid để tạo ID duy nhất
+
 export const onRowAppended = (
   cols,
   setGridData,
@@ -6,30 +8,32 @@ export const onRowAppended = (
   numRowsToAdd,
 ) => {
   if (numRowsToAdd <= 0) {
-    return
+    return;
   }
 
-  const newRows = []
+  const newRows = [];
 
   for (let i = 0; i < numRowsToAdd; i++) {
-    const newRow = {}
+    const newRow = {};
 
     cols.forEach((col) => {
       if (col.id === 'Status') {
-        newRow[col.id] = 'A'
+        newRow[col.id] = 'A'; 
       } else {
-        newRow[col.id] = ''
+        newRow[col.id] = '';
       }
-    })
+    });
 
-    newRows.push(newRow)
+    newRow.Id = uuidv4(); 
+
+    newRows.push(newRow);
   }
 
-  setGridData((prevData) => {
-    const newData = [...prevData, ...newRows]
-    setNumRows((prev) => prev + numRowsToAdd)
-    return newData
-  })
 
-  setAddedRows((prevAddedRows) => [...prevAddedRows, ...newRows])
-}
+  setGridData((prevData) => {
+    const newData = [...prevData, ...newRows];
+    setNumRows((prev) => prev + numRowsToAdd);
+    return newData;
+  });
+  setAddedRows((prevAddedRows) => [...prevAddedRows, ...newRows]);
+};
