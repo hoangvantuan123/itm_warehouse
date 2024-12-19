@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next'
 import { Helmet } from 'react-helmet'
-import { Typography, Layout, Button, message, Form } from 'antd'
+import { Typography, Layout, message, Form } from 'antd'
 const { Title } = Typography
 const { Header, Content } = Layout
 import 'moment/locale/vi'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import dayjs from 'dayjs'
 import BarcodeChangeAction from '../../components/actions/barcodePrint/barcodeChangAction'
 import TabelBarcodeChange from '../../components/table/barcodePrint/tableBarcodeChange'
@@ -17,19 +17,20 @@ import {
 import {
   BARCODE_ERR_MESSAGE,
   BARCODE_SUCCESS_MESSAGE,
-  ERROR_MESSAGES,
 } from '../../../utils/constants'
+
+import { FilterOutlined } from '@ant-design/icons'
+import BarcodeChangeFilter from '../../components/actions/barcodePrint/barcodeChangeFilter'
 
 export default function BarcodeChange({ permissions, isMobile }) {
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState([])
-  const [reload, setReload] = useState(0)
+  const [reload, setReload] = useState(0);
   const { t } = useTranslation()
-  const [dataInfo, setDataInfo] = useState([])
-  const [rowChecked, setRowChecked] = useState(null)
   const [fromDate, setFromDate] = useState(dayjs().startOf('week'))
   const [toDate, setToDate] = useState(dayjs().endOf('week'))
   const formatDate = useCallback((date) => date.format('YYYYMMDDHHmmss'), [])
+  const [showSearch, setShowSearch] = useState(false)
 
   const [modal2Open, setModal2Open] = useState(false)
   const [error, setError] = useState('')
@@ -37,12 +38,14 @@ export default function BarcodeChange({ permissions, isMobile }) {
   const [gridData, setGridData] = useState([])
   const [selectRow, setSelectRow] = useState(null)
   const [clickedRowData, setClickedRowData] = useState(null)
-  const [dataAc, setDataAc] = useState({})
   const [formChange] = Form.useForm()
+
+  const [lotNoSearch, setLotNoSearch] = useState('');
+  const [matIdSearch, setMatIdSearch] = useState('');
+  const [barcodeSearch, setBarcodeSearch] = useState('');
 
   const [oldQty, setOldQty] = useState()
   const [NewQty, setNewQty] = useState()
-  const [changeQty, setChangeQty] = useState('')
 
   const [BarcodeID, setBarcodeID] = useState('')
   const [ItemNo, setItemNo] = useState('')
@@ -56,7 +59,19 @@ export default function BarcodeChange({ permissions, isMobile }) {
   const barcodeRef = useState(null)
   const changeQtyRef = useRef(null)
   const remarkRef = useRef(null)
-  const [optionDevices, setOptionDevices] = useState([])
+
+  const [sizeLabel, setSizeLabel] = useState({
+    barCodePosX: Number(180),
+    barCodePosY: Number(30),
+    barCodeSizeX: Number(1),
+    barCodeSizeY: Number(1),
+    QrPosX: Number(700),
+    QrPosY: Number(60),
+    QrSizeX: Number(3.5),
+    QrSizeY: Number(3.5),
+    paperSizeX: Number(790),
+    paperSizeY: Number(160),
+  })
 
   const getMultiSelectedRows = () => {
     const selectedRows = selectRow.rows.items
@@ -76,19 +91,30 @@ export default function BarcodeChange({ permissions, isMobile }) {
   }
 
   useEffect(() => {
-    formChange.resetFields()
+    formChange.resetFields();
+    
   }, [formChange])
 
   useEffect(() => {
-    fetchData()
-    resetAllData()
-  }, [reload])
 
-  const onFinish = async (e) => {
+    fetchData();
+    resetAllData();
+
+    const userInfo = localStorage.getItem('userInfo')
+    const parsedData = JSON.parse(userInfo)
+    getDeviceOptions(parsedData.UserId);
+    const storedDevices = JSON.parse(localStorage.getItem("optionDevices")) || [];
+    setDevice(storedDevices[0]?.value)
+  }, [reload]);
+
+  const onFinish = async () => {
+    fetchData();
+  }
+
+  const fetchData = async () => {
     setData([])
 
-    let loadingMessage
-    const { fromDate, toDate, lotNo, matID, barcode } = e
+    let loadingMessage;
 
     try {
       setLoading(true)
@@ -96,29 +122,10 @@ export default function BarcodeChange({ permissions, isMobile }) {
       const result = await searchPage(
         formatDate(fromDate),
         formatDate(toDate),
-        lotNo,
-        matID,
-        barcode,
+        lotNoSearch || null,
+        matIdSearch || null,
+        barcodeSearch || null,
       )
-
-      setData(result.data.data || [])
-    } catch (err) {
-      setData([])
-    } finally {
-      setLoading(false)
-      if (loadingMessage) loadingMessage()
-    }
-  }
-
-  const fetchData = async () => {
-    setData([])
-
-    let loadingMessage
-
-    try {
-      setLoading(true)
-      loadingMessage = message.loading('Please Wait...', 0)
-      const result = await searchPage(formatDate(fromDate), formatDate(toDate))
 
       setData(result.data.data || [])
     } catch (err) {
@@ -178,7 +185,7 @@ export default function BarcodeChange({ permissions, isMobile }) {
     changeQtyRef.current.focus()
   }
 
-  const onChangeNewQty = (e) => {}
+  const onChangeNewQty = (e) => { }
 
   const [isModalVisible, setIsModalVisible] = useState(false)
 
@@ -191,23 +198,29 @@ export default function BarcodeChange({ permissions, isMobile }) {
     }
 
     const listSelected = getMultiSelectedRows()
-    const createPayload = (isConfirm, rows, device) => ({
+    const createPayload = (isConfirm, rows, device, sizeLabel) => ({
       isConfirm,
       listSelected: rows,
       device: device,
+      sizeLabel: sizeLabel
     })
 
     const handleCreateChangeBarcode = async (body) => {
+      let loadingMessage;
       try {
+        loadingMessage = message.loading('Printing...', 0)
         return await createChangeBarcode(body)
       } catch (err) {
         console.error('Error creating barcode change:', err)
         message.error(BARCODE_ERR_MESSAGE.PRINTER_ERROR)
       }
+      finally{
+        if (loadingMessage) loadingMessage()
+      }
     }
 
     if (listSelected.length >= 1) {
-      const body = createPayload(false, listSelected, device)
+      const body = createPayload(false, listSelected, device, sizeLabel)
       const isSucces = await handleCreateChangeBarcode(body)
       if (isSucces.result.status) {
         message.success(BARCODE_SUCCESS_MESSAGE.PRINTER_SUCCESS)
@@ -232,17 +245,17 @@ export default function BarcodeChange({ permissions, isMobile }) {
         NewStatus: '',
       }
 
-      const body = createPayload(true, [singleRow], device)
+      const body = createPayload(true, [singleRow], device, sizeLabel)
       const isSucces = await handleCreateChangeBarcode(body)
 
       if (isSucces.result.status) {
-        message.success(BARCODE_SUCCESS_MESSAGE.PRINTER_SUCCESS)
-        setIsModalVisible(true)
-        resetAllData()
+        message.success(BARCODE_SUCCESS_MESSAGE.PRINTER_SUCCESS);
+        setIsModalVisible(true);
+        resetAllData();
         return
       } else {
-        setModal2Open(true), setError(isSucces.result.message)
-        resetAllData()
+        setModal2Open(true), setError(isSucces.result.message);
+        resetAllData();
         return
       }
     }
@@ -275,35 +288,26 @@ export default function BarcodeChange({ permissions, isMobile }) {
     }
   }
 
-  const onDropDownChange = (e) => {
-    const getDeviceOptions = async (body) => {
-      try {
-        const result = await getPrinterDevice(body)
-        if (result?.result) {
-          const data = result.result
+  const getDeviceOptions = async (body) => {
+    try {
+      const result = await getPrinterDevice(body)
+      if (result?.result) {
+        const data = result.result
 
-          const formattedOptions = data.map((item, index) => ({
-            label: item.ip,
-            value: `${item.ip}:${item.port}`,
-            key: index.toString(),
-          }))
+        const formattedOptions = data.map((item, index) => ({
+          label: item.ip,
+          value: `${item.ip}:${item.port}`,
+          key: index.toString(),
+        }))
 
-          setOptionDevices([...formattedOptions])
-        } else {
-          message.error(BARCODE_ERR_MESSAGE.NO_DATA_PRINTER)
-          return
-        }
-      } catch (err) {
-        console.error('Error creating barcode change:', err)
+        localStorage.setItem("optionDevices", JSON.stringify(formattedOptions));
+      } else {
         message.error(BARCODE_ERR_MESSAGE.NO_DATA_PRINTER)
+        return
       }
-    }
-
-    const userInfo = localStorage.getItem('userInfo')
-    const parsedData = JSON.parse(userInfo)
-
-    if (e) {
-      getDeviceOptions(parsedData.UserId)
+    } catch (err) {
+      console.error('Error creating barcode change:', err)
+      message.error(BARCODE_ERR_MESSAGE.NO_DATA_PRINTER)
     }
   }
 
@@ -326,7 +330,7 @@ export default function BarcodeChange({ permissions, isMobile }) {
     setNewBarCodeId('')
     setRemark('')
     setUserID('')
-    setDevice('')
+    // setDevice('')
     formChange.resetFields()
   }
 
@@ -338,19 +342,42 @@ export default function BarcodeChange({ permissions, isMobile }) {
 
       <div className="flex flex-col h-full ">
         <Header className="bg-slate-50 px-4 h-auto flex-shrink-0">
-          <Title level={5} className="mt-2 uppercase">
-            {t('BARCODE CHANGE')}
-          </Title>
 
-          <BarcodeChangeAction
+          <div className="flex items-center justify-between mb-2">
+            <Title level={4} className="mt-2 uppercase opacity-85 ">
+              {t('CHANGE BARCODE')}
+            </Title>
+            <BarcodeChangeAction
+              fromDate={fromDate}
+              toDate={toDate}
+              onFinish={onFinish}
+              handleEnter={onKeyDownBarcode}
+              btnOpenModal={btnOpenModal}
+              formChange={formChange}
+            />
+          </div>
+
+          <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900">
+            <h2 className="text-xs font-medium flex items-center gap-2 text-blue-600 uppercase">
+              <FilterOutlined />
+              {t('Điều kiện truy vấn')}
+            </h2>
+          </summary>
+          <BarcodeChangeFilter
             fromDate={fromDate}
+            setFromDate= {setFromDate}
             toDate={toDate}
+            setToDate = {setToDate}
             onFinish={onFinish}
+            setMatIdSearch={setMatIdSearch}
+            setLotNoSearch={setLotNoSearch}
+            setBarcodeSearch={setBarcodeSearch}
             handleEnter={onKeyDownBarcode}
             btnOpenModal={btnOpenModal}
             isModalVisible={isModalVisible}
             setIsModalVisible={setIsModalVisible}
             setReload={setReload}
+
             formChange={formChange}
             onKeyDownChangeQty={onKeyDownChangeQty}
             barcodeRef={barcodeRef}
@@ -361,10 +388,11 @@ export default function BarcodeChange({ permissions, isMobile }) {
             newQty={NewBarcodeID}
             setRemark={setRemark}
             setUserId={setUserID}
-            onDropDownChange={onDropDownChange}
-            optionDevices={optionDevices}
             clickedRowData={clickedRowData}
             handleOnchangeDevice={handleOnchangeDevice}
+            sizeLabel = {sizeLabel}
+            setSizeLabel={setSizeLabel}
+
             modal2Open={modal2Open}
             setModal2Open={setModal2Open}
             error={error}
@@ -381,6 +409,9 @@ export default function BarcodeChange({ permissions, isMobile }) {
                 gridData={gridData}
                 setSelectRow={setSelectRow}
                 setClickedRowData={setClickedRowData}
+
+                showSearch={showSearch}
+                setShowSearch={setShowSearch}
               />
             </div>
           </div>

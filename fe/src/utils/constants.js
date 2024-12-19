@@ -56,12 +56,15 @@ export const BARCODE_ERR_MESSAGE = {
   NOT_LANGER_THAN_PRE_QTY: 'Not Langer Than Pre Qty.',
 
   VENDOR_NOT_SELECT: 'Vendor Not Selected.',
+  NEW_PRINTER_ADD_ERR: 'New Printer Add Error.',
+  ADDRESS_IP_INCORECT: 'Address IP Incorrect.'
 }
 
 export const BARCODE_SUCCESS_MESSAGE = {
   BARCODE_CONFIRM_SUCCESS: 'Barcode Confirm Succesfull.',
   PRINTER_SUCCESS: 'Printer Successfull.',
   CHECK_OLD_BARCODE_OK: 'Check Old Barcode: OK',
+  NEW_PRINTER_ADDED: 'Add Printer Succesfull.',
 }
 
 export const VENDOR_ERR_MESSAGE = {

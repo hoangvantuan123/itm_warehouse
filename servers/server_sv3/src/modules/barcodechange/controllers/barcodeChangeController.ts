@@ -36,7 +36,7 @@ export class BarcodeChangeController {
         @Body() baseDto: any
     ) {
         try {
-            const result = await this.barcodeChangeService.printBarcode(baseDto);
+            const result = await this.barcodeChangeService.printBarcode2(baseDto);
             return { result };
         } catch (error) {
             return {
@@ -121,6 +121,22 @@ export class BarcodeChangeController {
     ) {
         try {
             const result = await this.barcodeChangeService.getPrinter(userId);
+            return { result };
+        } catch (error) {
+            return {
+                status: false,
+                message: error.message || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+                data: null,
+            };
+        }
+    }
+
+    @Post('add-printer')
+    async createDevicePrinterBy(
+        @Body() body?: any
+    ) {
+        try {
+            const result = await this.barcodeChangeService.createPrinterBy(body);
             return { result };
         } catch (error) {
             return {

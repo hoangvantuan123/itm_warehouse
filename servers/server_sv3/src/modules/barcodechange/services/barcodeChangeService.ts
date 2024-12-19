@@ -5,13 +5,14 @@ import * as net from 'net';
 import { error, info, log } from 'console';
 import { DatabaseService } from 'src/common/database/sqlServer/ITMV20240117/database.service';
 import { BarcodeChange } from '../models/baseDto';
+import { PrintBarcodeService } from 'src/modules/print_barcode/services/printBarcodeService';
 
 
 @Injectable()
 export class BarcodeChangeService {
     constructor(
         private readonly databaseService: DatabaseService,
-
+        private readonly printBarcodeService: PrintBarcodeService,
     ) { }
 
     private readonly logger = new Logger(BarcodeChangeService.name, { timestamp: true })
@@ -142,6 +143,96 @@ export class BarcodeChangeService {
                 return {
                     status: false,
                     message: err,
+                }
+            }
+        }
+
+        return {
+            status: true,
+            message: SUCCESS_MESSAGES.REQUEST_SUCCESS,
+            data: dataCode
+        }
+    };
+
+    async printBarcode2(barcodeDto: any) {
+
+        const rCheck  = await this.validDto(barcodeDto);
+        if(rCheck != null && rCheck.status == false){
+            return rCheck;
+        }
+        this.isExistData(barcodeDto);
+        const listDataLabel = [];
+        listDataLabel.push(...barcodeDto.listSelected)
+
+        const dataCode = [];
+
+        if (!barcodeDto?.device) {
+            return {
+                status: false,
+                message: BARCODE_ERR_MESSAGES.IP_OR_PORT_IS_NULL,
+            }
+        }
+
+        if (!barcodeDto?.sizeLabel) {
+            return {
+                status: false,
+                message: BARCODE_ERR_MESSAGES.LABEL_SIZE_NULL,
+            }
+        }
+        const labelSize = barcodeDto.sizeLabel;
+
+        const device = barcodeDto.device.split(':');
+        const ip = device[0] || '';
+        const port = device[1] || 0;
+
+        const qTemplateLabel = ` SELECT label, value FROM ZPLCODE WHERE (1=1) AND label LIKE 'barcode-change-size'`.trim();
+        const rTemplateLabel = await this.databaseService.executeQuery(
+            qTemplateLabel
+        );
+
+        for (const data of listDataLabel) {
+
+            let zplCode = rTemplateLabel[0].value;
+
+            const zpl = zplCode
+                .replace('{BARCODE_DATA}', data.NewBarcodeID)
+                .replace('{CODE}', data.ItemNo)
+                .replace('{LOT}', data.LotNo)
+                .replace('{QTY}', data.NewQty)
+                .replace('{DC}', data.DateCode)
+                .replace('{REEL}', data.ReelNo)
+                .replace('{USER_ID}', data.UserID)
+                .replace('{QR_DATA}', data.NewBarcodeID)
+                .replace('{barcodeX}', labelSize.barCodePosX)
+                .replace('{barcodeY}', labelSize.barCodePosY)
+                .replace('{barcodeSizeX}', labelSize.barCodeSizeX)
+                .replace('{barcodeSizeY}', labelSize.barCodeSizeY)
+                .replace('{qrCodePosX}', labelSize.QrPosX)
+                .replace('{qrCodePosY}', labelSize.QrPosY)
+                .replace('{qrCodeSizeX}', labelSize.QrSizeX)
+                .replace('{qrCodeSizeY}', labelSize.QrSizeY)
+                .replace('{paperSizeX}', labelSize.paperSizeX)
+                .replace('{paperSizeY}', labelSize.paperSizeY);
+
+            dataCode.push(zpl);           
+            try {
+
+                const printResult = await this.printBarcodeService.printZpl(ip, port, zpl);
+
+                if (barcodeDto.isConfirm && data.NewStatus == '' && printResult == true) {
+                    this.logger.log('ZPL CODE', zpl);
+                    try {
+                        await this.createBarcodeChange(barcodeDto.listSelected[0]);
+                    } catch (err) {
+                        this.logger.error('Error execute query: ', err);
+                    }
+                }
+
+            } catch (err) {
+                error('Error connecting to printer:', err);
+                return {
+                    status: false,
+                    message: BARCODE_ERR_MESSAGES.NO_CONNECTION_PRINTER + ' ' + ip + ':' + port,
                 }
             }
         }
@@ -356,6 +447,20 @@ export class BarcodeChangeService {
             query
         );
         return result;
+    };
+
+    async createPrinterBy(body: any): Promise<any> {
+        const query = ` INSERT INTO Printer (userId, ip, port) 
+                        VALUES ('${body?.userId}', '${body?.ip}', '${body?.port}')`.trim();
+        const result = await this.databaseService.executeQuery(
+            query
+        );
+
+        return {
+            status: true,
+            message:  BARCODE_SUCCESS_MESSAGES.NEW_PRINTER_ADDED,
+            data: null,
+        };
     };
 
 }

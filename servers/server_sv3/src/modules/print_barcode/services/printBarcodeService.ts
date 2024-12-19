@@ -3,8 +3,7 @@ import { BARCODE_ERR_MESSAGES, BARCODE_SUCCESS_MESSAGES, ERROR_MESSAGES, SUCCESS
 
 import * as net from 'net';
 import { BarcodeDto } from '../models/barcodeDto';
-import { error, log } from 'console';
-import { ItemLabelDto } from '../models/itemLabelDto';
+import { error } from 'console';
 import { DatabaseService } from 'src/common/database/sqlServer/ITMV20240117/database.service';
 
 @Injectable()
@@ -196,11 +195,12 @@ export class PrintBarcodeService {
 
             dataCode.push(zpl);
 
-            this.logger.log('ZPL CODE', zpl);
+            
             try {
 
                 const printResult = await this.printZpl(ip, port, zpl);
                 if (barcodeDto.isMulti == false && printResult == true) {
+                    this.logger.log('ZPL CODE', zpl);
                     try {
                         await this.createBarcode(barcodeDto.listSelected[0]);
                     } catch (err) {
@@ -278,7 +278,7 @@ export class PrintBarcodeService {
         // Todo : check is exist label 
     };
 
-    private async printZpl(ip: string, port: number, zpl: string) {
+    async printZpl(ip: string, port: number, zpl: string) {
         return new Promise((resolve, reject) => {
             const client = new net.Socket();
 
@@ -428,6 +428,7 @@ export class PrintBarcodeService {
         try {
             const result = await this.databaseService.executeQuery(qCheck);
             if(result[0]?.count_ewip != null && result[0]?.count_ewip > 0 ){
+                this.logger.log('CHECK EXIST BARCODE', qCheck, result[0]?.count_ewip);
                 return {
                     status: false,
                     message: BARCODE_ERR_MESSAGES.BARCODE_ID_EXIST,
