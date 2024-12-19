@@ -29,27 +29,25 @@ export default function UserManagementQuery({
         <Row className="gap-4 flex items-center ">
           <Col>
             <Form.Item
-              label={<span className="uppercase text-xs">Họ và Tên</span>}
+              label={<span className="uppercase text-[9px]">Họ và Tên</span>}
               className="mb-0"
             >
               <Input
                 value={userName}
-                size="small"
+                     size="middle"
                 onChange={(e) => setUserName(e.target.value)}
-                className=" text-sm p-2"
               />
             </Form.Item>
           </Col>
           <Col>
             <Form.Item
-              label={<span className="uppercase text-xs">Mã nhân viên</span>}
+              label={<span className="uppercase  text-[9px]">Mã nhân viên</span>}
               className="mb-0"
             >
               <Input
                 value={userId}
-                size="small"
+                size="middle"
                 onChange={(e) => setUserId(e.target.value)}
-                className=" text-sm p-2"
               />
             </Form.Item>
           </Col>

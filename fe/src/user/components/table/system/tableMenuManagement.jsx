@@ -18,80 +18,7 @@ import {
 } from "@glideapps/glide-data-grid-cells";
 import { AsyncDropdownCellRenderer } from '../../sheet/cells/AsyncDropdownCellRenderer'
 import axios from "axios";
-const defaultCols = [
-  {
-    title: '#',
-    id: 'Status',
-    kind: 'Text',
-    readonly: true,
-    width: 50,
-    hasMenu: true,
-  },
-  {
-    title: 'Menu Root ID',
-    id: 'MenuRootId',
-    kind: 'Text',
-    readonly: false,
-    width: 200,
-    hasMenu: true,
-  },
-  {
-    title: 'MenuRootName',
-    id: 'MenuRootName',
-    kind: 'Text',
-    readonly: false,
-    width: 200,
-    hasMenu: true,
-  },
-  {
-    title: 'MenuSubRootName',
-    id: 'MenuSubRootName',
-    kind: 'Text',
-    readonly: false,
-    width: 200,
-    hasMenu: true,
-  },
-  {
-    title: 'Menu Sub Root ID',
-    id: 'MenuSubRootId',
-    kind: 'Text',
-    readonly: false,
-    width: 250,
-    hasMenu: true,
-  },
-  {
-    title: 'Key',
-    id: 'Key',
-    kind: 'Text',
-    readonly: false,
-    width: 250,
-    hasMenu: true,
-  },
-  {
-    title: 'Label',
-    id: 'Label',
-    kind: 'Text',
-    readonly: false,
-    width: 250,
-    hasMenu: true,
-  },
-  {
-    title: 'Link',
-    id: 'Link',
-    kind: 'Text',
-    readonly: false,
-    width: 250,
-    hasMenu: true,
-  },
-  {
-    title: 'Type',
-    id: 'Type',
-    kind: 'Text',
-    readonly: false,
-    width: 250,
-    hasMenu: true,
-  },
-]
+
 function getProducts() {
   return axios.get("https://dummyjson.com/products");
 }
@@ -111,18 +38,21 @@ function TableMenuManagement({
   openHelp,
   clickCount,
   setGridData, 
-  gridData
+  gridData, 
+  setNumRows, 
+  numRows, 
+  handleRowAppend, 
+  setCols, 
+  cols, 
+  defaultCols
 }) {
  
   const gridRef = useRef(null)
-  const [numRows, setNumRows] = useState(0)
   const [open, setOpen] = useState(false)
   const [inputHelp, setInputHelp] = useState(null)
   const cellProps = useExtraCells();
 
-  const [cols, setCols] = useState(() =>
-    loadFromLocalStorageSheet('S_ERP_COLS_PAGE_MENU', defaultCols),
-  )
+
   const onSearchClose = useCallback(() => setShowSearch(false), [])
   const [showMenu, setShowMenu] = useState(null)
   const [isCell, setIsCell] = useState(null)
@@ -201,12 +131,7 @@ function TableMenuManagement({
       }
     });
   }, []);
-  useEffect(() => {
-    if (data && Array.isArray(data) && data.length > 0) {
-      setGridData(data)
-      setNumRows(data.length)
-    }
-  }, [data])
+
   const getData = useCallback(
     ([col, row]) => {
       const person = gridData[row] || {};
@@ -258,16 +183,7 @@ function TableMenuManagement({
     [cols],
   )
 
-  const handleRowAppend = useCallback(
-    (numRowsToAdd) => {
-      onRowAppended(cols, setGridData, setNumRows, setAddedRows, numRowsToAdd)
-    },
-    [cols, setGridData, setNumRows, setAddedRows, numRowsToAdd],
-  )
 
-  useEffect(() => {
-    handleRowAppend(numRowsToAdd)
-  }, [numRowsToAdd, clickCount])
 
   useEffect(() => {
     if (!onSelectRow || Object.keys(onSelectRow).length === 0) return

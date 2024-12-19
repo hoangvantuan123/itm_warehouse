@@ -30,6 +30,7 @@ export default function MenuManagementActions({
   handleSaveData,
   setNumRowsToAdd,
   clickCount,
+  handleRowAppend
 }) {
   const [visible, setVisible] = useState(false)
   const [inputValue, setInputValue] = useState(1)
@@ -103,7 +104,7 @@ export default function MenuManagementActions({
 
   const handleAddRows = () => {
     if (inputValue && !isNaN(inputValue) && inputValue > 0) {
-      setNumRowsToAdd(inputValue)
+      handleRowAppend(inputValue)
     }
   }
 
