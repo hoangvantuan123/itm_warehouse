@@ -34,14 +34,16 @@ export default function UserManagementQuery({
             >
               <Input
                 value={userName}
-                     size="middle"
+                size="middle"
                 onChange={(e) => setUserName(e.target.value)}
               />
             </Form.Item>
           </Col>
           <Col>
             <Form.Item
-              label={<span className="uppercase  text-[9px]">Mã nhân viên</span>}
+              label={
+                <span className="uppercase  text-[9px]">Mã nhân viên</span>
+              }
               className="mb-0"
             >
               <Input

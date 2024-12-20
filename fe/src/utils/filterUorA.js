@@ -1,8 +1,4 @@
-export const filterAndSelectColumns = (
-  editedRows,
-  columnsToSelect,
-  status,
-) => {
+export const filterAndSelectColumns = (editedRows, columnsToSelect, status) => {
   const filteredRows = editedRows
     .filter((row) => row.status === status)
     .map((row) => {

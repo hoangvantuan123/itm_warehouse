@@ -13,14 +13,12 @@ import { reorderColumns } from '../../sheet/js/reorderColumns'
 import { SearchRootMenu } from '../../../../features/system/searchRootMenus'
 import { SearchMenus } from '../../../../features/system/searchMenus'
 import { updateEditedRows } from '../../sheet/js/updateEditedRows'
-import {
-  useExtraCells,
-} from "@glideapps/glide-data-grid-cells";
+import { useExtraCells } from '@glideapps/glide-data-grid-cells'
 import { AsyncDropdownCellRenderer } from '../../sheet/cells/AsyncDropdownCellRenderer'
-import axios from "axios";
+import axios from 'axios'
 
 function getProducts() {
-  return axios.get("https://dummyjson.com/products");
+  return axios.get('https://dummyjson.com/products')
 }
 function TableMenuManagement({
   data,
@@ -37,21 +35,19 @@ function TableMenuManagement({
   setOpenHelp,
   openHelp,
   clickCount,
-  setGridData, 
-  gridData, 
-  setNumRows, 
-  numRows, 
-  handleRowAppend, 
-  setCols, 
-  cols, 
-  defaultCols
+  setGridData,
+  gridData,
+  setNumRows,
+  numRows,
+  handleRowAppend,
+  setCols,
+  cols,
+  defaultCols,
 }) {
- 
   const gridRef = useRef(null)
   const [open, setOpen] = useState(false)
   const [inputHelp, setInputHelp] = useState(null)
-  const cellProps = useExtraCells();
-
+  const cellProps = useExtraCells()
 
   const onSearchClose = useCallback(() => setShowSearch(false), [])
   const [showMenu, setShowMenu] = useState(null)
@@ -79,7 +75,7 @@ function TableMenuManagement({
       })
     }
   }, [])
-  const [brands, setBrands] = useState([]);
+  const [brands, setBrands] = useState([])
   const highlightRegions = [
     {
       color: '#e8f0ff',
@@ -126,30 +122,30 @@ function TableMenuManagement({
   useEffect(() => {
     getProducts().then((res) => {
       if (res.status === 200) {
-        const s = new Set(res.data.products.map((prod) => prod.brand));
-        setBrands(Array.from(s));
+        const s = new Set(res.data.products.map((prod) => prod.brand))
+        setBrands(Array.from(s))
       }
-    });
-  }, []);
+    })
+  }, [])
 
   const getData = useCallback(
     ([col, row]) => {
-      const person = gridData[row] || {};
-      const column = cols[col];
-      const columnKey = column?.id || '';
-      const value = person[columnKey] || '';
+      const person = gridData[row] || {}
+      const column = cols[col]
+      const columnKey = column?.id || ''
+      const value = person[columnKey] || ''
 
       if (columnKey === 'Type') {
         return {
           kind: GridCellKind.Custom,
           allowOverlay: true,
           data: {
-            kind: "async-dropdown-cell",
+            kind: 'async-dropdown-cell',
             allowedValues: ['submenu', 'menu'],
-            value: value
+            value: value,
           },
-          readOnly: false
-        };
+          readOnly: false,
+        }
       }
 
       return {
@@ -159,10 +155,10 @@ function TableMenuManagement({
         readonly: column?.readonly || false,
         allowOverlay: true,
         hasMenu: column?.hasMenu || false,
-      };
+      }
     },
     [gridData, cols],
-  );
+  )
 
   const onFill = useCallback(
     (start, end, data) => {
@@ -182,8 +178,6 @@ function TableMenuManagement({
 
     [cols],
   )
-
-
 
   useEffect(() => {
     if (!onSelectRow || Object.keys(onSelectRow).length === 0) return
@@ -273,356 +267,348 @@ function TableMenuManagement({
   )
   const onCellEdited = useCallback(
     async (cell, newValue) => {
-
-      if (newValue.kind !== GridCellKind.Text && newValue.kind !== GridCellKind.Custom) {
-        return;
+      if (
+        newValue.kind !== GridCellKind.Text &&
+        newValue.kind !== GridCellKind.Custom
+      ) {
+        return
       }
-      const indexes = reorderColumns(cols);
-      const [col, row] = cell;
-      const key = indexes[col];
+      const indexes = reorderColumns(cols)
+      const [col, row] = cell
+      const key = indexes[col]
 
       if (key === 'Type') {
         if (newValue.kind === GridCellKind.Custom) {
           setGridData((prev) => {
-            const product = prev[row];
-            product[cols[col].id] = newValue.data.value;
-            const currentStatus = product['Status'] || '';
-            product['Status'] = currentStatus === 'A' ? 'A' : 'U';
-
-
+            const product = prev[row]
+            product[cols[col].id] = newValue.data.value
+            const currentStatus = product['Status'] || ''
+            product['Status'] = currentStatus === 'A' ? 'A' : 'U'
 
             setEditedRows((prevEditedRows) =>
-              updateEditedRows(prevEditedRows, row, prev, currentStatus)
-            );
-            return [...prev];
-          });
-          return;
+              updateEditedRows(prevEditedRows, row, prev, currentStatus),
+            )
+            return [...prev]
+          })
+          return
         }
       }
 
-
-
       if (key === 'MenuRootId') {
-        const searchText = newValue.data.trim().toLowerCase();
+        const searchText = newValue.data.trim().toLowerCase()
 
         if (searchText !== '') {
-          setPreviousSearchText(searchText);
+          setPreviousSearchText(searchText)
           if (searchText !== previousSearchText) {
-            setLoading1(true);
-            const searchFields = ['Id'];
+            setLoading1(true)
+            const searchFields = ['Id']
             try {
-              const response = await SearchRootMenu(searchText, searchFields);
+              const response = await SearchRootMenu(searchText, searchFields)
               if (response.success) {
-                searchResultsRef.current = response.data.data;
+                searchResultsRef.current = response.data.data
               }
             } catch (error) {
-              setError1(error.message || 'Đã xảy ra lỗi');
-              searchResultsRef.current = [];
+              setError1(error.message || 'Đã xảy ra lỗi')
+              searchResultsRef.current = []
             } finally {
-              setLoading1(false);
+              setLoading1(false)
             }
           }
 
-          const searchResults = searchResultsRef.current;
+          const searchResults = searchResultsRef.current
 
           if (searchResults.length > 0) {
-            const result = searchResults[0];
+            const result = searchResults[0]
 
             setGridData((prevData) => {
-              const updatedData = [...prevData];
-              if (!updatedData[row]) updatedData[row] = {};
-              const currentStatus = updatedData[row]['Status'] || '';
-              const status = currentStatus === 'A' ? 'A' : 'U';
+              const updatedData = [...prevData]
+              if (!updatedData[row]) updatedData[row] = {}
+              const currentStatus = updatedData[row]['Status'] || ''
+              const status = currentStatus === 'A' ? 'A' : 'U'
               updatedData[row] = {
                 ...updatedData[row],
                 MenuRootId: result.Id,
                 MenuRootName: result.Label,
                 Status: status,
-              };
+              }
 
               setEditedRows((prevEditedRows) =>
-                updateEditedRows(prevEditedRows, row, updatedData, status)
-              );
+                updateEditedRows(prevEditedRows, row, updatedData, status),
+              )
 
-              return updatedData;
-            });
+              return updatedData
+            })
           }
         } else {
           // Xử lý khi giá trị MenuRootId bị xóa
           setGridData((prevData) => {
-            const updatedData = [...prevData];
-            if (!updatedData[row]) updatedData[row] = {};
-            updatedData[row]['MenuRootId'] = '';
-            updatedData[row]['MenuRootName'] = '';
+            const updatedData = [...prevData]
+            if (!updatedData[row]) updatedData[row] = {}
+            updatedData[row]['MenuRootId'] = ''
+            updatedData[row]['MenuRootName'] = ''
             setEditedRows((prevEditedRows) =>
-              updateEditedRows(prevEditedRows, row, updatedData, 'U')
-            );
+              updateEditedRows(prevEditedRows, row, updatedData, 'U'),
+            )
 
-            return updatedData;
-          });
+            return updatedData
+          })
         }
 
-        return;
+        return
       }
 
       if (key === 'MenuRootName') {
-        const searchText = newValue.data.trim().toLowerCase();
+        const searchText = newValue.data.trim().toLowerCase()
 
-        setPreviousSearchText(searchText);
+        setPreviousSearchText(searchText)
         if (searchText !== '') {
           if (searchText !== previousSearchText) {
-            setLoading1(true);
-            const searchFields = ['Label'];
+            setLoading1(true)
+            const searchFields = ['Label']
             try {
-              const response = await SearchRootMenu(searchText, searchFields);
+              const response = await SearchRootMenu(searchText, searchFields)
               if (response.success) {
-                searchResultsRef.current = response.data.data;
+                searchResultsRef.current = response.data.data
               }
             } catch (error) {
-              setError1(error.message || 'Đã xảy ra lỗi');
-              searchResultsRef.current = [];
+              setError1(error.message || 'Đã xảy ra lỗi')
+              searchResultsRef.current = []
             } finally {
-              setLoading1(false);
+              setLoading1(false)
             }
           }
 
-          const searchResults = searchResultsRef.current;
+          const searchResults = searchResultsRef.current
 
           if (searchResults.length > 0) {
-            const result = searchResults[0];
+            const result = searchResults[0]
 
             setGridData((prevData) => {
-              const updatedData = [...prevData];
-              if (!updatedData[row]) updatedData[row] = {};
-              const currentStatus = updatedData[row]['Status'] || '';
-              const status = currentStatus === 'A' ? 'A' : 'U';
+              const updatedData = [...prevData]
+              if (!updatedData[row]) updatedData[row] = {}
+              const currentStatus = updatedData[row]['Status'] || ''
+              const status = currentStatus === 'A' ? 'A' : 'U'
               updatedData[row] = {
                 ...updatedData[row],
                 MenuRootId: result.Id,
                 MenuRootName: result.Label,
                 Status: status,
-              };
-
+              }
 
               setEditedRows((prevEditedRows) =>
-                updateEditedRows(prevEditedRows, row, updatedData, status)
-              );
+                updateEditedRows(prevEditedRows, row, updatedData, status),
+              )
 
-              return updatedData;
-            });
+              return updatedData
+            })
           }
         } else {
           setGridData((prevData) => {
-            const updatedData = [...prevData];
-            if (!updatedData[row]) updatedData[row] = {};
-            updatedData[row]['MenuRootId'] = '';
-            updatedData[row]['MenuRootName'] = '';
+            const updatedData = [...prevData]
+            if (!updatedData[row]) updatedData[row] = {}
+            updatedData[row]['MenuRootId'] = ''
+            updatedData[row]['MenuRootName'] = ''
 
             setEditedRows((prevEditedRows) =>
-              updateEditedRows(prevEditedRows, row, updatedData, 'U')
-            );
+              updateEditedRows(prevEditedRows, row, updatedData, 'U'),
+            )
 
-            return updatedData;
-          });
+            return updatedData
+          })
         }
 
-        return;
+        return
       }
-
-
 
       if (key === 'MenuSubRootId') {
-        const searchText = newValue.data.trim().toLowerCase();
+        const searchText = newValue.data.trim().toLowerCase()
 
         if (searchText !== '') {
-          setPreviousSearchText(searchText);
+          setPreviousSearchText(searchText)
           if (searchText !== previousSearchText) {
-            setLoading1(true);
-            const searchFields = ['Id'];
+            setLoading1(true)
+            const searchFields = ['Id']
             try {
-              const response = await SearchMenus(searchText, searchFields);
+              const response = await SearchMenus(searchText, searchFields)
               if (response.success) {
-                searchResultsRef.current = response.data.data;
+                searchResultsRef.current = response.data.data
               }
             } catch (error) {
-              setError1(error.message || 'Đã xảy ra lỗi');
-              searchResultsRef.current = [];
+              setError1(error.message || 'Đã xảy ra lỗi')
+              searchResultsRef.current = []
             } finally {
-              setLoading1(false);
+              setLoading1(false)
             }
           }
 
-          const searchResults = searchResultsRef.current;
+          const searchResults = searchResultsRef.current
 
           if (searchResults.length > 0) {
-            const result = searchResults[0];
+            const result = searchResults[0]
 
             setGridData((prevData) => {
-              const updatedData = [...prevData];
-              if (!updatedData[row]) updatedData[row] = {};
-              const currentStatus = updatedData[row]['Status'] || '';
-              const status = currentStatus === 'A' ? 'A' : 'U';
+              const updatedData = [...prevData]
+              if (!updatedData[row]) updatedData[row] = {}
+              const currentStatus = updatedData[row]['Status'] || ''
+              const status = currentStatus === 'A' ? 'A' : 'U'
               updatedData[row] = {
                 ...updatedData[row],
                 MenuSubRootId: result.Id,
                 MenuSubRootName: result.Label,
                 Status: status,
-              };
-
+              }
 
               setEditedRows((prevEditedRows) =>
-                updateEditedRows(prevEditedRows, row, updatedData, status)
-              );
+                updateEditedRows(prevEditedRows, row, updatedData, status),
+              )
 
-              return updatedData;
-            });
+              return updatedData
+            })
           }
         } else {
           setGridData((prevData) => {
-            const updatedData = [...prevData];
-            if (!updatedData[row]) updatedData[row] = {};
-            updatedData[row]['MenuSubRootId'] = '';
-            updatedData[row]['MenuSubRootName'] = '';
+            const updatedData = [...prevData]
+            if (!updatedData[row]) updatedData[row] = {}
+            updatedData[row]['MenuSubRootId'] = ''
+            updatedData[row]['MenuSubRootName'] = ''
 
             setEditedRows((prevEditedRows) =>
-              updateEditedRows(prevEditedRows, row, updatedData, 'U')
-            );
+              updateEditedRows(prevEditedRows, row, updatedData, 'U'),
+            )
 
-            return updatedData;
-          });
+            return updatedData
+          })
         }
 
-        return;
+        return
       }
       if (key === 'MenuSubRootName') {
-        const searchText = newValue.data.trim().toLowerCase();
+        const searchText = newValue.data.trim().toLowerCase()
 
-        setPreviousSearchText(searchText);
+        setPreviousSearchText(searchText)
         if (searchText !== '') {
           if (searchText !== previousSearchText) {
-            setLoading1(true);
-            const searchFields = ['Label'];
+            setLoading1(true)
+            const searchFields = ['Label']
             try {
-              const response = await SearchMenus(searchText, searchFields);
+              const response = await SearchMenus(searchText, searchFields)
               if (response.success) {
-                searchResultsRef.current = response.data.data;
+                searchResultsRef.current = response.data.data
               }
             } catch (error) {
-              setError1(error.message || 'Đã xảy ra lỗi');
-              searchResultsRef.current = [];
+              setError1(error.message || 'Đã xảy ra lỗi')
+              searchResultsRef.current = []
             } finally {
-              setLoading1(false);
+              setLoading1(false)
             }
           }
 
-          const searchResults = searchResultsRef.current;
+          const searchResults = searchResultsRef.current
 
           if (searchResults.length > 0) {
-            const result = searchResults[0];
+            const result = searchResults[0]
 
             setGridData((prevData) => {
-              const updatedData = [...prevData];
-              if (!updatedData[row]) updatedData[row] = {};
-              const currentStatus = updatedData[row]['Status'] || '';
-              const status = currentStatus === 'A' ? 'A' : 'U';
+              const updatedData = [...prevData]
+              if (!updatedData[row]) updatedData[row] = {}
+              const currentStatus = updatedData[row]['Status'] || ''
+              const status = currentStatus === 'A' ? 'A' : 'U'
               updatedData[row] = {
                 ...updatedData[row],
                 MenuSubRootId: result.Id,
                 MenuSubRootName: result.Label,
                 Status: status,
-              };
+              }
 
               setEditedRows((prevEditedRows) => {
                 const existingIndex = prevEditedRows.findIndex(
                   (editedRow) => editedRow.rowIndex === row,
-                );
+                )
 
                 const updatedRowData = {
                   rowIndex: row,
                   updatedRow: updatedData[row],
                   status: status,
-                };
+                }
 
                 if (existingIndex === -1) {
-                  return [...prevEditedRows, updatedRowData];
+                  return [...prevEditedRows, updatedRowData]
                 } else {
-                  const updatedEditedRows = [...prevEditedRows];
-                  updatedEditedRows[existingIndex] = updatedRowData;
-                  return updatedEditedRows;
+                  const updatedEditedRows = [...prevEditedRows]
+                  updatedEditedRows[existingIndex] = updatedRowData
+                  return updatedEditedRows
                 }
-              });
+              })
 
-              return updatedData;
-            });
+              return updatedData
+            })
           }
         } else {
           setGridData((prevData) => {
-            const updatedData = [...prevData];
-            if (!updatedData[row]) updatedData[row] = {};
-            updatedData[row]['MenuSubRootId'] = '';
-            updatedData[row]['MenuSubRootName'] = '';
+            const updatedData = [...prevData]
+            if (!updatedData[row]) updatedData[row] = {}
+            updatedData[row]['MenuSubRootId'] = ''
+            updatedData[row]['MenuSubRootName'] = ''
             setEditedRows((prevEditedRows) => {
               const existingIndex = prevEditedRows.findIndex(
                 (editedRow) => editedRow.rowIndex === row,
-              );
+              )
 
               const updatedRowData = {
                 rowIndex: row,
                 updatedRow: updatedData[row],
                 status: 'U',
-              };
+              }
 
               if (existingIndex === -1) {
-                return [...prevEditedRows, updatedRowData];
+                return [...prevEditedRows, updatedRowData]
               } else {
-                const updatedEditedRows = [...prevEditedRows];
-                updatedEditedRows[existingIndex] = updatedRowData;
-                return updatedEditedRows;
+                const updatedEditedRows = [...prevEditedRows]
+                updatedEditedRows[existingIndex] = updatedRowData
+                return updatedEditedRows
               }
-            });
+            })
 
-            return updatedData;
-          });
+            return updatedData
+          })
         }
 
-        return;
+        return
       }
 
       setGridData((prevData) => {
-        const updatedData = [...prevData];
-        if (!updatedData[row]) updatedData[row] = {};
+        const updatedData = [...prevData]
+        if (!updatedData[row]) updatedData[row] = {}
 
-        const currentStatus = updatedData[row]['Status'] || '';
-        updatedData[row][key] = newValue.data;
-        updatedData[row]['Status'] = currentStatus === 'A' ? 'A' : 'U';
+        const currentStatus = updatedData[row]['Status'] || ''
+        updatedData[row][key] = newValue.data
+        updatedData[row]['Status'] = currentStatus === 'A' ? 'A' : 'U'
 
         setEditedRows((prevEditedRows) => {
           const existingIndex = prevEditedRows.findIndex(
             (editedRow) => editedRow.rowIndex === row,
-          );
+          )
 
           const updatedRowData = {
             rowIndex: row,
             updatedRow: updatedData[row],
             status: currentStatus === 'A' ? 'A' : 'U',
-          };
+          }
 
           if (existingIndex === -1) {
-            return [...prevEditedRows, updatedRowData];
+            return [...prevEditedRows, updatedRowData]
           } else {
-            const updatedEditedRows = [...prevEditedRows];
-            updatedEditedRows[existingIndex] = updatedRowData;
-            return updatedEditedRows;
+            const updatedEditedRows = [...prevEditedRows]
+            updatedEditedRows[existingIndex] = updatedRowData
+            return updatedEditedRows
           }
-        });
+        })
 
-        return updatedData;
-      });
+        return updatedData
+      })
     },
     [cols, previousSearchText, gridData],
-  );
-
-
+  )
 
   const onColumnResize = useCallback(
     (column, newSize) => {
@@ -774,8 +760,8 @@ function TableMenuManagement({
             i % 2 === 0
               ? undefined
               : {
-                bgCell: '#FBFBFB',
-              }
+                  bgCell: '#FBFBFB',
+                }
           }
           onPaste={true}
           fillHandle={true}

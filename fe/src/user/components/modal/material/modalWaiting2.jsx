@@ -100,10 +100,11 @@ function ModalWaiting2({
       footer={false}
       width={800}
     >
+      
       <div className="items-center justify-center flex flex-col">
         <ExclamationCircleOutlined className="text-4xl mb-2 text-red-500" />
         <p className="mt-10 text-lg">{error}</p>
-        <div className="w-full h-full border  rounded-md">
+        {gridData.length > 0 && <div className="w-full h-full border  rounded-md">
           <DataEditor
             columns={cols}
             getCellContent={getData}
@@ -126,7 +127,8 @@ function ModalWaiting2({
               i % 2 === 0 ? undefined : { bgCell: '#FBFBFB' }
             }
           />
-        </div>
+        </div>}
+
       </div>
     </Modal>
   )

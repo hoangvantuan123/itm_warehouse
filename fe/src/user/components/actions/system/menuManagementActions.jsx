@@ -30,7 +30,7 @@ export default function MenuManagementActions({
   handleSaveData,
   setNumRowsToAdd,
   clickCount,
-  handleRowAppend
+  handleRowAppend,
 }) {
   const [visible, setVisible] = useState(false)
   const [inputValue, setInputValue] = useState(1)

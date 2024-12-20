@@ -21,15 +21,15 @@ import {
 } from '../../../utils/constants'
 
 export default function BarcodeChange({ permissions, isMobile }) {
-    const [loading, setLoading] = useState(false)
-    const [data, setData] = useState([])
-    const [reload, setReload] = useState(0);
-    const { t } = useTranslation()
-    const [dataInfo, setDataInfo] = useState([])
-    const [rowChecked, setRowChecked] = useState(null)
-    const [fromDate, setFromDate] = useState(dayjs().startOf('week'))
-    const [toDate, setToDate] = useState(dayjs().endOf('week'))
-    const formatDate = useCallback((date) => date.format('YYYYMMDDHHmmss'), [])
+  const [loading, setLoading] = useState(false)
+  const [data, setData] = useState([])
+  const [reload, setReload] = useState(0)
+  const { t } = useTranslation()
+  const [dataInfo, setDataInfo] = useState([])
+  const [rowChecked, setRowChecked] = useState(null)
+  const [fromDate, setFromDate] = useState(dayjs().startOf('week'))
+  const [toDate, setToDate] = useState(dayjs().endOf('week'))
+  const formatDate = useCallback((date) => date.format('YYYYMMDDHHmmss'), [])
 
   const [modal2Open, setModal2Open] = useState(false)
   const [error, setError] = useState('')
@@ -79,11 +79,10 @@ export default function BarcodeChange({ permissions, isMobile }) {
     formChange.resetFields()
   }, [formChange])
 
-    useEffect(() => {
-
-        fetchData();
-        resetAllData();
-    }, [reload]);
+  useEffect(() => {
+    fetchData()
+    resetAllData()
+  }, [reload])
 
   const onFinish = async (e) => {
     setData([])
@@ -343,39 +342,35 @@ export default function BarcodeChange({ permissions, isMobile }) {
             {t('BARCODE CHANGE')}
           </Title>
 
-                    <BarcodeChangeAction
-                        fromDate={fromDate}
-                        toDate={toDate}
-                        onFinish={onFinish}
-                        handleEnter={onKeyDownBarcode}
-                        btnOpenModal={btnOpenModal}
-                        isModalVisible={isModalVisible}
-                        setIsModalVisible={setIsModalVisible}
-                        setReload = {setReload}
-
-                        formChange={formChange}
-                        onKeyDownChangeQty={onKeyDownChangeQty}
-                        barcodeRef = {barcodeRef}
-                        changeQtyRef={changeQtyRef}
-                        remarkRef={remarkRef}
-                        onChangeNewQty={onChangeNewQty}
-                        oldQty={oldQty}
-                        newQty={NewBarcodeID}
-                        setRemark={setRemark}
-                        setUserId={setUserID}
-                        onDropDownChange={onDropDownChange}
-                        optionDevices={optionDevices}
-                        clickedRowData={clickedRowData}
-                        handleOnchangeDevice={handleOnchangeDevice}
-
-
-                        modal2Open={modal2Open}
-                        setModal2Open={setModal2Open}
-                        error={error}
-                        setError={setError}
-
-                    />
-                </Header>
+          <BarcodeChangeAction
+            fromDate={fromDate}
+            toDate={toDate}
+            onFinish={onFinish}
+            handleEnter={onKeyDownBarcode}
+            btnOpenModal={btnOpenModal}
+            isModalVisible={isModalVisible}
+            setIsModalVisible={setIsModalVisible}
+            setReload={setReload}
+            formChange={formChange}
+            onKeyDownChangeQty={onKeyDownChangeQty}
+            barcodeRef={barcodeRef}
+            changeQtyRef={changeQtyRef}
+            remarkRef={remarkRef}
+            onChangeNewQty={onChangeNewQty}
+            oldQty={oldQty}
+            newQty={NewBarcodeID}
+            setRemark={setRemark}
+            setUserId={setUserID}
+            onDropDownChange={onDropDownChange}
+            optionDevices={optionDevices}
+            clickedRowData={clickedRowData}
+            handleOnchangeDevice={handleOnchangeDevice}
+            modal2Open={modal2Open}
+            setModal2Open={setModal2Open}
+            error={error}
+            setError={setError}
+          />
+        </Header>
 
         <Content className="flex-grow px-4  bg-slate-50">
           <div className="h-full flex flex-col">

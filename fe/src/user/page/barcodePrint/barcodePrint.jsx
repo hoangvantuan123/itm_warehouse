@@ -32,17 +32,17 @@ import { ArrowIcon } from '../../components/icons'
 import BarcodePrintQuery from '../../components/actions/barcodePrint/barcodePrintQuery'
 
 export default function BarcodePrint({ permissions, isMobile }) {
-    const [formQuery] = Form.useForm();
-    const [formPreview] = Form.useForm();
-    const [modal2Open, setModal2Open] = useState(false);
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [reload, setReload] = useState(0);
-    const [data, setData] = useState([]);
-    const { t } = useTranslation();
-    const [fromDate, setFromDate] = useState(dayjs().startOf('week'))
-    const [toDate, setToDate] = useState(dayjs().endOf('week'))
-    const formatDate = useCallback((date) => date.format('YYYYMMDDHHmmss'), [])
+  const [formQuery] = Form.useForm()
+  const [formPreview] = Form.useForm()
+  const [modal2Open, setModal2Open] = useState(false)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [reload, setReload] = useState(0)
+  const [data, setData] = useState([])
+  const { t } = useTranslation()
+  const [fromDate, setFromDate] = useState(dayjs().startOf('week'))
+  const [toDate, setToDate] = useState(dayjs().endOf('week'))
+  const formatDate = useCallback((date) => date.format('YYYYMMDDHHmmss'), [])
 
   const [gridData, setGridData] = useState([])
   const [isModalVisible, setIsModalVisible] = useState(false)
@@ -1005,27 +1005,19 @@ export default function BarcodePrint({ permissions, isMobile }) {
       payLoad = createPayload(false, [singleRow], device)
     }
 
-            try {
-                const result = await CreatePrintLabel(
-                    payLoad
-                );
-                if (result.result.status) {
-                    setModal2Open(true);
-                    setError(BARCODE_SUCCESS_MESSAGE.PRINTER_SUCCESS);
-                    resetAllState();
-                    setReload((pre) => pre + 1);
-                }
-                else {
-                    setModal2Open(true);
-                    setError(result.result.message);
-                }
-
-            } catch (error) {
-
-            }
-
-        }, [getMultiSelectedRows]
-    )
+    try {
+      const result = await CreatePrintLabel(payLoad)
+      if (result.result.status) {
+        setModal2Open(true)
+        setError(BARCODE_SUCCESS_MESSAGE.PRINTER_SUCCESS)
+        resetAllState()
+        setReload((pre) => pre + 1)
+      } else {
+        setModal2Open(true)
+        setError(result.result.message)
+      }
+    } catch (error) {}
+  }, [getMultiSelectedRows])
 
   const onClickCancel = () => {
     setIsModalVisible(false)
@@ -1081,13 +1073,13 @@ export default function BarcodePrint({ permissions, isMobile }) {
     resetAllState()
   }
 
-    useEffect((e) => {
-
-        resetAllState();
-        fetchData();
-
-    }, [reload])
-
+  useEffect(
+    (e) => {
+      resetAllState()
+      fetchData()
+    },
+    [reload],
+  )
 
   const onCellClicked = (cell) => {
     const [colIndex, rowIndex] = cell
