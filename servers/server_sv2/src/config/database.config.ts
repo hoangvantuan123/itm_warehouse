@@ -29,7 +29,7 @@ export const sqlServerITMV: TypeOrmModuleOptions = {
   port: 14233,
   username: 'genuine',
   password: 'Itmv209#',
-  database: 'ITMV20240117',
+  database: 'ITMV',
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   synchronize: false,
   logging: true,

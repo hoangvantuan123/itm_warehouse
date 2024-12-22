@@ -51,7 +51,8 @@ export const SUCCESS_MESSAGES = {
 export const BARCODE_SUCCESS_MESSAGES = {
   BARCODE_CONFIRM_SUCCESSFULL: 'Barcode confirm successfull',
   BARCODE_VERIFY_SUCCESFULL: 'Barcode verify successfull.', 
-  PRINT_SUCCESSFULL: 'Print successfull.'
+  PRINT_SUCCESSFULL: 'Print successfull.',
+  NEW_PRINTER_ADDED: 'Add Printer Succesfull.',
 };
 
 

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import UserRouter from './user/routes/userRouter'
+import '@glideapps/glide-data-grid/dist/index.css'
+
 import './App.css'
 import { Modal } from 'antd'
 const App = () => {
