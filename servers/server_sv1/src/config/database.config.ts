@@ -32,15 +32,16 @@ export const sqlServerITMV: TypeOrmModuleOptions = {
   database: 'ITMV',
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   synchronize: false,
-  logging: false,  
+  logging: true,  
   cache: true,  
   extra: {
-    trustServerCertificate: true,
+    trustServerCertificate: false,
     encrypt: false,  
-    connectionTimeout: 10000000,
-    max: 10000000,  // Số kết nối tối đa
+    connectionTimeout: 1200000,  // Tăng thời gian chờ kết nối lên 20 phút
+    requestTimeout: 1200000,  // Tăng thời gian chờ yêu cầu lên 20 phút
+    max: 1000,  // Số kết nối tối đa
     min: 10,  // Số kết nối tối thiểu
-    idleTimeoutMillis: 3000000,  // Thời gian chờ cho kết nối nhàn rỗi
+    idleTimeoutMillis: 600000,  // Tăng thời gian chờ cho kết nối nhàn rỗi lên 10 phút
   },
-  maxQueryExecutionTime: 10000,  // Giới hạn thời gian thực thi query là 10 giây
+  maxQueryExecutionTime: 1200000,  // Giới hạn thời gian thực thi query là 20 phút
 };

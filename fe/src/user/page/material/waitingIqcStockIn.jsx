@@ -24,7 +24,7 @@ import SuccessSubmit from '../default/successSubmit'
 import { CompactSelection } from '@glideapps/glide-data-grid'
 import ModalFocus from '../default/focus'
 import ModalWaiting2 from '../../components/modal/material/modalWaiting2'
-
+import { escapeXml } from '../../../utils/escapeXml'
 export default function WaitingIqcStockIn({ permissions, isMobile }) {
   const { t } = useTranslation()
   const { id } = useParams()
@@ -263,10 +263,10 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
             prevData.map((item) =>
               item.ItemNo === formData.itemNo
                 ? {
-                    ...item,
-                    OkQty: item.OkQty + formData.qty,
-                    RemainQty: item.RemainQty - formData.qty,
-                  }
+                  ...item,
+                  OkQty: item.OkQty + formData.qty,
+                  RemainQty: item.RemainQty - formData.qty,
+                }
                 : item,
             ),
           )
@@ -351,56 +351,58 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
   /* SAVE */
   const createXmlDataCloseCheck = (data) => {
     return `
-          <DataBlock1>
-              <WorkingTag>A</WorkingTag>
-              <IDX_NO>1</IDX_NO>
-              <Status>0</Status>
-              <DataSeq>1</DataSeq>
-              <Selected>1</Selected>
-              <TABLE_NAME>DataBlock1</TABLE_NAME>
-              <IsChangedMst>1</IsChangedMst>
-              <BizUnit>${data.BizUnit}</BizUnit>
-              <Date>${DateIn}</Date>
-              <DeptSeq>${data.DeptSeq}</DeptSeq>
-              <ServiceSeq>4492</ServiceSeq> 
-              <MethodSeq>2</MethodSeq>
-              <DtlUnitSeq>1</DtlUnitSeq>
-          </DataBlock1>
-      `
-  }
+      <DataBlock1>
+          <WorkingTag>A</WorkingTag>
+          <IDX_NO>1</IDX_NO>
+          <Status>0</Status>
+          <DataSeq>1</DataSeq>
+          <Selected>1</Selected>
+          <TABLE_NAME>DataBlock1</TABLE_NAME>
+          <IsChangedMst>1</IsChangedMst>
+          <BizUnit>${escapeXml(data.BizUnit)}</BizUnit>
+          <Date>${escapeXml(data.DateIn)}</Date>
+          <DeptSeq>${escapeXml(data.DeptSeq)}</DeptSeq>
+          <ServiceSeq>4492</ServiceSeq>
+          <MethodSeq>2</MethodSeq>
+          <DtlUnitSeq>1</DtlUnitSeq>
+      </DataBlock1>
+    `;
+  };
+  
   const createXmlDataMasterCheck = (data) => {
     return `
-          <DataBlock1>
-    <WorkingTag>A</WorkingTag>
-    <IDX_NO>1</IDX_NO>
-    <Status>0</Status>
-    <DataSeq>1</DataSeq>
-    <Selected>1</Selected>
-    <TABLE_NAME>DataBlock1</TABLE_NAME>
-    <IsChangedMst>1</IsChangedMst>
-    <DelvNo /> 
-    <BLNo /> 
-    <BizUnit>${data[0].BizUnit}</BizUnit> 
-    <BizUnitName>${data[0].BizUnitName}</BizUnitName>
-    <SMImpKind>${data[0].SMImpKind}</SMImpKind>
-    <SMImpKindName>${data[0].SMImpKindName}</SMImpKindName> 
-    <CustSeq>${data[0].CustSeq}</CustSeq> 
-    <CustName>${data[0].CustName}</CustName> 
-    <PermitNo>${data[0].PermitNo}</PermitNo>
-    <DelvSeq>0</DelvSeq> 
-    <DelvDate>${data[0].DateIn}</DelvDate>
-    <EmpSeq>${data[0].EmpSeq}</EmpSeq>
-    <EmpName>${data[0].EmpName}</EmpName>
-    <DeptSeq>${data[0].DeptSeq}</DeptSeq>
-    <DeptName>${data[0].DeptName}</DeptName>
-    <CurrSeq>${data[0].CurrSeq}</CurrSeq>
-    <CurrName>${data[0].CurrName}</CurrName>
-    <ExRate>${data[0].ExRate}</ExRate>
-    <Remark>${data[0].InvoiceNo}</Remark>
-    <IsPJT>0</IsPJT>
-  </DataBlock1>
-      `
-  }
+      <DataBlock1>
+          <WorkingTag>A</WorkingTag>
+          <IDX_NO>1</IDX_NO>
+          <Status>0</Status>
+          <DataSeq>1</DataSeq>
+          <Selected>1</Selected>
+          <TABLE_NAME>DataBlock1</TABLE_NAME>
+          <IsChangedMst>1</IsChangedMst>
+          <DelvNo />
+          <BLNo />
+          <BizUnit>${escapeXml(data[0].BizUnit)}</BizUnit>
+          <BizUnitName>${escapeXml(data[0].BizUnitName)}</BizUnitName>
+          <SMImpKind>${escapeXml(data[0].SMImpKind)}</SMImpKind>
+          <SMImpKindName>${escapeXml(data[0].SMImpKindName)}</SMImpKindName>
+          <CustSeq>${escapeXml(data[0].CustSeq)}</CustSeq>
+          <CustName>${escapeXml(data[0].CustName)}</CustName>
+          <PermitNo>${escapeXml(data[0].PermitNo)}</PermitNo>
+          <DelvSeq>0</DelvSeq>
+          <DelvDate>${escapeXml(data[0].DateIn)}</DelvDate>
+          <EmpSeq>${escapeXml(data[0].EmpSeq)}</EmpSeq>
+          <EmpName>${escapeXml(data[0].EmpName)}</EmpName>
+          <DeptSeq>${escapeXml(data[0].DeptSeq)}</DeptSeq>
+          <DeptName>${escapeXml(data[0].DeptName)}</DeptName>
+          <CurrSeq>${escapeXml(data[0].CurrSeq)}</CurrSeq>
+          <CurrName>${escapeXml(data[0].CurrName)}</CurrName>
+          <ExRate>${escapeXml(data[0].ExRate)}</ExRate>
+          <Remark>${escapeXml(data[0].InvoiceNo)}</Remark>
+          <IsPJT>0</IsPJT>
+      </DataBlock1>
+    `;
+  };
+  
 
   const createXmlDataBlock = (row, index) => `
   <DataBlock2>
@@ -422,77 +424,76 @@ export default function WaitingIqcStockIn({ permissions, isMobile }) {
 `
 
   const createXmlDataBlock2 = (row, index) => `
-    <DataBlock2>
+<DataBlock2>
+  <WorkingTag>A</WorkingTag>
+  <IDX_NO>${index + 1}</IDX_NO>
+  <DataSeq>${index + 1}</DataSeq>
+  <Status>0</Status>
+  <Selected>0</Selected>
+  <PJTSeq>0</PJTSeq>
+  <WBSSeq>0</WBSSeq>
+  <ItemName>${escapeXml(row?.ItemName)}</ItemName>
+  <ItemNo>${escapeXml(row?.ItemNo)}</ItemNo>
+  <Spec>${escapeXml(row?.Spec)}</Spec>
+  <MakerName />
+  <MakerSeq>0</MakerSeq>
+  <UnitName>${escapeXml(row?.UnitName)}</UnitName>
+  <Qty>${row?.Qty}</Qty>
+  <Price>${row?.Price}</Price>
+  <CurAmt>${row?.CurAmt}</CurAmt>
+  <DomAmt>${row?.DomAmt}</DomAmt>
+  <WHName>${escapeXml(row?.WHName)}</WHName>
+  <LotNo>${escapeXml(row?.LotNoFull)}</LotNo>
+  <FromSerlNo />
+  <ToSerlNo />
+  <ProdDate />
+  <STDUnitName>${escapeXml(row?.STDUnitName)}</STDUnitName>
+  <STDQty>${row?.StdQty}</STDQty>
+  <DelvSerl />
+  <ItemSeq>${row?.ItemSeq}</ItemSeq>
+  <UnitSeq>${row?.UnitSeq}</UnitSeq>
+  <STDUnitSeq>${row?.StdUnitSeq}</STDUnitSeq>
+  <AccName />
+  <OppAccName />
+  <WHSeq>${row?.WHSeq}</WHSeq>
+  <IsQtyChange />
+  <Remark />
+  <Memo1 />
+  <Memo2 />
+  <Memo3 />
+  <Memo4 />
+  <Memo5 />
+  <Memo6 />
+  <Memo7>0</Memo7>
+  <Memo8>0</Memo8>
+  <TABLE_NAME>DataBlock2</TABLE_NAME>
+  <BizUnit>${row?.BizUnit}</BizUnit>
+  <DelvDate>${row?.DateIn}</DelvDate>
+  <DelvSeq></DelvSeq>
+</DataBlock2>
+`;
+  const createXmlDataBlock3 = (row, index) => `
+  <DataBlock1>
     <WorkingTag>A</WorkingTag>
     <IDX_NO>${index + 1}</IDX_NO>
     <DataSeq>${index + 1}</DataSeq>
     <Status>0</Status>
     <Selected>0</Selected>
-    <PJTSeq>0</PJTSeq>
-    <WBSSeq>0</WBSSeq>
-    <ItemName>${row?.ItemName}</ItemName>
-    <ItemNo>${row?.ItemNo}</ItemNo>
-    <Spec>${row?.Spec}</Spec>
-    <MakerName />
-    <MakerSeq>0</MakerSeq>
-    <UnitName>${row?.UnitName}</UnitName>
+    <Spec>${escapeXml(row?.Spec)}</Spec>
+    <CustSeq>${escapeXml(row?.CustSeq)}</CustSeq>
     <Qty>${row?.Qty}</Qty>
-    <Price>${row?.Price}</Price>
-    <CurAmt>${row?.CurAmt}</CurAmt>
-    <DomAmt>${row?.DomAmt}</DomAmt>
-    <WHName>${row?.WHName}</WHName>
-    <LotNo>${row?.LotNo}</LotNo>
-    <FromSerlNo />
-    <ToSerlNo />
-    <ProdDate />
-    <STDUnitName>${row?.STDUnitName}</STDUnitName>
-    <STDQty>${row?.StdQty}</STDQty>
-    <DelvSerl />
-    <ItemSeq>${row?.ItemSeq}</ItemSeq>
-    <UnitSeq>${row?.UnitSeq}</UnitSeq>
-    <STDUnitSeq>${row?.StdUnitSeq}</STDUnitSeq>
-    <AccName />
-    <OppAccName />
-    <WHSeq>${row?.WHSeq}</WHSeq>
-    <IsQtyChange />
-    <Remark />
-    <Memo1 />
-    <Memo2 />
-    <Memo3 />
-    <Memo4 />
-    <Memo5 />
-    <Memo6 />
-    <Memo7>0</Memo7>
-    <Memo8>0</Memo8>
-    <TABLE_NAME>DataBlock2</TABLE_NAME>
-    <BizUnit>${row?.BizUnit}</BizUnit>
-    <DelvDate>${row?.DateIn}</DelvDate>
-    <DelvSeq></DelvSeq>
-  </DataBlock2>
-
-`
-  const createXmlDataBlock3 = (row, index) => `
-   <DataBlock1>
-    <WorkingTag>A</WorkingTag>
-    <IDX_NO>${index + 1}</IDX_NO>
-    <DataSeq>${index + 1}</DataSeq>
-    <Status>0</Status>
-    <Selected>0</Selected> 
-    <Spec>${row?.Spec}</Spec>
-    <CustSeq>${row?.CustSeq}</CustSeq>
-    <Qty>${row?.Qty}</Qty>
-    <LotNo>${row?.LotNoFull}</LotNo>
-    <CreateDate>${row?.CreateDate}</CreateDate>
+    <LotNo>${escapeXml(row?.LotNoFull)}</LotNo>
+    <CreateDate>${escapeXml(row?.CreateDate)}</CreateDate>
     <ItemSeq>${row?.ItemSeq}</ItemSeq>
     <UnitSeq>${row?.UnitSeq}</UnitSeq>
     <ItemSeqOld>0</ItemSeqOld>
     <LotNoOLD/>
-    <TABLE_NAME>DataBlock1</TABLE_NAME> 
-    <RegDate>${row?.RegDate}</RegDate>
-    <InNo>${row?.InvoiceNo}</InNo>
-    <SupplyCustSeq>${row?.CustSeq} </SupplyCustSeq>
+    <TABLE_NAME>DataBlock1</TABLE_NAME>
+    <RegDate>${escapeXml(row?.RegDate)}</RegDate>
+    <InNo>${escapeXml(row?.InvoiceNo)}</InNo>
+    <SupplyCustSeq>${escapeXml(row?.CustSeq)}</SupplyCustSeq>
   </DataBlock1>
-`
+`;
 
   const handleSubmit = useCallback(
     async (e) => {

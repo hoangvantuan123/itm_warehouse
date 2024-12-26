@@ -260,7 +260,12 @@ function TableMenuManagement({
         }
       } else {
         setInputHelp(null)
-        setIsCellSelected(false)
+        setIsCell
+        
+        
+        
+        
+        Selected(false)
       }
     },
     [cols, gridData],

@@ -20,6 +20,7 @@ import SuccessSubmit from '../default/successSubmit'
 import LoadSubmit from '../default/loadSubmit'
 import { CompactSelection } from '@glideapps/glide-data-grid'
 import ModalFocus from '../default/focus'
+import { escapeXml } from '../../../utils/escapeXml'
 export default function StockOutRequestFiFo({ permissions, isMobile }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -235,10 +236,10 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
             prevData.map((item) =>
               item.ItemNo === formData.ItemNo
                 ? {
-                    ...item,
-                    OutQty: item.OutQty + formData.Qty,
-                    RemainQty: item.RemainQty - formData.Qty,
-                  }
+                  ...item,
+                  OutQty: item.OutQty + formData.Qty,
+                  RemainQty: item.RemainQty - formData.Qty,
+                }
                 : item,
             ),
           )
@@ -325,98 +326,104 @@ export default function StockOutRequestFiFo({ permissions, isMobile }) {
     dataRefSacenHistory.current = scanHistory
   }, [dataA, scanHistory])
 
+
+
+  // Hàm tạo XML cho DataCloseCheck
   const createXmlDataCloseCheck = (data) => {
     return `
-          <DataBlock1>
-              <WorkingTag>A</WorkingTag>
-              <IDX_NO>1</IDX_NO>
-              <Status>0</Status>
-              <DataSeq>1</DataSeq>
-              <Selected>1</Selected>
-              <TABLE_NAME>DataBlock1</TABLE_NAME>
-              <IsChangedMst>1</IsChangedMst>
-              <FactUnit>${data.FactUnit}</FactUnit>
-              <Date>${data.StockOutDate}</Date>
-              <ServiceSeq>3032</ServiceSeq>
-              <MethodSeq>2</MethodSeq>
-              <DtlUnitSeq>1</DtlUnitSeq>
-          </DataBlock1>
-      `
-  }
+      <DataBlock1>
+          <WorkingTag>A</WorkingTag>
+          <IDX_NO>1</IDX_NO>
+          <Status>0</Status>
+          <DataSeq>1</DataSeq>
+          <Selected>1</Selected>
+          <TABLE_NAME>DataBlock1</TABLE_NAME>
+          <IsChangedMst>1</IsChangedMst>
+          <FactUnit>${escapeXml(data.FactUnit)}</FactUnit>
+          <Date>${data.StockOutDate}</Date>
+          <ServiceSeq>3032</ServiceSeq>
+          <MethodSeq>2</MethodSeq>
+          <DtlUnitSeq>1</DtlUnitSeq>
+      </DataBlock1>
+  `;
+  };
 
+  // Hàm tạo XML cho CloseItemCheck
   const createXmlCloseItemCheck = (row, index) => `
   <DataBlock2>
-   <WorkingTag>A</WorkingTag>
-    <IDX_NO>${index + 1}</IDX_NO>
-    <DataSeq>${index + 1}</DataSeq>
-    <Status>0</Status>
-    <Selected>0</Selected>
-    <ItemSeq>${row.ItemSeq}</ItemSeq>
-    <FactUnit>${row.FactUnit}</FactUnit>
-    <TABLE_NAME>DataBlock2</TABLE_NAME>
-    <FactUnitOld>1</FactUnitOld>
-    <DateOld>${row.StockOutDate}</DateOld>
-    <ServiceSeq>3032</ServiceSeq>
-    <MethodSeq>2</MethodSeq>
-    <Date>${row.StockOutDate}</Date>
+      <WorkingTag>A</WorkingTag>
+      <IDX_NO>${index + 1}</IDX_NO>
+      <DataSeq>${index + 1}</DataSeq>
+      <Status>0</Status>
+      <Selected>0</Selected>
+      <ItemSeq>${row.ItemSeq}</ItemSeq>
+      <FactUnit>${escapeXml(row.FactUnit)}</FactUnit>
+      <TABLE_NAME>DataBlock2</TABLE_NAME>
+      <FactUnitOld>1</FactUnitOld>
+      <DateOld>${row.StockOutDate}</DateOld>
+      <ServiceSeq>3032</ServiceSeq>
+      <MethodSeq>2</MethodSeq>
+      <Date>${row.StockOutDate}</Date>
   </DataBlock2>
-`
+`;
 
+  // Hàm tạo XML cho OutProcCheck
   const createXmlOutProcCheck = (data) => {
     return `
-        <DataBlock1>
-            <WorkingTag>A</WorkingTag>
-    <IDX_NO>1</IDX_NO>
-    <Status>0</Status>
-    <DataSeq>1</DataSeq>
-    <Selected>1</Selected>
-    <TABLE_NAME>DataBlock1</TABLE_NAME>
-    <IsChangedMst>1</IsChangedMst>
-    <UseType>6044001</UseType>
-    <IsOutSide>0</IsOutSide>
-    <OutWHSeq />
-    <InWHSeq>${data.InWHSeq}</InWHSeq>
-    <MatOutSeq>0</MatOutSeq>
-    <FactUnit>${data.FactUnit}</FactUnit>
-    <MatOutNo />
-    <MatOutDate>${data.StockOutDate}</MatOutDate>
-    <EmpSeq>${data.EmpSeq}</EmpSeq>
-    <MatOutType />
-    <Remark />
-        </DataBlock1>
-    `
-  }
+      <DataBlock1>
+          <WorkingTag>A</WorkingTag>
+          <IDX_NO>1</IDX_NO>
+          <Status>0</Status>
+          <DataSeq>1</DataSeq>
+          <Selected>1</Selected>
+          <TABLE_NAME>DataBlock1</TABLE_NAME>
+          <IsChangedMst>1</IsChangedMst>
+          <UseType>6044001</UseType>
+          <IsOutSide>0</IsOutSide>
+          <OutWHSeq />
+          <InWHSeq>${data.InWHSeq}</InWHSeq>
+          <MatOutSeq>0</MatOutSeq>
+          <FactUnit>${escapeXml(data.FactUnit)}</FactUnit>
+          <MatOutNo />
+          <MatOutDate>${data.StockOutDate}</MatOutDate>
+          <EmpSeq>${data.EmpSeq}</EmpSeq>
+          <MatOutType />
+          <Remark />
+      </DataBlock1>
+  `;
+  };
 
+  // Hàm tạo XML cho OutProcItemCheck
   const createXmlOutProcItemCheck = (row, index) => `
   <DataBlock3>
-   <WorkingTag>A</WorkingTag>
-     <IDX_NO>${index + 1}</IDX_NO>
-    <DataSeq>${index + 1}</DataSeq>
-    <Status>0</Status>
-    <Selected>0</Selected>
-    <ReqQty>${row.ReqQty}</ReqQty>
-    <Qty>${row.Qty}</Qty>
-    <StdUnitQty>0</StdUnitQty>
-    <Remark />
-    <ItemLotNo>${row.LotNoFull}</ItemLotNo>
-    <SerialNoFrom />
-    <MatOutSeq></MatOutSeq>
-    <OutItemSerl>0</OutItemSerl>
-    <ItemSeq>${row.ItemSeq}</ItemSeq>
-    <OutWHSeq>${row.OutWHSeq}</OutWHSeq>
-    <InWHSeq>${row.InWHSeq}</InWHSeq>
-    <UnitSeq>${row.UnitSeq}</UnitSeq>
-    <WorkOrderSeq>${row.WorkOrderSeq}</WorkOrderSeq>
-    <ConsgnmtCustSeq>0</ConsgnmtCustSeq>
-    <OutReqSeq>${row.OutReqSeq}</OutReqSeq>
-    <OutReqItemSerl>${row.OutReqItemSerl}</OutReqItemSerl>
-    <PJTSeq>0</PJTSeq>
-    <WBSSeq>0</WBSSeq>
-    <WorkOrderSerl>${row.WorkOrderSerl}</WorkOrderSerl>
-    <AlterRate>0</AlterRate>
-    <TABLE_NAME>DataBlock3</TABLE_NAME>
+      <WorkingTag>A</WorkingTag>
+      <IDX_NO>${index + 1}</IDX_NO>
+      <DataSeq>${index + 1}</DataSeq>
+      <Status>0</Status>
+      <Selected>0</Selected>
+      <ReqQty>${row.ReqQty}</ReqQty>
+      <Qty>${row.Qty}</Qty>
+      <StdUnitQty>0</StdUnitQty>
+      <Remark />
+      <ItemLotNo>${row.LotNoFull}</ItemLotNo>
+      <SerialNoFrom />
+      <MatOutSeq />
+      <OutItemSerl>0</OutItemSerl>
+      <ItemSeq>${row.ItemSeq}</ItemSeq>
+      <OutWHSeq>${row.OutWHSeq}</OutWHSeq>
+      <InWHSeq>${row.InWHSeq}</InWHSeq>
+      <UnitSeq>${row.UnitSeq}</UnitSeq>
+      <WorkOrderSeq>${row.WorkOrderSeq}</WorkOrderSeq>
+      <ConsgnmtCustSeq>0</ConsgnmtCustSeq>
+      <OutReqSeq>${row.OutReqSeq}</OutReqSeq>
+      <OutReqItemSerl>${row.OutReqItemSerl}</OutReqItemSerl>
+      <PJTSeq>0</PJTSeq>
+      <WBSSeq>0</WBSSeq>
+      <WorkOrderSerl>${row.WorkOrderSerl}</WorkOrderSerl>
+      <AlterRate>0</AlterRate>
+      <TABLE_NAME>DataBlock3</TABLE_NAME>
   </DataBlock3>
-`
+`;
   const handleSubmit = useCallback(
     async (e) => {
       if (!isAPISuccess) {
