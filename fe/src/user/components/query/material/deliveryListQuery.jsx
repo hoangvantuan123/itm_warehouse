@@ -47,7 +47,7 @@ export default function DeliveryListQuery({
               className="mb-0"
             >
               <DatePicker
-                className="w-full text-sm p-2"
+                   size="middle"
                 value={formData}
                 onChange={handleFormDate}
               />
@@ -59,7 +59,7 @@ export default function DeliveryListQuery({
               className="mb-0"
             >
               <DatePicker
-                className="w-full text-sm p-2"
+                   size="middle"
                 value={toDate}
                 onChange={handletoDate}
                 format="YYYY-MM-DD"
@@ -75,9 +75,9 @@ export default function DeliveryListQuery({
               <Input
                 placeholder=""
                 value={deliveryNo}
-                size="small"
+                 size="middle"
                 onChange={(e) => setDeliveryNo(e.target.value)}
-                className=" text-sm p-2"
+               
               />
             </Form.Item>
           </Col>
@@ -90,7 +90,7 @@ export default function DeliveryListQuery({
               <Select
                 id="typeSelect"
                 defaultValue="All"
-                size="large"
+                  size="middle"
                 style={{
                   width: 190,
                 }}
@@ -98,7 +98,7 @@ export default function DeliveryListQuery({
                 options={[
                   { label: 'All', value: '0' },
                   ...(dataUnit?.map((item) => ({
-                    label: <> >spa>{item?.AccUnitName}   {item?.AccUnitName,} </>
+                    label: item?.AccUnitName,
                     value: item?.BizUnit,
                   })) || []),
                 ]}
